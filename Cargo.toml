@@ -1,0 +1,8 @@
+[package]
+name = "gust"
+version = "0.1.0"
+authors = ["softprops <d.tangren@gmail.com>"]
+
+[dependencies]
+hyper = "0.6"
+rustc-serialize = "0.3"
