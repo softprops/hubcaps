@@ -10,6 +10,7 @@ pub mod pullrequests;
 
 use gists::{Gists, UserGists};
 use hyper::Client;
+use hyper::client::{IntoUrl, RequestBuilder};
 use hyper::header::{Authorization, UserAgent};
 use repository::Repository;
 use std::fmt;
@@ -71,11 +72,9 @@ impl<'a> Github<'a> {
     Gists::new(self)
   }
 
-  fn get(&self, uri: &str) -> Result<String> {
-    let url = format!("{}{}", self.host, uri);
-    let builder = self.client.get(
-      &url
-    ).header(
+  fn request<U: IntoUrl>(
+    &self, request_builder: RequestBuilder<'a, U>, body: Option<&'a [u8]>) -> Result<String> {
+    let builder = request_builder.header(
       UserAgent(self.agent.to_owned())
     );
     let authenticated = match self.token {
@@ -86,68 +85,50 @@ impl<'a> Github<'a> {
       _ =>
         builder
     };
-    let mut res = authenticated.send().unwrap();
+    let mut res = match body {
+      Some(ref bod) => authenticated.body(*bod).send().unwrap(),
+       _ => authenticated.send().unwrap()
+    };
     let mut body = String::new();
     res.read_to_string(&mut body).unwrap();
     Ok(body)
+  }
+
+  fn get(&self, uri: &str) -> Result<String> {
+    let url = format!("{}{}", self.host, uri);
+    self.request(
+      self.client.get(
+        &url
+      ), None
+    )
   }
 
   fn delete(&self, uri: &str) -> Result<()> {
     let url = format!("{}{}", self.host, uri);
-    let builder = self.client.delete(
-      &url
-    ).header(
-      UserAgent(self.agent.to_owned())
-    );
-    let authenticated = match self.token {
-      Some(token) =>
-        builder.header(
-          Authorization(format!("token {}", token))
-        ),
-      _ =>
-        builder
-    };
-    let mut res = authenticated.send().unwrap();
-    Ok(())
+    self.request(
+      self.client.delete(
+        &url
+      ), None
+    ).map(|_| ())
   }
 
   fn post(&self, uri: &str, message: &[u8]) -> Result<String> {
     let url = format!("{}{}", self.host, uri);
-    let builder = self.client.post(
-      &url
-    ).header(
-      UserAgent(self.agent.to_owned())
-    );
-    let authenticated = match self.token {
-      Some(token) =>
-        builder.header(
-          Authorization(format!("token {}", token))
-        ),
-      _ => builder
-    };
-    let mut res = authenticated.body(message).send().unwrap();
-    let mut body = String::new();
-    res.read_to_string(&mut body).unwrap();
-    Ok(body)
+    self.request(
+      self.client.post(
+        &url
+      ),
+      Some(message)
+    )
   }
 
   fn put(&self, uri: &str, message: &[u8]) -> Result<String> {
     let url = format!("{}{}", self.host, uri);
-    let builder = self.client.put(
-      &url
-    ).header(
-      UserAgent(self.agent.to_owned())
-    );
-    let authenticated = match self.token {
-      Some(token) =>
-        builder.header(
-          Authorization(format!("token {}", token))
-        ),
-      _ => builder
-    };
-    let mut res = authenticated.body(message).send().unwrap();
-    let mut body = String::new();
-    res.read_to_string(&mut body).unwrap();
-    Ok(body)
+    self.request(
+      self.client.put(
+        &url
+      ),
+      Some(message)
+    )
   }
 }
