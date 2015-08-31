@@ -11,6 +11,7 @@ pub mod pullrequests;
 use gists::{Gists, UserGists};
 use hyper::Client;
 use hyper::client::{IntoUrl, RequestBuilder};
+use hyper::method::Method;
 use hyper::header::{Authorization, UserAgent};
 use repository::Repository;
 use std::default::Default;
@@ -123,6 +124,17 @@ impl<'a> Github<'a> {
     let url = format!("{}{}", self.host, uri);
     self.request(
       self.client.post(
+        &url
+      ),
+      Some(message)
+    )
+  }
+
+  fn patch(&self, uri: &str, message: &[u8]) -> Result<String> {
+    let url = format!("{}{}", self.host, uri);
+    self.request(
+      self.client.request(
+        Method::Patch,
         &url
       ),
       Some(message)
