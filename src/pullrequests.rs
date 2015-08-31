@@ -66,7 +66,6 @@ impl<'a> PullRequests<'a> {
     format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
   }
 
-
   pub fn create(&self, pr: &PullReq) -> Result<Pull> {
     let data = json::encode(&pr).unwrap();
     let body = try!(

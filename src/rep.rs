@@ -238,3 +238,30 @@ pub struct Pull {
   pub deletions: Option<u64>,
   pub changed_files: Option<u64>
 }
+
+#[derive(Debug, RustcEncodable)]
+pub struct IssueReq {
+  pub title: &'static str,
+  pub body: Option<&'static str>,
+  pub assignee: Option<&'static str>,
+  pub milestone: Option<i64>,
+  pub labels: Vec<&'static str>
+}
+
+impl IssueReq {
+  pub fn new(title: &'static str, body: Option<&'static str>, assignee: Option<&'static str>,
+             milestone: Option<i64>, labels: Vec<&'static str>) -> IssueReq {
+    IssueReq {
+      title: title,
+      body: body,
+      assignee: assignee,
+      milestone: milestone,
+      labels: labels
+    }
+  }
+}
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Issue {
+  pub title: String
+}

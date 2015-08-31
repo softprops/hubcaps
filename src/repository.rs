@@ -5,7 +5,7 @@ use rep::Label;
 use deployments::Deployments;
 use pullrequests::PullRequests;
 use rustc_serialize::json;
-use issues::{Issue, Issues};
+use issues::{IssueRef, Issues};
 
 pub struct Repository<'a> {
   github: &'a Github<'a>,
@@ -44,8 +44,8 @@ impl<'a> Repository<'a> {
   }
 
   /// get a reference to a specific github issue associated with this repoistory ref
-  pub fn issue(&self, number: &'static i64) -> Issue {
-    Issue::new(self.github, self.owner, self.repo, number)
+  pub fn issue(&self, number: &'static i64) -> IssueRef {
+    IssueRef::new(self.github, self.owner, self.repo, number)
   }
 
   pub fn issues(&self) -> Issues {
