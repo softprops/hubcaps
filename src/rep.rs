@@ -40,12 +40,13 @@ pub struct GistFork {
 
 #[derive(Debug, RustcEncodable)]
 pub struct Content {
+  pub filename: Option<&'static str>,
   pub content: &'static str
 }
 
 impl Content {
-  pub fn new(content: &'static str) -> Content {
-    Content { content: content }
+  pub fn new(filename: Option<&'static str>, content: &'static str) -> Content {
+    Content { filename: filename, content: content }
   }
 }
 
@@ -57,11 +58,15 @@ pub struct GistReq {
 }
 
 impl GistReq {
-  pub fn new(desc: Option<&'static str>, public: bool, files: HashMap<&'static str, Content>) -> GistReq {
+  pub fn new(desc: Option<&'static str>, public: bool, files: HashMap<&'static str, &'static str>) -> GistReq {
+    let mut contents = HashMap::new();
+    for (k,v) in files {
+      contents.insert(k, Content::new(None, v));
+    }
     GistReq {
       description: desc,
       public: Some(public),
-      files: files
+      files: contents
     }
   }
 }
@@ -124,7 +129,7 @@ pub struct Repo {
   tags_url: String,
   teams_url: String,
   trees_url: String,
-  homepage: String,
+  homepage: Option<String>,
   language: Option<String>,
   forks_count: i64,
   stargazers_count: i64,
@@ -179,19 +184,39 @@ pub struct Label {
   pub color: String
 }
 
+
+#[derive(Debug, RustcEncodable)]
+pub struct PullReq {
+  pub title: &'static str,
+  pub head: &'static str,
+  pub base: &'static str,
+  pub body: Option<&'static str>
+}
+
+impl PullReq {
+  pub fn new(title: &'static str, head: &'static str, base: &'static str, body: Option<&'static str>) -> PullReq {
+    PullReq {
+      title: title,
+      head: head,
+      base: base,
+      body: body
+    }
+  }
+}
+
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Pull {
   pub id: u64,
   pub url: String,
   pub html_url: String,
-  diff_url: String,
-  patch_url: String,
-  issue_url: String,
-  commits_url: String,
-  review_comments_url: String,
-  review_comment_url: String,
-  comments_url: String,
-  statuses_url: String,
+  pub diff_url: String,
+  pub patch_url: String,
+  pub issue_url: String,
+  pub commits_url: String,
+  pub review_comments_url: String,
+  pub review_comment_url: String,
+  pub comments_url: String,
+  pub statuses_url: String,
   pub number: u64,
   pub state: String,
   pub title: String,
@@ -200,8 +225,16 @@ pub struct Pull {
   pub updated_at: String,
   pub closed_at: Option<String>,
   pub merged_at: Option<String>,
-  pub head: Commit,
+  //pub head: Commit,
 //  pub base: Commit,
   // links
-  pub user: User
+  pub user: User,
+  pub merge_commit_sha: Option<String>,
+  pub mergeable: Option<bool>,
+  pub merged_by: Option<User>,
+  pub comments: Option<u64>,
+  pub commits: Option<u64>,
+  pub additions: Option<u64>,
+  pub deletions: Option<u64>,
+  pub changed_files: Option<u64>
 }
