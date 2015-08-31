@@ -1,6 +1,7 @@
 use self::super::{Github, SortDirection};
-use rep::Pull;
+use rep::{Pull, PullReq};
 use rustc_serialize::json;
+use std::default::Default;
 use std::fmt;
 use std::io::Result;
 
@@ -22,6 +23,12 @@ impl fmt::Display for PullSort {
   }
 }
 
+impl Default for PullSort {
+  fn default() -> PullSort {
+    PullSort::Created
+  }
+}
+
 pub enum PullState {
   Open,
   Closed,
@@ -38,6 +45,12 @@ impl fmt::Display for PullState {
   }
 }
 
+impl Default for PullState {
+  fn default() -> PullState {
+    PullState::Open
+  }
+}
+
 pub struct PullRequests<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
@@ -51,6 +64,18 @@ impl<'a> PullRequests<'a> {
 
   fn path(&self, more: &str) -> String {
     format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
+  }
+
+
+  pub fn create(&self, pr: &PullReq) -> Result<Pull> {
+    let data = json::encode(&pr).unwrap();
+    let body = try!(
+      self.github.post(
+        &self.path(""),
+        data.as_bytes()
+      )
+    );
+    Ok(json::decode::<Pull>(&body).unwrap())
   }
 
   pub fn get(&self, number: i64) -> Result<Pull> {
