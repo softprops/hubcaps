@@ -40,26 +40,20 @@ impl<'a> Gists<'a> {
   }
 
   pub fn star(&self, id: &'static str) -> Result<()> {
-    let body = try!(
-      self.github.put(
-        &self.path(
-          &format!("/{}/star", id)
-        ),
-        &[]
-      )
-    );
-    Ok(())
+    self.github.put(
+      &self.path(
+        &format!("/{}/star", id)
+      ),
+      &[]
+    ).map(|_| ())
   }
 
   pub fn unstar(&self, id: &'static str) -> Result<()> {
-    let body = try!(
-      self.github.delete(
-        &self.path(
-          &format!("/{}/star", id)
-        )
+    self.github.delete(
+      &self.path(
+        &format!("/{}/star", id)
       )
-    );
-    Ok(())
+    ).map(|_| ())
   }
 
   pub fn fork(&self, id: &'static str) -> Result<Gist> {
@@ -86,14 +80,11 @@ impl<'a> Gists<'a> {
   }
 
   pub fn delete(&self, id: &'static str) -> Result<()> {
-    let body = try!(
-      self.github.delete(
-        &self.path(
-          &format!("/{}", id)
-        )
+    self.github.delete(
+      &self.path(
+        &format!("/{}", id)
       )
-    );
-    Ok(())
+    ).map(|_| ())
   }
 
   pub fn get(&self, id: &'static str) -> Result<Gist> {
