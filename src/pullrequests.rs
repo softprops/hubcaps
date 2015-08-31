@@ -5,49 +5,49 @@ use std::default::Default;
 use std::fmt;
 use std::io::Result;
 
-pub enum PullSort {
+pub enum Sort {
   Created,
   Updated,
   Popularity,
   LongRunning
 }
 
-impl fmt::Display for PullSort {
+impl fmt::Display for Sort {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{}", match *self {
-      PullSort::Created     => "created",
-      PullSort::Updated     => "updated",
-      PullSort::Popularity  => "popularity",
-      PullSort::LongRunning => "long-running"
+      Sort::Created     => "created",
+      Sort::Updated     => "updated",
+      Sort::Popularity  => "popularity",
+      Sort::LongRunning => "long-running"
     })
   }
 }
 
-impl Default for PullSort {
-  fn default() -> PullSort {
-    PullSort::Created
+impl Default for Sort {
+  fn default() -> Sort {
+    Sort::Created
   }
 }
 
-pub enum PullState {
+pub enum State {
   Open,
   Closed,
   All
 }
 
-impl fmt::Display for PullState {
+impl fmt::Display for State {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{}", match *self {
-      PullState::Open   => "open",
-      PullState::Closed => "closed",
-      PullState::All    => "all"
+      State::Open   => "open",
+      State::Closed => "closed",
+      State::All    => "all"
     })
   }
 }
 
-impl Default for PullState {
-  fn default() -> PullState {
-    PullState::Open
+impl Default for State {
+  fn default() -> State {
+    State::Open
   }
 }
 
@@ -129,7 +129,7 @@ impl<'a> PullRequests<'a> {
   }
 
   pub fn list(
-    &self, state: PullState, sort: PullSort, direction: SortDirection) -> Result<Vec<Pull>> {
+    &self, state: State, sort: Sort, direction: SortDirection) -> Result<Vec<Pull>> {
     let body = try!(
       self.github.get(
         &self.path(
