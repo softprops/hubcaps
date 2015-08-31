@@ -13,6 +13,7 @@ use hyper::Client;
 use hyper::client::{IntoUrl, RequestBuilder};
 use hyper::header::{Authorization, UserAgent};
 use repository::Repository;
+use std::default::Default;
 use std::fmt;
 use std::io::{Read, Result};
 
@@ -27,6 +28,12 @@ impl fmt::Display for SortDirection {
       SortDirection::Asc => "asc",
       SortDirection::Desc => "desc"
     })
+  }
+}
+
+impl Default for SortDirection {
+  fn default() -> SortDirection {
+    SortDirection::Asc
   }
 }
 
