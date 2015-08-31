@@ -85,6 +85,17 @@ impl<'a> IssueRef<'a> {
     ));
     Ok(json::decode::<Vec<Label>>(&body).unwrap())
   }
+
+  pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
+    let data = json::encode(&is).unwrap();
+    let body = try!(
+      self.github.patch(
+        &self.path(""),
+        data.as_bytes()
+      )
+    );
+    Ok(json::decode::<Issue>(&body).unwrap())
+  }
 }
 
 pub struct Issues<'a> {
