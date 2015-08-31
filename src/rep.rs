@@ -275,5 +275,22 @@ impl IssueReq {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Issue {
-  pub title: String
+  pub id: i64,
+  pub url: String,
+  pub labels_url: String,
+  pub comments_url: String,
+  pub events_url: String,
+  pub html_url: String,
+  pub number: i64,
+  pub state: String,
+  pub title: String,
+  pub body: String,
+  pub user: User,
+  pub labels: Vec<Label>,
+  pub assignee: Option<User>,
+  pub locked: bool,
+  pub comments: i64,
+  pub closed_at: Option<String>,
+  pub created_at: String,
+  pub updated_at: String
 }
