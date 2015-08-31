@@ -184,6 +184,18 @@ pub struct Label {
   pub color: String
 }
 
+#[derive(Debug, RustcEncodable)]
+pub struct PullEdit {
+  title: Option<&'static str>,
+  body: Option<&'static str>,
+  state: Option<&'static str>
+}
+
+impl PullEdit {
+  pub fn new(title: Option<&'static str>, body: Option<&'static str>, state: Option<&'static str>) -> PullEdit {
+    PullEdit { title: title, body: body, state: state }
+  }
+}
 
 #[derive(Debug, RustcEncodable)]
 pub struct PullReq {
