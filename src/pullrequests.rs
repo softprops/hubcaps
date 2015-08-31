@@ -1,4 +1,4 @@
-use self::super::{Github, SortDirection};
+use self::super::{Github, SortDirection, State};
 use rep::{Pull, PullEdit, PullReq};
 use rustc_serialize::json;
 use std::default::Default;
@@ -29,27 +29,7 @@ impl Default for Sort {
   }
 }
 
-pub enum State {
-  Open,
-  Closed,
-  All
-}
 
-impl fmt::Display for State {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", match *self {
-      State::Open   => "open",
-      State::Closed => "closed",
-      State::All    => "all"
-    })
-  }
-}
-
-impl Default for State {
-  fn default() -> State {
-    State::Open
-  }
-}
 
 pub struct PullRequest<'a> {
   github: &'a Github<'a>,

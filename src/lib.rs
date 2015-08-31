@@ -18,6 +18,28 @@ use std::default::Default;
 use std::fmt;
 use std::io::{Read, Result};
 
+pub enum State {
+  Open,
+  Closed,
+  All
+}
+
+impl fmt::Display for State {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", match *self {
+      State::Open   => "open",
+      State::Closed => "closed",
+      State::All    => "all"
+    })
+  }
+}
+
+impl Default for State {
+  fn default() -> State {
+    State::Open
+  }
+}
+
 pub enum SortDirection {
   Asc,
   Desc
