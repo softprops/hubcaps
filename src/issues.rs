@@ -108,6 +108,10 @@ impl<'a> Issues<'a> {
     format!("/repos/{}/{}/issues{}", self.owner, self.repo, more)
   }
 
+  pub fn get(&self, number: &'static i64) -> IssueRef {
+    IssueRef::new(self.github, self.owner, self.repo, number)
+  }
+
   pub fn create(&self, is: &IssueReq) -> Result<Issue> {
     let data = json::encode(&is).unwrap();
     let body = try!(
