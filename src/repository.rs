@@ -1,11 +1,7 @@
-
-use std::io::Result;
 use self::super::Github;
-use rep::Label;
 use deployments::Deployments;
 use labels::Labels;
 use pullrequests::PullRequests;
-use rustc_serialize::json;
 use issues::{IssueRef, Issues};
 
 pub struct Repository<'a> {
@@ -22,10 +18,6 @@ impl<'a> Repository<'a> {
       owner: owner,
       repo: repo
     }
-  }
-
-  fn path(&self, more: &str) -> String {
-    format!("/repos/{}/{}{}", self.owner, self.repo, more)
   }
 
   /// get a list of labels associated with this repository ref
