@@ -11,3 +11,7 @@ license = "MIT"
 [dependencies]
 hyper = "0.6"
 rustc-serialize = "0.3"
+
+[[bin]]
+doc = false
+name = "hubcaps"
