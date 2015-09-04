@@ -75,7 +75,7 @@ impl<'a> Gists<'a> {
           &format!("/{}/forks", id)
         )
       )
-        );
+    );
     Ok(json::decode::<Vec<GistFork>>(&body).unwrap())
   }
 
