@@ -84,6 +84,53 @@ pub struct PullRequests<'a> {
   repo: &'static str
 }
 
+pub struct ListBuilder<'a> {
+  pulls: &'a PullRequests<'a>,
+  state: State,
+  sort: Sort,
+  direction: SortDirection
+}
+
+impl<'a> ListBuilder<'a> {
+  pub fn new(pulls: &'a PullRequests<'a>) -> ListBuilder<'a> {
+    ListBuilder {
+      pulls: pulls,
+      state: Default::default(),
+      sort: Default::default(),
+      direction: Default::default()
+    }
+  }
+
+  pub fn state(&mut self, state: State) -> &mut ListBuilder<'a> {
+    self.state = state;
+    self
+  }
+
+  pub fn sort(&mut self, sort: Sort) -> &mut ListBuilder<'a> {
+    self.sort = sort;
+    self
+  }
+
+  pub fn direction(&mut self, direction: SortDirection) -> &mut ListBuilder<'a> {
+    self.direction = direction;
+    self
+  }
+
+  pub fn get(&self) -> Result<Vec<Pull>> {
+    let body = try!(
+      self.pulls.github.get(
+        &self.pulls.path(
+          &format!(
+            "?state={}&sort={}&direction={}", self.state, self.sort, self.direction
+          )[..]
+        )
+      )
+    );
+    Ok(json::decode::<Vec<Pull>>(&body).unwrap())
+  }
+}
+
+
 impl<'a> PullRequests<'a> {
   pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> PullRequests<'a> {
     PullRequests { github: github, owner: owner, repo: repo }
@@ -108,17 +155,7 @@ impl<'a> PullRequests<'a> {
     Ok(json::decode::<Pull>(&body).unwrap())
   }
 
-  pub fn list(
-    &self, state: State, sort: Sort, direction: SortDirection) -> Result<Vec<Pull>> {
-    let body = try!(
-      self.github.get(
-        &self.path(
-          &format!(
-            "?state={}&sort={}&direction={}", state, sort, direction
-          )[..]
-        )
-      )
-    );
-    Ok(json::decode::<Vec<Pull>>(&body).unwrap())
+  pub fn list(&self) -> ListBuilder {
+    ListBuilder::new(self)
   }
 }
