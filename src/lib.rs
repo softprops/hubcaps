@@ -4,6 +4,7 @@ extern crate rustc_serialize;
 pub mod gists;
 pub mod deployments;
 pub mod issues;
+pub mod labels;
 pub mod rep;
 pub mod repository;
 pub mod pullrequests;

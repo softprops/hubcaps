@@ -3,6 +3,7 @@ use std::io::Result;
 use self::super::Github;
 use rep::Label;
 use deployments::Deployments;
+use labels::Labels;
 use pullrequests::PullRequests;
 use rustc_serialize::json;
 use issues::{IssueRef, Issues};
@@ -28,9 +29,8 @@ impl<'a> Repository<'a> {
   }
 
   /// get a list of labels associated with this repository ref
-  pub fn labels(&self) -> Result<Vec<Label>> {
-    let body = try!(self.github.get(&self.path("/labels")));
-    Ok(json::decode::<Vec<Label>>(&body).unwrap())
+  pub fn labels(&self) -> Labels {
+    Labels::new(self.github, self.owner, self.repo)
   }
 
   /// get a list of deployments associated with this repository ref
