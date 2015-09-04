@@ -192,11 +192,11 @@ impl<'a> ListBuilder<'a> {
       params.push(format!("since={}", s));
     }
     if !self.labels.is_empty() {
-      params.push(format!("labels={}", self.labels.join(",")));
+      params.push(format!("labels={}", self.labels.connect(",")));
     }
     println!("params {:?}", params);
     let url = self.issues.path(
-      &format!("?{}", params.join("&"))
+      &format!("?{}", params.connect("&"))
     );
     let body = try!(
       self.issues.github.get(
