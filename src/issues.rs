@@ -106,7 +106,7 @@ pub struct Issues<'a> {
 }
 
 /// an mutable issue list builder
-pub struct IssuesListBuilder<'a> {
+pub struct ListBuilder<'a> {
   issues: &'a Issues<'a>,
   state: State,
   sort: Sort,
@@ -118,10 +118,10 @@ pub struct IssuesListBuilder<'a> {
   since: Option<&'static str>
 }
 
-impl<'a> IssuesListBuilder<'a> {
+impl<'a> ListBuilder<'a> {
 
-  pub fn new(is: &'a Issues<'a>) -> IssuesListBuilder<'a> {
-    IssuesListBuilder {
+  pub fn new(is: &'a Issues<'a>) -> ListBuilder<'a> {
+    ListBuilder {
       issues: is,
       state: Default::default(),
       sort: Default::default(),
@@ -134,42 +134,42 @@ impl<'a> IssuesListBuilder<'a> {
     }
   }
 
-  pub fn state(&mut self, state: State) -> &mut IssuesListBuilder<'a> {
+  pub fn state(&mut self, state: State) -> &mut ListBuilder<'a> {
     self.state = state;
     self
   }
 
-  pub fn sort(&mut self, sort: Sort) -> &mut IssuesListBuilder<'a> {
+  pub fn sort(&mut self, sort: Sort) -> &mut ListBuilder<'a> {
     self.sort = sort;
     self
   }
 
-  pub fn direction(&mut self, direction: SortDirection) -> &mut IssuesListBuilder<'a> {
+  pub fn direction(&mut self, direction: SortDirection) -> &mut ListBuilder<'a> {
     self.direction = direction;
     self
   }
 
-  pub fn assignee(&mut self, assignee: &'static str) -> &mut IssuesListBuilder<'a> {
+  pub fn assignee(&mut self, assignee: &'static str) -> &mut ListBuilder<'a> {
     self.assignee = Some(assignee);
     self
   }
 
-  pub fn creator(&mut self, creator: &'static str) -> &mut IssuesListBuilder<'a> {
+  pub fn creator(&mut self, creator: &'static str) -> &mut ListBuilder<'a> {
     self.creator = Some(creator);
     self
   }
 
-  pub fn mentioned(&mut self, mentioned: &'static str) -> &mut IssuesListBuilder<'a> {
+  pub fn mentioned(&mut self, mentioned: &'static str) -> &mut ListBuilder<'a> {
     self.mentioned = Some(mentioned);
     self
   }
 
-  pub fn labels(&mut self, labels: Vec<&'static str>) -> &mut IssuesListBuilder<'a> {
+  pub fn labels(&mut self, labels: Vec<&'static str>) -> &mut ListBuilder<'a> {
     self.labels = labels;
     self
   }
 
-  pub fn since(&mut self, since: &'static str) -> &mut IssuesListBuilder<'a> {
+  pub fn since(&mut self, since: &'static str) -> &mut ListBuilder<'a> {
     self.since = Some(since);
     self
   }
@@ -238,7 +238,7 @@ impl<'a> Issues<'a> {
     Ok(json::decode::<Issue>(&body).unwrap())
   }
 
-  pub fn list(&self) -> IssuesListBuilder {
-    IssuesListBuilder::new(self)
+  pub fn list(&self) -> ListBuilder {
+    ListBuilder::new(self)
   }
 }
