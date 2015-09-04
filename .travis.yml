@@ -1,20 +1,25 @@
 sudo: false
+
 language: rust
+
 matrix:
   fast_finish: true
   include:
   - rust: nightly
   - rust: beta
   - rust: stable
+
 script:
 - cargo build
 - cargo test
 - cargo bench
+
 cache:
   apt: true
-    directories:
-    - target/debug/deps
-    - target/debug/build
+  directories:
+  - target/debug/deps
+  - target/debug/build
+
 after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
   [ $TRAVIS_BRANCH = master ] &&
