@@ -134,42 +134,42 @@ impl<'a> IssuesListBuilder<'a> {
     }
   }
 
-  pub fn state(&mut self, state: State) -> &IssuesListBuilder {
+  pub fn state(&mut self, state: State) -> &mut IssuesListBuilder<'a> {
     self.state = state;
     self
   }
 
-  pub fn sort(&mut self, sort: Sort) -> &IssuesListBuilder {
+  pub fn sort(&mut self, sort: Sort) -> &mut IssuesListBuilder<'a> {
     self.sort = sort;
     self
   }
 
-  pub fn direction(&mut self, direction: SortDirection) -> &IssuesListBuilder {
+  pub fn direction(&mut self, direction: SortDirection) -> &mut IssuesListBuilder<'a> {
     self.direction = direction;
     self
   }
 
-  pub fn assignee(&mut self, assignee: &'static str) -> &IssuesListBuilder {
+  pub fn assignee(&mut self, assignee: &'static str) -> &mut IssuesListBuilder<'a> {
     self.assignee = Some(assignee);
     self
   }
 
-  pub fn creator(&mut self, creator: &'static str) -> &IssuesListBuilder {
+  pub fn creator(&mut self, creator: &'static str) -> &mut IssuesListBuilder<'a> {
     self.creator = Some(creator);
     self
   }
 
-  pub fn mentioned(&mut self, mentioned: &'static str) -> &IssuesListBuilder {
+  pub fn mentioned(&mut self, mentioned: &'static str) -> &mut IssuesListBuilder<'a> {
     self.mentioned = Some(mentioned);
     self
   }
 
-  pub fn labels(&mut self, labels: Vec<&'static str>) -> &IssuesListBuilder {
+  pub fn labels(&mut self, labels: Vec<&'static str>) -> &mut IssuesListBuilder<'a> {
     self.labels = labels;
     self
   }
 
-  pub fn since(&mut self, since: &'static str) -> &IssuesListBuilder {
+  pub fn since(&mut self, since: &'static str) -> &mut IssuesListBuilder<'a> {
     self.since = Some(since);
     self
   }
