@@ -1,3 +1,5 @@
+//! Repository interface
+
 use self::super::Github;
 use deployments::Deployments;
 use labels::Labels;

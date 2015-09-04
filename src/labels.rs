@@ -1,3 +1,5 @@
+//! Labels interface
+
 use self::super::Github;
 use rep::{Label, LabelReq};
 use rustc_serialize::json;

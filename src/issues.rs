@@ -1,3 +1,5 @@
+//! Issues interface
+
 use std::io::Result;
 use self::super::{Github, SortDirection, State};
 use rep::{Issue, IssueReq, Label};

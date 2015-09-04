@@ -1,3 +1,5 @@
+//! Rust representations of Github API data structures
+
 use std::collections::HashMap;
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]

@@ -1,3 +1,5 @@
+//! Deployments interface
+
 use self::super::Github;
 use rustc_serialize::json;
 use std::io::Result;

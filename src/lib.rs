@@ -1,3 +1,6 @@
+
+//! Hubcaps wraps hyper with an interface for interacting with the Github API
+
 extern crate hyper;
 extern crate rustc_serialize;
 
@@ -20,6 +23,7 @@ use std::default::Default;
 use std::fmt;
 use std::io::{Read, Result};
 
+/// enum representation of github pulls and issues
 pub enum State {
   Open,
   Closed,
@@ -42,6 +46,8 @@ impl Default for State {
   }
 }
 
+
+/// enum representation of Github list sorting options
 pub enum SortDirection {
   Asc,
   Desc
@@ -62,6 +68,7 @@ impl Default for SortDirection {
   }
 }
 
+/// Entry point interface for interacting with Github API
 pub struct Github<'a> {
   host: &'static str,
   agent: &'static str,
@@ -70,13 +77,13 @@ pub struct Github<'a> {
 }
 
 impl<'a> Github<'a> {
-  /// create a new Github instance
+  /// Create a new Github instance
   pub fn new(
     agent: &'static str, client: &'a Client, token: Option<&'static str>) -> Github<'a> {
     Github::host("https://api.github.com", agent, client, token)
   }
 
-  /// create a new Github instance hosted and a custom location
+  /// Create a new Github instance hosted at a custom location
   pub fn host(
     host: &'static str, agent: &'static str,
     client: &'a Client, token: Option<&'static str>) -> Github<'a> {
@@ -88,18 +95,18 @@ impl<'a> Github<'a> {
     }
   }
 
-  /// return a reference to a github reposistory
+  /// Return a reference to a Github reposistory
   pub fn repo(&self, owner: &'static str, repo: &'static str) -> Repository {
     Repository::new(self, owner, repo)
   }
 
-  /// return a reference to an interface that provides access to a user's gists
+  /// Return a reference to an interface that provides access to a user's gists
   pub fn user_gists(&self, owner: &'static str) -> UserGists {
     UserGists::new(self, owner)
   }
 
-  /// return a reference to an interface that provides access to the
-  /// the gists belonging to the owner of the token used to configure this client
+  ///Rreturn a reference to an interface that provides access to the
+  /// gists belonging to the owner of the token used to configure this client
   pub fn gists(&self) -> Gists {
     Gists::new(self)
   }

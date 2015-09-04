@@ -1,3 +1,5 @@
+//! Pull requests interface
+
 use self::super::{Github, SortDirection, State};
 use rep::{Pull, PullEdit, PullReq};
 use rustc_serialize::json;
