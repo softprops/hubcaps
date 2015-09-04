@@ -98,10 +98,114 @@ impl<'a> IssueRef<'a> {
   }
 }
 
+
 pub struct Issues<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
   repo: &'static str
+}
+
+/// an mutable issue list builder
+pub struct IssuesListBuilder<'a> {
+  issues: &'a Issues<'a>,
+  state: State,
+  sort: Sort,
+  direction: SortDirection,
+  assignee: Option<&'static str>,
+  creator: Option<&'static str>,
+  mentioned: Option<&'static str>,
+  labels: Vec<&'static str>,
+  since: Option<&'static str>
+}
+
+impl<'a> IssuesListBuilder<'a> {
+
+  pub fn new(is: &'a Issues<'a>) -> IssuesListBuilder<'a> {
+    IssuesListBuilder {
+      issues: is,
+      state: Default::default(),
+      sort: Default::default(),
+      direction: Default::default(),
+      assignee: None,
+      creator: None,
+      mentioned: None,
+      labels: vec![],
+      since: None
+    }
+  }
+
+  pub fn state(&mut self, state: State) -> &IssuesListBuilder {
+    self.state = state;
+    self
+  }
+
+  pub fn sort(&mut self, sort: Sort) -> &IssuesListBuilder {
+    self.sort = sort;
+    self
+  }
+
+  pub fn direction(&mut self, direction: SortDirection) -> &IssuesListBuilder {
+    self.direction = direction;
+    self
+  }
+
+  pub fn assignee(&mut self, assignee: &'static str) -> &IssuesListBuilder {
+    self.assignee = Some(assignee);
+    self
+  }
+
+  pub fn creator(&mut self, creator: &'static str) -> &IssuesListBuilder {
+    self.creator = Some(creator);
+    self
+  }
+
+  pub fn mentioned(&mut self, mentioned: &'static str) -> &IssuesListBuilder {
+    self.mentioned = Some(mentioned);
+    self
+  }
+
+  pub fn labels(&mut self, labels: Vec<&'static str>) -> &IssuesListBuilder {
+    self.labels = labels;
+    self
+  }
+
+  pub fn since(&mut self, since: &'static str) -> &IssuesListBuilder {
+    self.since = Some(since);
+    self
+  }
+
+  pub fn get(&self) -> Result<Vec<Issue>> {
+    let mut params = Vec::new();
+    params.push(format!("state={}", self.state));
+    params.push(format!("sort={}", self.sort));
+    params.push(format!("direction={}", self.direction));
+    if let Some(a) = self.assignee {
+      params.push(format!("assignee={}", a));
+    }
+    if let Some(c) = self.creator {
+      params.push(format!("creator={}", c));
+    }
+    if let Some(m) = self.mentioned {
+      params.push(format!("mentioned={}", m));
+    }
+    if let Some(s) = self.since {
+      params.push(format!("since={}", s));
+    }
+    if !self.labels.is_empty() {
+      params.push(format!("labels={}", self.labels.join(",")));
+    }
+    println!("params {:?}", params);
+    let url = self.issues.path(
+      &format!("?{}", params.join("&"))
+    );
+    let body = try!(
+      self.issues.github.get(
+        &url
+      )
+    );
+    Ok(json::decode::<Vec<Issue>>(&body).unwrap())
+  }
+
 }
 
 impl<'a> Issues<'a> {
@@ -134,35 +238,7 @@ impl<'a> Issues<'a> {
     Ok(json::decode::<Issue>(&body).unwrap())
   }
 
-  pub fn list(
-    &self,
-    state: State,
-    sort: Sort,
-    direction: SortDirection,
-    assignee: Option<&'static str>,
-    creator: Option<&'static str>,
-    mentioned: Option<&'static str>,
-    labels: Vec<&'static str>,
-    since: Option<String>
-   ) -> Result<Vec<Issue>> {
-    let mut params = Vec::new();
-    params.push(format!("state={}", state));
-    params.push(format!("sort={}", sort));
-    params.push(format!("direction={}", direction));
-    if let Some(a) = assignee {
-      params.push(format!("assignee={}", a));
-    }
-    if let Some(c) = creator {
-      params.push(format!("creator={}", c));
-    }
-    let url = self.path(
-      &format!("?{}", params.join("&"))
-    );
-    let body = try!(
-      self.github.get(
-        &url
-      )
-    );
-    Ok(json::decode::<Vec<Issue>>(&body).unwrap())
+  pub fn list(&self) -> IssuesListBuilder {
+    IssuesListBuilder::new(self)
   }
 }

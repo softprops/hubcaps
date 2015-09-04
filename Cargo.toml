@@ -1,7 +1,12 @@
 [package]
-name = "gust"
+name = "hubcaps"
 version = "0.1.0"
 authors = ["softprops <d.tangren@gmail.com>"]
+description = "Rust interface for Github"
+homepage = "https://github.com/softprops/hubcaps"
+repository = "https://github.com/softprops/hubcaps"
+keywords = ["log", "logging", "syslog", "unix"]
+license = "MIT"
 
 [dependencies]
 hyper = "0.6"
