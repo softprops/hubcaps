@@ -1,3 +1,4 @@
+sudo: false
 language: rust
 matrix:
   fast_finish: true
@@ -9,16 +10,20 @@ script:
 - cargo build
 - cargo test
 - cargo bench
-- cargo doc
+cache:
+  apt: true
+    directories:
+    - target/debug/deps
+    - target/debug/build
 after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
   [ $TRAVIS_RUST_VERSION = stable ] &&
-  cargo doc &&
+  cargo doc --no-deps &&
   echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
-  sudo pip install ghp-import &&
-  ghp-import -n target/doc &&
+  pip install ghp-import &&
+  /home/travis/.local/bin/ghp-import -n target/doc &&
   git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
 env:
   global:
