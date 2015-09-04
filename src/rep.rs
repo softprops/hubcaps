@@ -177,6 +177,12 @@ pub struct Commit {
   pub repo: Option<Repo>
 }
 
+#[derive(Debug, RustcEncodable)]
+pub struct LabelReq {
+  pub name: &'static str,
+  pub color: &'static str
+}
+
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Label {
   pub url: String,

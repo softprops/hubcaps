@@ -1,5 +1,5 @@
 use self::super::Github;
-use rep::Label;
+use rep::{Label, LabelReq};
 use rustc_serialize::json;
 use std::io::Result;
 
@@ -20,6 +20,38 @@ impl<'a> Labels<'a> {
 
   fn path(&self, more: &str) -> String {
     format!("/repos/{}/{}/labels{}", self.owner, self.repo, more)
+  }
+
+  pub fn create(&self, lab: &LabelReq) -> Result<Label> {
+    let data = json::encode(&lab).unwrap();
+    let body = try!(
+      self.github.post(
+        &self.path(""),
+        data.as_bytes()
+      )
+    );
+    Ok(json::decode::<Label>(&body).unwrap())
+  }
+
+  pub fn update(&self, prevname: &'static str, lab: &LabelReq) -> Result<Label> {
+    let data = json::encode(&lab).unwrap();
+    let body = try!(
+      self.github.patch(
+        &self.path(
+          &format!("/{}", prevname)
+        ),
+        data.as_bytes()
+      )
+    );
+    Ok(json::decode::<Label>(&body).unwrap())
+  }
+
+  pub fn delete(&self, name: &'static str) -> Result<()> {
+    self.github.delete(
+      &self.path(
+        &format!("/{}", name)
+      )
+    ).map(|_| ())
   }
 
   pub fn list(&self) -> Result<Vec<Label>> {
