@@ -183,6 +183,15 @@ pub struct LabelReq {
   pub color: &'static str
 }
 
+impl LabelReq {
+  pub fn new(name: &'static str, color: &'static str) -> LabelReq {
+    LabelReq {
+      name: name,
+      color: color
+    }
+  }
+}
+
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Label {
   pub url: String,
