@@ -309,3 +309,120 @@ pub struct Issue {
   pub created_at: String,
   pub updated_at: String
 }
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Asset {
+  pub url: String,
+  pub browser_download_url: String,
+  pub id: i64,
+  pub name: String,
+  pub label: Option<String>,
+  pub state: String,
+  pub content_type: String,
+  pub size: i64,
+  pub download_count: i64,
+  pub created_at: String,
+  pub updated_at: String,
+  pub uploader: User
+}
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Release {
+  pub url: String,
+  pub html_url: String,
+  pub assets_url: String,
+  pub upload_url: String,
+  pub tarball_url: String,
+  pub zipball_url: String,
+  pub id: i64,
+  pub tag_name: String,
+  pub target_commitish: String,
+  pub name: String,
+  pub body: String,
+  pub draft: bool,
+  pub prerelease: bool,
+  pub created_at: String,
+  pub published_at: String,
+  pub author: User,
+  pub assets: Vec<Asset>
+}
+
+#[derive(Debug, RustcEncodable)]
+pub struct ReleaseReq {
+  pub tag_name: &'static str,
+  pub target_commitish: Option<&'static str>,
+  pub name: Option<&'static str>,
+  pub body: Option<&'static str>,
+  pub draft: Option<bool>,
+  pub prerelease: Option<bool>
+}
+
+
+/// builder interface for ReleaseReq
+pub struct ReleaseBuilder {
+  tag: &'static str,
+  commitish: Option<&'static str>,
+  name: Option<&'static str>,
+  body: Option<&'static str>,
+  draft: Option<bool>,
+  prerelease: Option<bool>
+}
+
+impl ReleaseBuilder {
+  pub fn new(tag: &'static str) -> ReleaseBuilder {
+    ReleaseBuilder {
+      tag: tag,
+      commitish: None,
+      name: None,
+      body: None,
+      draft: None,
+      prerelease: None
+    }
+  }
+
+  pub fn commitish(&mut self, commit: &'static str) -> &mut ReleaseBuilder {
+    self.commitish = Some(commit);
+    self
+  }
+
+  pub fn name(&mut self, name: &'static str) -> &mut ReleaseBuilder {
+    self.name = Some(name);
+    self
+  }
+
+  pub fn body(&mut self, body: &'static str) -> &mut ReleaseBuilder {
+    self.body = Some(body);
+    self
+  }
+
+  pub fn draft(&mut self, draft: bool) -> &mut ReleaseBuilder {
+    self.draft = Some(draft);
+    self
+  }
+
+  pub fn prerelease(&mut self, pre: bool) -> &mut ReleaseBuilder {
+    self.prerelease = Some(pre);
+    self
+  }
+
+  pub fn request(&self) -> ReleaseReq {
+    ReleaseReq::new(self.tag, self.commitish, self.name, self.body, self.draft, self.prerelease)
+  }
+}
+
+impl ReleaseReq {
+  pub fn new(tag: &'static str, commit: Option<&'static str>, name: Option<&'static str>, body: Option<&'static str>, draft: Option<bool>, prerelease: Option<bool>) -> ReleaseReq {
+    ReleaseReq {
+      tag_name: tag,
+      target_commitish: commit,
+      name: name,
+      body: body,
+      draft: draft,
+      prerelease: prerelease
+    }
+  }
+
+  pub fn builder(tag: &'static str) -> ReleaseBuilder {
+    ReleaseBuilder::new(tag)
+  }
+}

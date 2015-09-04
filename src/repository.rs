@@ -1,6 +1,7 @@
 use self::super::Github;
 use deployments::Deployments;
 use labels::Labels;
+use releases::Releases;
 use pullrequests::PullRequests;
 use issues::{IssueRef, Issues};
 
@@ -42,5 +43,9 @@ impl<'a> Repository<'a> {
 
   pub fn issues(&self) -> Issues {
     Issues::new(self.github, self.owner, self.repo)
+  }
+
+  pub fn releases(&self) -> Releases {
+    Releases::new(self.github, self.owner, self.repo)
   }
 }
