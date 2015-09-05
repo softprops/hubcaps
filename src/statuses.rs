@@ -39,7 +39,7 @@ impl<'a> Statuses<'a> {
     let body = try!(
       self.github.get(
         &format!(
-          "/repos/{}/{}/commit/{}/statuses", self.owner, self.repo, sha
+          "/repos/{}/{}/commits/{}/statuses", self.owner, self.repo, sha
         )
       )
     );
@@ -50,7 +50,7 @@ impl<'a> Statuses<'a> {
     let body = try!(
       self.github.get(
         &format!(
-          "/repos/{}/{}/commit/{}/status", self.owner, self.repo, sha
+          "/repos/{}/{}/commits/{}/status", self.owner, self.repo, sha
         )
       )
     );
