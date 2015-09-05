@@ -24,7 +24,7 @@ impl<'a> Statuses<'a> {
     format!("/repos/{}/{}/statuses{}", self.owner, self.repo, more)
   }
 
-  fn create(&self, sha: &'static str, status: &StatusReq) -> Result<Status> {
+  pub fn create(&self, sha: &'static str, status: &StatusReq) -> Result<Status> {
     let data = json::encode(&status).unwrap();
     let body = try!(
       self.github.post(
