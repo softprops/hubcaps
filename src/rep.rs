@@ -1,6 +1,35 @@
 //! Rust representations of Github API data structures
 
 use std::collections::HashMap;
+use rustc_serialize::json::Json;
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Deployment {
+  ur: String,
+  id: i64,
+  sha: String,
+//  ref: String,
+  task: String,
+//  payload: Json,
+  environment: String,
+  description: String,
+  creator: User,
+  created_at: String,
+  updated_at: String,
+  statuses_url: String,
+  repository_url: String
+}
+
+#[derive(Debug, RustcEncodable)]
+pub struct DeploymentReq {
+//  ref: &'static str,
+  task: Option<&'static str>,
+  auto_merge: Option<bool>,
+  required_contexts: Option<Vec<&'static str>>,
+//  payload: Option<Json>,
+  environment: Option<&'static str>,
+  description: Option<&'static str>
+}
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct GistFile {

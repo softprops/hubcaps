@@ -3,6 +3,7 @@
 use self::super::Github;
 use rustc_serialize::json;
 use std::io::Result;
+use rep::{Deployment, DeploymentReq};
 
 pub struct Deployments<'a> {
   github: &'a Github<'a>,
@@ -28,11 +29,12 @@ impl<'a> Deployments<'a> {
     Ok(body)
   }
 
-  pub fn create(&self, gitref: &str) -> Result<String> {
+  pub fn create(&self, dep: &DeploymentReq) -> Result<String> {
+    let data = json::encode(&dep).unwrap();
     let body = try!(
       self.github.post(
         &self.path(""),
-        &[]
+        data.as_bytes()
       )
     );
     Ok(body)
