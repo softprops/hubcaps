@@ -35,4 +35,15 @@ impl<'a> Statuses<'a> {
     Ok(json::decode::<Status>(&body).unwrap())
   }
 
+  pub fn list(&self, sha: &'static str) -> Result<Vec<Status>> {
+    let body = try!(
+      self.github.get(
+        &format!(
+          "/repos/{}/{}/commit/{}/statuses", self.owner, self.repo, sha
+        )
+      )
+    );
+    Ok(json::decode::<Vec<Status>>(&body).unwrap())
+  }
+
 }
