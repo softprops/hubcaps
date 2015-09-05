@@ -46,4 +46,17 @@ impl<'a> Statuses<'a> {
     Ok(json::decode::<Vec<Status>>(&body).unwrap())
   }
 
+  pub fn combined(&self, sha: &'static str) -> Result<String> {
+    let body = try!(
+      self.github.get(
+        &format!(
+          "/repos/{}/{}/commit/{}/status", self.owner, self.repo, sha
+        )
+      )
+    );
+    Ok(body)
+//    Ok(json::decode::<Vec<Status>>(&body).unwrap())
+  }
+
+
 }
