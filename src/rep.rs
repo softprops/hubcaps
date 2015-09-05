@@ -428,3 +428,76 @@ impl ReleaseReq {
     ReleaseBuilder::new(tag)
   }
 }
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Status {
+  created_at: String,
+  updated_at: String,
+  statue: String,
+  target_url: String,
+  description: String,
+  id: i64,
+  url: String,
+  context: String,
+  creator: User
+}
+
+#[derive(Debug, RustcEncodable)]
+pub struct StatusReq {
+  state: &'static str,
+  target_url: Option<&'static str>,
+  description: Option<&'static str>,
+  context: Option<&'static str>
+}
+
+pub struct StatusBuilder {
+  state: &'static str,
+  target_url: Option<&'static str>,
+  description: Option<&'static str>,
+  context: Option<&'static str>,
+}
+
+impl StatusBuilder {
+  pub fn new(state: &'static str) -> StatusBuilder {
+    StatusBuilder {
+      state: state,
+      target_url: None,
+      description: None,
+      context: None
+    }
+  }
+
+  pub fn target_url(&mut self, url: &'static str) -> &mut StatusBuilder {
+    self.target_url = Some(url);
+    self
+  }
+
+  pub fn description(&mut self, desc: &'static str) -> &mut StatusBuilder {
+    self.description = Some(desc);
+    self
+  }
+
+  pub fn context(&mut self, ctx: &'static str) -> &mut StatusBuilder {
+    self.context = Some(ctx);
+    self
+  }
+
+  pub fn request(&self) -> StatusReq {
+    StatusReq::new(self.state, self.target_url, self.description, self.context)
+  }
+}
+
+impl StatusReq {
+  pub fn new(state: &'static str, target_url: Option<&'static str>, descr: Option<&'static str>, context: Option<&'static str>) -> StatusReq {
+    StatusReq {
+      state: state,
+      target_url: target_url,
+      description: descr,
+      context: context
+    }
+  }
+
+  pub fn builder(state: &'static str) -> StatusBuilder {
+    StatusBuilder::new(state)
+  }
+}

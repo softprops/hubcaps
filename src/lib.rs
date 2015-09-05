@@ -11,6 +11,7 @@ pub mod labels;
 pub mod rep;
 pub mod releases;
 pub mod repository;
+pub mod statuses;
 pub mod pullrequests;
 
 use gists::{Gists, UserGists};
