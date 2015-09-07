@@ -63,7 +63,11 @@ pub struct IssueLabels<'a> {
 }
 
 impl<'a> IssueLabels<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str, number: &'static i64) -> IssueLabels<'a> {
+  pub fn new(
+    github: &'a Github<'a>,
+    owner: &'static str,
+    repo: &'static str,
+    number: &'static i64) -> IssueLabels<'a> {
     IssueLabels {
       github: github,
       owner: owner,
