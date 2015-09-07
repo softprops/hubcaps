@@ -79,9 +79,29 @@ impl<'a> IssueRef<'a> {
     format!("/repos/{}/{}/issues/{}{}", self.owner, self.repo, self.number, more)
   }
 
-  // add a set of labels to this issue ref
+  /// add a set of labels to this issue ref
   pub fn label(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
     let body = try!(self.github.post(
+      &self.path("/labels"),
+      json::encode(&labels).unwrap().as_bytes()
+    ));
+    Ok(json::decode::<Vec<Label>>(&body).unwrap())
+  }
+
+  /// remove a label from this issue
+  pub fn unlabel(&self, label: &'static str) -> Result<()> {
+    self.github.delete(
+      &self.path(
+        &format!("/labels/{}", label)
+      )
+    ).map(|_| ())
+  }
+
+  /// replace all labels associated with this issue with a new set.
+  /// providing an empty set of labels is the same as clearing the
+  /// current labels
+  pub fn relabel(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
+    let body = try!(self.github.patch(
       &self.path("/labels"),
       json::encode(&labels).unwrap().as_bytes()
     ));
