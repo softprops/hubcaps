@@ -4,6 +4,10 @@
 
 > a rust interface for github
 
+## docs
+
+Find them [here](http://softprops.github.io/hubcaps)
+
 # usage
 
 
