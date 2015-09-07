@@ -5,6 +5,11 @@ use rep::{Status, StatusReq};
 use rustc_serialize::json;
 use std::io::Result;
 
+#[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
+pub enum State {
+  sending, success, error, failure
+}
+
 pub struct Statuses<'a> {
   github: &'a Github<'a>,
   owner: &'static str,

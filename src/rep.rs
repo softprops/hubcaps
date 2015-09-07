@@ -3,16 +3,7 @@
 use std::collections::HashMap;
 use rustc_serialize::json::{Json, ToJson};
 use rustc_serialize::{Decoder, Decodable, Encodable, Encoder, json};
-
-// Encodable for json is provided by not Decodable??
-// https://github.com/rust-lang/rustc-serialize/blob/master/src/json.rs#L920
-
-/*impl Decodable for Json {
-  fn decode<D: Decoder>(d: &mut D) -> result::Result<Json, D::Error> {
-    json::decode
-    Decodable::decode(&mut Decoder::new(json))
-  }
-}*/
+use statuses::State;
 
 impl Decodable for Deployment {
   fn decode<D: Decoder>(decoder: &mut D) -> Result<Deployment, D::Error> {
@@ -103,6 +94,12 @@ pub struct DeploymentReq {
   pub description: Option<&'static str>
 }
 
+impl DeploymentReq {
+  pub fn builder(commit: &'static str) -> DeploymentReqBuilder {
+    DeploymentReqBuilder::new(commit)
+  }
+}
+
 pub struct DeploymentReqBuilder {
   pub commit_ref: &'static str,
   pub task: Option<&'static str>,
@@ -156,7 +153,7 @@ impl DeploymentReqBuilder {
     self
   }
 
-  pub fn request(&self) -> DeploymentReq {
+  pub fn build(&self) -> DeploymentReq {
     DeploymentReq {
       commit_ref: self.commit_ref,
       task: self.task,
@@ -574,7 +571,7 @@ impl ReleaseBuilder {
     self
   }
 
-  pub fn request(&self) -> ReleaseReq {
+  pub fn build(&self) -> ReleaseReq {
     ReleaseReq::new(self.tag, self.commitish, self.name, self.body, self.draft, self.prerelease)
   }
 }
@@ -596,11 +593,12 @@ impl ReleaseReq {
   }
 }
 
+
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Status {
   created_at: String,
   updated_at: String,
-  statue: String,
+  state: State,
   target_url: String,
   description: String,
   id: i64,
@@ -611,21 +609,21 @@ pub struct Status {
 
 #[derive(Debug, RustcEncodable)]
 pub struct StatusReq {
-  state: &'static str,
+  state: State,
   target_url: Option<&'static str>,
   description: Option<&'static str>,
   context: Option<&'static str>
 }
 
 pub struct StatusBuilder {
-  state: &'static str,
+  state: State,
   target_url: Option<&'static str>,
   description: Option<&'static str>,
   context: Option<&'static str>,
 }
 
 impl StatusBuilder {
-  pub fn new(state: &'static str) -> StatusBuilder {
+  pub fn new(state: State) -> StatusBuilder {
     StatusBuilder {
       state: state,
       target_url: None,
@@ -649,13 +647,13 @@ impl StatusBuilder {
     self
   }
 
-  pub fn request(&self) -> StatusReq {
-    StatusReq::new(self.state, self.target_url, self.description, self.context)
+  pub fn build(&self) -> StatusReq {
+    StatusReq::new(self.state.clone(), self.target_url, self.description, self.context)
   }
 }
 
 impl StatusReq {
-  pub fn new(state: &'static str, target_url: Option<&'static str>, descr: Option<&'static str>, context: Option<&'static str>) -> StatusReq {
+  pub fn new(state: State, target_url: Option<&'static str>, descr: Option<&'static str>, context: Option<&'static str>) -> StatusReq {
     StatusReq {
       state: state,
       target_url: target_url,
@@ -664,7 +662,7 @@ impl StatusReq {
     }
   }
 
-  pub fn builder(state: &'static str) -> StatusBuilder {
+  pub fn builder(state: State) -> StatusBuilder {
     StatusBuilder::new(state)
   }
 }
