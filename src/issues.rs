@@ -55,6 +55,64 @@ impl Default for Sort {
   }
 }
 
+pub struct IssueLabels<'a> {
+  github: &'a Github<'a>,
+  owner: &'static str,
+  repo: &'static str,
+  number: &'static i64
+}
+
+impl<'a> IssueLabels<'a> {
+  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str, number: &'static i64) -> IssueLabels<'a> {
+    IssueLabels {
+      github: github,
+      owner: owner,
+      repo: repo,
+      number: number
+    }
+  }
+
+  fn path(&self, more: &str) -> String {
+    format!("/repos/{}/{}/issues/{}/labels{}", self.owner, self.repo, self.number, more)
+  }
+
+  /// add a set of labels to this issue ref
+  pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
+    let body = try!(self.github.post(
+      &self.path(""),
+      json::encode(&labels).unwrap().as_bytes()
+    ));
+    Ok(json::decode::<Vec<Label>>(&body).unwrap())
+  }
+
+  /// remove a label from this issue
+  pub fn remove(&self, label: &'static str) -> Result<()> {
+    self.github.delete(
+      &self.path(
+        &format!("/{}", label)
+      )
+    ).map(|_| ())
+  }
+
+  /// replace all labels associated with this issue with a new set.
+  /// providing an empty set of labels is the same as clearing the
+  /// current labels
+  pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
+    let body = try!(self.github.patch(
+      &self.path(""),
+      json::encode(&labels).unwrap().as_bytes()
+    ));
+    Ok(json::decode::<Vec<Label>>(&body).unwrap())
+  }
+
+  /// remove all labels from an issue
+  pub fn clear(&self) -> Result<()> {
+    self.github.delete(
+      &self.path("")
+    ).map(|_| ())
+  }
+}
+
 pub struct IssueRef<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
@@ -79,33 +137,8 @@ impl<'a> IssueRef<'a> {
     format!("/repos/{}/{}/issues/{}{}", self.owner, self.repo, self.number, more)
   }
 
-  /// add a set of labels to this issue ref
-  pub fn label(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-    let body = try!(self.github.post(
-      &self.path("/labels"),
-      json::encode(&labels).unwrap().as_bytes()
-    ));
-    Ok(json::decode::<Vec<Label>>(&body).unwrap())
-  }
-
-  /// remove a label from this issue
-  pub fn unlabel(&self, label: &'static str) -> Result<()> {
-    self.github.delete(
-      &self.path(
-        &format!("/labels/{}", label)
-      )
-    ).map(|_| ())
-  }
-
-  /// replace all labels associated with this issue with a new set.
-  /// providing an empty set of labels is the same as clearing the
-  /// current labels
-  pub fn relabel(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-    let body = try!(self.github.patch(
-      &self.path("/labels"),
-      json::encode(&labels).unwrap().as_bytes()
-    ));
-    Ok(json::decode::<Vec<Label>>(&body).unwrap())
+  pub fn labels(&self) -> IssueLabels {
+    IssueLabels::new(self.github, self.owner, self.repo, self.number)
   }
 
   pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
