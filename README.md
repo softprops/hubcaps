@@ -8,7 +8,7 @@
 
 Find them [here](http://softprops.github.io/hubcaps)
 
-# usage
+## usage
 
 
 Doug Tangren (softprops) 2015
