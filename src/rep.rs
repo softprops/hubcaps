@@ -1,14 +1,46 @@
 //! Rust representations of Github API data structures
 
 use std::collections::HashMap;
-use rustc_serialize::json::Json;
+use rustc_serialize::json::{Json, ToJson};
+use rustc_serialize::{Decoder, Decodable, Encodable, Encoder, json};
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+// Encodable for json is provided by not Decodable??
+// https://github.com/rust-lang/rustc-serialize/blob/master/src/json.rs#L920
+
+/*impl Decodable for Json {
+  fn decode<D: Decoder>(d: &mut D) -> result::Result<Json, D::Error> {
+    json::decode
+    Decodable::decode(&mut Decoder::new(json))
+  }
+}*/
+
+impl Decodable for Deployment {
+  fn decode<D: Decoder>(decoder: &mut D) -> Result<Deployment, D::Error> {
+    decoder.read_struct("root", 0, |decoder| {
+      Ok(Deployment {
+        url: try!(decoder.read_struct_field("url", 0, |decoder| Decodable::decode(decoder))),
+        id: try!(decoder.read_struct_field("id", 0, |decoder| Decodable::decode(decoder))),
+        sha: try!(decoder.read_struct_field("sha", 0, |decoder| Decodable::decode(decoder))),
+        commit_ref: try!(decoder.read_struct_field("ref", 0, |decoder| Decodable::decode(decoder))),
+        task: try!(decoder.read_struct_field("task", 0, |decoder| Decodable::decode(decoder))),
+        environment: try!(decoder.read_struct_field("environment", 0, |decoder| Decodable::decode(decoder))),
+        description: try!(decoder.read_struct_field("description", 0, |decoder| Decodable::decode(decoder))),
+        creator: try!(decoder.read_struct_field("creator", 0, |decoder| Decodable::decode(decoder))),
+        created_at: try!(decoder.read_struct_field("created_at", 0, |decoder| Decodable::decode(decoder))),
+        updated_at: try!(decoder.read_struct_field("updated_at", 0, |decoder| Decodable::decode(decoder))),
+        statuses_url: try!(decoder.read_struct_field("statuses_url", 0, |decoder| Decodable::decode(decoder))),
+        repository_url: try!(decoder.read_struct_field("repository_url", 0, |decoder| Decodable::decode(decoder))),
+      })
+    })
+  }
+}
+
+#[derive(Debug)]
 pub struct Deployment {
-  ur: String,
+  url: String,
   id: i64,
   sha: String,
-//  ref: String,
+  commit_ref: String,
   task: String,
 //  payload: Json,
   environment: String,
@@ -20,15 +52,120 @@ pub struct Deployment {
   repository_url: String
 }
 
-#[derive(Debug, RustcEncodable)]
+impl Encodable for DeploymentReq {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      DeploymentReq {
+        commit_ref: ref cref,
+        task: ref tsk,
+        auto_merge: ref amrg,
+        required_contexts: ref reqctx,
+        payload: ref pld,
+        environment: ref env,
+        description: ref desc
+      } => {
+        encoder.emit_struct("DeploymentReq", 1usize, |encoder| {
+          try!(encoder.emit_struct_field("ref", 0usize, |encoder| cref.encode(encoder)));
+          if tsk.is_some() {
+            try!(encoder.emit_struct_field("task", 0usize, |encoder| tsk.encode(encoder)));
+          }
+          if amrg.is_some() {
+            try!(encoder.emit_struct_field("auto_merge", 0usize, |encoder| amrg.encode(encoder)));
+          }
+          if reqctx.is_some() {
+            try!(encoder.emit_struct_field("required_contexts", 0usize, |encoder| reqctx.encode(encoder)));
+          }
+          if pld.is_some() {
+            try!(encoder.emit_struct_field("payload", 0usize, |encoder| pld.encode(encoder)));
+          }
+          if env.is_some() {
+            try!(encoder.emit_struct_field("environment", 0usize, |encoder| env.encode(encoder)));
+          }
+          if desc.is_some() {
+            try!(encoder.emit_struct_field("description", 0usize, |encoder| desc.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct DeploymentReq {
-//  ref: &'static str,
-  task: Option<&'static str>,
-  auto_merge: Option<bool>,
-  required_contexts: Option<Vec<&'static str>>,
-//  payload: Option<Json>,
-  environment: Option<&'static str>,
-  description: Option<&'static str>
+  pub commit_ref: &'static str,
+  pub task: Option<&'static str>,
+  pub auto_merge: Option<bool>,
+  pub required_contexts: Option<Vec<&'static str>>,
+  pub payload: Option<Json>,
+  pub environment: Option<&'static str>,
+  pub description: Option<&'static str>
+}
+
+pub struct DeploymentReqBuilder {
+  pub commit_ref: &'static str,
+  pub task: Option<&'static str>,
+  pub auto_merge: Option<bool>,
+  pub required_contexts: Option<Vec<&'static str>>,
+  pub payload: Option<Json>,
+  pub environment: Option<&'static str>,
+  pub description: Option<&'static str>
+}
+
+impl DeploymentReqBuilder {
+  pub fn new(commit: &'static str) -> DeploymentReqBuilder {
+    DeploymentReqBuilder {
+      commit_ref: commit,
+      task: None,
+      auto_merge: None,
+      required_contexts: None,
+      payload: None,
+      environment: None,
+      description: None
+    }
+  }
+
+  pub fn task(&mut self, task: &'static str) -> &mut DeploymentReqBuilder {
+    self.task = Some(task);
+    self
+  }
+
+  pub fn auto_merge(&mut self, auto_merge: bool) -> &mut DeploymentReqBuilder {
+    self.auto_merge = Some(auto_merge);
+    self
+  }
+
+  pub fn required_contexts(&mut self, ctxs: Vec<&'static str>) -> &mut DeploymentReqBuilder {
+    self.required_contexts = Some(ctxs);
+    self
+  }
+
+  pub fn payload<T: ToJson>(&mut self, pl: T) -> &mut DeploymentReqBuilder {
+    self.payload = Some(pl.to_json());
+    self
+  }
+
+  pub fn environment(&mut self, env: &'static str) -> &mut DeploymentReqBuilder {
+    self.environment = Some(env);
+    self
+  }
+
+  pub fn description(&mut self, desc: &'static str) -> &mut DeploymentReqBuilder {
+    self.description = Some(desc);
+    self
+  }
+
+  pub fn request(&self) -> DeploymentReq {
+    DeploymentReq {
+      commit_ref: self.commit_ref,
+      task: self.task,
+      auto_merge: self.auto_merge,
+      required_contexts: self.required_contexts.clone(),
+      payload: self.payload.clone(),
+      environment: self.environment,
+      description: self.description
+    }
+  }
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
