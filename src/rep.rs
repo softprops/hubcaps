@@ -204,7 +204,26 @@ pub struct GistFork {
   updated_at: String
 }
 
-#[derive(Debug, RustcEncodable)]
+impl Encodable for Content {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      Content {
+        filename: ref this_filename,
+        content: ref this_content,
+      } => {
+        encoder.emit_struct("Content", 1usize, |encoder| {
+          try!(encoder.emit_struct_field("content", 0usize, |encoder| this_content.encode(encoder)));
+          if this_filename.is_some() {
+            try!(encoder.emit_struct_field("filename", 0usize, |encoder| this_filename.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct Content {
   pub filename: Option<&'static str>,
   pub content: &'static str
@@ -216,7 +235,30 @@ impl Content {
   }
 }
 
-#[derive(Debug, RustcEncodable)]
+impl Encodable for GistReq {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      GistReq {
+        description: ref this_description,
+        public: ref this_public,
+        files: ref this_files
+      } => {
+        encoder.emit_struct("GistReq", 1usize, |encoder| {
+          try!(encoder.emit_struct_field("files", 0usize, |encoder| this_files.encode(encoder)));
+          if this_public.is_some() {
+            try!(encoder.emit_struct_field("public", 0usize, |encoder| this_public.encode(encoder)));
+          }
+          if this_description.is_some() {
+            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct GistReq {
   pub description: Option<&'static str>,
   pub public: Option<bool>,
@@ -365,7 +407,32 @@ pub struct Label {
   pub color: String
 }
 
-#[derive(Debug, RustcEncodable)]
+impl Encodable for PullEdit {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      PullEdit {
+        title: ref this_title,
+        body: ref this_body,
+        state: ref this_state
+      } => {
+        encoder.emit_struct("PullEdit", 1usize, |encoder| {
+          if this_title.is_some() {
+            try!(encoder.emit_struct_field("title", 0usize, |encoder| this_title.encode(encoder)));
+          }
+          if this_body.is_some() {
+            try!(encoder.emit_struct_field("body", 0usize, |encoder| this_body.encode(encoder)));
+          }
+          if this_state.is_some() {
+            try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct PullEdit {
   title: Option<&'static str>,
   body: Option<&'static str>,
@@ -607,7 +674,36 @@ pub struct Status {
   creator: User
 }
 
-#[derive(Debug, RustcEncodable)]
+
+
+impl Encodable for StatusReq {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      StatusReq {
+        state: ref this_state,
+        target_url: ref this_target_url,
+        description: ref this_description,
+        context: ref this_context
+      } => {
+        encoder.emit_struct("StatusReq", 1usize, |encoder| {
+          try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
+          if this_target_url.is_some() {
+            try!(encoder.emit_struct_field("target_url", 0usize, |encoder| this_target_url.encode(encoder)));
+          }
+          if this_description.is_some() {
+            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
+          }
+          if this_context.is_some() {
+            try!(encoder.emit_struct_field("context", 0usize, |encoder| this_context.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct StatusReq {
   state: State,
   target_url: Option<&'static str>,

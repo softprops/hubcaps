@@ -31,8 +31,6 @@ impl Default for Sort {
   }
 }
 
-
-
 pub struct PullRequest<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
@@ -131,7 +129,6 @@ impl<'a> ListBuilder<'a> {
     Ok(json::decode::<Vec<Pull>>(&body).unwrap())
   }
 }
-
 
 impl<'a> PullRequests<'a> {
   pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> PullRequests<'a> {
