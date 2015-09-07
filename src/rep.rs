@@ -97,7 +97,8 @@ pub struct DeploymentReq {
   pub task: Option<&'static str>,
   pub auto_merge: Option<bool>,
   pub required_contexts: Option<Vec<&'static str>>,
-  pub payload: Option<Json>,
+  /// contents of payload should be valid JSON
+  pub payload: Option<String>,
   pub environment: Option<&'static str>,
   pub description: Option<&'static str>
 }
@@ -161,7 +162,7 @@ impl DeploymentReqBuilder {
       task: self.task,
       auto_merge: self.auto_merge,
       required_contexts: self.required_contexts.clone(),
-      payload: self.payload.clone(),
+      payload: self.payload.clone().map(|p| p.to_string()),
       environment: self.environment,
       description: self.description
     }
