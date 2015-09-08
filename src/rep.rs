@@ -674,7 +674,30 @@ pub struct DeploymentStatus {
   creator: User
 }
 
-#[derive(Debug, RustcEncodable)]
+impl Encodable for DeploymentStatusReq {
+  fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
+    match *self {
+      DeploymentStatusReq {
+        state: ref this_state,
+        target_url: ref this_target_url,
+        description: ref this_description
+      } => {
+        encoder.emit_struct("DeploymentStatusReq", 1usize, |encoder| {
+          try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
+          if this_target_url.is_some() {
+            try!(encoder.emit_struct_field("target_url", 0usize, |encoder| this_target_url.encode(encoder)));
+          }
+          if this_description.is_some() {
+            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
+          }
+          Ok(())
+        })
+      }
+    }
+  }
+}
+
+#[derive(Debug)]
 pub struct DeploymentStatusReq {
   state: State,
   target_url: Option<&'static str>,
