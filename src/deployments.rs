@@ -44,8 +44,8 @@ impl<'a> DeploymentStatuses<'a> {
     Ok(json::decode::<Vec<DeploymentStatus>>(&body).unwrap())
   }
 
-  pub fn create(&self, stat: &DeploymentStatusReq) -> Result<DeploymentStatus> {
-    let data = json::encode::<DeploymentStatusReq>(&stat).unwrap();
+  pub fn create(&self, status: &DeploymentStatusReq) -> Result<DeploymentStatus> {
+    let data = json::encode::<DeploymentStatusReq>(&status).unwrap();
     let body = try!(
       self.github.post(
         &self.path(""),
