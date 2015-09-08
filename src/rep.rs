@@ -697,11 +697,52 @@ impl Encodable for DeploymentStatusReq {
   }
 }
 
+pub struct DeploymentStatusReqBuilder {
+  state: State,
+  target_url: Option<&'static str>,
+  description: Option<&'static str>
+}
+
+impl DeploymentStatusReqBuilder {
+
+  pub fn new(state: State) -> DeploymentStatusReqBuilder {
+    DeploymentStatusReqBuilder {
+      state: state,
+      target_url: None,
+      description: None
+    }
+  }
+
+  pub fn target_url(&mut self, url: &'static str) -> &mut DeploymentStatusReqBuilder {
+    self.target_url = Some(url);
+    self
+  }
+
+  pub fn description(&mut self, desc: &'static str) -> &mut DeploymentStatusReqBuilder {
+    self.description = Some(desc);
+    self
+  }
+
+  pub fn build(&self) -> DeploymentStatusReq {
+    DeploymentStatusReq {
+      state: self.state.clone(),
+      target_url: self.target_url,
+      description: self.description
+    }
+  }
+}
+
 #[derive(Debug)]
 pub struct DeploymentStatusReq {
   state: State,
   target_url: Option<&'static str>,
   description: Option<&'static str>
+}
+
+impl DeploymentStatusReq {
+  pub fn builder(state: State) -> DeploymentStatusReqBuilder {
+    DeploymentStatusReqBuilder::new(state)
+  }
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
