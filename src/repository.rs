@@ -52,7 +52,7 @@ impl<'a> Repository<'a> {
     Releases::new(self.github, self.owner, self.repo)
   }
 
-  pub fn statues(&self) -> Statuses {
+  pub fn statuses(&self) -> Statuses {
     Statuses::new(self.github, self.owner, self.repo)
   }
 }
