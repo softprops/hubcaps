@@ -660,6 +660,26 @@ impl ReleaseReq {
   }
 }
 
+#[derive(Debug, RustcDecodable)]
+pub struct DeploymentStatus {
+  url: String,
+  created_at: String,
+  updated_at: String,
+  state: State,
+  target_url: String,
+  description: String,
+  id: i64,
+  deployment_url: String,
+  repository_url: String,
+  creator: User
+}
+
+#[derive(Debug, RustcEncodable)]
+pub struct DeploymentStatusReq {
+  state: State,
+  target_url: Option<&'static str>,
+  description: Option<&'static str>
+}
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Status {
@@ -673,8 +693,6 @@ pub struct Status {
   context: String,
   creator: User
 }
-
-
 
 impl Encodable for StatusReq {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {

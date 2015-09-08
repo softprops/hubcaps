@@ -7,7 +7,7 @@ use std::io::Result;
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub enum State {
-  sending, success, error, failure
+  pending, success, error, failure
 }
 
 pub struct Statuses<'a> {
