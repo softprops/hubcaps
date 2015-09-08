@@ -102,7 +102,7 @@ impl<'a> IssueLabels<'a> {
   /// providing an empty set of labels is the same as clearing the
   /// current labels
   pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-    let body = try!(self.github.patch(
+    let body = try!(self.github.put(
       &self.path(""),
       json::encode(&labels).unwrap().as_bytes()
     ));
