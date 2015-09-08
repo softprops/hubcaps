@@ -28,19 +28,19 @@ impl Decodable for Deployment {
 
 #[derive(Debug)]
 pub struct Deployment {
-  url: String,
-  id: i64,
-  sha: String,
-  commit_ref: String,
-  task: String,
+  pub url: String,
+  pub id: i64,
+  pub sha: String,
+  pub commit_ref: String,
+  pub task: String,
 //  payload: Json,
-  environment: String,
-  description: String,
-  creator: User,
-  created_at: String,
-  updated_at: String,
-  statuses_url: String,
-  repository_url: String
+  pub environment: String,
+  pub description: String,
+  pub creator: User,
+  pub created_at: String,
+  pub updated_at: String,
+  pub statuses_url: String,
+  pub repository_url: String
 }
 
 impl Encodable for DeploymentReq {
@@ -662,16 +662,16 @@ impl ReleaseReq {
 
 #[derive(Debug, RustcDecodable)]
 pub struct DeploymentStatus {
-  url: String,
-  created_at: String,
-  updated_at: String,
-  state: State,
-  target_url: String,
-  description: String,
-  id: i64,
-  deployment_url: String,
-  repository_url: String,
-  creator: User
+  pub url: String,
+  pub created_at: String,
+  pub updated_at: String,
+  pub state: State,
+  pub target_url: String,
+  pub description: String,
+  pub id: i64,
+  pub deployment_url: String,
+  pub repository_url: String,
+  pub creator: User
 }
 
 impl Encodable for DeploymentStatusReq {
