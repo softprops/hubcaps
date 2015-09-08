@@ -40,7 +40,7 @@ impl<'a> Repository<'a> {
   }
 
   /// get a reference to a specific github issue associated with this repoistory ref
-  pub fn issue(&self, number: &'static i64) -> IssueRef {
+  pub fn issue(&self, number: i64) -> IssueRef {
     IssueRef::new(self.github, self.owner, self.repo, number)
   }
 

@@ -59,7 +59,7 @@ pub struct IssueLabels<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
   repo: &'static str,
-  number: &'static i64
+  number: i64
 }
 
 impl<'a> IssueLabels<'a> {
@@ -67,7 +67,7 @@ impl<'a> IssueLabels<'a> {
     github: &'a Github<'a>,
     owner: &'static str,
     repo: &'static str,
-    number: &'static i64) -> IssueLabels<'a> {
+    number: i64) -> IssueLabels<'a> {
     IssueLabels {
       github: github,
       owner: owner,
@@ -121,14 +121,16 @@ pub struct IssueRef<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
   repo: &'static str,
-  number: &'static i64
+  number: i64
 }
 
 impl<'a> IssueRef<'a> {
   /// create a new instance of a github repo issue ref
   pub fn new(
-    github: &'a Github<'a>, owner: &'static str, repo: &'static str,
-    number: &'static i64) -> IssueRef<'a> {
+    github: &'a Github<'a>,
+    owner: &'static str,
+    repo: &'static str,
+    number: i64) -> IssueRef<'a> {
     IssueRef {
       github: github,
       owner: owner,
@@ -282,7 +284,7 @@ impl<'a> Issues<'a> {
     format!("/repos/{}/{}/issues{}", self.owner, self.repo, more)
   }
 
-  pub fn get(&self, number: &'static i64) -> IssueRef {
+  pub fn get(&self, number: i64) -> IssueRef {
     IssueRef::new(self.github, self.owner, self.repo, number)
   }
 
