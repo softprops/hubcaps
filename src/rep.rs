@@ -747,15 +747,15 @@ impl DeploymentStatusReq {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Status {
-  created_at: String,
-  updated_at: String,
-  state: State,
-  target_url: String,
-  description: String,
-  id: i64,
-  url: String,
-  context: String,
-  creator: User
+  pub created_at: String,
+  pub updated_at: String,
+  pub state: State,
+  pub target_url: String,
+  pub description: String,
+  pub id: i64,
+  pub url: String,
+  pub context: String,
+  pub creator: User
 }
 
 impl Encodable for StatusReq {
