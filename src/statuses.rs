@@ -10,6 +10,7 @@ pub enum State {
   pending, success, error, failure
 }
 
+/// interface for statuses assocaited with a repository
 pub struct Statuses<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
@@ -29,6 +30,7 @@ impl<'a> Statuses<'a> {
     format!("/repos/{}/{}/statuses{}", self.owner, self.repo, more)
   }
 
+  /// creates a new status for a target sha
   pub fn create(&self, sha: &'static str, status: &StatusReq) -> Result<Status> {
     let data = json::encode(&status).unwrap();
     let body = try!(
@@ -40,6 +42,7 @@ impl<'a> Statuses<'a> {
     Ok(json::decode::<Status>(&body).unwrap())
   }
 
+  /// lists all statuses associated with a given git sha
   pub fn list(&self, sha: &'static str) -> Result<Vec<Status>> {
     let body = try!(
       self.github.get(
@@ -51,6 +54,7 @@ impl<'a> Statuses<'a> {
     Ok(json::decode::<Vec<Status>>(&body).unwrap())
   }
 
+  /// list the combined statuses for a given git sha
   pub fn combined(&self, sha: &'static str) -> Result<String> {
     let body = try!(
       self.github.get(

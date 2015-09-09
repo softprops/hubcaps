@@ -5,12 +5,14 @@ use rustc_serialize::json;
 use std::io::Result;
 use rep::{Deployment, DeploymentReq, DeploymentStatus, DeploymentStatusReq};
 
+/// Interface for repository deployements
 pub struct Deployments<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
   repo: &'static str
 }
 
+/// INterface for deployment statuses
 pub struct DeploymentStatuses<'a> {
   github: &'a Github<'a>,
   owner: &'static str,
@@ -19,6 +21,7 @@ pub struct DeploymentStatuses<'a> {
 }
 
 impl<'a> DeploymentStatuses<'a> {
+  /// creates a new
   pub fn new(
     github: &'a Github<'a>,
     owner: &'static str,
@@ -35,6 +38,7 @@ impl<'a> DeploymentStatuses<'a> {
     format!("/repos/{}/{}/deployments/{}/statuses{}", self.owner, self.repo, self.id, more)
   }
 
+  /// lists all statuses associated with a deployment
   pub fn list(&self) -> Result<Vec<DeploymentStatus>> {
     let body = try!(
       self.github.get(
@@ -44,6 +48,8 @@ impl<'a> DeploymentStatuses<'a> {
     Ok(json::decode::<Vec<DeploymentStatus>>(&body).unwrap())
   }
 
+  /// creates a new deployment status. For convenience, a DeploymentStatusReq.builder
+  /// interface is required for building up a request
   pub fn create(&self, status: &DeploymentStatusReq) -> Result<DeploymentStatus> {
     let data = json::encode::<DeploymentStatusReq>(&status).unwrap();
     let body = try!(
@@ -57,6 +63,7 @@ impl<'a> DeploymentStatuses<'a> {
 }
 
 impl<'a> Deployments<'a> {
+  /// Create a new deployments instance
   pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Deployments<'a> {
     Deployments { github: github, owner: owner, repo: repo }
   }
@@ -65,6 +72,7 @@ impl<'a> Deployments<'a> {
     format!("/repos/{}/{}/deployments{}", self.owner, self.repo, more)
   }
 
+  /// lists all deployments for a repository
   pub fn list(&self) -> Result<String> {
     let body = try!(
       self.github.get(
@@ -74,6 +82,7 @@ impl<'a> Deployments<'a> {
     Ok(body)
   }
 
+  /// creates a new deployment for this repository
   pub fn create(&self, dep: &DeploymentReq) -> Result<String> {
     let data = json::encode(&dep).unwrap();
     let body = try!(
@@ -85,6 +94,7 @@ impl<'a> Deployments<'a> {
     Ok(body)
   }
 
+  /// get a reference to the statuses api for a give deployment
   pub fn statuses(&self, id: i64) -> DeploymentStatuses {
     DeploymentStatuses::new(self.github, self.owner, self.repo, id)
   }
