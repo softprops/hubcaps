@@ -10,6 +10,7 @@ Find them [here](http://softprops.github.io/hubcaps)
 
 ## usage
 
+Basic usage requires a user-defined useragent string, a `hyper::Client` instance and optionally a personal access token.
 
 ```rust
 extern crate hyper;
@@ -26,6 +27,66 @@ fn main() {
     Some("personal-access-token")
   );
 }
+```
+
+Github instances define functions for accessing api services that map closely to their url structure.
+
+### repositories
+
+Typically the reference point of most github services is a repository
+
+```rust
+let repo = github.repo("user", "repo");
+```
+
+With a repo on hand, you can access a number of sub services, like `labels`, `deployments`, `pulls`, `issues`, and `releases`.
+
+### labels
+
+Labels is a service for tagging resources like issues and pulls with names which you can later group and filter on.
+
+```rust
+let labels = repo.labels();
+```
+
+### deployments
+
+Deployments is a service for orchestation deployments of applications sourced from github repositories
+
+```rust
+let deployments = repo.deployments();
+```
+
+### pulls
+
+Pulls is a service for issuing change requests against a repository
+
+```rust
+let pulls = repo.pulls();
+```
+
+### issues
+
+Issues is a service for tracking bugs for a repository
+
+```rust
+let issues = repo.issues();
+```
+
+### releases
+
+Releases is a service for tracking changes for a stable releases of a versioned library or application
+
+```rust
+let releases = repo.releases();
+```
+
+### gists
+
+Gists is a service for micro repositories
+
+```rust
+let gists = github.gists();
 ```
 
 Doug Tangren (softprops) 2015
