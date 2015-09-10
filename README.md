@@ -47,6 +47,23 @@ Labels is a service for tagging resources like issues and pulls with names which
 
 ```rust
 let labels = repo.labels();
+
+// create new labels
+println!(
+  "{:?}", labels.create(
+    &LabelReq::new(
+      "rustic", "ccc"
+    )
+  ).unwrap()
+);
+
+// list labels
+for l in labels.list().unwrap() {
+  println!("{:?}", l)
+}
+
+// delete labels
+labels.delete("rustic").unwrap();
 ```
 
 ### deployments
