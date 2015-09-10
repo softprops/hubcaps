@@ -844,3 +844,20 @@ impl StatusReq {
     StatusBuilder::new(state)
   }
 }
+
+#[derive(Debug, RustcEncodable, RustcDecodable)]
+pub struct Key {
+  pub id: i64,
+  pub key: String,
+  pub title: String,
+  pub verified: bool,
+  pub created_at: String,
+  pub read_only: bool
+}
+
+#[derive(Debug, RustcEncodable)]
+pub struct KeyReq {
+  pub title: &'static str,
+  pub key: &'static str,
+  pub read_only: bool
+}
