@@ -6,6 +6,7 @@ use rep::{Issue, IssueReq, Label};
 use rustc_serialize::json;
 use std::fmt;
 use std::default::Default;
+use url::form_urlencoded;
 
 pub enum Filter {
   Assigned,
@@ -237,27 +238,26 @@ impl<'a> ListBuilder<'a> {
 
   pub fn get(&self) -> Result<Vec<Issue>> {
     let mut params = Vec::new();
-    params.push(format!("state={}", self.state));
-    params.push(format!("sort={}", self.sort));
-    params.push(format!("direction={}", self.direction));
+    params.push(("state", self.state.to_string()));
+    params.push(("sort", self.sort.to_string()));
+    params.push(("direction", self.direction.to_string()));
     if let Some(a) = self.assignee {
-      params.push(format!("assignee={}", a));
+      params.push(("assignee", a.to_owned()));
     }
     if let Some(c) = self.creator {
-      params.push(format!("creator={}", c));
+      params.push(("creator", c.to_owned()));
     }
     if let Some(m) = self.mentioned {
-      params.push(format!("mentioned={}", m));
+      params.push(("mentioned", m.to_owned()));
     }
     if let Some(s) = self.since {
-      params.push(format!("since={}", s));
+      params.push(("since", s.to_owned()));
     }
     if !self.labels.is_empty() {
-      params.push(format!("labels={}", self.labels.connect(",")));
+      params.push(("labels", self.labels.connect(",")));
     }
-    println!("params {:?}", params);
     let url = self.issues.path(
-      &format!("?{}", params.connect("&"))
+      &format!("?{}", form_urlencoded::serialize(params))
     );
     let body = try!(
       self.issues.github.get(
