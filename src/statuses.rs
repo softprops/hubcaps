@@ -10,6 +10,12 @@ pub enum State {
   pending, success, error, failure
 }
 
+impl Default for State {
+  fn default() -> State {
+    State::pending
+  }
+}
+
 /// interface for statuses assocaited with a repository
 pub struct Statuses<'a> {
   github: &'a Github<'a>,
