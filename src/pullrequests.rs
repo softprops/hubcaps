@@ -1,5 +1,6 @@
 //! Pull requests interface
 
+use url::form_urlencoded;
 use self::super::{Github, SortDirection, State};
 use rep::{Pull, PullEdit, PullReq};
 use rustc_serialize::json;
@@ -121,8 +122,14 @@ impl<'a> ListBuilder<'a> {
       self.pulls.github.get(
         &self.pulls.path(
           &format!(
-            "?state={}&sort={}&direction={}", self.state, self.sort, self.direction
-          )[..]
+            "?{}", form_urlencoded::serialize(
+              vec![
+                ("state", self.state.to_string()),
+                ("sort", self.sort.to_string()),
+                ("direction", self.direction.to_string())
+              ]
+            )
+          )
         )
       )
     );
