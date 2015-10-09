@@ -100,6 +100,7 @@ impl DeploymentReq {
   }
 }
 
+#[derive(Default)]
 pub struct DeploymentReqBuilder {
   pub commit_ref: &'static str,
   pub task: Option<&'static str>,
@@ -114,12 +115,7 @@ impl DeploymentReqBuilder {
   pub fn new(commit: &'static str) -> DeploymentReqBuilder {
     DeploymentReqBuilder {
       commit_ref: commit,
-      task: None,
-      auto_merge: None,
-      required_contexts: None,
-      payload: None,
-      environment: None,
-      description: None
+      ..Default::default()
     }
   }
 
@@ -353,6 +349,15 @@ pub struct Repo {
   created_at: String,
   updated_at: String,
 //  permissions: Permissions
+}
+
+#[derive(Debug, RustcDecodable)]
+pub struct RepoDetails {
+  pub id: i64,
+  pub owner: User,
+  pub name: String,
+  pub full_name: String,
+  // todo
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
@@ -592,6 +597,7 @@ pub struct ReleaseReq {
 
 
 /// builder interface for ReleaseReq
+#[derive(Default)]
 pub struct ReleaseBuilder {
   tag: &'static str,
   commitish: Option<&'static str>,
@@ -605,11 +611,7 @@ impl ReleaseBuilder {
   pub fn new(tag: &'static str) -> ReleaseBuilder {
     ReleaseBuilder {
       tag: tag,
-      commitish: None,
-      name: None,
-      body: None,
-      draft: None,
-      prerelease: None
+      ..Default::default()
     }
   }
 
@@ -697,6 +699,7 @@ impl Encodable for DeploymentStatusReq {
   }
 }
 
+#[derive(Default)]
 pub struct DeploymentStatusReqBuilder {
   state: State,
   target_url: Option<&'static str>,
@@ -708,8 +711,7 @@ impl DeploymentStatusReqBuilder {
   pub fn new(state: State) -> DeploymentStatusReqBuilder {
     DeploymentStatusReqBuilder {
       state: state,
-      target_url: None,
-      description: None
+      ..Default::default()
     }
   }
 
@@ -793,6 +795,7 @@ pub struct StatusReq {
   context: Option<&'static str>
 }
 
+#[derive(Default)]
 pub struct StatusBuilder {
   state: State,
   target_url: Option<&'static str>,
@@ -804,9 +807,7 @@ impl StatusBuilder {
   pub fn new(state: State) -> StatusBuilder {
     StatusBuilder {
       state: state,
-      target_url: None,
-      description: None,
-      context: None
+      ..Default::default()
     }
   }
 
