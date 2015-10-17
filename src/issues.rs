@@ -1,7 +1,6 @@
 //! Issues interface
 
-use std::io::Result;
-use self::super::{Github, SortDirection, State};
+use self::super::{Github, Result, SortDirection, State};
 use rep::{Issue, IssueReq, Label};
 use rustc_serialize::json;
 use std::fmt;

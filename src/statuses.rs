@@ -1,9 +1,8 @@
 //! Statuses interface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use rep::{Status, StatusReq};
 use rustc_serialize::json;
-use std::io::Result;
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub enum State {

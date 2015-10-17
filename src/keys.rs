@@ -1,8 +1,7 @@
 //! Deploy keys interface
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/) for motivation and use
 
-use std::io::Result;
-use self::super::Github;
+use self::super::{Github, Result};
 use rep::{Key, KeyReq};
 use rustc_serialize::json;
 

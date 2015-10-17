@@ -21,10 +21,36 @@ use hyper::Client;
 use hyper::client::{IntoUrl, RequestBuilder};
 use hyper::method::Method;
 use hyper::header::{Authorization, UserAgent};
+use hyper::status::StatusCode;
 use repository::Repository;
+use std::convert::From;
 use std::default::Default;
 use std::fmt;
-use std::io::{Read, Result};
+use std::io::Read;
+
+use std::io::Error as IoError;
+use hyper::Error as HttpError;
+
+/// enumerated types of client errors
+pub enum Error {
+    Http(HttpError),
+    Io(IoError),
+    Fault { code: StatusCode, body: String }
+}
+
+impl From<HttpError> for Error {
+    fn from(error: HttpError) -> Error {
+        Error::Http(error)
+    }
+}
+
+impl From<IoError> for Error {
+    fn from(error: IoError) -> Error {
+        Error::Io(error)
+    }
+}
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// enum representation of github pulls and issues
 pub enum State {
@@ -132,8 +158,14 @@ impl<'a> Github<'a> {
        _ => authenticated.send().unwrap()
     };
     let mut body = String::new();
-    res.read_to_string(&mut body).unwrap();
-    Ok(body)
+      res.read_to_string(&mut body).unwrap();
+      match res.status {
+          StatusCode::BadRequest |
+          StatusCode::UnprocessableEntity |
+          StatusCode::NotFound | StatusCode::Forbidden =>
+              Err(Error::Fault { code: res.status, body: body }),
+          _ => Ok(body)
+      }
   }
 
   fn get(&self, uri: &str) -> Result<String> {

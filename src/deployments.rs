@@ -1,8 +1,7 @@
 //! Deployments interface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use rustc_serialize::json;
-use std::io::Result;
 use rep::{Deployment, DeploymentReq, DeploymentStatus, DeploymentStatusReq};
 
 /// Interface for repository deployements

@@ -1,8 +1,7 @@
 //! Gists interface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use rustc_serialize::json;
-use std::io::Result;
 use rep::{Gist, GistFork, GistReq};
 
 /// reference to gists associated with a github user

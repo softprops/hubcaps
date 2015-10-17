@@ -1,12 +1,11 @@
 //! Pull requests interface
 
 use url::form_urlencoded;
-use self::super::{Github, SortDirection, State};
+use self::super::{Github, Result, SortDirection, State};
 use rep::{Pull, PullEdit, PullReq};
 use rustc_serialize::json;
 use std::default::Default;
 use std::fmt;
-use std::io::Result;
 
 pub enum Sort {
   Created,

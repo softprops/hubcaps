@@ -1,8 +1,7 @@
 //! Releases inteface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use rustc_serialize::json;
-use std::io::Result;
 use rep::{Asset, Release, ReleaseReq};
 
 

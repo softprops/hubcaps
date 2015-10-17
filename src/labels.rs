@@ -1,9 +1,8 @@
 //! Labels interface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use rep::{Label, LabelReq};
 use rustc_serialize::json;
-use std::io::Result;
 
 pub struct Labels<'a> {
   github: &'a Github<'a>,
