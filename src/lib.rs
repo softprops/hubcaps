@@ -31,7 +31,7 @@ use std::io::Read;
 /// alias for Result that infers hubcaps::Error as Err
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// enum representation of github pulls and issues
+/// enum representation of github pull and issue state
 pub enum State {
   Open,
   Closed,
