@@ -60,160 +60,160 @@ pub enum State {
 }
 
 impl fmt::Display for State {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", match *self {
-      State::Open   => "open",
-      State::Closed => "closed",
-      State::All    => "all"
-    })
-  }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match *self {
+            State::Open   => "open",
+            State::Closed => "closed",
+            State::All    => "all"
+        })
+    }
 }
 
 impl Default for State {
-  fn default() -> State {
-    State::Open
-  }
+    fn default() -> State {
+        State::Open
+    }
 }
 
 
 /// enum representation of Github list sorting options
 pub enum SortDirection {
-  Asc,
-  Desc
+    Asc,
+    Desc
 }
 
 impl fmt::Display for SortDirection {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", match *self {
-      SortDirection::Asc => "asc",
-      SortDirection::Desc => "desc"
-    })
-  }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match *self {
+            SortDirection::Asc => "asc",
+            SortDirection::Desc => "desc"
+        })
+    }
 }
 
 impl Default for SortDirection {
-  fn default() -> SortDirection {
-    SortDirection::Asc
-  }
+    fn default() -> SortDirection {
+        SortDirection::Asc
+    }
 }
 
 /// Entry point interface for interacting with Github API
 pub struct Github<'a> {
-  host: &'static str,
-  agent: &'static str,
-  client: &'a Client,
-  token: Option<&'static str>
+    host: &'static str,
+    agent: &'static str,
+    client: &'a Client,
+    token: Option<&'static str>
 }
 
 impl<'a> Github<'a> {
-  /// Create a new Github instance
-  pub fn new(
-    agent: &'static str, client: &'a Client, token: Option<&'static str>) -> Github<'a> {
-    Github::host("https://api.github.com", agent, client, token)
-  }
-
-  /// Create a new Github instance hosted at a custom location
-  pub fn host(
-    host: &'static str, agent: &'static str,
-    client: &'a Client, token: Option<&'static str>) -> Github<'a> {
-    Github {
-      host: host,
-      agent: agent,
-      client: client,
-      token: token
+    /// Create a new Github instance
+    pub fn new(
+        agent: &'static str, client: &'a Client, token: Option<&'static str>) -> Github<'a> {
+        Github::host("https://api.github.com", agent, client, token)
     }
-  }
 
-  /// Return a reference to a Github reposistory
-  pub fn repo(&self, owner: &'static str, repo: &'static str) -> Repository {
-    Repository::new(self, owner, repo)
-  }
+    /// Create a new Github instance hosted at a custom location
+    pub fn host(
+        host: &'static str, agent: &'static str,
+        client: &'a Client, token: Option<&'static str>) -> Github<'a> {
+        Github {
+            host: host,
+            agent: agent,
+            client: client,
+            token: token
+        }
+    }
 
-  /// Return a reference to an interface that provides access to a user's gists
-  pub fn user_gists(&self, owner: &'static str) -> UserGists {
-    UserGists::new(self, owner)
-  }
+    /// Return a reference to a Github reposistory
+    pub fn repo(&self, owner: &'static str, repo: &'static str) -> Repository {
+        Repository::new(self, owner, repo)
+    }
 
-  ///Rreturn a reference to an interface that provides access to the
-  /// gists belonging to the owner of the token used to configure this client
-  pub fn gists(&self) -> Gists {
-    Gists::new(self)
-  }
+    /// Return a reference to an interface that provides access to a user's gists
+    pub fn user_gists(&self, owner: &'static str) -> UserGists {
+        UserGists::new(self, owner)
+    }
 
-  fn request<U: IntoUrl>(
-    &self, request_builder: RequestBuilder<'a, U>, body: Option<&'a [u8]>) -> Result<String> {
-    let builder = request_builder.header(
-      UserAgent(self.agent.to_owned())
-    );
-    let authenticated = match self.token {
-      Some(token) =>
-        builder.header(
-          Authorization(format!("token {}", token))
-        ),
-      _ =>
-        builder
-    };
-    let mut res = match body {
-      Some(ref bod) => authenticated.body(*bod).send().unwrap(),
-       _ => authenticated.send().unwrap()
-    };
-    let mut body = String::new();
-      res.read_to_string(&mut body).unwrap();
-      match res.status {
-          StatusCode::BadRequest |
-          StatusCode::UnprocessableEntity |
-          StatusCode::NotFound | StatusCode::Forbidden =>
-              Err(Error::Fault { code: res.status, body: body }),
-          _ => Ok(body)
-      }
-  }
+    /// Return a reference to an interface that provides access to the
+    /// gists belonging to the owner of the token used to configure this client
+    pub fn gists(&self) -> Gists {
+        Gists::new(self)
+    }
 
-  fn get(&self, uri: &str) -> Result<String> {
-    let url = format!("{}{}", self.host, uri);
-    self.request(
-      self.client.get(
-        &url
-      ), None
-    )
-  }
+    fn request<U: IntoUrl>(
+        &self, request_builder: RequestBuilder<'a, U>, body: Option<&'a [u8]>) -> Result<String> {
+        let builder = request_builder.header(
+            UserAgent(self.agent.to_owned())
+        );
+        let authenticated = match self.token {
+            Some(token) =>
+                builder.header(
+                    Authorization(format!("token {}", token))
+               ),
+            _ =>
+                builder
+        };
+        let mut res = match body {
+            Some(ref bod) => authenticated.body(*bod).send().unwrap(),
+            _ => authenticated.send().unwrap()
+        };
+        let mut body = String::new();
+        res.read_to_string(&mut body).unwrap();
+        match res.status {
+            StatusCode::BadRequest |
+            StatusCode::UnprocessableEntity |
+            StatusCode::NotFound | StatusCode::Forbidden =>
+                Err(Error::Fault { code: res.status, body: body }),
+            _ => Ok(body)
+        }
+    }
 
-  fn delete(&self, uri: &str) -> Result<()> {
-    let url = format!("{}{}", self.host, uri);
-    self.request(
-      self.client.delete(
-        &url
-      ), None
-    ).map(|_| ())
-  }
+    fn get(&self, uri: &str) -> Result<String> {
+        let url = format!("{}{}", self.host, uri);
+        self.request(
+            self.client.get(
+                &url
+            ), None
+        )
+    }
 
-  fn post(&self, uri: &str, message: &[u8]) -> Result<String> {
-    let url = format!("{}{}", self.host, uri);
-    self.request(
-      self.client.post(
-        &url
-      ),
-      Some(message)
-    )
-  }
+    fn delete(&self, uri: &str) -> Result<()> {
+        let url = format!("{}{}", self.host, uri);
+        self.request(
+            self.client.delete(
+                &url
+            ), None
+        ).map(|_| ())
+    }
 
-  fn patch(&self, uri: &str, message: &[u8]) -> Result<String> {
-    let url = format!("{}{}", self.host, uri);
-    self.request(
-      self.client.request(
-        Method::Patch,
-        &url
-      ),
-      Some(message)
-    )
-  }
+    fn post(&self, uri: &str, message: &[u8]) -> Result<String> {
+        let url = format!("{}{}", self.host, uri);
+        self.request(
+            self.client.post(
+                &url
+            ),
+            Some(message)
+        )
+    }
 
-  fn put(&self, uri: &str, message: &[u8]) -> Result<String> {
-    let url = format!("{}{}", self.host, uri);
-    self.request(
-      self.client.put(
-        &url
-      ),
-      Some(message)
-    )
-  }
+    fn patch(&self, uri: &str, message: &[u8]) -> Result<String> {
+        let url = format!("{}{}", self.host, uri);
+        self.request(
+            self.client.request(
+                Method::Patch,
+                &url
+            ),
+            Some(message)
+        )
+    }
+
+    fn put(&self, uri: &str, message: &[u8]) -> Result<String> {
+        let url = format!("{}{}", self.host, uri);
+        self.request(
+            self.client.put(
+                &url
+            ),
+            Some(message)
+        )
+    }
 }
