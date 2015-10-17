@@ -20,7 +20,6 @@ pub mod pullrequests;
 use errors::Error;
 use gists::{Gists, UserGists};
 use hyper::Client;
-use hyper::client::{IntoUrl, RequestBuilder};
 use hyper::method::Method;
 use hyper::header::{Authorization, UserAgent};
 use hyper::status::StatusCode;
@@ -120,9 +119,10 @@ impl<'a> Github<'a> {
         Gists::new(self)
     }
 
-    fn request<U: IntoUrl>(
-        &self, request_builder: RequestBuilder<'a, U>, body: Option<&'a [u8]>) -> Result<String> {
-        let builder = request_builder.header(
+    fn request(
+        &self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<String> {
+        let url = format!("{}{}", self.host, uri);
+        let builder = self.client.request(method, &url).header(
             UserAgent(self.agent.to_owned())
         );
         let authenticated = match self.token {
@@ -152,50 +152,41 @@ impl<'a> Github<'a> {
     }
 
     fn get(&self, uri: &str) -> Result<String> {
-        let url = format!("{}{}", self.host, uri);
         self.request(
-            self.client.get(
-                &url
-            ), None
+            Method::Get,
+            uri,
+            None
         )
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        let url = format!("{}{}", self.host, uri);
         self.request(
-            self.client.delete(
-                &url
-            ), None
+            Method::Delete,
+            uri,
+            None
         ).map(|_| ())
     }
 
     fn post(&self, uri: &str, message: &[u8]) -> Result<String> {
-        let url = format!("{}{}", self.host, uri);
         self.request(
-            self.client.post(
-                &url
-            ),
+            Method::Post,
+            uri,
             Some(message)
         )
     }
 
     fn patch(&self, uri: &str, message: &[u8]) -> Result<String> {
-        let url = format!("{}{}", self.host, uri);
         self.request(
-            self.client.request(
-                Method::Patch,
-                &url
-            ),
+            Method::Patch,
+            uri,
             Some(message)
         )
     }
 
     fn put(&self, uri: &str, message: &[u8]) -> Result<String> {
-        let url = format!("{}{}", self.host, uri);
         self.request(
-            self.client.put(
-                &url
-            ),
+            Method::Put,
+            uri,
             Some(message)
         )
     }
