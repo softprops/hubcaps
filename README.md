@@ -46,6 +46,8 @@ With a repo on hand, you can access a number of sub services, like `labels`, `de
 Labels is a service for tagging resources like issues and pulls with names which you can later group and filter on.
 
 ```rust
+use hubcaps::LabelReq;
+
 let labels = repo.labels();
 
 // create new labels
