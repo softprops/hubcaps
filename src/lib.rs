@@ -8,6 +8,7 @@ extern crate url;
 pub mod keys;
 pub mod gists;
 pub mod deployments;
+pub mod errors;
 pub mod issues;
 pub mod labels;
 pub mod rep;
@@ -16,6 +17,7 @@ pub mod repository;
 pub mod statuses;
 pub mod pullrequests;
 
+use errors::Error;
 use gists::{Gists, UserGists};
 use hyper::Client;
 use hyper::client::{IntoUrl, RequestBuilder};
@@ -28,27 +30,9 @@ use std::default::Default;
 use std::fmt;
 use std::io::Read;
 
-use std::io::Error as IoError;
-use hyper::Error as HttpError;
 
-/// enumerated types of client errors
-pub enum Error {
-    Http(HttpError),
-    Io(IoError),
-    Fault { code: StatusCode, body: String }
-}
 
-impl From<HttpError> for Error {
-    fn from(error: HttpError) -> Error {
-        Error::Http(error)
-    }
-}
 
-impl From<IoError> for Error {
-    fn from(error: IoError) -> Error {
-        Error::Io(error)
-    }
-}
 
 pub type Result<T> = std::result::Result<T, Error>;
 
