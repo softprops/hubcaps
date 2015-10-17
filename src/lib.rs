@@ -25,15 +25,11 @@ use hyper::method::Method;
 use hyper::header::{Authorization, UserAgent};
 use hyper::status::StatusCode;
 use repository::Repository;
-use std::convert::From;
 use std::default::Default;
 use std::fmt;
 use std::io::Read;
 
-
-
-
-
+/// alias for Result that infers hubcaps::Error as Err
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// enum representation of github pulls and issues
@@ -144,10 +140,13 @@ impl<'a> Github<'a> {
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
         match res.status {
-            StatusCode::BadRequest |
-            StatusCode::UnprocessableEntity |
-            StatusCode::NotFound | StatusCode::Forbidden =>
-                Err(Error::Fault { code: res.status, body: body }),
+            StatusCode::BadRequest
+            | StatusCode::UnprocessableEntity
+            | StatusCode::Unauthorized
+            | StatusCode::NotFound
+            | StatusCode::Forbidden => Err(
+                Error::Fault { code: res.status, body: body }
+            ),
             _ => Ok(body)
         }
     }

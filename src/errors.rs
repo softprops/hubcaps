@@ -3,6 +3,7 @@ use hyper::Error as HttpError;
 use hyper::status::StatusCode;
 
 /// enumerated types of client errors
+#[derive(Debug)]
 pub enum Error {
     Http(HttpError),
     Io(IoError),
