@@ -135,11 +135,11 @@ impl<'a> Github<'a> {
                 builder
         };
         let mut res = match body {
-            Some(ref bod) => authenticated.body(*bod).send().unwrap(),
-            _ => authenticated.send().unwrap()
+            Some(ref bod) => try!(authenticated.body(*bod).send()),
+            _ => try!(authenticated.send())
         };
         let mut body = String::new();
-        res.read_to_string(&mut body).unwrap();
+        try!(res.read_to_string(&mut body));
         match res.status {
             StatusCode::BadRequest
             | StatusCode::UnprocessableEntity
