@@ -134,10 +134,12 @@ impl<'a> Github<'a> {
             _ =>
                 builder
         };
-        let mut res = match body {
-            Some(ref bod) => try!(authenticated.body(*bod).send()),
-            _ => try!(authenticated.send())
-        };
+        let mut res = try!(
+            match body {
+                Some(ref bod) => authenticated.body(*bod).send(),
+                _ => authenticated.send()
+            }
+        );
         let mut body = String::new();
         try!(res.read_to_string(&mut body));
         match res.status {
