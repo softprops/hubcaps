@@ -9,6 +9,35 @@ use pullrequests::PullRequests;
 use releases::Releases;
 use statuses::Statuses;
 
+pub struct Repositories<'a> {
+    github: &'a Github<'a>
+}
+
+impl <'a> Repositories<'a> {
+    pub fn new(
+        github: &'a Github<'a>) -> Repositories<'a> {
+        Repositories {
+            github: github
+        }
+    }
+}
+
+pub struct UserRepositories<'a> {
+    github: &'a Github<'a>,
+    owner: &'static str
+}
+
+impl <'a> UserRepositories<'a> {
+    pub fn new(
+        github: &'a Github<'a>,
+        owner: &'static str) -> UserRepositories<'a> {
+        UserRepositories {
+            github: github,
+            owner: owner
+        }
+    }
+}
+
 pub struct Repository<'a> {
   github: &'a Github<'a>,
   owner: &'static str,

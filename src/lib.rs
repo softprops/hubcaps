@@ -13,7 +13,7 @@ pub mod issues;
 pub mod labels;
 pub mod rep;
 pub mod releases;
-pub mod repository;
+pub mod repositories;
 pub mod statuses;
 pub mod pullrequests;
 
@@ -24,7 +24,7 @@ use hyper::Client;
 use hyper::method::Method;
 use hyper::header::{Authorization, UserAgent};
 use hyper::status::StatusCode;
-use repository::Repository;
+use repositories::{Repository, Repositories, UserRepositories};
 use std::default::Default;
 use std::fmt;
 use std::io::Read;
@@ -107,6 +107,18 @@ impl<'a> Github<'a> {
     /// Return a reference to a Github reposistory
     pub fn repo(&self, owner: &'static str, repo: &'static str) -> Repository {
         Repository::new(self, owner, repo)
+    }
+
+    /// Return a reference to the collection of repositories owned by an
+    /// associated with an owner
+    pub fn user_repos(&self, owner: &'static str) -> UserRepositories {
+        UserRepositories::new(self, owner)
+    }
+
+    /// Return a reference to  the collection of repositores owned by the user
+    /// associated with the current authentication credentials
+    pub fn repos(&self) -> Repositories {
+        Repositories::new(self)
     }
 
     /// Return a reference to an interface that provides access to a user's gists

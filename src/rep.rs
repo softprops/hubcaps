@@ -862,3 +862,8 @@ pub struct KeyReq {
   pub key: &'static str,
   pub read_only: bool
 }
+
+#[cfg(test)]
+mod tests {
+
+}
