@@ -18,7 +18,7 @@ pub mod statuses;
 pub mod pullrequests;
 
 pub use rep::*;
-use errors::Error;
+pub use errors::Error;
 use gists::{Gists, UserGists};
 use hyper::Client;
 use hyper::method::Method;
