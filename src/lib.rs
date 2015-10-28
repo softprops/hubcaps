@@ -94,8 +94,11 @@ impl<'a> Github<'a> {
 
     /// Create a new Github instance hosted at a custom location
     pub fn host(
-        host: &'static str, agent: &'static str,
-        client: &'a Client, token: Option<&'static str>) -> Github<'a> {
+        host: &'static str,
+        agent: &'static str,
+        client: &'a Client,
+        token: Option<&'static str>
+     ) -> Github<'a> {
         Github {
             host: host,
             agent: agent,
