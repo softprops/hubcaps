@@ -59,11 +59,6 @@ impl<'a> Repository<'a> {
     Deployments::new(self.github, self.owner, self.repo)
   }
 
-  /// get a reference deploy keys associated with this repository ref
-  pub fn keys(&self) -> Keys {
-    Keys::new(self.github, self.owner, self.repo)
-  }
-
   /// get a reference to a specific github issue associated with this repoistory ref
   pub fn issue(&self, number: i64) -> IssueRef {
     IssueRef::new(self.github, self.owner, self.repo, number)
@@ -72,6 +67,11 @@ impl<'a> Repository<'a> {
   /// get a reference to github issues associated with this repoistory ref
   pub fn issues(&self) -> Issues {
     Issues::new(self.github, self.owner, self.repo)
+  }
+
+  /// get a reference deploy keys associated with this repository ref
+  pub fn keys(&self) -> Keys {
+    Keys::new(self.github, self.owner, self.repo)
   }
 
   /// get a list of labels associated with this repository ref
