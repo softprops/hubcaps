@@ -1,12 +1,14 @@
 //! Repository interface
 
-use self::super::Github;
+use self::super::{Github, Result};
 use deployments::Deployments;
 use keys::Keys;
 use issues::{IssueRef, Issues};
 use labels::Labels;
 use pullrequests::PullRequests;
 use releases::Releases;
+use rep::Repo;
+use rustc_serialize::json;
 use statuses::Statuses;
 
 pub struct Repositories<'a> {
@@ -19,6 +21,22 @@ impl <'a> Repositories<'a> {
         Repositories {
             github: github
         }
+    }
+
+    fn path(&self, more: &str) -> String {
+        format!("/user/repos{}", more)
+    }
+
+    /// list the authenticated users repositories
+    /// https://developer.github.com/v3/repos/#list-your-repositories
+    // todo: params
+    pub fn list(&self) -> Result<Vec<Repo>> {
+        let body = try!(
+            self.github.get(
+                &self.path("")
+            )
+         );
+         Ok(json::decode::<Vec<Repo>>(&body).unwrap())
     }
 }
 
@@ -35,6 +53,19 @@ impl <'a> UserRepositories<'a> {
             github: github,
             owner: owner
         }
+    }
+
+    fn path(&self, more: &str) -> String {
+        format!("/users/{}/repos{}", self.owner, more)
+    }
+
+    pub fn list(&self) -> Result<Vec<Repo>> {
+        let body = try!(
+            self.github.get(
+                &self.path("")
+            )
+         );
+        Ok(json::decode::<Vec<Repo>>(&body).unwrap())
     }
 }
 
