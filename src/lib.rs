@@ -22,7 +22,7 @@ pub use errors::Error;
 use gists::{Gists, UserGists};
 use hyper::Client;
 use hyper::method::Method;
-use hyper::header::{Authorization, UserAgent};
+use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories};
 use std::default::Default;
@@ -155,7 +155,12 @@ impl<'a> Github<'a> {
                 _ => authenticated.send()
             }
         );
-        let mut body = String::new();
+        let mut body =
+            match res.headers.clone().get::<ContentLength>() {
+                Some(&ContentLength(len)) =>
+                    String::with_capacity(len as usize),
+                _ => String::new()
+            };
         try!(res.read_to_string(&mut body));
         match res.status {
             StatusCode::BadRequest
