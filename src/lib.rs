@@ -79,25 +79,25 @@ impl Default for SortDirection {
 
 /// Entry point interface for interacting with Github API
 pub struct Github<'a> {
-    host: &'static str,
-    agent: &'static str,
+    host: &'a str,
+    agent: &'a str,
     client: &'a Client,
-    token: Option<&'static str>
+    token: Option<&'a str>
 }
 
 impl<'a> Github<'a> {
     /// Create a new Github instance
     pub fn new(
-        agent: &'static str, client: &'a Client, token: Option<&'static str>) -> Github<'a> {
+        agent: &'a str, client: &'a Client, token: Option<&'a str>) -> Github<'a> {
         Github::host("https://api.github.com", agent, client, token)
     }
 
     /// Create a new Github instance hosted at a custom location
     pub fn host(
-        host: &'static str,
-        agent: &'static str,
+        host: &'a str,
+        agent: &'a str,
         client: &'a Client,
-        token: Option<&'static str>
+        token: Option<&'a str>
      ) -> Github<'a> {
         Github {
             host: host,
