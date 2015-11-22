@@ -90,7 +90,7 @@ impl<'a> IssueLabels<'a> {
   }
 
   /// remove a label from this issue
-  pub fn remove(&self, label: &'static str) -> Result<()> {
+  pub fn remove(&self, label: &str) -> Result<()> {
     self.github.delete(
       &self.path(
         &format!("/{}", label)

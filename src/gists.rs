@@ -39,7 +39,7 @@ impl<'a> Gists<'a> {
     format!("/gists{}", more)
   }
 
-  pub fn star(&self, id: &'static str) -> Result<()> {
+  pub fn star(&self, id: &str) -> Result<()> {
     self.github.put(
       &self.path(
         &format!("/{}/star", id)
@@ -48,7 +48,7 @@ impl<'a> Gists<'a> {
     ).map(|_| ())
   }
 
-  pub fn unstar(&self, id: &'static str) -> Result<()> {
+  pub fn unstar(&self, id: &str) -> Result<()> {
     self.github.delete(
       &self.path(
         &format!("/{}/star", id)
@@ -56,7 +56,7 @@ impl<'a> Gists<'a> {
     ).map(|_| ())
   }
 
-  pub fn fork(&self, id: &'static str) -> Result<Gist> {
+  pub fn fork(&self, id: &str) -> Result<Gist> {
     let body = try!(
       self.github.post(
         &self.path(
@@ -68,7 +68,7 @@ impl<'a> Gists<'a> {
     Ok(json::decode::<Gist>(&body).unwrap())
   }
 
-  pub fn forks(&self, id: &'static str) -> Result<Vec<GistFork>> {
+  pub fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
     let body = try!(
       self.github.get(
         &self.path(
@@ -79,7 +79,7 @@ impl<'a> Gists<'a> {
     Ok(json::decode::<Vec<GistFork>>(&body).unwrap())
   }
 
-  pub fn delete(&self, id: &'static str) -> Result<()> {
+  pub fn delete(&self, id: &str) -> Result<()> {
     self.github.delete(
       &self.path(
         &format!("/{}", id)
@@ -87,7 +87,7 @@ impl<'a> Gists<'a> {
     ).map(|_| ())
   }
 
-  pub fn get(&self, id: &'static str) -> Result<Gist> {
+  pub fn get(&self, id: &str) -> Result<Gist> {
     let body = try!(
       self.github.get(
         &self.path(
@@ -98,7 +98,7 @@ impl<'a> Gists<'a> {
     Ok(json::decode::<Gist>(&body).unwrap())
   }
 
-  pub fn getrev(&self, id: &'static str, sha: &'static str) -> Result<Gist> {
+  pub fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
     let body = try!(
       self.github.get(
         &self.path(

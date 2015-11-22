@@ -36,7 +36,7 @@ impl<'a> Statuses<'a> {
   }
 
   /// creates a new status for a target sha
-  pub fn create(&self, sha: &'static str, status: &StatusReq) -> Result<Status> {
+  pub fn create(&self, sha: &str, status: &StatusReq) -> Result<Status> {
     let data = json::encode(&status).unwrap();
     let body = try!(
       self.github.post(
@@ -48,7 +48,7 @@ impl<'a> Statuses<'a> {
   }
 
   /// lists all statuses associated with a given git sha
-  pub fn list(&self, sha: &'static str) -> Result<Vec<Status>> {
+  pub fn list(&self, sha: &str) -> Result<Vec<Status>> {
     let body = try!(
       self.github.get(
         &format!(
@@ -60,7 +60,7 @@ impl<'a> Statuses<'a> {
   }
 
   /// list the combined statuses for a given git sha
-  pub fn combined(&self, sha: &'static str) -> Result<String> {
+  pub fn combined(&self, sha: &str) -> Result<String> {
     let body = try!(
       self.github.get(
         &format!(

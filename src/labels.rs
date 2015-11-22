@@ -34,7 +34,7 @@ impl<'a> Labels<'a> {
     Ok(json::decode::<Label>(&body).unwrap())
   }
 
-  pub fn update(&self, prevname: &'static str, lab: &LabelReq) -> Result<Label> {
+  pub fn update(&self, prevname: &str, lab: &LabelReq) -> Result<Label> {
     let data = json::encode(&lab).unwrap();
     let body = try!(
       self.github.patch(
@@ -47,7 +47,7 @@ impl<'a> Labels<'a> {
     Ok(json::decode::<Label>(&body).unwrap())
   }
 
-  pub fn delete(&self, name: &'static str) -> Result<()> {
+  pub fn delete(&self, name: &str) -> Result<()> {
     self.github.delete(
       &self.path(
         &format!("/{}", name)
