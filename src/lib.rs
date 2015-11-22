@@ -127,7 +127,7 @@ impl<'a> Github<'a> {
     }
 
     /// Return a reference to an interface that provides access to a user's gists
-    pub fn user_gists(&self, owner: &'static str) -> UserGists {
+    pub fn user_gists<O>(&self, owner: O) -> UserGists where O: Into<String> {
         UserGists::new(self, owner)
     }
 

@@ -7,13 +7,13 @@ use rep::{Gist, GistFork, GistReq};
 /// reference to gists associated with a github user
 pub struct UserGists<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
+  owner: String,
 }
 
 impl<'a> UserGists<'a> {
 
-  pub fn new(github: &'a Github<'a>, owner: &'static str) -> UserGists<'a> {
-    UserGists { github: github, owner: owner }
+  pub fn new<O>(github: &'a Github<'a>, owner: O) -> UserGists<'a> where O: Into<String>{
+    UserGists { github: github, owner: owner.into() }
   }
 
   pub fn list(&self) -> Result<Vec<Gist>> {
