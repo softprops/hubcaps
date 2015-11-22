@@ -33,14 +33,14 @@ impl Default for Sort {
 
 pub struct PullRequest<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str,
+  owner: String,
+  repo: String,
   number: i64
 }
 
 impl<'a> PullRequest<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str, number: i64) -> PullRequest<'a> {
-    PullRequest { github: github, owner: owner, repo: repo, number: number }
+  pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R, number: i64) -> PullRequest<'a> where O: Into<String>, R: Into<String> {
+    PullRequest { github: github, owner: owner.into(), repo: repo.into(), number: number }
   }
 
   fn path(&self, more: &str) -> String {
@@ -80,8 +80,8 @@ impl<'a> PullRequest<'a> {
 
 pub struct PullRequests<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str
+  owner: String,
+  repo: String
 }
 
 pub struct ListBuilder<'a> {
@@ -137,8 +137,8 @@ impl<'a> ListBuilder<'a> {
 }
 
 impl<'a> PullRequests<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> PullRequests<'a> {
-    PullRequests { github: github, owner: owner, repo: repo }
+  pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R) -> PullRequests<'a> where O: Into<String>, R: Into<String> {
+    PullRequests { github: github, owner: owner.into(), repo: repo.into() }
   }
 
   fn path(&self, more: &str) -> String {
@@ -146,7 +146,7 @@ impl<'a> PullRequests<'a> {
   }
 
   pub fn get(&self, number: i64) -> PullRequest {
-    PullRequest::new(self.github, self.owner, self.repo, number)
+    PullRequest::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
   }
 
   pub fn create(&self, pr: &PullReq) -> Result<Pull> {

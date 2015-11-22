@@ -18,16 +18,16 @@ impl Default for State {
 /// interface for statuses assocaited with a repository
 pub struct Statuses<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str
+  owner: String,
+  repo: String
 }
 
 impl<'a> Statuses<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Statuses<'a> {
+  pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R) -> Statuses<'a> where O: Into<String>, R: Into<String> {
     Statuses {
       github: github,
-      owner: owner,
-      repo: repo
+      owner: owner.into(),
+      repo: repo.into()
     }
   }
 

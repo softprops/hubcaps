@@ -7,16 +7,16 @@ use rustc_serialize::json;
 
 pub struct Keys<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str
+  owner: String,
+  repo: String
 }
 
 impl<'a> Keys<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Keys<'a> {
+  pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R) -> Keys<'a> where O: Into<String>, R: Into<String> {
     Keys {
       github: github,
-      owner: owner,
-      repo: repo
+      owner: owner.into(),
+      repo: repo.into()
     }
   }
 

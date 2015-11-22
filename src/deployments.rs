@@ -7,31 +7,32 @@ use rep::{Deployment, DeploymentReq, DeploymentStatus, DeploymentStatusReq};
 /// Interface for repository deployements
 pub struct Deployments<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str
+  owner: String,
+  repo: String
 }
 
 /// INterface for deployment statuses
 pub struct DeploymentStatuses<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str,
+  owner: String,
+  repo: String,
   id: i64
 }
 
 impl<'a> DeploymentStatuses<'a> {
-  /// creates a new
-  pub fn new(
-    github: &'a Github<'a>,
-    owner: &'static str,
-    repo: &'static str, id: i64) -> DeploymentStatuses<'a> {
-    DeploymentStatuses {
-      github: github,
-      owner: owner,
-      repo: repo,
-      id: id
+    /// creates a new deployment status
+    pub fn new<O,R>(
+        github: &'a Github<'a>,
+        owner: O,
+        repo: R,
+        id: i64) -> DeploymentStatuses<'a> where O: Into<String>, R: Into<String> {
+        DeploymentStatuses {
+            github: github,
+            owner: owner.into(),
+            repo: repo.into(),
+            id: id
+        }
     }
-  }
 
   fn path(&self, more: &str) -> String {
     format!("/repos/{}/{}/deployments/{}/statuses{}", self.owner, self.repo, self.id, more)
@@ -62,10 +63,10 @@ impl<'a> DeploymentStatuses<'a> {
 }
 
 impl<'a> Deployments<'a> {
-  /// Create a new deployments instance
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Deployments<'a> {
-    Deployments { github: github, owner: owner, repo: repo }
-  }
+    /// Create a new deployments instance
+    pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R) -> Deployments<'a> where O: Into<String>, R: Into<String> {
+        Deployments { github: github, owner: owner.into(), repo: repo.into() }
+    }
 
   fn path(&self, more: &str) -> String {
     format!("/repos/{}/{}/deployments{}", self.owner, self.repo, more)
@@ -95,6 +96,6 @@ impl<'a> Deployments<'a> {
 
   /// get a reference to the statuses api for a give deployment
   pub fn statuses(&self, id: i64) -> DeploymentStatuses {
-    DeploymentStatuses::new(self.github, self.owner, self.repo, id)
+    DeploymentStatuses::new(self.github, self.owner.as_ref(), self.repo.as_ref(), id)
   }
 }

@@ -6,16 +6,16 @@ use rustc_serialize::json;
 
 pub struct Labels<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str,
+  owner: String,
+  repo: String,
 }
 
 impl<'a> Labels<'a> {
-  pub fn new(github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Labels<'a> {
+  pub fn new<O,R>(github: &'a Github<'a>, owner: O, repo: R) -> Labels<'a> where O: Into<String>, R: Into<String> {
     Labels {
       github: github,
-      owner: owner,
-      repo: repo
+      owner: owner.into(),
+      repo: repo.into()
     }
   }
 

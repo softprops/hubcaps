@@ -57,21 +57,21 @@ impl Default for Sort {
 
 pub struct IssueLabels<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str,
+  owner: String,
+  repo: String,
   number: i64
 }
 
 impl<'a> IssueLabels<'a> {
-  pub fn new(
+  pub fn new<O,R>(
     github: &'a Github<'a>,
-    owner: &'static str,
-    repo: &'static str,
-    number: i64) -> IssueLabels<'a> {
+    owner: O,
+    repo: R,
+    number: i64) -> IssueLabels<'a> where O: Into<String>, R: Into<String> {
     IssueLabels {
       github: github,
-      owner: owner,
-      repo: repo,
+      owner: owner.into(),
+      repo: repo.into(),
       number: number
     }
   }
@@ -119,22 +119,22 @@ impl<'a> IssueLabels<'a> {
 
 pub struct IssueRef<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str,
+  owner: String,
+  repo: String,
   number: i64
 }
 
 impl<'a> IssueRef<'a> {
   /// create a new instance of a github repo issue ref
-  pub fn new(
+  pub fn new<O,R>(
     github: &'a Github<'a>,
-    owner: &'static str,
-    repo: &'static str,
-    number: i64) -> IssueRef<'a> {
+    owner: O,
+    repo: R,
+    number: i64) -> IssueRef<'a> where O: Into<String>, R: Into<String> {
     IssueRef {
       github: github,
-      owner: owner,
-      repo: repo,
+      owner: owner.into(),
+      repo: repo.into(),
       number: number
     }
   }
@@ -144,7 +144,7 @@ impl<'a> IssueRef<'a> {
   }
 
   pub fn labels(&self) -> IssueLabels {
-    IssueLabels::new(self.github, self.owner, self.repo, self.number)
+    IssueLabels::new(self.github, self.owner.as_ref(), self.repo.as_ref(), self.number)
   }
 
   pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
@@ -162,8 +162,8 @@ impl<'a> IssueRef<'a> {
 
 pub struct Issues<'a> {
   github: &'a Github<'a>,
-  owner: &'static str,
-  repo: &'static str
+  owner: String,
+  repo: String
 }
 
 /// an mutable issue list builder
@@ -270,12 +270,12 @@ impl<'a> ListBuilder<'a> {
 
 impl<'a> Issues<'a> {
   /// create a new instance of a github repo issue ref
-  pub fn new(
-    github: &'a Github<'a>, owner: &'static str, repo: &'static str) -> Issues<'a> {
+  pub fn new<O,R>(
+    github: &'a Github<'a>, owner: O, repo: R) -> Issues<'a> where O: Into<String>, R: Into<String> {
     Issues {
       github: github,
-      owner: owner,
-      repo: repo
+      owner: owner.into(),
+      repo: repo.into()
     }
   }
 
@@ -284,7 +284,7 @@ impl<'a> Issues<'a> {
   }
 
   pub fn get(&self, number: i64) -> IssueRef {
-    IssueRef::new(self.github, self.owner, self.repo, number)
+    IssueRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
   }
 
   pub fn create(&self, is: &IssueReq) -> Result<Issue> {

@@ -55,7 +55,6 @@ impl Default for State {
     }
 }
 
-
 /// enum representation of Github list sorting options
 pub enum SortDirection {
     Asc,
@@ -79,42 +78,45 @@ impl Default for SortDirection {
 
 /// Entry point interface for interacting with Github API
 pub struct Github<'a> {
-    host: &'a str,
-    agent: &'a str,
+    host: String,
+    agent: String,
     client: &'a Client,
-    token: Option<&'a str>
+    token: Option<String>
 }
 
 impl<'a> Github<'a> {
     /// Create a new Github instance
-    pub fn new(
-        agent: &'a str, client: &'a Client, token: Option<&'a str>) -> Github<'a> {
+    pub fn new<A,T>(
+        agent: A,
+        client: &'a Client,
+        token: Option<T>
+    ) -> Github<'a> where A : Into<String>, T: Into<String> {
         Github::host("https://api.github.com", agent, client, token)
     }
 
     /// Create a new Github instance hosted at a custom location
-    pub fn host(
-        host: &'a str,
-        agent: &'a str,
+    pub fn host<H,A,T>(
+        host: H,
+        agent: A,
         client: &'a Client,
-        token: Option<&'a str>
-     ) -> Github<'a> {
+        token: Option<T>
+     ) -> Github<'a> where H: Into<String>, A: Into<String>, T: Into<String>{
         Github {
-            host: host,
-            agent: agent,
+            host: host.into(),
+            agent: agent.into(),
             client: client,
-            token: token
+            token: token.map(|t| t.into())
         }
     }
 
     /// Return a reference to a Github reposistory
-    pub fn repo(&self, owner: &'static str, repo: &'static str) -> Repository {
+    pub fn repo<O,R>(&self, owner: O, repo: R) -> Repository where O: Into<String>, R: Into<String> {
         Repository::new(self, owner, repo)
     }
 
     /// Return a reference to the collection of repositories owned by an
     /// associated with an owner
-    pub fn user_repos(&self, owner: &'static str) -> UserRepositories {
+    pub fn user_repos<S>(&self, owner: S) -> UserRepositories where S: Into<String>{
         UserRepositories::new(self, owner)
     }
 
@@ -142,7 +144,7 @@ impl<'a> Github<'a> {
             UserAgent(self.agent.to_owned())
         );
         let authenticated = match self.token {
-            Some(token) =>
+            Some(ref token) =>
                 builder.header(
                     Authorization(format!("token {}", token))
                ),
