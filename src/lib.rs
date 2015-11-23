@@ -15,7 +15,7 @@ pub mod rep;
 pub mod releases;
 pub mod repositories;
 pub mod statuses;
-pub mod pullrequests;
+pub mod pulls;
 
 pub use rep::*;
 pub use errors::Error;

@@ -5,7 +5,7 @@ use deployments::Deployments;
 use keys::Keys;
 use issues::{IssueRef, Issues};
 use labels::Labels;
-use pullrequests::PullRequests;
+use pulls::PullRequests;
 use releases::Releases;
 use rep::Repo;
 use rustc_serialize::json;
