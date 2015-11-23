@@ -1,5 +1,5 @@
 
-//! Hubcaps wraps hyper with an interface for interacting with the Github API
+//! Hubcaps provides a set of building blocks for interacting with the Github API
 
 extern crate hyper;
 extern crate rustc_serialize;
