@@ -7,7 +7,10 @@ use hyper::status::StatusCode;
 pub enum Error {
     Http(HttpError),
     Io(IoError),
-    Fault { code: StatusCode, body: String }
+    Fault {
+        code: StatusCode,
+        body: String,
+    },
 }
 
 impl From<HttpError> for Error {
