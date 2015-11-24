@@ -16,12 +16,12 @@ pub struct DeploymentStatuses<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
-    id: i64,
+    id: u64,
 }
 
 impl<'a> DeploymentStatuses<'a> {
     /// creates a new deployment status
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: i64) -> DeploymentStatuses<'a>
+    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -87,7 +87,7 @@ impl<'a> Deployments<'a> {
     }
 
     /// get a reference to the statuses api for a give deployment
-    pub fn statuses(&self, id: i64) -> DeploymentStatuses {
+    pub fn statuses(&self, id: u64) -> DeploymentStatuses {
         DeploymentStatuses::new(self.github, self.owner.as_ref(), self.repo.as_ref(), id)
     }
 }

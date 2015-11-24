@@ -9,12 +9,12 @@ pub struct Assets<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
-    releaseid: i64,
+    releaseid: u64,
 }
 
 
 impl<'a> Assets<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, releaseid: i64) -> Assets<'a>
+    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, releaseid: u64) -> Assets<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -38,12 +38,12 @@ impl<'a> Assets<'a> {
     }
 
     // todo: stream interface to download
-    pub fn get(&self, id: i64) -> Result<Asset> {
+    pub fn get(&self, id: u64) -> Result<Asset> {
         let body = try!(self.github.get(&self.path(&format!("/{}", id))));
         Ok(json::decode::<Asset>(&body).unwrap())
     }
 
-    pub fn delete(&self, id: i64) -> Result<()> {
+    pub fn delete(&self, id: u64) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}", id)))
             .map(|_| ())
@@ -59,11 +59,11 @@ pub struct ReleaseRef<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
-    id: i64,
+    id: u64,
 }
 
 impl<'a> ReleaseRef<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: i64) -> ReleaseRef<'a>
+    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: u64) -> ReleaseRef<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -125,13 +125,13 @@ impl<'a> Releases<'a> {
         Ok(json::decode::<Release>(&body).unwrap())
     }
 
-    pub fn edit(&self, id: i64, rel: &ReleaseReq) -> Result<Release> {
+    pub fn edit(&self, id: u64, rel: &ReleaseReq) -> Result<Release> {
         let data = json::encode(&rel).unwrap();
         let body = try!(self.github.patch(&self.path(&format!("/{}", id)), data.as_bytes()));
         Ok(json::decode::<Release>(&body).unwrap())
     }
 
-    pub fn delete(&self, id: i64) -> Result<()> {
+    pub fn delete(&self, id: u64) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}", id)))
             .map(|_| ())
@@ -142,7 +142,7 @@ impl<'a> Releases<'a> {
         Ok(json::decode::<Vec<Release>>(&body).unwrap())
     }
 
-    pub fn get(&self, id: i64) -> ReleaseRef {
+    pub fn get(&self, id: u64) -> ReleaseRef {
         ReleaseRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), id)
     }
 }

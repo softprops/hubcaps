@@ -29,7 +29,7 @@ impl Decodable for Deployment {
 #[derive(Debug)]
 pub struct Deployment {
   pub url: String,
-  pub id: i64,
+  pub id: u64,
   pub sha: String,
   pub commit_ref: String,
   pub task: String,
@@ -164,7 +164,7 @@ impl DeploymentReqBuilder {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct GistFile {
-  pub size: i64,
+  pub size: u64,
   pub raw_url: String,
   // type: String
 //  pub truncated: bool,
@@ -182,7 +182,7 @@ pub struct Gist {
   pub owner: User,
   pub user: Option<User>,
   pub files: HashMap<String, GistFile>,
-  pub comments: i64,
+  pub comments: u64,
   pub comments_url: String,
   pub html_url: String,
   pub git_pull_url: String,
@@ -284,7 +284,7 @@ pub struct Permissions {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Repo {
-  pub id: i64,
+  pub id: u64,
   pub owner: User,
   pub name: String,
   pub full_name: String,
@@ -335,12 +335,12 @@ pub struct Repo {
   pub trees_url: String,
   pub homepage: Option<String>,
   pub language: Option<String>,
-  pub forks_count: i64,
-  pub stargazers_count: i64,
-  pub watchers_count: i64,
-  pub size: i64,
+  pub forks_count: u64,
+  pub stargazers_count: u64,
+  pub watchers_count: u64,
+  pub size: u64,
   pub default_branch: String,
-  pub open_issues_count: i64,
+  pub open_issues_count: u64,
   pub has_issues: bool,
   pub has_wiki: bool,
   pub has_pages: bool,
@@ -353,7 +353,7 @@ pub struct Repo {
 
 #[derive(Debug, RustcDecodable)]
 pub struct RepoDetails {
-  pub id: i64,
+  pub id: u64,
   pub owner: User,
   pub name: String,
   pub full_name: String,
@@ -509,13 +509,13 @@ pub struct IssueReq {
   pub title: &'static str,
   pub body: Option<&'static str>,
   pub assignee: Option<&'static str>,
-  pub milestone: Option<i64>,
+  pub milestone: Option<u64>,
   pub labels: Vec<&'static str>
 }
 
 impl IssueReq {
   pub fn new(title: &'static str, body: Option<&'static str>, assignee: Option<&'static str>,
-             milestone: Option<i64>, labels: Vec<&'static str>) -> IssueReq {
+             milestone: Option<u64>, labels: Vec<&'static str>) -> IssueReq {
     IssueReq {
       title: title,
       body: body,
@@ -528,13 +528,13 @@ impl IssueReq {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Issue {
-  pub id: i64,
+  pub id: u64,
   pub url: String,
   pub labels_url: String,
   pub comments_url: String,
   pub events_url: String,
   pub html_url: String,
-  pub number: i64,
+  pub number: u64,
   pub state: String,
   pub title: String,
   pub body: String,
@@ -542,7 +542,7 @@ pub struct Issue {
   pub labels: Vec<Label>,
   pub assignee: Option<User>,
   pub locked: bool,
-  pub comments: i64,
+  pub comments: u64,
   pub closed_at: Option<String>,
   pub created_at: String,
   pub updated_at: String
@@ -552,13 +552,13 @@ pub struct Issue {
 pub struct Asset {
   pub url: String,
   pub browser_download_url: String,
-  pub id: i64,
+  pub id: u64,
   pub name: String,
   pub label: Option<String>,
   pub state: String,
   pub content_type: String,
-  pub size: i64,
-  pub download_count: i64,
+  pub size: u64,
+  pub download_count: u64,
   pub created_at: String,
   pub updated_at: String,
   pub uploader: User
@@ -572,7 +572,7 @@ pub struct Release {
   pub upload_url: String,
   pub tarball_url: String,
   pub zipball_url: String,
-  pub id: i64,
+  pub id: u64,
   pub tag_name: String,
   pub target_commitish: String,
   pub name: String,
@@ -670,7 +670,7 @@ pub struct DeploymentStatus {
   pub state: State,
   pub target_url: String,
   pub description: String,
-  pub id: i64,
+  pub id: u64,
   pub deployment_url: String,
   pub repository_url: String,
   pub creator: User
@@ -754,7 +754,7 @@ pub struct Status {
   pub state: State,
   pub target_url: String,
   pub description: String,
-  pub id: i64,
+  pub id: u64,
   pub url: String,
   pub context: String,
   pub creator: User
@@ -848,7 +848,7 @@ impl StatusReq {
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct Key {
-  pub id: i64,
+  pub id: u64,
   pub key: String,
   pub title: String,
   pub verified: bool,

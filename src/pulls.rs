@@ -37,11 +37,11 @@ pub struct PullRequest<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
-    number: i64,
+    number: u64,
 }
 
 impl<'a> PullRequest<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: i64) -> PullRequest<'a>
+    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: u64) -> PullRequest<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -151,7 +151,7 @@ impl<'a> PullRequests<'a> {
         format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
     }
 
-    pub fn get(&self, number: i64) -> PullRequest {
+    pub fn get(&self, number: u64) -> PullRequest {
         PullRequest::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
     }
 

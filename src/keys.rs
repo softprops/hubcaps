@@ -38,12 +38,12 @@ impl<'a> Keys<'a> {
         Ok(json::decode::<Vec<Key>>(&body).unwrap())
     }
 
-    pub fn get(&self, id: i64) -> Result<Key> {
+    pub fn get(&self, id: u64) -> Result<Key> {
         let body = try!(self.github.get(&self.path(&format!("/{}", id))));
         Ok(json::decode::<Key>(&body).unwrap())
     }
 
-    pub fn delete(&self, id: i64) -> Result<()> {
+    pub fn delete(&self, id: u64) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}", id)))
             .map(|_| ())
