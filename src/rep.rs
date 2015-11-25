@@ -55,27 +55,34 @@ impl Encodable for DeploymentReq {
         environment: ref env,
         description: ref desc
       } => {
-        encoder.emit_struct("DeploymentReq", 1usize, |encoder| {
-          try!(encoder.emit_struct_field("ref", 0usize, |encoder| cref.encode(encoder)));
-          if tsk.is_some() {
-            try!(encoder.emit_struct_field("task", 0usize, |encoder| tsk.encode(encoder)));
-          }
-          if amrg.is_some() {
-            try!(encoder.emit_struct_field("auto_merge", 0usize, |encoder| amrg.encode(encoder)));
-          }
-          if reqctx.is_some() {
-            try!(encoder.emit_struct_field("required_contexts", 0usize, |encoder| reqctx.encode(encoder)));
-          }
-          if pld.is_some() {
-            try!(encoder.emit_struct_field("payload", 0usize, |encoder| pld.encode(encoder)));
-          }
-          if env.is_some() {
-            try!(encoder.emit_struct_field("environment", 0usize, |encoder| env.encode(encoder)));
-          }
-          if desc.is_some() {
-            try!(encoder.emit_struct_field("description", 0usize, |encoder| desc.encode(encoder)));
-          }
-          Ok(())
+          encoder.emit_struct("DeploymentReq", 1usize, |encoder| {
+              let mut index = 0;
+              try!(encoder.emit_struct_field("ref", index, |encoder| cref.encode(encoder)));
+              if tsk.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("task", index, |encoder| tsk.encode(encoder)));
+              }
+              if amrg.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("auto_merge", index, |encoder| amrg.encode(encoder)));
+              }
+              if reqctx.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("required_contexts", index, |encoder| reqctx.encode(encoder)));
+              }
+              if pld.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("payload", index, |encoder| pld.encode(encoder)));
+              }
+              if env.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("environment", index, |encoder| env.encode(encoder)));
+              }
+              if desc.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("description", index, |encoder| desc.encode(encoder)));
+              }
+              Ok(())
         })
       }
     }
@@ -896,5 +903,20 @@ mod tests {
             )
         ];
         test_encoding(tests);
+    }
+
+    #[test]
+    fn deployment_reqs() {
+        let tests = vec![
+            (
+                DeploymentReq::builder("test").build(),
+                r#"{"ref":"test"}"#
+            ),
+            (
+                DeploymentReq::builder("test").task("launchit").build(),
+                r#"{"ref":"test","task":"launchit"}"#
+            )
+        ];
+        test_encoding(tests)
     }
 }
