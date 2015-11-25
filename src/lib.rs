@@ -25,7 +25,6 @@ use hyper::method::Method;
 use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories};
-use std::default::Default;
 use std::fmt;
 use std::io::Read;
 
@@ -33,6 +32,7 @@ use std::io::Read;
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// enum representation of github pull and issue state
+#[derive(Debug, PartialEq)]
 pub enum State {
   Open,
   Closed,
@@ -56,6 +56,7 @@ impl Default for State {
 }
 
 /// enum representation of Github list sorting options
+#[derive(Debug, PartialEq)]
 pub enum SortDirection {
     Asc,
     Desc
@@ -214,5 +215,22 @@ impl<'a> Github<'a> {
             uri,
             Some(message)
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_state() {
+        let default: State = Default::default();
+        assert_eq!(default, State::Open)
+    }
+
+    #[test]
+    fn default_sort_direction() {
+        let default: SortDirection = Default::default();
+        assert_eq!(default, SortDirection::Asc)
     }
 }

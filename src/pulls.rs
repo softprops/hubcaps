@@ -7,6 +7,7 @@ use rustc_serialize::json;
 use std::default::Default;
 use std::fmt;
 
+#[derive(Debug, PartialEq)]
 pub enum Sort {
     Created,
     Updated,
@@ -163,5 +164,16 @@ impl<'a> PullRequests<'a> {
 
     pub fn list(&self) -> ListBuilder {
         ListBuilder::new(self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_sort() {
+        let default: Sort = Default::default();
+        assert_eq!(default, Sort::Created)
     }
 }
