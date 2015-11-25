@@ -1,8 +1,8 @@
 //! Rust representations of Github API data structures
 
 use std::collections::HashMap;
-use rustc_serialize::json::{Json, ToJson};
-use rustc_serialize::{Decoder, Decodable, Encodable, Encoder, json};
+use rustc_serialize::json::{self, Json, ToJson};
+use rustc_serialize::{Decoder, Decodable, Encodable, Encoder};
 use statuses::State;
 
 impl Decodable for Deployment {
@@ -207,13 +207,13 @@ impl Encodable for Content {
         filename: ref this_filename,
         content: ref this_content,
       } => {
-        encoder.emit_struct("Content", 1usize, |encoder| {
-          try!(encoder.emit_struct_field("content", 0usize, |encoder| this_content.encode(encoder)));
-          if this_filename.is_some() {
-            try!(encoder.emit_struct_field("filename", 0usize, |encoder| this_filename.encode(encoder)));
-          }
-          Ok(())
-        })
+          encoder.emit_struct("Content", 1_usize, |encoder| {
+              if this_filename.is_some() {
+                  try!(encoder.emit_struct_field("filename", 0_usize, |encoder| this_filename.encode(encoder)));
+              }
+              try!(encoder.emit_struct_field("content", 0_usize, |encoder| this_content.encode(encoder)));
+              Ok(())
+          })
       }
     }
   }
@@ -239,15 +239,19 @@ impl Encodable for GistReq {
         public: ref this_public,
         files: ref this_files
       } => {
-        encoder.emit_struct("GistReq", 1usize, |encoder| {
-          try!(encoder.emit_struct_field("files", 0usize, |encoder| this_files.encode(encoder)));
-          if this_public.is_some() {
-            try!(encoder.emit_struct_field("public", 0usize, |encoder| this_public.encode(encoder)));
-          }
-          if this_description.is_some() {
-            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
-          }
-          Ok(())
+          encoder.emit_struct("GistReq", 1, |encoder| {
+              let mut index: isize = -1;
+              if this_description.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("description", index as usize, |encoder| this_description.encode(encoder)));
+              }
+              if this_public.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("public", index as usize, |encoder| this_public.encode(encoder)));
+              }
+              index += 1;
+              try!(encoder.emit_struct_field("files", index as usize, |encoder| this_files.encode(encoder)));
+              Ok(())
         })
       }
     }
@@ -865,5 +869,32 @@ pub struct KeyReq {
 
 #[cfg(test)]
 mod tests {
+    use rustc_serialize::{json, Encodable};
+    use std::collections::HashMap;
+    use super::*;
 
+    fn test_encoding<E: Encodable>(tests: Vec<(E, &str)>) {
+        for test in tests {
+            match test {
+                (k, v) => assert_eq!(json::encode::<E>(&k).unwrap(), v)
+            }
+        }
+    }
+
+    #[test]
+    fn gist_reqs() {
+        let mut files = HashMap::new();
+        files.insert("foo", "bar");
+        let tests = vec![
+            (
+                GistReq::new(None, true, files.clone()),
+                r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
+            ),
+            (
+                GistReq::new(Some("desc"), true, files.clone()),
+                r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#
+            )
+        ];
+        test_encoding(tests);
+    }
 }
