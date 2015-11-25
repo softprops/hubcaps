@@ -431,17 +431,21 @@ impl Encodable for PullEdit {
         body: ref this_body,
         state: ref this_state
       } => {
-        encoder.emit_struct("PullEdit", 1usize, |encoder| {
-          if this_title.is_some() {
-            try!(encoder.emit_struct_field("title", 0usize, |encoder| this_title.encode(encoder)));
-          }
-          if this_body.is_some() {
-            try!(encoder.emit_struct_field("body", 0usize, |encoder| this_body.encode(encoder)));
-          }
-          if this_state.is_some() {
-            try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
-          }
-          Ok(())
+          encoder.emit_struct("PullEdit", 1usize, |encoder| {
+              let mut index: isize = -1;
+              if this_title.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("title", index as usize, |encoder| this_title.encode(encoder)));
+              }
+              if this_body.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("body", index as usize, |encoder| this_body.encode(encoder)));
+              }
+              if this_state.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("state", index as usize, |encoder| this_state.encode(encoder)));
+              }
+              Ok(())
         })
       }
     }
@@ -915,6 +919,21 @@ mod tests {
             (
                 DeploymentReq::builder("test").task("launchit").build(),
                 r#"{"ref":"test","task":"launchit"}"#
+            )
+        ];
+        test_encoding(tests)
+    }
+
+    #[test]
+    fn pullreq_edits() {
+        let tests = vec![
+            (
+                PullEdit::new(Some("test"), None, None),
+                r#"{"title":"test"}"#
+            ),
+            (
+                PullEdit::new(Some("test"), Some("desc"), None),
+                r#"{"title":"test","body":"desc"}"#
             )
         ];
         test_encoding(tests)
