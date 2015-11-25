@@ -97,7 +97,8 @@ impl<'a> Github<'a> {
         Github::host(DEFAULT_HOST, agent, client, token)
     }
 
-    /// Create a new Github instance hosted at a custom location
+    /// Create a new Github instance hosted at a custom location.
+    /// Useful for github enterprise installations ( yourdomain.com/api/v3/ )
     pub fn host<H,A,T>(
         host: H,
         agent: A,
