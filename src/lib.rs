@@ -28,6 +28,8 @@ use repositories::{Repository, Repositories, UserRepositories};
 use std::fmt;
 use std::io::Read;
 
+const DEFAULT_HOST: &'static str = "https://api.github.com";
+
 /// alias for Result that infers hubcaps::Error as Err
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -92,7 +94,7 @@ impl<'a> Github<'a> {
         client: &'a Client,
         token: Option<T>
     ) -> Github<'a> where A : Into<String>, T: Into<String> {
-        Github::host("https://api.github.com", agent, client, token)
+        Github::host(DEFAULT_HOST, agent, client, token)
     }
 
     /// Create a new Github instance hosted at a custom location
