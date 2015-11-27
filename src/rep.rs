@@ -699,16 +699,19 @@ impl Encodable for DeploymentStatusReq {
         target_url: ref this_target_url,
         description: ref this_description
       } => {
-        encoder.emit_struct("DeploymentStatusReq", 1usize, |encoder| {
-          try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
-          if this_target_url.is_some() {
-            try!(encoder.emit_struct_field("target_url", 0usize, |encoder| this_target_url.encode(encoder)));
-          }
-          if this_description.is_some() {
-            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
-          }
-          Ok(())
-        })
+          encoder.emit_struct("DeploymentStatusReq", 1_usize, |encoder| {
+              let mut index = 0;
+              try!(encoder.emit_struct_field("state", index, |encoder| this_state.encode(encoder)));
+              if this_target_url.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("target_url", index, |encoder| this_target_url.encode(encoder)));
+              }
+              if this_description.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("description", index, |encoder| this_description.encode(encoder)));
+              }
+              Ok(())
+          })
       }
     }
   }
@@ -883,6 +886,7 @@ mod tests {
     use rustc_serialize::{json, Encodable};
     use std::collections::HashMap;
     use super::*;
+    use super::super::statuses::State;
 
     fn test_encoding<E: Encodable>(tests: Vec<(E, &str)>) {
         for test in tests {
@@ -920,6 +924,25 @@ mod tests {
                 DeploymentReq::builder("test").task("launchit").build(),
                 r#"{"ref":"test","task":"launchit"}"#
             )
+        ];
+        test_encoding(tests)
+    }
+
+    #[test]
+    fn deployment_status_reqs() {
+        let tests = vec![
+            (
+                DeploymentStatusReq::builder(State::pending).build(),
+                r#"{"state":"pending"}"#
+            ),
+            (
+                DeploymentStatusReq::builder(State::pending).target_url("http://host.com").build(),
+                r#"{"state":"pending","target_url":"http://host.com"}"#
+            ),
+            (
+                DeploymentStatusReq::builder(State::pending).target_url("http://host.com").description("desc").build(),
+                r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
+            ),
         ];
         test_encoding(tests)
     }
