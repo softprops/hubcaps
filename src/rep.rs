@@ -1,7 +1,7 @@
 //! Rust representations of Github API data structures
 
 use std::collections::HashMap;
-use rustc_serialize::json::{self, Json, ToJson};
+use rustc_serialize::json::{Json, ToJson};
 use rustc_serialize::{Decoder, Decodable, Encodable, Encoder};
 use statuses::State;
 
