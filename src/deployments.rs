@@ -2,7 +2,7 @@
 
 use self::super::{Github, Result};
 use rustc_serialize::json;
-use rep::{Deployment, DeploymentReq, DeploymentStatus, DeploymentStatusReq};
+use rep::{DeploymentReq, DeploymentStatus, DeploymentStatusReq};
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {
