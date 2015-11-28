@@ -3,6 +3,7 @@ name = "hubcaps"
 version = "0.1.0"
 authors = ["softprops <d.tangren@gmail.com>"]
 description = "Rust interface for Github"
+documentation = "http://softprops.github.io/hubcaps"
 homepage = "https://github.com/softprops/hubcaps"
 repository = "https://github.com/softprops/hubcaps"
 keywords = ["hyper", "github"]
