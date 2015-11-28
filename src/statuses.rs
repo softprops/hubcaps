@@ -43,7 +43,7 @@ impl<'a> Statuses<'a> {
 
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusReq) -> Result<Status> {
-        let data = json::encode(&status).unwrap();
+        let data = try!(json::encode(&status));
         let body = try!(self.github.post(&self.path(&format!("/{}", sha)), data.as_bytes()));
         Ok(try!(json::decode::<Status>(&body)))
     }

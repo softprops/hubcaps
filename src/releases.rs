@@ -120,13 +120,13 @@ impl<'a> Releases<'a> {
     }
 
     pub fn create(&self, rel: &ReleaseReq) -> Result<Release> {
-        let data = json::encode(&rel).unwrap();
+        let data = try!(json::encode(&rel));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Release>(&body)))
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseReq) -> Result<Release> {
-        let data = json::encode(&rel).unwrap();
+        let data = try!(json::encode(&rel));
         let body = try!(self.github.patch(&self.path(&format!("/{}", id)), data.as_bytes()));
         Ok(try!(json::decode::<Release>(&body)))
     }

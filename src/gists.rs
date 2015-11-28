@@ -94,7 +94,7 @@ impl<'a> Gists<'a> {
     }
 
     pub fn create(&self, gist: &GistReq) -> Result<Gist> {
-        let data = json::encode(&gist).unwrap();
+        let data = try!(json::encode(&gist));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Gist>(&body)))
     }

@@ -27,13 +27,13 @@ impl<'a> Labels<'a> {
     }
 
     pub fn create(&self, lab: &LabelReq) -> Result<Label> {
-        let data = json::encode(&lab).unwrap();
+        let data = try!(json::encode(&lab));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Label>(&body)))
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelReq) -> Result<Label> {
-        let data = json::encode(&lab).unwrap();
+        let data = try!(json::encode(&lab));
         let body = try!(self.github.patch(&self.path(&format!("/{}", prevname)), data.as_bytes()));
         Ok(try!(json::decode::<Label>(&body)))
     }

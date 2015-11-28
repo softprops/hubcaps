@@ -78,7 +78,7 @@ impl<'a> PullRequest<'a> {
     }
 
     pub fn edit(&self, pr: &PullEdit) -> Result<Pull> {
-        let data = json::encode(&pr).unwrap();
+        let data = try!(json::encode(&pr));
         let body = try!(self.github.patch(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Pull>(&body)))
     }
@@ -157,7 +157,7 @@ impl<'a> PullRequests<'a> {
     }
 
     pub fn create(&self, pr: &PullReq) -> Result<Pull> {
-        let data = json::encode(&pr).unwrap();
+        let data = try!(json::encode(&pr));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Pull>(&body)))
     }

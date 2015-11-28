@@ -28,7 +28,7 @@ impl<'a> Keys<'a> {
     }
 
     pub fn create(&self, key: &KeyReq) -> Result<Key> {
-        let data = json::encode::<KeyReq>(key).unwrap();
+        let data = try!(json::encode::<KeyReq>(key));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(try!(json::decode::<Key>(&body)))
     }

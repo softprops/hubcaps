@@ -50,7 +50,7 @@ impl<'a> DeploymentStatuses<'a> {
     /// creates a new deployment status. For convenience, a DeploymentStatusReq.builder
     /// interface is required for building up a request
     pub fn create(&self, status: &DeploymentStatusReq) -> Result<DeploymentStatus> {
-        let data = json::encode::<DeploymentStatusReq>(&status).unwrap();
+        let data = try!(json::encode::<DeploymentStatusReq>(&status));
         let body = try!(self.github.post(&self.path(""), &data.as_bytes()));
         Ok(try!(json::decode::<DeploymentStatus>(&body)))
     }
@@ -81,7 +81,7 @@ impl<'a> Deployments<'a> {
 
     /// creates a new deployment for this repository
     pub fn create(&self, dep: &DeploymentReq) -> Result<String> {
-        let data = json::encode(&dep).unwrap();
+        let data = try!(json::encode(&dep));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(body)
     }
