@@ -40,7 +40,7 @@ impl<'a> Assets<'a> {
     // todo: stream interface to download
     pub fn get(&self, id: u64) -> Result<Asset> {
         let body = try!(self.github.get(&self.path(&format!("/{}", id))));
-        Ok(json::decode::<Asset>(&body).unwrap())
+        Ok(try!(json::decode::<Asset>(&body)))
     }
 
     pub fn delete(&self, id: u64) -> Result<()> {
@@ -51,7 +51,7 @@ impl<'a> Assets<'a> {
 
     pub fn list(&self) -> Result<Vec<Asset>> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Vec<Asset>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Asset>>(&body)))
     }
 }
 
@@ -85,7 +85,7 @@ impl<'a> ReleaseRef<'a> {
 
     pub fn get(&self) -> Result<Release> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Release>(&body).unwrap())
+        Ok(try!(json::decode::<Release>(&body)))
     }
 
     pub fn assets(&self) -> Assets {
@@ -122,13 +122,13 @@ impl<'a> Releases<'a> {
     pub fn create(&self, rel: &ReleaseReq) -> Result<Release> {
         let data = json::encode(&rel).unwrap();
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(json::decode::<Release>(&body).unwrap())
+        Ok(try!(json::decode::<Release>(&body)))
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseReq) -> Result<Release> {
         let data = json::encode(&rel).unwrap();
         let body = try!(self.github.patch(&self.path(&format!("/{}", id)), data.as_bytes()));
-        Ok(json::decode::<Release>(&body).unwrap())
+        Ok(try!(json::decode::<Release>(&body)))
     }
 
     pub fn delete(&self, id: u64) -> Result<()> {
@@ -139,7 +139,7 @@ impl<'a> Releases<'a> {
 
     pub fn list(&self) -> Result<Vec<Release>> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Vec<Release>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Release>>(&body)))
     }
 
     pub fn get(&self, id: u64) -> ReleaseRef {

@@ -5,6 +5,19 @@ use rustc_serialize::json::{Json, ToJson};
 use rustc_serialize::{Decoder, Decodable, Encodable, Encoder};
 use statuses::State;
 
+#[derive(Debug, RustcDecodable)]
+pub struct FieldErr {
+    pub resource: String,
+    pub field: String,
+    pub code: String
+}
+
+#[derive(Debug, RustcDecodable)]
+pub struct ClientError {
+    pub message: String,
+    pub errors: Option<Vec<FieldErr>>
+}
+
 impl Decodable for Deployment {
   fn decode<D: Decoder>(decoder: &mut D) -> Result<Deployment, D::Error> {
     decoder.read_struct("root", 0, |decoder| {

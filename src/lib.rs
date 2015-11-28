@@ -5,6 +5,7 @@ extern crate hyper;
 extern crate rustc_serialize;
 extern crate url;
 
+use rustc_serialize::json;
 pub mod keys;
 pub mod gists;
 pub mod deployments;
@@ -174,7 +175,10 @@ impl<'a> Github<'a> {
             | StatusCode::Unauthorized
             | StatusCode::NotFound
             | StatusCode::Forbidden => Err(
-                Error::Fault { code: res.status, body: body }
+                Error::Fault {
+                    code: res.status,
+                    error: try!(json::decode::<ClientError>(&body))
+                }
             ),
             _ => Ok(body)
         }

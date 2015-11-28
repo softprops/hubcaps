@@ -64,7 +64,7 @@ impl<'a> PullRequest<'a> {
 
     pub fn get(&self) -> Result<Pull> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Pull>(&body).unwrap())
+        Ok(try!(json::decode::<Pull>(&body)))
     }
 
     /// short hand for editing state = open
@@ -80,7 +80,7 @@ impl<'a> PullRequest<'a> {
     pub fn edit(&self, pr: &PullEdit) -> Result<Pull> {
         let data = json::encode(&pr).unwrap();
         let body = try!(self.github.patch(&self.path(""), data.as_bytes()));
-        Ok(json::decode::<Pull>(&body).unwrap())
+        Ok(try!(json::decode::<Pull>(&body)))
     }
 }
 
@@ -132,7 +132,7 @@ impl<'a> ListBuilder<'a> {
               ]
             )
           ))));
-        Ok(json::decode::<Vec<Pull>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Pull>>(&body)))
     }
 }
 
@@ -159,7 +159,7 @@ impl<'a> PullRequests<'a> {
     pub fn create(&self, pr: &PullReq) -> Result<Pull> {
         let data = json::encode(&pr).unwrap();
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(json::decode::<Pull>(&body).unwrap())
+        Ok(try!(json::decode::<Pull>(&body)))
     }
 
     pub fn list(&self) -> ListBuilder {

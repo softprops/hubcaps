@@ -91,7 +91,7 @@ impl<'a> IssueLabels<'a> {
     pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
         let body = try!(self.github
                             .post(&self.path(""), json::encode(&labels).unwrap().as_bytes()));
-        Ok(json::decode::<Vec<Label>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Label>>(&body)))
     }
 
     /// remove a label from this issue
@@ -106,7 +106,7 @@ impl<'a> IssueLabels<'a> {
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
         let body = try!(self.github.put(&self.path(""), json::encode(&labels).unwrap().as_bytes()));
-        Ok(json::decode::<Vec<Label>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Label>>(&body)))
     }
 
     /// remove all labels from an issue
@@ -156,7 +156,7 @@ impl<'a> IssueRef<'a> {
     pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
         let data = json::encode(&is).unwrap();
         let body = try!(self.github.patch(&self.path(""), data.as_bytes()));
-        Ok(json::decode::<Issue>(&body).unwrap())
+        Ok(try!(json::decode::<Issue>(&body)))
     }
 }
 
@@ -258,7 +258,7 @@ impl<'a> ListBuilder<'a> {
         }
         let url = self.issues.path(&format!("?{}", form_urlencoded::serialize(params)));
         let body = try!(self.issues.github.get(&url));
-        Ok(json::decode::<Vec<Issue>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Issue>>(&body)))
     }
 
 }
@@ -287,7 +287,7 @@ impl<'a> Issues<'a> {
     pub fn create(&self, is: &IssueReq) -> Result<Issue> {
         let data = json::encode(&is).unwrap();
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(json::decode::<Issue>(&body).unwrap())
+        Ok(try!(json::decode::<Issue>(&body)))
     }
 
     pub fn list(&self) -> ListBuilder {

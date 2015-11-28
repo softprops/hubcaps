@@ -45,7 +45,7 @@ impl<'a> Statuses<'a> {
     pub fn create(&self, sha: &str, status: &StatusReq) -> Result<Status> {
         let data = json::encode(&status).unwrap();
         let body = try!(self.github.post(&self.path(&format!("/{}", sha)), data.as_bytes()));
-        Ok(json::decode::<Status>(&body).unwrap())
+        Ok(try!(json::decode::<Status>(&body)))
     }
 
     /// lists all statuses associated with a given git sha
@@ -54,7 +54,7 @@ impl<'a> Statuses<'a> {
                                                  self.owner,
                                                  self.repo,
                                                  sha)));
-        Ok(json::decode::<Vec<Status>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Status>>(&body)))
     }
 
     /// list the combined statuses for a given git sha

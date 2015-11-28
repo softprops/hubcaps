@@ -1,16 +1,25 @@
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
+use rustc_serialize::json::DecoderError;
+use rep::ClientError;
 
 /// enumerated types of client errors
 #[derive(Debug)]
 pub enum Error {
+    Decoding(DecoderError),
     Http(HttpError),
-    Io(IoError),
+    IO(IoError),
     Fault {
         code: StatusCode,
-        body: String,
+        error: ClientError
     },
+}
+
+impl From<DecoderError> for Error {
+    fn from(error: DecoderError) -> Error {
+        Error::Decoding(error)
+    }
 }
 
 impl From<HttpError> for Error {
@@ -21,6 +30,6 @@ impl From<HttpError> for Error {
 
 impl From<IoError> for Error {
     fn from(error: IoError) -> Error {
-        Error::Io(error)
+        Error::IO(error)
     }
 }

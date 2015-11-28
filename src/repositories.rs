@@ -29,7 +29,7 @@ impl <'a> Repositories<'a> {
     // todo: params
     pub fn list(&self) -> Result<Vec<Repo>> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Vec<Repo>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Repo>>(&body)))
     }
 }
 
@@ -54,7 +54,7 @@ impl <'a> UserRepositories<'a> {
 
     pub fn list(&self) -> Result<Vec<Repo>> {
         let body = try!(self.github.get(&self.path("")));
-        Ok(json::decode::<Vec<Repo>>(&body).unwrap())
+        Ok(try!(json::decode::<Vec<Repo>>(&body)))
     }
 }
 
