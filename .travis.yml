@@ -10,6 +10,7 @@ matrix:
   - rust: stable
 
 script:
+- cargo clean
 - cargo build
 - cargo test
 - cargo bench
