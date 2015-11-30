@@ -63,8 +63,7 @@ impl<'a> PullRequest<'a> {
     }
 
     pub fn get(&self) -> Result<Pull> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Pull>(&body)))
+        self.github.get::<Pull>(&self.path(""))
     }
 
     /// short hand for editing state = open
@@ -79,8 +78,7 @@ impl<'a> PullRequest<'a> {
 
     pub fn edit(&self, pr: &PullEdit) -> Result<Pull> {
         let data = try!(json::encode(&pr));
-        let body = try!(self.github.patch(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Pull>(&body)))
+        self.github.patch::<Pull>(&self.path(""), data.as_bytes())
     }
 }
 
@@ -123,7 +121,7 @@ impl<'a> ListBuilder<'a> {
     }
 
     pub fn get(&self) -> Result<Vec<Pull>> {
-        let body = try!(self.pulls.github.get(&self.pulls.path(&format!(
+        self.pulls.github.get::<Vec<Pull>>(&self.pulls.path(&format!(
             "?{}", form_urlencoded::serialize(
               vec![
                 ("state", self.state.to_string()),
@@ -131,8 +129,7 @@ impl<'a> ListBuilder<'a> {
                 ("direction", self.direction.to_string())
               ]
             )
-          ))));
-        Ok(try!(json::decode::<Vec<Pull>>(&body)))
+          )))
     }
 }
 
@@ -158,8 +155,7 @@ impl<'a> PullRequests<'a> {
 
     pub fn create(&self, pr: &PullReq) -> Result<Pull> {
         let data = try!(json::encode(&pr));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Pull>(&body)))
+        self.github.post::<Pull>(&self.path(""), data.as_bytes())
     }
 
     pub fn list(&self) -> ListBuilder {

@@ -29,18 +29,15 @@ impl<'a> Keys<'a> {
 
     pub fn create(&self, key: &KeyReq) -> Result<Key> {
         let data = try!(json::encode::<KeyReq>(key));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Key>(&body)))
+        self.github.post::<Key>(&self.path(""), data.as_bytes())
     }
 
     pub fn list(&self) -> Result<Vec<Key>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<Key>>(&body)))
+        self.github.get::<Vec<Key>>(&self.path(""))
     }
 
     pub fn get(&self, id: u64) -> Result<Key> {
-        let body = try!(self.github.get(&self.path(&format!("/{}", id))));
-        Ok(try!(json::decode::<Key>(&body)))
+        self.github.get::<Key>(&self.path(&format!("/{}", id)))
     }
 
     pub fn delete(&self, id: u64) -> Result<()> {

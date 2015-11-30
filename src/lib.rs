@@ -5,7 +5,7 @@ extern crate hyper;
 extern crate rustc_serialize;
 extern crate url;
 
-use rustc_serialize::json;
+use rustc_serialize::{json, Decodable};
 pub mod keys;
 pub mod gists;
 pub mod deployments;
@@ -142,8 +142,8 @@ impl<'a> Github<'a> {
         Gists::new(self)
     }
 
-    fn request(
-        &self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<String> {
+    fn request<D>(
+        &self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D> where D : Decodable{
         let url = format!("{}{}", self.host, uri);
         let builder = self.client.request(method, &url).header(
             UserAgent(self.agent.to_owned())
@@ -180,11 +180,12 @@ impl<'a> Github<'a> {
                     error: try!(json::decode::<ClientError>(&body))
                 }
             ),
-            _ => Ok(body)
+            _ =>
+                Ok(try!(json::decode::<D>(&body)))
         }
     }
 
-    fn get(&self, uri: &str) -> Result<String> {
+    fn get<D>(&self, uri: &str) -> Result<D> where D: Decodable {
         self.request(
             Method::Get,
             uri,
@@ -193,14 +194,14 @@ impl<'a> Github<'a> {
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        self.request(
+        self.request::<String>(
             Method::Delete,
             uri,
             None
         ).map(|_| ())
     }
 
-    fn post(&self, uri: &str, message: &[u8]) -> Result<String> {
+    fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D> where D: Decodable {
         self.request(
             Method::Post,
             uri,
@@ -208,7 +209,7 @@ impl<'a> Github<'a> {
         )
     }
 
-    fn patch(&self, uri: &str, message: &[u8]) -> Result<String> {
+    fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D> where D: Decodable {
         self.request(
             Method::Patch,
             uri,
@@ -216,7 +217,7 @@ impl<'a> Github<'a> {
         )
     }
 
-    fn put(&self, uri: &str, message: &[u8]) -> Result<String> {
+    fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D> where D: Decodable {
         self.request(
             Method::Put,
             uri,

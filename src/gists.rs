@@ -22,8 +22,7 @@ impl<'a> UserGists<'a> {
     }
 
     pub fn list(&self) -> Result<Vec<Gist>> {
-        let body = try!(self.github.get(&format!("/users/{}/gists", self.owner)));
-        Ok(try!(json::decode::<Vec<Gist>>(&body)))
+        self.github.get::<Vec<Gist>>(&format!("/users/{}/gists", self.owner))
     }
 }
 
@@ -42,8 +41,7 @@ impl<'a> Gists<'a> {
 
     pub fn star(&self, id: &str) -> Result<()> {
         self.github
-            .put(&self.path(&format!("/{}/star", id)), &[])
-            .map(|_| ())
+            .put::<()>(&self.path(&format!("/{}/star", id)), &[])
     }
 
     pub fn unstar(&self, id: &str) -> Result<()> {
@@ -53,13 +51,11 @@ impl<'a> Gists<'a> {
     }
 
     pub fn fork(&self, id: &str) -> Result<Gist> {
-        let body = try!(self.github.post(&self.path(&format!("/{}/forks", id)), &[]));
-        Ok(try!(json::decode::<Gist>(&body)))
+        self.github.post::<Gist>(&self.path(&format!("/{}/forks", id)), &[])
     }
 
     pub fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
-        let body = try!(self.github.get(&self.path(&format!("/{}/forks", id))));
-        Ok(try!(json::decode::<Vec<GistFork>>(&body)))
+        self.github.get::<Vec<GistFork>>(&self.path(&format!("/{}/forks", id)))
     }
 
     pub fn delete(&self, id: &str) -> Result<()> {
@@ -69,33 +65,27 @@ impl<'a> Gists<'a> {
     }
 
     pub fn get(&self, id: &str) -> Result<Gist> {
-        let body = try!(self.github.get(&self.path(&format!("/{}", id))));
-        Ok(try!(json::decode::<Gist>(&body)))
+        self.github.get::<Gist>(&self.path(&format!("/{}", id)))
     }
 
     pub fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
-        let body = try!(self.github.get(&self.path(&format!("/{}/{}", id, sha))));
-        Ok(try!(json::decode::<Gist>(&body)))
+        self.github.get::<Gist>(&self.path(&format!("/{}/{}", id, sha)))
     }
 
     pub fn list(&self) -> Result<Vec<Gist>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<Gist>>(&body)))
+        self.github.get::<Vec<Gist>>(&self.path(""))
     }
 
     pub fn public(&self) -> Result<Vec<Gist>> {
-        let body = try!(self.github.get(&self.path("/public")));
-        Ok(try!(json::decode::<Vec<Gist>>(&body)))
+        self.github.get::<Vec<Gist>>(&self.path("/public"))
     }
 
     pub fn starred(&self) -> Result<Vec<Gist>> {
-        let body = try!(self.github.get(&self.path("/starred")));
-        Ok(try!(json::decode::<Vec<Gist>>(&body)))
+        self.github.get::<Vec<Gist>>(&self.path("/starred"))
     }
 
     pub fn create(&self, gist: &GistReq) -> Result<Gist> {
         let data = try!(json::encode(&gist));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Gist>(&body)))
+        self.github.post::<Gist>(&self.path(""), data.as_bytes())
     }
 }

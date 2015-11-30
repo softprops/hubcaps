@@ -89,31 +89,27 @@ impl<'a> IssueLabels<'a> {
 
     /// add a set of labels to this issue ref
     pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        let body = try!(self.github
-                            .post(&self.path(""), try!(json::encode(&labels)).as_bytes()));
-        Ok(try!(json::decode::<Vec<Label>>(&body)))
+        self.github
+            .post::<Vec<Label>>(&self.path(""), try!(json::encode(&labels)).as_bytes())
     }
 
     /// remove a label from this issue
     pub fn remove(&self, label: &str) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}", label)))
-            .map(|_| ())
     }
 
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        let body = try!(self.github.put(&self.path(""), try!(json::encode(&labels)).as_bytes()));
-        Ok(try!(json::decode::<Vec<Label>>(&body)))
+        self.github.put::<Vec<Label>>(&self.path(""), try!(json::encode(&labels)).as_bytes())
     }
 
     /// remove all labels from an issue
     pub fn clear(&self) -> Result<()> {
         self.github
             .delete(&self.path(""))
-            .map(|_| ())
     }
 }
 
@@ -155,8 +151,7 @@ impl<'a> IssueRef<'a> {
 
     pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
         let data = try!(json::encode(&is));
-        let body = try!(self.github.patch(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Issue>(&body)))
+        self.github.patch::<Issue>(&self.path(""), data.as_bytes())
     }
 }
 
@@ -257,8 +252,7 @@ impl<'a> ListBuilder<'a> {
             params.push(("labels", self.labels.connect(",")));
         }
         let url = self.issues.path(&format!("?{}", form_urlencoded::serialize(params)));
-        let body = try!(self.issues.github.get(&url));
-        Ok(try!(json::decode::<Vec<Issue>>(&body)))
+        self.issues.github.get::<Vec<Issue>>(&url)
     }
 
 }
@@ -286,8 +280,7 @@ impl<'a> Issues<'a> {
 
     pub fn create(&self, is: &IssueReq) -> Result<Issue> {
         let data = try!(json::encode(&is));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Issue>(&body)))
+        self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
     pub fn list(&self) -> ListBuilder {

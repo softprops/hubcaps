@@ -43,16 +43,14 @@ impl<'a> DeploymentStatuses<'a> {
 
     /// lists all statuses associated with a deployment
     pub fn list(&self) -> Result<Vec<DeploymentStatus>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<DeploymentStatus>>(&body)))
+        self.github.get::<Vec<DeploymentStatus>>(&self.path(""))
     }
 
     /// creates a new deployment status. For convenience, a DeploymentStatusReq.builder
     /// interface is required for building up a request
     pub fn create(&self, status: &DeploymentStatusReq) -> Result<DeploymentStatus> {
         let data = try!(json::encode::<DeploymentStatusReq>(&status));
-        let body = try!(self.github.post(&self.path(""), &data.as_bytes()));
-        Ok(try!(json::decode::<DeploymentStatus>(&body)))
+        self.github.post::<DeploymentStatus>(&self.path(""), &data.as_bytes())
     }
 }
 

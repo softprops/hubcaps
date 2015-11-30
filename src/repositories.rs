@@ -8,7 +8,6 @@ use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
 use rep::Repo;
-use rustc_serialize::json;
 use statuses::Statuses;
 
 pub struct Repositories<'a> {
@@ -28,8 +27,7 @@ impl <'a> Repositories<'a> {
     /// https://developer.github.com/v3/repos/#list-your-repositories
     // todo: params
     pub fn list(&self) -> Result<Vec<Repo>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<Repo>>(&body)))
+        self.github.get::<Vec<Repo>>(&self.path(""))
     }
 }
 
@@ -53,8 +51,7 @@ impl <'a> UserRepositories<'a> {
     }
 
     pub fn list(&self) -> Result<Vec<Repo>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<Repo>>(&body)))
+        self.github.get::<Vec<Repo>>(&self.path(""))
     }
 }
 

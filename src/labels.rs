@@ -28,14 +28,12 @@ impl<'a> Labels<'a> {
 
     pub fn create(&self, lab: &LabelReq) -> Result<Label> {
         let data = try!(json::encode(&lab));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(try!(json::decode::<Label>(&body)))
+        self.github.post::<Label>(&self.path(""), data.as_bytes())
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelReq) -> Result<Label> {
         let data = try!(json::encode(&lab));
-        let body = try!(self.github.patch(&self.path(&format!("/{}", prevname)), data.as_bytes()));
-        Ok(try!(json::decode::<Label>(&body)))
+        self.github.patch::<Label>(&self.path(&format!("/{}", prevname)), data.as_bytes())
     }
 
     pub fn delete(&self, name: &str) -> Result<()> {
@@ -45,7 +43,6 @@ impl<'a> Labels<'a> {
     }
 
     pub fn list(&self) -> Result<Vec<Label>> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(try!(json::decode::<Vec<Label>>(&body)))
+        self.github.get::<Vec<Label>>(&self.path(""))
     }
 }
