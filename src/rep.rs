@@ -240,7 +240,7 @@ impl Encodable for Content {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Content {
   pub filename: Option<String>,
   pub content: String
@@ -279,6 +279,44 @@ impl Encodable for GistReq {
   }
 }
 
+#[derive(Default)]
+pub struct GistReqBuilder {
+    pub description: Option<String>,
+    pub public: Option<bool>,
+    pub files: HashMap<String, Content>
+}
+
+impl GistReqBuilder {
+    pub fn new<K,V>(files: HashMap<K,V>) -> GistReqBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
+        let mut contents = HashMap::new();
+        for (k,v) in files.into_iter() {
+            contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
+        }
+        GistReqBuilder {
+            files: contents,
+            ..Default::default()
+        }
+    }
+
+    pub fn description<D>(&mut self, desc: D) -> &mut GistReqBuilder where D: Into<String> {
+        self.description = Some(desc.into());
+        self
+    }
+
+    pub fn public(&mut self, p: bool) -> &mut GistReqBuilder {
+        self.public = Some(p);
+        self
+    }
+
+  pub fn build(&self) -> GistReq {
+    GistReq {
+        files: self.files.clone(),
+        description: self.description.clone(),
+        public: self.public
+    }
+  }
+}
+
 #[derive(Debug)]
 pub struct GistReq {
   pub description: Option<String>,
@@ -298,6 +336,9 @@ impl GistReq {
       files: contents
     }
   }
+    pub fn builder<K,V>(files: HashMap<K,V>) -> GistReqBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
+        GistReqBuilder::new(files)
+    }
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
@@ -958,7 +999,7 @@ mod tests {
         files.insert("foo", "bar");
         let tests = vec![
             (
-                GistReq::new(None, true, files.clone()),
+                GistReq::new(None as Option<String>, true, files.clone()),
                 r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
             ),
             (
@@ -1007,12 +1048,16 @@ mod tests {
     fn pullreq_edits() {
         let tests = vec![
             (
-                PullEdit::new(Some("test"), None, None),
+                PullEdit::builder().title("test").build(),
                 r#"{"title":"test"}"#
             ),
             (
-                PullEdit::new(Some("test"), Some("desc"), None),
+                PullEdit::builder().title("test").body("desc").build(),
                 r#"{"title":"test","body":"desc"}"#
+            ),
+            (
+                PullEdit::builder().state("closed").build(),
+                r#"{"state":"closed"}"#
             )
         ];
         test_encoding(tests)

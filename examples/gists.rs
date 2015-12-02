@@ -18,9 +18,7 @@ fn main() {
             let mut files = HashMap::new();
             files.insert("thename", "the contents");
             let gist = github.gists().create(
-                &GistReq::new(
-                    None, false, files
-                        )
+                &GistReq::builder(files).public(false).build()
                     ).unwrap();
             println!("{:?}", gist)
         },
