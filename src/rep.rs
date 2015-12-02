@@ -1,6 +1,7 @@
 //! Rust representations of Github API data structures
 
 use std::collections::HashMap;
+use std::hash::Hash;
 use rustc_serialize::json::{Json, ToJson};
 use rustc_serialize::{Decoder, Decodable, Encodable, Encoder};
 use statuses::State;
@@ -104,43 +105,43 @@ impl Encodable for DeploymentReq {
 
 #[derive(Debug)]
 pub struct DeploymentReq {
-  pub commit_ref: &'static str,
-  pub task: Option<&'static str>,
+  pub commit_ref: String,
+  pub task: Option<String>,
   pub auto_merge: Option<bool>,
-  pub required_contexts: Option<Vec<&'static str>>,
+  pub required_contexts: Option<Vec<String>>,
   /// contents of payload should be valid JSON
   pub payload: Option<String>,
-  pub environment: Option<&'static str>,
-  pub description: Option<&'static str>
+  pub environment: Option<String>,
+  pub description: Option<String>
 }
 
 impl DeploymentReq {
-  pub fn builder(commit: &'static str) -> DeploymentReqBuilder {
+  pub fn builder<C>(commit: C) -> DeploymentReqBuilder where C: Into<String> {
     DeploymentReqBuilder::new(commit)
   }
 }
 
 #[derive(Default)]
 pub struct DeploymentReqBuilder {
-  pub commit_ref: &'static str,
-  pub task: Option<&'static str>,
+  pub commit_ref: String,
+  pub task: Option<String>,
   pub auto_merge: Option<bool>,
-  pub required_contexts: Option<Vec<&'static str>>,
+  pub required_contexts: Option<Vec<String>>,
   pub payload: Option<Json>,
-  pub environment: Option<&'static str>,
-  pub description: Option<&'static str>
+  pub environment: Option<String>,
+  pub description: Option<String>
 }
 
 impl DeploymentReqBuilder {
-  pub fn new(commit: &'static str) -> DeploymentReqBuilder {
+  pub fn new<C>(commit: C) -> DeploymentReqBuilder where C: Into<String> {
     DeploymentReqBuilder {
-      commit_ref: commit,
+      commit_ref: commit.into(),
       ..Default::default()
     }
   }
 
-  pub fn task(&mut self, task: &'static str) -> &mut DeploymentReqBuilder {
-    self.task = Some(task);
+  pub fn task<T>(&mut self, task: T) -> &mut DeploymentReqBuilder where T: Into<String> {
+    self.task = Some(task.into());
     self
   }
 
@@ -149,8 +150,8 @@ impl DeploymentReqBuilder {
     self
   }
 
-  pub fn required_contexts(&mut self, ctxs: Vec<&'static str>) -> &mut DeploymentReqBuilder {
-    self.required_contexts = Some(ctxs);
+  pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentReqBuilder where C: Into<String> {
+    self.required_contexts = Some(ctxs.into_iter().map(|c|c.into()).collect::<Vec<String>>());
     self
   }
 
@@ -159,25 +160,25 @@ impl DeploymentReqBuilder {
     self
   }
 
-  pub fn environment(&mut self, env: &'static str) -> &mut DeploymentReqBuilder {
-    self.environment = Some(env);
+  pub fn environment<E>(&mut self, env: E) -> &mut DeploymentReqBuilder where E: Into<String> {
+    self.environment = Some(env.into());
     self
   }
 
-  pub fn description(&mut self, desc: &'static str) -> &mut DeploymentReqBuilder {
-    self.description = Some(desc);
+  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentReqBuilder where D: Into<String> {
+    self.description = Some(desc.into());
     self
   }
 
   pub fn build(&self) -> DeploymentReq {
     DeploymentReq {
-      commit_ref: self.commit_ref,
-      task: self.task,
+      commit_ref: self.commit_ref.clone(),
+      task: self.task.clone(),
       auto_merge: self.auto_merge,
       required_contexts: self.required_contexts.clone(),
       payload: self.payload.clone().map(|p| p.to_string()),
-      environment: self.environment,
-      description: self.description
+      environment: self.environment.clone(),
+      description: self.description.clone()
     }
   }
 }
@@ -241,13 +242,13 @@ impl Encodable for Content {
 
 #[derive(Debug)]
 pub struct Content {
-  pub filename: Option<&'static str>,
-  pub content: &'static str
+  pub filename: Option<String>,
+  pub content: String
 }
 
 impl Content {
-  pub fn new(filename: Option<&'static str>, content: &'static str) -> Content {
-    Content { filename: filename, content: content }
+  pub fn new<F, C>(filename: Option<F>, content: C) -> Content where F: Into<String>, C: Into<String> {
+    Content { filename: filename.map(|f| f.into()), content: content.into() }
   }
 }
 
@@ -280,19 +281,19 @@ impl Encodable for GistReq {
 
 #[derive(Debug)]
 pub struct GistReq {
-  pub description: Option<&'static str>,
+  pub description: Option<String>,
   pub public: Option<bool>,
-  pub files: HashMap<&'static str, Content>
+  pub files: HashMap<String, Content>
 }
 
 impl GistReq {
-  pub fn new(desc: Option<&'static str>, public: bool, files: HashMap<&'static str, &'static str>) -> GistReq {
+  pub fn new<D,K,V>(desc: Option<D>, public: bool, files: HashMap<K, V>) -> GistReq where D: Into<String>, K: Hash + Eq + Into<String>, V: Into<String> {
     let mut contents = HashMap::new();
-    for (k,v) in files {
-      contents.insert(k, Content::new(None, v));
+    for (k,v) in files.into_iter() {
+      contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
     }
     GistReq {
-      description: desc,
+      description: desc.map(|d|d.into()),
       public: Some(public),
       files: contents
     }
@@ -416,15 +417,15 @@ pub struct Commit {
 
 #[derive(Debug, RustcEncodable)]
 pub struct LabelReq {
-  pub name: &'static str,
-  pub color: &'static str
+  pub name: String,
+  pub color: String
 }
 
 impl LabelReq {
-  pub fn new(name: &'static str, color: &'static str) -> LabelReq {
+  pub fn new<N,C>(name: N, color: C) -> LabelReq where N: Into<String>, C: Into<String>{
     LabelReq {
-      name: name,
-      color: color
+      name: name.into(),
+      color: color.into()
     }
   }
 }
@@ -434,6 +435,44 @@ pub struct Label {
   pub url: String,
   pub name: String,
   pub color: String
+}
+
+#[derive(Default)]
+pub struct PullEditBuilder {
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub state: Option<String>
+}
+
+impl PullEditBuilder {
+    pub fn new() -> PullEditBuilder {
+        PullEditBuilder {
+            ..Default::default()
+        }
+    }
+
+    pub fn title<T>(&mut self, title: T) -> &mut PullEditBuilder where T: Into<String> {
+        self.title = Some(title.into());
+        self
+    }
+
+  pub fn body<B>(&mut self, body: B) -> &mut PullEditBuilder where B: Into<String>{
+    self.body = Some(body.into());
+    self
+  }
+
+  pub fn state<S>(&mut self, state: S) -> &mut PullEditBuilder where S: Into<String> {
+      self.state = Some(state.into());
+      self
+  }
+
+  pub fn build(&self) -> PullEdit {
+    PullEdit {
+        title: self.title.clone(),
+        body: self.body.clone(),
+        state: self.state.clone()
+    }
+  }
 }
 
 impl Encodable for PullEdit {
@@ -467,32 +506,36 @@ impl Encodable for PullEdit {
 
 #[derive(Debug)]
 pub struct PullEdit {
-  title: Option<&'static str>,
-  body: Option<&'static str>,
-  state: Option<&'static str>
+  title: Option<String>,
+  body: Option<String>,
+  state: Option<String>
 }
 
 impl PullEdit {
-  pub fn new(title: Option<&'static str>, body: Option<&'static str>, state: Option<&'static str>) -> PullEdit {
-    PullEdit { title: title, body: body, state: state }
+  // todo represent state as enum
+  pub fn new<T,B,S>(title: Option<T>, body: Option<B>, state: Option<S>) -> PullEdit where T: Into<String>, B: Into<String>, S: Into<String> {
+    PullEdit { title: title.map(|t|t.into()), body: body.map(|b|b.into()), state: state.map(|s|s.into()) }
   }
+    pub fn builder() -> PullEditBuilder {
+        PullEditBuilder::new()
+    }
 }
 
 #[derive(Debug, RustcEncodable)]
 pub struct PullReq {
-  pub title: &'static str,
-  pub head: &'static str,
-  pub base: &'static str,
-  pub body: Option<&'static str>
+  pub title: String,
+  pub head: String,
+  pub base: String,
+  pub body: Option<String>
 }
 
 impl PullReq {
-  pub fn new(title: &'static str, head: &'static str, base: &'static str, body: Option<&'static str>) -> PullReq {
+  pub fn new<T,H,BS,B>(title: T, head: H, base: BS, body: Option<B>) -> PullReq where T: Into<String>, H: Into<String>, BS: Into<String>, B: Into<String> {
     PullReq {
-      title: title,
-      head: head,
-      base: base,
-      body: body
+      title: title.into(),
+      head: head.into(),
+      base: base.into(),
+      body: body.map(|b| b.into())
     }
   }
 }
@@ -534,22 +577,22 @@ pub struct Pull {
 
 #[derive(Debug, RustcEncodable)]
 pub struct IssueReq {
-  pub title: &'static str,
-  pub body: Option<&'static str>,
-  pub assignee: Option<&'static str>,
+  pub title: String,
+  pub body: Option<String>,
+  pub assignee: Option<String>,
   pub milestone: Option<u64>,
-  pub labels: Vec<&'static str>
+  pub labels: Vec<String>
 }
 
 impl IssueReq {
-  pub fn new(title: &'static str, body: Option<&'static str>, assignee: Option<&'static str>,
-             milestone: Option<u64>, labels: Vec<&'static str>) -> IssueReq {
+  pub fn new<T,B,A,L>(title: T, body: Option<B>, assignee: Option<A>,
+             milestone: Option<u64>, labels: Vec<L>) -> IssueReq where T: Into<String>, B: Into<String>, A: Into<String>, L: Into<String> {
     IssueReq {
-      title: title,
-      body: body,
-      assignee: assignee,
+      title: title.into(),
+      body: body.map(|b|b.into()),
+      assignee: assignee.map(|a|a.into()),
       milestone: milestone,
-      labels: labels
+      labels: labels.into_iter().map(|l|l.into()).collect::<Vec<String>>()
     }
   }
 }

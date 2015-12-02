@@ -68,12 +68,12 @@ impl<'a> PullRequest<'a> {
 
     /// short hand for editing state = open
     pub fn open(&self) -> Result<Pull> {
-        self.edit(&PullEdit::new(None, None, Some("open")))
+        self.edit(&PullEdit::builder().state("open").build())
     }
 
     /// shorthand for editing state = closed
     pub fn close(&self) -> Result<Pull> {
-        self.edit(&PullEdit::new(None, None, Some("closed")))
+        self.edit(&PullEdit::builder().state("closed").build())
     }
 
     pub fn edit(&self, pr: &PullEdit) -> Result<Pull> {
