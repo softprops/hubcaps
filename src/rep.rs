@@ -229,10 +229,13 @@ impl Encodable for Content {
         content: ref this_content,
       } => {
           encoder.emit_struct("Content", 1_usize, |encoder| {
+              let mut index = 0;
+              try!(encoder.emit_struct_field("content", index, |encoder| this_content.encode(encoder)));
               if this_filename.is_some() {
-                  try!(encoder.emit_struct_field("filename", 0_usize, |encoder| this_filename.encode(encoder)));
+                  index += 1;
+                  try!(encoder.emit_struct_field("filename", index, |encoder| this_filename.encode(encoder)));
               }
-              try!(encoder.emit_struct_field("content", 0_usize, |encoder| this_content.encode(encoder)));
+
               Ok(())
           })
       }
@@ -699,46 +702,45 @@ pub struct Release {
 
 #[derive(Debug, RustcEncodable)]
 pub struct ReleaseReq {
-  pub tag_name: &'static str,
-  pub target_commitish: Option<&'static str>,
-  pub name: Option<&'static str>,
-  pub body: Option<&'static str>,
+  pub tag_name: String,
+  pub target_commitish: Option<String>,
+  pub name: Option<String>,
+  pub body: Option<String>,
   pub draft: Option<bool>,
   pub prerelease: Option<bool>
 }
 
-
 /// builder interface for ReleaseReq
 #[derive(Default)]
 pub struct ReleaseBuilder {
-  tag: &'static str,
-  commitish: Option<&'static str>,
-  name: Option<&'static str>,
-  body: Option<&'static str>,
+  tag: String,
+  commitish: Option<String>,
+  name: Option<String>,
+  body: Option<String>,
   draft: Option<bool>,
   prerelease: Option<bool>
 }
 
 impl ReleaseBuilder {
-  pub fn new(tag: &'static str) -> ReleaseBuilder {
+  pub fn new<T>(tag: T) -> ReleaseBuilder where T: Into<String> {
     ReleaseBuilder {
-      tag: tag,
+      tag: tag.into(),
       ..Default::default()
     }
   }
 
-  pub fn commitish(&mut self, commit: &'static str) -> &mut ReleaseBuilder {
-    self.commitish = Some(commit);
+  pub fn commitish<C>(&mut self, commit: C) -> &mut ReleaseBuilder where C: Into<String> {
+    self.commitish = Some(commit.into());
     self
   }
 
-  pub fn name(&mut self, name: &'static str) -> &mut ReleaseBuilder {
-    self.name = Some(name);
+  pub fn name<N>(&mut self, name: N) -> &mut ReleaseBuilder where N: Into<String> {
+    self.name = Some(name.into());
     self
   }
 
-  pub fn body(&mut self, body: &'static str) -> &mut ReleaseBuilder {
-    self.body = Some(body);
+  pub fn body<B>(&mut self, body: B) -> &mut ReleaseBuilder where B: Into<String> {
+    self.body = Some(body.into());
     self
   }
 
@@ -753,23 +755,24 @@ impl ReleaseBuilder {
   }
 
   pub fn build(&self) -> ReleaseReq {
-    ReleaseReq::new(self.tag, self.commitish, self.name, self.body, self.draft, self.prerelease)
+      ReleaseReq::new(
+          self.tag.as_ref(), self.commitish.clone(), self.name.clone(), self.body.clone(), self.draft, self.prerelease)
   }
 }
 
 impl ReleaseReq {
-  pub fn new(tag: &'static str, commit: Option<&'static str>, name: Option<&'static str>, body: Option<&'static str>, draft: Option<bool>, prerelease: Option<bool>) -> ReleaseReq {
+  pub fn new<T,C,N,B>(tag: T, commit: Option<C>, name: Option<N>, body: Option<B>, draft: Option<bool>, prerelease: Option<bool>) -> ReleaseReq where T: Into<String>, C: Into<String>, N: Into<String>, B: Into<String>{
     ReleaseReq {
-      tag_name: tag,
-      target_commitish: commit,
-      name: name,
-      body: body,
+      tag_name: tag.into(),
+      target_commitish: commit.map(|c|c.into()),
+      name: name.map(|n|n.into()),
+      body: body.map(|b|b.into()),
       draft: draft,
       prerelease: prerelease
     }
   }
 
-  pub fn builder(tag: &'static str) -> ReleaseBuilder {
+  pub fn builder<T>(tag: T) -> ReleaseBuilder where T: Into<String> {
     ReleaseBuilder::new(tag)
   }
 }
@@ -817,8 +820,8 @@ impl Encodable for DeploymentStatusReq {
 #[derive(Default)]
 pub struct DeploymentStatusReqBuilder {
   state: State,
-  target_url: Option<&'static str>,
-  description: Option<&'static str>
+  target_url: Option<String>,
+  description: Option<String>
 }
 
 impl DeploymentStatusReqBuilder {
@@ -830,21 +833,21 @@ impl DeploymentStatusReqBuilder {
     }
   }
 
-  pub fn target_url(&mut self, url: &'static str) -> &mut DeploymentStatusReqBuilder {
-    self.target_url = Some(url);
+  pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusReqBuilder where T: Into<String> {
+    self.target_url = Some(url.into());
     self
   }
 
-  pub fn description(&mut self, desc: &'static str) -> &mut DeploymentStatusReqBuilder {
-    self.description = Some(desc);
+  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentStatusReqBuilder where D: Into<String> {
+    self.description = Some(desc.into());
     self
   }
 
   pub fn build(&self) -> DeploymentStatusReq {
     DeploymentStatusReq {
       state: self.state.clone(),
-      target_url: self.target_url,
-      description: self.description
+      target_url: self.target_url.clone(),
+      description: self.description.clone()
     }
   }
 }
@@ -852,8 +855,8 @@ impl DeploymentStatusReqBuilder {
 #[derive(Debug)]
 pub struct DeploymentStatusReq {
   state: State,
-  target_url: Option<&'static str>,
-  description: Option<&'static str>
+  target_url: Option<String>,
+  description: Option<String>
 }
 
 impl DeploymentStatusReq {
@@ -905,17 +908,17 @@ impl Encodable for StatusReq {
 #[derive(Debug)]
 pub struct StatusReq {
   state: State,
-  target_url: Option<&'static str>,
-  description: Option<&'static str>,
-  context: Option<&'static str>
+  target_url: Option<String>,
+  description: Option<String>,
+  context: Option<String>
 }
 
 #[derive(Default)]
 pub struct StatusBuilder {
   state: State,
-  target_url: Option<&'static str>,
-  description: Option<&'static str>,
-  context: Option<&'static str>,
+  target_url: Option<String>,
+  description: Option<String>,
+  context: Option<String>,
 }
 
 impl StatusBuilder {
@@ -926,33 +929,33 @@ impl StatusBuilder {
     }
   }
 
-  pub fn target_url(&mut self, url: &'static str) -> &mut StatusBuilder {
-    self.target_url = Some(url);
+  pub fn target_url<T>(&mut self, url: T) -> &mut StatusBuilder where T: Into<String> {
+    self.target_url = Some(url.into());
     self
   }
 
-  pub fn description(&mut self, desc: &'static str) -> &mut StatusBuilder {
-    self.description = Some(desc);
+  pub fn description<D>(&mut self, desc: D) -> &mut StatusBuilder where D: Into<String> {
+    self.description = Some(desc.into());
     self
   }
 
-  pub fn context(&mut self, ctx: &'static str) -> &mut StatusBuilder {
-    self.context = Some(ctx);
+  pub fn context<C>(&mut self, ctx: C) -> &mut StatusBuilder where C: Into<String> {
+    self.context = Some(ctx.into());
     self
   }
 
   pub fn build(&self) -> StatusReq {
-    StatusReq::new(self.state.clone(), self.target_url, self.description, self.context)
+    StatusReq::new(self.state.clone(), self.target_url.clone(), self.description.clone(), self.context.clone())
   }
 }
 
 impl StatusReq {
-  pub fn new(state: State, target_url: Option<&'static str>, descr: Option<&'static str>, context: Option<&'static str>) -> StatusReq {
+  pub fn new<T,D,C>(state: State, target_url: Option<T>, descr: Option<D>, context: Option<C>) -> StatusReq where T: Into<String>, D: Into<String>, C: Into<String> {
     StatusReq {
       state: state,
-      target_url: target_url,
-      description: descr,
-      context: context
+      target_url: target_url.map(|t|t.into()),
+      description: descr.map(|d|d.into()),
+      context: context.map(|c|c.into())
     }
   }
 
@@ -973,8 +976,8 @@ pub struct Key {
 
 #[derive(Debug, RustcEncodable)]
 pub struct KeyReq {
-  pub title: &'static str,
-  pub key: &'static str,
+  pub title: String,
+  pub key: String,
   pub read_only: bool
 }
 
