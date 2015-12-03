@@ -143,7 +143,7 @@ impl<'a> Github<'a> {
     }
 
     fn request<D>(
-        &self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D> where D : Decodable{
+        &self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D> where D : Decodable {
         let url = format!("{}{}", self.host, uri);
         let builder = self.client.request(method, &url).header(
             UserAgent(self.agent.to_owned())
@@ -194,11 +194,14 @@ impl<'a> Github<'a> {
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        self.request::<String>(
+        match self.request::<()>(
             Method::Delete,
             uri,
             None
-        ).map(|_| ())
+        ) {
+            Err(Error::Decoding(_)) => Ok(()),
+            otherwise => otherwise
+        }
     }
 
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D> where D: Decodable {
