@@ -14,7 +14,7 @@ pub struct Repositories<'a> {
     github: &'a Github<'a>,
 }
 
-impl <'a> Repositories<'a> {
+impl<'a> Repositories<'a> {
     pub fn new(github: &'a Github<'a>) -> Repositories<'a> {
         Repositories { github: github }
     }
@@ -36,7 +36,7 @@ pub struct UserRepositories<'a> {
     owner: String,
 }
 
-impl <'a> UserRepositories<'a> {
+impl<'a> UserRepositories<'a> {
     pub fn new<O>(github: &'a Github<'a>, owner: O) -> UserRepositories<'a>
         where O: Into<String>
     {

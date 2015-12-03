@@ -217,11 +217,8 @@ pub struct ListReqBuilder {
 }
 
 impl ListReqBuilder {
-
     pub fn new() -> ListReqBuilder {
-        ListReqBuilder {
-            ..Default::default()
-        }
+        ListReqBuilder { ..Default::default() }
     }
 
     pub fn state(&mut self, state: State) -> &mut ListReqBuilder {
@@ -239,27 +236,37 @@ impl ListReqBuilder {
         self
     }
 
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListReqBuilder where A: Into<String> {
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListReqBuilder
+        where A: Into<String>
+    {
         self.assignee = Some(assignee.into());
         self
     }
 
-    pub fn creator<C>(&mut self, creator: C) -> &mut ListReqBuilder where C: Into<String> {
+    pub fn creator<C>(&mut self, creator: C) -> &mut ListReqBuilder
+        where C: Into<String>
+    {
         self.creator = Some(creator.into());
         self
     }
 
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListReqBuilder where M: Into<String> {
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListReqBuilder
+        where M: Into<String>
+    {
         self.mentioned = Some(mentioned.into());
         self
     }
 
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListReqBuilder where L: Into<String> {
-        self.labels = labels.into_iter().map(|l|l.into()).collect::<Vec<String>>();
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListReqBuilder
+        where L: Into<String>
+    {
+        self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
         self
     }
 
-    pub fn since<S>(&mut self, since: S) -> &mut ListReqBuilder where S: Into<String> {
+    pub fn since<S>(&mut self, since: S) -> &mut ListReqBuilder
+        where S: Into<String>
+    {
         self.since = Some(since.into());
         self
     }
@@ -276,7 +283,6 @@ impl ListReqBuilder {
             since: self.since.clone(),
         }
     }
-
 }
 
 impl<'a> Issues<'a> {
@@ -321,7 +327,7 @@ mod tests {
         fn test_serialize(tests: Vec<(ListReq, &str)>) {
             for test in tests {
                 match test {
-                    (k, v) => assert_eq!(k.serialize(), v)
+                    (k, v) => assert_eq!(k.serialize(), v),
                 }
             }
         }
@@ -343,7 +349,7 @@ mod tests {
     }
     #[test]
     fn filter_display() {
-        for (k,v) in vec![
+        for (k, v) in vec![
             (Filter::Assigned, "assigned"),
             (Filter::Created, "created"),
             (Filter::Mentioned, "mentioned"),

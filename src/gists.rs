@@ -11,7 +11,6 @@ pub struct UserGists<'a> {
 }
 
 impl<'a> UserGists<'a> {
-
     pub fn new<O>(github: &'a Github<'a>, owner: O) -> UserGists<'a>
         where O: Into<String>
     {
@@ -41,10 +40,11 @@ impl<'a> Gists<'a> {
 
     pub fn star(&self, id: &str) -> Result<()> {
         match self.github
-            .put::<String>(&self.path(&format!("/{}/star", id)), &[]).map(|_|()) {
-                Err(Error::Decoding(_)) => Ok(()),
-                otherwise => otherwise
-            }
+                  .put::<String>(&self.path(&format!("/{}/star", id)), &[])
+                  .map(|_| ()) {
+            Err(Error::Decoding(_)) => Ok(()),
+            otherwise => otherwise,
+        }
     }
 
     pub fn unstar(&self, id: &str) -> Result<()> {
