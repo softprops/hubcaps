@@ -7,6 +7,7 @@ use std::fmt;
 use std::default::Default;
 use url::form_urlencoded;
 
+#[derive(Debug, PartialEq)]
 pub enum Filter {
     Assigned,
     Created,
@@ -35,7 +36,7 @@ impl Default for Filter {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Sort {
     Created,
     Updated,
@@ -347,6 +348,13 @@ mod tests {
         ];
         test_serialize(tests)
     }
+
+    #[test]
+    fn filter_default() {
+        let default: Filter = Default::default();
+        assert_eq!(default, Filter::Assigned)
+    }
+
     #[test]
     fn filter_display() {
         for (k, v) in vec![
@@ -356,6 +364,21 @@ mod tests {
             (Filter::Subscribed, "subscribed"),
             (Filter::All, "all"),
         ] {
+            assert_eq!(k.to_string(), v)
+        }
+    }
+
+    #[test]
+    fn sort_default() {
+        let default: Sort = Default::default();
+        assert_eq!(default, Sort::Created)
+    }
+
+    #[test]
+    fn sort_display() {
+        for (k, v) in vec![(Sort::Created, "created"),
+                           (Sort::Updated, "updated"),
+                           (Sort::Comments, "comments")] {
             assert_eq!(k.to_string(), v)
         }
     }
