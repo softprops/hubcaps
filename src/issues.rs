@@ -168,11 +168,11 @@ pub struct ListBuilder<'a> {
     state: State,
     sort: Sort,
     direction: SortDirection,
-    assignee: Option<&'static str>,
-    creator: Option<&'static str>,
-    mentioned: Option<&'static str>,
-    labels: Vec<&'static str>,
-    since: Option<&'static str>,
+    assignee: Option<String>,
+    creator: Option<String>,
+    mentioned: Option<String>,
+    labels: Vec<String>,
+    since: Option<String>,
 }
 
 impl<'a> ListBuilder<'a> {
@@ -183,11 +183,11 @@ impl<'a> ListBuilder<'a> {
             state: Default::default(),
             sort: Default::default(),
             direction: Default::default(),
-            assignee: None,
-            creator: None,
-            mentioned: None,
-            labels: vec![],
-            since: None,
+            assignee: Default::default(),
+            creator: Default::default(),
+            mentioned: Default::default(),
+            labels: Default::default(),
+            since: Default::default(),
         }
     }
 
@@ -206,28 +206,28 @@ impl<'a> ListBuilder<'a> {
         self
     }
 
-    pub fn assignee(&mut self, assignee: &'static str) -> &mut ListBuilder<'a> {
-        self.assignee = Some(assignee);
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListBuilder<'a> where A: Into<String> {
+        self.assignee = Some(assignee.into());
         self
     }
 
-    pub fn creator(&mut self, creator: &'static str) -> &mut ListBuilder<'a> {
-        self.creator = Some(creator);
+    pub fn creator<C>(&mut self, creator: C) -> &mut ListBuilder<'a> where C: Into<String> {
+        self.creator = Some(creator.into());
         self
     }
 
-    pub fn mentioned(&mut self, mentioned: &'static str) -> &mut ListBuilder<'a> {
-        self.mentioned = Some(mentioned);
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListBuilder<'a> where M: Into<String> {
+        self.mentioned = Some(mentioned.into());
         self
     }
 
-    pub fn labels(&mut self, labels: Vec<&'static str>) -> &mut ListBuilder<'a> {
-        self.labels = labels;
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListBuilder<'a> where L: Into<String> {
+        self.labels = labels.into_iter().map(|l|l.into()).collect::<Vec<String>>();
         self
     }
 
-    pub fn since(&mut self, since: &'static str) -> &mut ListBuilder<'a> {
-        self.since = Some(since);
+    pub fn since<S>(&mut self, since: S) -> &mut ListBuilder<'a> where S: Into<String> {
+        self.since = Some(since.into());
         self
     }
 
@@ -236,16 +236,16 @@ impl<'a> ListBuilder<'a> {
         params.push(("state", self.state.to_string()));
         params.push(("sort", self.sort.to_string()));
         params.push(("direction", self.direction.to_string()));
-        if let Some(a) = self.assignee {
+        if let Some(ref a) = self.assignee {
             params.push(("assignee", a.to_owned()));
         }
-        if let Some(c) = self.creator {
+        if let Some(ref c) = self.creator {
             params.push(("creator", c.to_owned()));
         }
-        if let Some(m) = self.mentioned {
+        if let Some(ref m) = self.mentioned {
             params.push(("mentioned", m.to_owned()));
         }
-        if let Some(s) = self.since {
+        if let Some(ref s) = self.since {
             params.push(("since", s.to_owned()));
         }
         if !self.labels.is_empty() {
