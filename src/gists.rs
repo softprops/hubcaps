@@ -1,6 +1,6 @@
 //! Gists interface
 
-use self::super::{Github, Result};
+use self::super::{Error, Github, Result};
 use rustc_serialize::json;
 use rep::{Gist, GistFork, GistReq};
 
@@ -40,14 +40,16 @@ impl<'a> Gists<'a> {
     }
 
     pub fn star(&self, id: &str) -> Result<()> {
-        self.github
-            .put::<()>(&self.path(&format!("/{}/star", id)), &[])
+        match self.github
+            .put::<String>(&self.path(&format!("/{}/star", id)), &[]).map(|_|()) {
+                Err(Error::Decoding(_)) => Ok(()),
+                otherwise => otherwise
+            }
     }
 
     pub fn unstar(&self, id: &str) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}/star", id)))
-            .map(|_| ())
     }
 
     pub fn fork(&self, id: &str) -> Result<Gist> {
@@ -61,7 +63,6 @@ impl<'a> Gists<'a> {
     pub fn delete(&self, id: &str) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/{}", id)))
-            .map(|_| ())
     }
 
     pub fn get(&self, id: &str) -> Result<Gist> {
