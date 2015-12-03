@@ -35,6 +35,7 @@ impl Default for Filter {
     }
 }
 
+#[derive(Clone)]
 pub enum Sort {
     Created,
     Updated,
@@ -162,9 +163,7 @@ pub struct Issues<'a> {
     repo: String,
 }
 
-/// an mutable issue list builder
-pub struct ListBuilder<'a> {
-    issues: &'a Issues<'a>,
+pub struct ListReq {
     state: State,
     sort: Sort,
     direction: SortDirection,
@@ -175,84 +174,84 @@ pub struct ListBuilder<'a> {
     since: Option<String>,
 }
 
-impl<'a> ListBuilder<'a> {
+impl ListReq {
+    pub fn builder() -> ListReqBuilder {
+        ListReqBuilder::new()
+    }
+}
 
-    pub fn new(is: &'a Issues<'a>) -> ListBuilder<'a> {
-        ListBuilder {
-            issues: is,
-            state: Default::default(),
-            sort: Default::default(),
-            direction: Default::default(),
-            assignee: Default::default(),
-            creator: Default::default(),
-            mentioned: Default::default(),
-            labels: Default::default(),
-            since: Default::default(),
+/// an mutable issue list builder
+#[derive(Default)]
+pub struct ListReqBuilder {
+    state: State,
+    sort: Sort,
+    direction: SortDirection,
+    assignee: Option<String>,
+    creator: Option<String>,
+    mentioned: Option<String>,
+    labels: Vec<String>,
+    since: Option<String>,
+}
+
+impl ListReqBuilder {
+
+    pub fn new() -> ListReqBuilder {
+        ListReqBuilder {
+            ..Default::default()
         }
     }
 
-    pub fn state(&mut self, state: State) -> &mut ListBuilder<'a> {
+    pub fn state(&mut self, state: State) -> &mut ListReqBuilder {
         self.state = state;
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut ListBuilder<'a> {
+    pub fn sort(&mut self, sort: Sort) -> &mut ListReqBuilder {
         self.sort = sort;
         self
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut ListBuilder<'a> {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut ListReqBuilder {
         self.direction = direction;
         self
     }
 
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListBuilder<'a> where A: Into<String> {
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListReqBuilder where A: Into<String> {
         self.assignee = Some(assignee.into());
         self
     }
 
-    pub fn creator<C>(&mut self, creator: C) -> &mut ListBuilder<'a> where C: Into<String> {
+    pub fn creator<C>(&mut self, creator: C) -> &mut ListReqBuilder where C: Into<String> {
         self.creator = Some(creator.into());
         self
     }
 
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListBuilder<'a> where M: Into<String> {
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListReqBuilder where M: Into<String> {
         self.mentioned = Some(mentioned.into());
         self
     }
 
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListBuilder<'a> where L: Into<String> {
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListReqBuilder where L: Into<String> {
         self.labels = labels.into_iter().map(|l|l.into()).collect::<Vec<String>>();
         self
     }
 
-    pub fn since<S>(&mut self, since: S) -> &mut ListBuilder<'a> where S: Into<String> {
+    pub fn since<S>(&mut self, since: S) -> &mut ListReqBuilder where S: Into<String> {
         self.since = Some(since.into());
         self
     }
 
-    pub fn get(&self) -> Result<Vec<Issue>> {
-        let mut params = Vec::new();
-        params.push(("state", self.state.to_string()));
-        params.push(("sort", self.sort.to_string()));
-        params.push(("direction", self.direction.to_string()));
-        if let Some(ref a) = self.assignee {
-            params.push(("assignee", a.to_owned()));
+    pub fn build(&self) -> ListReq {
+        ListReq {
+            state: self.state.clone(),
+            sort: self.sort.clone(),
+            direction: self.direction.clone(),
+            assignee: self.assignee.clone(),
+            creator: self.creator.clone(),
+            mentioned: self.mentioned.clone(),
+            labels: self.labels.clone(),
+            since: self.since.clone(),
         }
-        if let Some(ref c) = self.creator {
-            params.push(("creator", c.to_owned()));
-        }
-        if let Some(ref m) = self.mentioned {
-            params.push(("mentioned", m.to_owned()));
-        }
-        if let Some(ref s) = self.since {
-            params.push(("since", s.to_owned()));
-        }
-        if !self.labels.is_empty() {
-            params.push(("labels", self.labels.connect(",")));
-        }
-        let url = self.issues.path(&format!("?{}", form_urlencoded::serialize(params)));
-        self.issues.github.get::<Vec<Issue>>(&url)
     }
 
 }
@@ -283,7 +282,27 @@ impl<'a> Issues<'a> {
         self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
-    pub fn list(&self) -> ListBuilder {
-        ListBuilder::new(self)
+    pub fn list(&self, req: &ListReq) -> Result<Vec<Issue>> {
+        let mut params = Vec::new();
+        params.push(("state", req.state.to_string()));
+        params.push(("sort", req.sort.to_string()));
+        params.push(("direction", req.direction.to_string()));
+        if let Some(ref a) = req.assignee {
+            params.push(("assignee", a.to_owned()));
+        }
+        if let Some(ref c) = req.creator {
+            params.push(("creator", c.to_owned()));
+        }
+        if let Some(ref m) = req.mentioned {
+            params.push(("mentioned", m.to_owned()));
+        }
+        if let Some(ref s) = req.since {
+            params.push(("since", s.to_owned()));
+        }
+        if !req.labels.is_empty() {
+            params.push(("labels", req.labels.connect(",")));
+        }
+        let url = self.path(&format!("?{}", form_urlencoded::serialize(params)));
+        self.github.get::<Vec<Issue>>(&url)
     }
 }
