@@ -178,6 +178,29 @@ impl ListReq {
     pub fn builder() -> ListReqBuilder {
         ListReqBuilder::new()
     }
+
+    pub fn serialize(&self) -> String {
+        let mut params = Vec::new();
+        params.push(("state", self.state.to_string()));
+        params.push(("sort", self.sort.to_string()));
+        params.push(("direction", self.direction.to_string()));
+        if let Some(ref a) = self.assignee {
+            params.push(("assignee", a.to_owned()));
+        }
+        if let Some(ref c) = self.creator {
+            params.push(("creator", c.to_owned()));
+        }
+        if let Some(ref m) = self.mentioned {
+            params.push(("mentioned", m.to_owned()));
+        }
+        if let Some(ref s) = self.since {
+            params.push(("since", s.to_owned()));
+        }
+        if !self.labels.is_empty() {
+            params.push(("labels", self.labels.connect(",")));
+        }
+        form_urlencoded::serialize(params)
+    }
 }
 
 /// an mutable issue list builder
@@ -283,26 +306,51 @@ impl<'a> Issues<'a> {
     }
 
     pub fn list(&self, req: &ListReq) -> Result<Vec<Issue>> {
-        let mut params = Vec::new();
-        params.push(("state", req.state.to_string()));
-        params.push(("sort", req.sort.to_string()));
-        params.push(("direction", req.direction.to_string()));
-        if let Some(ref a) = req.assignee {
-            params.push(("assignee", a.to_owned()));
-        }
-        if let Some(ref c) = req.creator {
-            params.push(("creator", c.to_owned()));
-        }
-        if let Some(ref m) = req.mentioned {
-            params.push(("mentioned", m.to_owned()));
-        }
-        if let Some(ref s) = req.since {
-            params.push(("since", s.to_owned()));
-        }
-        if !req.labels.is_empty() {
-            params.push(("labels", req.labels.connect(",")));
-        }
-        let url = self.path(&format!("?{}", form_urlencoded::serialize(params)));
+        let url = self.path(&format!("?{}", req.serialize()));
         self.github.get::<Vec<Issue>>(&url)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::super::*;
+
+    #[test]
+    fn list_reqs() {
+        fn test_serialize(tests: Vec<(ListReq, &str)>) {
+            for test in tests {
+                match test {
+                    (k, v) => assert_eq!(k.serialize(), v)
+                }
+            }
+        }
+        let tests = vec![
+            (
+                ListReq::builder().build(),
+                "state=open&sort=created&direction=asc"
+            ),
+            (
+                ListReq::builder().state(State::Closed).build(),
+                "state=closed&sort=created&direction=asc"
+             ),
+            (
+                ListReq::builder().labels(vec!["foo", "bar"]).build(),
+                "state=open&sort=created&direction=asc&labels=foo%2Cbar"
+            ),
+        ];
+        test_serialize(tests)
+    }
+    #[test]
+    fn filter_display() {
+        for (k,v) in vec![
+            (Filter::Assigned, "assigned"),
+            (Filter::Created, "created"),
+            (Filter::Mentioned, "mentioned"),
+            (Filter::Subscribed, "subscribed"),
+            (Filter::All, "all"),
+        ] {
+            assert_eq!(k.to_string(), v)
+        }
     }
 }
