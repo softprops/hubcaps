@@ -35,7 +35,7 @@ const DEFAULT_HOST: &'static str = "https://api.github.com";
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// enum representation of github pull and issue state
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum State {
   Open,
   Closed,
@@ -59,7 +59,7 @@ impl Default for State {
 }
 
 /// enum representation of Github list sorting options
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SortDirection {
     Asc,
     Desc
