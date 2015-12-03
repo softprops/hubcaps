@@ -4,14 +4,12 @@ use self::super::{Github, Result};
 use rustc_serialize::json;
 use rep::{Asset, Release, ReleaseReq};
 
-
 pub struct Assets<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
     releaseid: u64,
 }
-
 
 impl<'a> Assets<'a> {
     pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, releaseid: u64) -> Assets<'a>
