@@ -26,7 +26,8 @@ addons:
     - libcurl4-openssl-dev
     - libelf-dev
     - libdw-dev
-    - libbfd-dev # required for `--verify`
+    - binutils-dev # required for `kcov --verify`
+    - libbfd-dev # required for `kcov --verify`
 
 after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
