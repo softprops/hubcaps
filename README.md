@@ -10,7 +10,7 @@ Find them [here](http://softprops.github.io/hubcaps)
 
 ## usage
 
-Basic usage requires a user-defined useragent string, a `hyper::Client` instance and optionally a personal access token.
+Basic usage requires a user-defined useragent string, a `hyper::Client` instance and optionally a [personal access token](https://github.com/settings/tokens).
 
 ```rust
 extern crate hyper;
