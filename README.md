@@ -31,6 +31,8 @@ fn main() {
 
 Github instances define functions for accessing api services that map closely to their url structure.
 
+As a convention api methods, that expect arguments are exposed as functions that take struct arguments representing those arguments with an optional builder interface for convenience.
+
 ### repositories
 
 Typically the reference point of most github services is a repository
