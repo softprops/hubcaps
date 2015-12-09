@@ -72,7 +72,7 @@ labels.delete("rustic").unwrap();
 
 ### deployments
 
-Deployments is a service for orchestation deployments of applications sourced from github repositories
+Deployments is a service for orchestating deployments of applications sourced from github repositories
 
 ```rust
 let deployments = repo.deployments();
@@ -80,7 +80,7 @@ let deployments = repo.deployments();
 
 ### pulls
 
-Pulls is a service for issuing change requests against a repository
+Pulls is a service for issuing code change requests against a repository
 
 ```rust
 let pulls = repo.pulls();
