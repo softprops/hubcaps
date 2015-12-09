@@ -89,4 +89,6 @@ impl<'a> Gists<'a> {
         let data = try!(json::encode(&gist));
         self.github.post::<Gist>(&self.path(""), data.as_bytes())
     }
+
+    // todo: edit
 }
