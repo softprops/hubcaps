@@ -164,7 +164,7 @@ pub struct Issues<'a> {
     repo: String,
 }
 
-pub struct ListReq {
+pub struct IssueListReq {
     state: State,
     sort: Sort,
     direction: SortDirection,
@@ -175,9 +175,9 @@ pub struct ListReq {
     since: Option<String>,
 }
 
-impl ListReq {
-    pub fn builder() -> ListReqBuilder {
-        ListReqBuilder::new()
+impl IssueListReq {
+    pub fn builder() -> IssueListReqBuilder {
+        IssueListReqBuilder::new()
     }
 
     pub fn serialize(&self) -> String {
@@ -204,9 +204,9 @@ impl ListReq {
     }
 }
 
-/// an mutable issue list builder
+/// a mutable issue list builder
 #[derive(Default)]
-pub struct ListReqBuilder {
+pub struct IssueListReqBuilder {
     state: State,
     sort: Sort,
     direction: SortDirection,
@@ -217,63 +217,63 @@ pub struct ListReqBuilder {
     since: Option<String>,
 }
 
-impl ListReqBuilder {
-    pub fn new() -> ListReqBuilder {
-        ListReqBuilder { ..Default::default() }
+impl IssueListReqBuilder {
+    pub fn new() -> IssueListReqBuilder {
+        IssueListReqBuilder { ..Default::default() }
     }
 
-    pub fn state(&mut self, state: State) -> &mut ListReqBuilder {
+    pub fn state(&mut self, state: State) -> &mut IssueListReqBuilder {
         self.state = state;
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut ListReqBuilder {
+    pub fn sort(&mut self, sort: Sort) -> &mut IssueListReqBuilder {
         self.sort = sort;
         self
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut ListReqBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListReqBuilder {
         self.direction = direction;
         self
     }
 
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut ListReqBuilder
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListReqBuilder
         where A: Into<String>
     {
         self.assignee = Some(assignee.into());
         self
     }
 
-    pub fn creator<C>(&mut self, creator: C) -> &mut ListReqBuilder
+    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListReqBuilder
         where C: Into<String>
     {
         self.creator = Some(creator.into());
         self
     }
 
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut ListReqBuilder
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListReqBuilder
         where M: Into<String>
     {
         self.mentioned = Some(mentioned.into());
         self
     }
 
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut ListReqBuilder
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListReqBuilder
         where L: Into<String>
     {
         self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
         self
     }
 
-    pub fn since<S>(&mut self, since: S) -> &mut ListReqBuilder
+    pub fn since<S>(&mut self, since: S) -> &mut IssueListReqBuilder
         where S: Into<String>
     {
         self.since = Some(since.into());
         self
     }
 
-    pub fn build(&self) -> ListReq {
-        ListReq {
+    pub fn build(&self) -> IssueListReq {
+        IssueListReq {
             state: self.state.clone(),
             sort: self.sort.clone(),
             direction: self.direction.clone(),
@@ -312,7 +312,7 @@ impl<'a> Issues<'a> {
         self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
-    pub fn list(&self, req: &ListReq) -> Result<Vec<Issue>> {
+    pub fn list(&self, req: &IssueListReq) -> Result<Vec<Issue>> {
         let url = self.path(&format!("?{}", req.serialize()));
         self.github.get::<Vec<Issue>>(&url)
     }
@@ -325,7 +325,7 @@ mod tests {
 
     #[test]
     fn list_reqs() {
-        fn test_serialize(tests: Vec<(ListReq, &str)>) {
+        fn test_serialize(tests: Vec<(IssueListReq, &str)>) {
             for test in tests {
                 match test {
                     (k, v) => assert_eq!(k.serialize(), v),
@@ -334,15 +334,15 @@ mod tests {
         }
         let tests = vec![
             (
-                ListReq::builder().build(),
+                IssueListReq::builder().build(),
                 "state=open&sort=created&direction=asc"
             ),
             (
-                ListReq::builder().state(State::Closed).build(),
+                IssueListReq::builder().state(State::Closed).build(),
                 "state=closed&sort=created&direction=asc"
              ),
             (
-                ListReq::builder().labels(vec!["foo", "bar"]).build(),
+                IssueListReq::builder().labels(vec!["foo", "bar"]).build(),
                 "state=open&sort=created&direction=asc&labels=foo%2Cbar"
             ),
         ];
