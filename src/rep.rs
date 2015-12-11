@@ -1,10 +1,14 @@
 //! Rust representations of Github API data structures
 
+use super::SortDirection;
+use super::{State as StdState};
+use super::issues::Sort;
 use std::collections::HashMap;
 use std::hash::Hash;
 use rustc_serialize::json::{Json, ToJson};
 use rustc_serialize::{Decoder, Decodable, Encodable, Encoder};
 use statuses::State;
+use url::form_urlencoded;
 
 #[derive(Debug, RustcDecodable)]
 pub struct FieldErr {
@@ -619,6 +623,137 @@ pub struct Pull {
   pub changed_files: Option<u64>
 }
 
+
+pub struct IssueListReq {
+    state: StdState,
+    sort: Sort,
+    direction: SortDirection,
+    assignee: Option<String>,
+    creator: Option<String>,
+    mentioned: Option<String>,
+    labels: Vec<String>,
+    since: Option<String>,
+}
+
+impl IssueListReq {
+    pub fn builder() -> IssueListReqBuilder {
+        IssueListReqBuilder::new()
+    }
+
+    pub fn serialize(&self) -> String {
+        let mut params = Vec::new();
+        params.push(("state", self.state.to_string()));
+        params.push(("sort", self.sort.to_string()));
+        params.push(("direction", self.direction.to_string()));
+        if let Some(ref a) = self.assignee {
+            params.push(("assignee", a.to_owned()));
+        }
+        if let Some(ref c) = self.creator {
+            params.push(("creator", c.to_owned()));
+        }
+        if let Some(ref m) = self.mentioned {
+            params.push(("mentioned", m.to_owned()));
+        }
+        if let Some(ref s) = self.since {
+            params.push(("since", s.to_owned()));
+        }
+        if !self.labels.is_empty() {
+            params.push(("labels", self.labels.connect(",")));
+        }
+        form_urlencoded::serialize(params)
+    }
+}
+
+/// a mutable issue list builder
+#[derive(Default)]
+pub struct IssueListReqBuilder {
+    state: StdState,
+    sort: Sort,
+    direction: SortDirection,
+    assignee: Option<String>,
+    creator: Option<String>,
+    mentioned: Option<String>,
+    labels: Vec<String>,
+    since: Option<String>,
+}
+
+impl IssueListReqBuilder {
+    pub fn new() -> IssueListReqBuilder {
+        IssueListReqBuilder { ..Default::default() }
+    }
+
+    pub fn state(&mut self, state: StdState) -> &mut IssueListReqBuilder {
+        self.state = state;
+        self
+    }
+
+    pub fn sort(&mut self, sort: Sort) -> &mut IssueListReqBuilder {
+        self.sort = sort;
+        self
+    }
+
+    pub fn asc(&mut self) -> &mut IssueListReqBuilder {
+        self.direction(SortDirection::Asc)
+    }
+
+    pub fn desc(&mut self) -> &mut IssueListReqBuilder {
+        self.direction(SortDirection::Desc)
+    }
+
+    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListReqBuilder {
+        self.direction = direction;
+        self
+    }
+
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListReqBuilder
+        where A: Into<String>
+    {
+        self.assignee = Some(assignee.into());
+        self
+    }
+
+    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListReqBuilder
+        where C: Into<String>
+    {
+        self.creator = Some(creator.into());
+        self
+    }
+
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListReqBuilder
+        where M: Into<String>
+    {
+        self.mentioned = Some(mentioned.into());
+        self
+    }
+
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListReqBuilder
+        where L: Into<String>
+    {
+        self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
+        self
+    }
+
+    pub fn since<S>(&mut self, since: S) -> &mut IssueListReqBuilder
+        where S: Into<String>
+    {
+        self.since = Some(since.into());
+        self
+    }
+
+    pub fn build(&self) -> IssueListReq {
+        IssueListReq {
+            state: self.state.clone(),
+            sort: self.sort.clone(),
+            direction: self.direction.clone(),
+            assignee: self.assignee.clone(),
+            creator: self.creator.clone(),
+            mentioned: self.mentioned.clone(),
+            labels: self.labels.clone(),
+            since: self.since.clone(),
+        }
+    }
+}
+
 #[derive(Debug, RustcEncodable)]
 pub struct IssueReq {
   pub title: String,
@@ -983,6 +1118,7 @@ pub struct KeyReq {
 
 #[cfg(test)]
 mod tests {
+    use super::super::{State as StdState};
     use rustc_serialize::{json, Encodable};
     use std::collections::HashMap;
     use super::*;
@@ -1064,5 +1200,31 @@ mod tests {
             )
         ];
         test_encoding(tests)
+    }
+
+        #[test]
+    fn list_reqs() {
+        fn test_serialize(tests: Vec<(IssueListReq, &str)>) {
+            for test in tests {
+                match test {
+                    (k, v) => assert_eq!(k.serialize(), v),
+                }
+            }
+        }
+        let tests = vec![
+            (
+                IssueListReq::builder().build(),
+                "state=open&sort=created&direction=asc"
+            ),
+            (
+                IssueListReq::builder().state(StdState::Closed).build(),
+                "state=closed&sort=created&direction=asc"
+             ),
+            (
+                IssueListReq::builder().labels(vec!["foo", "bar"]).build(),
+                "state=open&sort=created&direction=asc&labels=foo%2Cbar"
+            ),
+        ];
+        test_serialize(tests)
     }
 }

@@ -1,11 +1,10 @@
 //! Issues interface
 
-use self::super::{Github, Result, SortDirection, State};
-use rep::{Issue, IssueReq, Label};
+use self::super::{Github, Result};
+use rep::{Issue, IssueReq, IssueListReq, Label};
 use rustc_serialize::json;
 use std::fmt;
 use std::default::Default;
-use url::form_urlencoded;
 
 #[derive(Debug, PartialEq)]
 pub enum Filter {
@@ -164,128 +163,6 @@ pub struct Issues<'a> {
     repo: String,
 }
 
-pub struct IssueListReq {
-    state: State,
-    sort: Sort,
-    direction: SortDirection,
-    assignee: Option<String>,
-    creator: Option<String>,
-    mentioned: Option<String>,
-    labels: Vec<String>,
-    since: Option<String>,
-}
-
-impl IssueListReq {
-    pub fn builder() -> IssueListReqBuilder {
-        IssueListReqBuilder::new()
-    }
-
-    pub fn serialize(&self) -> String {
-        let mut params = Vec::new();
-        params.push(("state", self.state.to_string()));
-        params.push(("sort", self.sort.to_string()));
-        params.push(("direction", self.direction.to_string()));
-        if let Some(ref a) = self.assignee {
-            params.push(("assignee", a.to_owned()));
-        }
-        if let Some(ref c) = self.creator {
-            params.push(("creator", c.to_owned()));
-        }
-        if let Some(ref m) = self.mentioned {
-            params.push(("mentioned", m.to_owned()));
-        }
-        if let Some(ref s) = self.since {
-            params.push(("since", s.to_owned()));
-        }
-        if !self.labels.is_empty() {
-            params.push(("labels", self.labels.connect(",")));
-        }
-        form_urlencoded::serialize(params)
-    }
-}
-
-/// a mutable issue list builder
-#[derive(Default)]
-pub struct IssueListReqBuilder {
-    state: State,
-    sort: Sort,
-    direction: SortDirection,
-    assignee: Option<String>,
-    creator: Option<String>,
-    mentioned: Option<String>,
-    labels: Vec<String>,
-    since: Option<String>,
-}
-
-impl IssueListReqBuilder {
-    pub fn new() -> IssueListReqBuilder {
-        IssueListReqBuilder { ..Default::default() }
-    }
-
-    pub fn state(&mut self, state: State) -> &mut IssueListReqBuilder {
-        self.state = state;
-        self
-    }
-
-    pub fn sort(&mut self, sort: Sort) -> &mut IssueListReqBuilder {
-        self.sort = sort;
-        self
-    }
-
-    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListReqBuilder {
-        self.direction = direction;
-        self
-    }
-
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListReqBuilder
-        where A: Into<String>
-    {
-        self.assignee = Some(assignee.into());
-        self
-    }
-
-    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListReqBuilder
-        where C: Into<String>
-    {
-        self.creator = Some(creator.into());
-        self
-    }
-
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListReqBuilder
-        where M: Into<String>
-    {
-        self.mentioned = Some(mentioned.into());
-        self
-    }
-
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListReqBuilder
-        where L: Into<String>
-    {
-        self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
-        self
-    }
-
-    pub fn since<S>(&mut self, since: S) -> &mut IssueListReqBuilder
-        where S: Into<String>
-    {
-        self.since = Some(since.into());
-        self
-    }
-
-    pub fn build(&self) -> IssueListReq {
-        IssueListReq {
-            state: self.state.clone(),
-            sort: self.sort.clone(),
-            direction: self.direction.clone(),
-            assignee: self.assignee.clone(),
-            creator: self.creator.clone(),
-            mentioned: self.mentioned.clone(),
-            labels: self.labels.clone(),
-            since: self.since.clone(),
-        }
-    }
-}
-
 impl<'a> Issues<'a> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Issues<'a>
@@ -321,33 +198,6 @@ impl<'a> Issues<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::*;
-
-    #[test]
-    fn list_reqs() {
-        fn test_serialize(tests: Vec<(IssueListReq, &str)>) {
-            for test in tests {
-                match test {
-                    (k, v) => assert_eq!(k.serialize(), v),
-                }
-            }
-        }
-        let tests = vec![
-            (
-                IssueListReq::builder().build(),
-                "state=open&sort=created&direction=asc"
-            ),
-            (
-                IssueListReq::builder().state(State::Closed).build(),
-                "state=closed&sort=created&direction=asc"
-             ),
-            (
-                IssueListReq::builder().labels(vec!["foo", "bar"]).build(),
-                "state=open&sort=created&direction=asc&labels=foo%2Cbar"
-            ),
-        ];
-        test_serialize(tests)
-    }
 
     #[test]
     fn filter_default() {
