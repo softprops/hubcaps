@@ -1022,16 +1022,20 @@ impl Encodable for StatusReq {
         description: ref this_description,
         context: ref this_context
       } => {
-        encoder.emit_struct("StatusReq", 1usize, |encoder| {
-          try!(encoder.emit_struct_field("state", 0usize, |encoder| this_state.encode(encoder)));
-          if this_target_url.is_some() {
-            try!(encoder.emit_struct_field("target_url", 0usize, |encoder| this_target_url.encode(encoder)));
+          encoder.emit_struct("StatusReq", 1usize, |encoder| {
+              let mut index = 0;
+          try!(encoder.emit_struct_field("state", index, |encoder| this_state.encode(encoder)));
+              if this_target_url.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("target_url", index, |encoder| this_target_url.encode(encoder)));
+              }
+              if this_description.is_some() {
+                  index += 1;
+            try!(encoder.emit_struct_field("description", index, |encoder| this_description.encode(encoder)));
           }
-          if this_description.is_some() {
-            try!(encoder.emit_struct_field("description", 0usize, |encoder| this_description.encode(encoder)));
-          }
-          if this_context.is_some() {
-            try!(encoder.emit_struct_field("context", 0usize, |encoder| this_context.encode(encoder)));
+              if this_context.is_some() {
+                  index += 1;
+                  try!(encoder.emit_struct_field("context", index, |encoder| this_context.encode(encoder)));
           }
           Ok(())
         })
@@ -1202,7 +1206,30 @@ mod tests {
         test_encoding(tests)
     }
 
-        #[test]
+    #[test]
+    fn status_reqs() {
+        let tests = vec![
+            (
+                StatusReq::builder(State::pending).build(),
+                r#"{"state":"pending"}"#
+            ),
+            (
+                StatusReq::builder(State::success).target_url("http://acme.com").build(),
+                r#"{"state":"success","target_url":"http://acme.com"}"#
+            ),
+            (
+                StatusReq::builder(State::error).description("desc").build(),
+                r#"{"state":"error","description":"desc"}"#
+            ),
+            (
+                StatusReq::builder(State::failure).target_url("http://acme.com").description("desc").build(),
+                r#"{"state":"failure","target_url":"http://acme.com","description":"desc"}"#
+            )
+        ];
+        test_encoding(tests)
+    }
+
+    #[test]
     fn list_reqs() {
         fn test_serialize(tests: Vec<(IssueListReq, &str)>) {
             for test in tests {
