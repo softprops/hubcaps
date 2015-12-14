@@ -193,7 +193,7 @@ pub struct GistFile {
     pub raw_url: String,
     pub content: String,
   // type: String
-//  pub truncated: bool,
+  pub truncated: bool,
   pub language: Option<String>
 }
 
