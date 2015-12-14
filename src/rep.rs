@@ -190,7 +190,8 @@ impl DeploymentReqBuilder {
 #[derive(Debug, RustcEncodable, RustcDecodable)]
 pub struct GistFile {
   pub size: u64,
-  pub raw_url: String,
+    pub raw_url: String,
+    pub content: String,
   // type: String
 //  pub truncated: bool,
   pub language: Option<String>
