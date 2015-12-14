@@ -187,7 +187,7 @@ impl DeploymentReqBuilder {
   }
 }
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+#[derive(Debug, RustcDecodable)]
 pub struct GistFile {
   pub size: u64,
     pub raw_url: String,
@@ -197,7 +197,7 @@ pub struct GistFile {
   pub language: Option<String>
 }
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+#[derive(Debug, RustcDecodable)]
 pub struct Gist {
   pub url: String,
   pub forks_url: String,
