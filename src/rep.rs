@@ -61,10 +61,10 @@ pub struct Deployment {
   pub repository_url: String
 }
 
-impl Encodable for DeploymentReq {
+impl Encodable for DeploymentOptions {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
     match *self {
-      DeploymentReq {
+      DeploymentOptions {
         commit_ref: ref cref,
         task: ref tsk,
         auto_merge: ref amrg,
@@ -73,7 +73,7 @@ impl Encodable for DeploymentReq {
         environment: ref env,
         description: ref desc
       } => {
-          encoder.emit_struct("DeploymentReq", 1usize, |encoder| {
+          encoder.emit_struct("DeploymentOptions", 1usize, |encoder| {
               let mut index = 0;
               try!(encoder.emit_struct_field("ref", index, |encoder| cref.encode(encoder)));
               if tsk.is_some() {
@@ -108,7 +108,7 @@ impl Encodable for DeploymentReq {
 }
 
 #[derive(Debug)]
-pub struct DeploymentReq {
+pub struct DeploymentOptions {
   pub commit_ref: String,
   pub task: Option<String>,
   pub auto_merge: Option<bool>,
@@ -119,14 +119,14 @@ pub struct DeploymentReq {
   pub description: Option<String>
 }
 
-impl DeploymentReq {
-  pub fn builder<C>(commit: C) -> DeploymentReqBuilder where C: Into<String> {
-    DeploymentReqBuilder::new(commit)
+impl DeploymentOptions {
+  pub fn builder<C>(commit: C) -> DeploymentOptionsBuilder where C: Into<String> {
+    DeploymentOptionsBuilder::new(commit)
   }
 }
 
 #[derive(Default)]
-pub struct DeploymentReqBuilder {
+pub struct DeploymentOptionsBuilder {
   pub commit_ref: String,
   pub task: Option<String>,
   pub auto_merge: Option<bool>,
@@ -136,46 +136,46 @@ pub struct DeploymentReqBuilder {
   pub description: Option<String>
 }
 
-impl DeploymentReqBuilder {
-  pub fn new<C>(commit: C) -> DeploymentReqBuilder where C: Into<String> {
-    DeploymentReqBuilder {
+impl DeploymentOptionsBuilder {
+  pub fn new<C>(commit: C) -> DeploymentOptionsBuilder where C: Into<String> {
+    DeploymentOptionsBuilder {
       commit_ref: commit.into(),
       ..Default::default()
     }
   }
 
-  pub fn task<T>(&mut self, task: T) -> &mut DeploymentReqBuilder where T: Into<String> {
+  pub fn task<T>(&mut self, task: T) -> &mut DeploymentOptionsBuilder where T: Into<String> {
     self.task = Some(task.into());
     self
   }
 
-  pub fn auto_merge(&mut self, auto_merge: bool) -> &mut DeploymentReqBuilder {
+  pub fn auto_merge(&mut self, auto_merge: bool) -> &mut DeploymentOptionsBuilder {
     self.auto_merge = Some(auto_merge);
     self
   }
 
-  pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentReqBuilder where C: Into<String> {
+  pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentOptionsBuilder where C: Into<String> {
     self.required_contexts = Some(ctxs.into_iter().map(|c|c.into()).collect::<Vec<String>>());
     self
   }
 
-  pub fn payload<T: ToJson>(&mut self, pl: T) -> &mut DeploymentReqBuilder {
+  pub fn payload<T: ToJson>(&mut self, pl: T) -> &mut DeploymentOptionsBuilder {
     self.payload = Some(pl.to_json());
     self
   }
 
-  pub fn environment<E>(&mut self, env: E) -> &mut DeploymentReqBuilder where E: Into<String> {
+  pub fn environment<E>(&mut self, env: E) -> &mut DeploymentOptionsBuilder where E: Into<String> {
     self.environment = Some(env.into());
     self
   }
 
-  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentReqBuilder where D: Into<String> {
+  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentOptionsBuilder where D: Into<String> {
     self.description = Some(desc.into());
     self
   }
 
-  pub fn build(&self) -> DeploymentReq {
-    DeploymentReq {
+  pub fn build(&self) -> DeploymentOptions {
+    DeploymentOptions {
       commit_ref: self.commit_ref.clone(),
       task: self.task.clone(),
       auto_merge: self.auto_merge,
@@ -260,15 +260,15 @@ impl Content {
   }
 }
 
-impl Encodable for GistReq {
+impl Encodable for GistOptions {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
     match *self {
-      GistReq {
+      GistOptions {
         description: ref this_description,
         public: ref this_public,
         files: ref this_files
       } => {
-          encoder.emit_struct("GistReq", 1, |encoder| {
+          encoder.emit_struct("GistOptions", 1, |encoder| {
               let mut index: isize = -1;
               if this_description.is_some() {
                   index += 1;
@@ -288,36 +288,36 @@ impl Encodable for GistReq {
 }
 
 #[derive(Default)]
-pub struct GistReqBuilder {
+pub struct GistOptionsBuilder {
     pub description: Option<String>,
     pub public: Option<bool>,
     pub files: HashMap<String, Content>
 }
 
-impl GistReqBuilder {
-    pub fn new<K,V>(files: HashMap<K,V>) -> GistReqBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
+impl GistOptionsBuilder {
+    pub fn new<K,V>(files: HashMap<K,V>) -> GistOptionsBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
         let mut contents = HashMap::new();
         for (k,v) in files.into_iter() {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
-        GistReqBuilder {
+        GistOptionsBuilder {
             files: contents,
             ..Default::default()
         }
     }
 
-    pub fn description<D>(&mut self, desc: D) -> &mut GistReqBuilder where D: Into<String> {
+    pub fn description<D>(&mut self, desc: D) -> &mut GistOptionsBuilder where D: Into<String> {
         self.description = Some(desc.into());
         self
     }
 
-    pub fn public(&mut self, p: bool) -> &mut GistReqBuilder {
+    pub fn public(&mut self, p: bool) -> &mut GistOptionsBuilder {
         self.public = Some(p);
         self
     }
 
-  pub fn build(&self) -> GistReq {
-    GistReq {
+  pub fn build(&self) -> GistOptions {
+    GistOptions {
         files: self.files.clone(),
         description: self.description.clone(),
         public: self.public
@@ -326,26 +326,26 @@ impl GistReqBuilder {
 }
 
 #[derive(Debug)]
-pub struct GistReq {
+pub struct GistOptions {
   pub description: Option<String>,
   pub public: Option<bool>,
   pub files: HashMap<String, Content>
 }
 
-impl GistReq {
-  pub fn new<D,K,V>(desc: Option<D>, public: bool, files: HashMap<K, V>) -> GistReq where D: Into<String>, K: Hash + Eq + Into<String>, V: Into<String> {
+impl GistOptions {
+  pub fn new<D,K,V>(desc: Option<D>, public: bool, files: HashMap<K, V>) -> GistOptions where D: Into<String>, K: Hash + Eq + Into<String>, V: Into<String> {
     let mut contents = HashMap::new();
     for (k,v) in files.into_iter() {
       contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
     }
-    GistReq {
+    GistOptions {
       description: desc.map(|d|d.into()),
       public: Some(public),
       files: contents
     }
   }
-    pub fn builder<K,V>(files: HashMap<K,V>) -> GistReqBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
-        GistReqBuilder::new(files)
+    pub fn builder<K,V>(files: HashMap<K,V>) -> GistOptionsBuilder where K: Clone + Hash + Eq + Into<String>, V: Into<String> {
+        GistOptionsBuilder::new(files)
     }
 }
 
@@ -465,14 +465,14 @@ pub struct Commit {
 }
 
 #[derive(Debug, RustcEncodable)]
-pub struct LabelReq {
+pub struct LabelOptions {
   pub name: String,
   pub color: String
 }
 
-impl LabelReq {
-  pub fn new<N,C>(name: N, color: C) -> LabelReq where N: Into<String>, C: Into<String>{
-    LabelReq {
+impl LabelOptions {
+  pub fn new<N,C>(name: N, color: C) -> LabelOptions where N: Into<String>, C: Into<String>{
+    LabelOptions {
       name: name.into(),
       color: color.into()
     }
@@ -487,36 +487,36 @@ pub struct Label {
 }
 
 #[derive(Default)]
-pub struct PullEditBuilder {
+pub struct PullEditOptionsBuilder {
     pub title: Option<String>,
     pub body: Option<String>,
     pub state: Option<String>
 }
 
-impl PullEditBuilder {
-    pub fn new() -> PullEditBuilder {
-        PullEditBuilder {
+impl PullEditOptionsBuilder {
+    pub fn new() -> PullEditOptionsBuilder {
+        PullEditOptionsBuilder {
             ..Default::default()
         }
     }
 
-    pub fn title<T>(&mut self, title: T) -> &mut PullEditBuilder where T: Into<String> {
+    pub fn title<T>(&mut self, title: T) -> &mut PullEditOptionsBuilder where T: Into<String> {
         self.title = Some(title.into());
         self
     }
 
-  pub fn body<B>(&mut self, body: B) -> &mut PullEditBuilder where B: Into<String>{
+  pub fn body<B>(&mut self, body: B) -> &mut PullEditOptionsBuilder where B: Into<String>{
     self.body = Some(body.into());
     self
   }
 
-  pub fn state<S>(&mut self, state: S) -> &mut PullEditBuilder where S: Into<String> {
+  pub fn state<S>(&mut self, state: S) -> &mut PullEditOptionsBuilder where S: Into<String> {
       self.state = Some(state.into());
       self
   }
 
-  pub fn build(&self) -> PullEdit {
-    PullEdit {
+  pub fn build(&self) -> PullEditOptions {
+    PullEditOptions {
         title: self.title.clone(),
         body: self.body.clone(),
         state: self.state.clone()
@@ -524,15 +524,15 @@ impl PullEditBuilder {
   }
 }
 
-impl Encodable for PullEdit {
+impl Encodable for PullEditOptions {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
     match *self {
-      PullEdit {
+      PullEditOptions {
         title: ref this_title,
         body: ref this_body,
         state: ref this_state
       } => {
-          encoder.emit_struct("PullEdit", 1usize, |encoder| {
+          encoder.emit_struct("PullEditOptions", 1usize, |encoder| {
               let mut index: isize = -1;
               if this_title.is_some() {
                   index += 1;
@@ -554,33 +554,33 @@ impl Encodable for PullEdit {
 }
 
 #[derive(Debug)]
-pub struct PullEdit {
+pub struct PullEditOptions {
   title: Option<String>,
   body: Option<String>,
   state: Option<String>
 }
 
-impl PullEdit {
+impl PullEditOptions {
   // todo represent state as enum
-  pub fn new<T,B,S>(title: Option<T>, body: Option<B>, state: Option<S>) -> PullEdit where T: Into<String>, B: Into<String>, S: Into<String> {
-    PullEdit { title: title.map(|t|t.into()), body: body.map(|b|b.into()), state: state.map(|s|s.into()) }
+  pub fn new<T,B,S>(title: Option<T>, body: Option<B>, state: Option<S>) -> PullEditOptions where T: Into<String>, B: Into<String>, S: Into<String> {
+    PullEditOptions { title: title.map(|t|t.into()), body: body.map(|b|b.into()), state: state.map(|s|s.into()) }
   }
-    pub fn builder() -> PullEditBuilder {
-        PullEditBuilder::new()
+    pub fn builder() -> PullEditOptionsBuilder {
+        PullEditOptionsBuilder::new()
     }
 }
 
 #[derive(Debug, RustcEncodable)]
-pub struct PullReq {
+pub struct PullOptions {
   pub title: String,
   pub head: String,
   pub base: String,
   pub body: Option<String>
 }
 
-impl PullReq {
-  pub fn new<T,H,BS,B>(title: T, head: H, base: BS, body: Option<B>) -> PullReq where T: Into<String>, H: Into<String>, BS: Into<String>, B: Into<String> {
-    PullReq {
+impl PullOptions {
+  pub fn new<T,H,BS,B>(title: T, head: H, base: BS, body: Option<B>) -> PullOptions where T: Into<String>, H: Into<String>, BS: Into<String>, B: Into<String> {
+    PullOptions {
       title: title.into(),
       head: head.into(),
       base: base.into(),
@@ -625,7 +625,7 @@ pub struct Pull {
 }
 
 
-pub struct IssueListReq {
+pub struct IssueListOptions {
     state: StdState,
     sort: Sort,
     direction: SortDirection,
@@ -636,9 +636,9 @@ pub struct IssueListReq {
     since: Option<String>,
 }
 
-impl IssueListReq {
-    pub fn builder() -> IssueListReqBuilder {
-        IssueListReqBuilder::new()
+impl IssueListOptions {
+    pub fn builder() -> IssueListOptionsBuilder {
+        IssueListOptionsBuilder::new()
     }
 
     pub fn serialize(&self) -> String {
@@ -667,7 +667,7 @@ impl IssueListReq {
 
 /// a mutable issue list builder
 #[derive(Default)]
-pub struct IssueListReqBuilder {
+pub struct IssueListOptionsBuilder {
     state: StdState,
     sort: Sort,
     direction: SortDirection,
@@ -678,71 +678,71 @@ pub struct IssueListReqBuilder {
     since: Option<String>,
 }
 
-impl IssueListReqBuilder {
-    pub fn new() -> IssueListReqBuilder {
-        IssueListReqBuilder { ..Default::default() }
+impl IssueListOptionsBuilder {
+    pub fn new() -> IssueListOptionsBuilder {
+        IssueListOptionsBuilder { ..Default::default() }
     }
 
-    pub fn state(&mut self, state: StdState) -> &mut IssueListReqBuilder {
+    pub fn state(&mut self, state: StdState) -> &mut IssueListOptionsBuilder {
         self.state = state;
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut IssueListReqBuilder {
+    pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
         self.sort = sort;
         self
     }
 
-    pub fn asc(&mut self) -> &mut IssueListReqBuilder {
+    pub fn asc(&mut self) -> &mut IssueListOptionsBuilder {
         self.direction(SortDirection::Asc)
     }
 
-    pub fn desc(&mut self) -> &mut IssueListReqBuilder {
+    pub fn desc(&mut self) -> &mut IssueListOptionsBuilder {
         self.direction(SortDirection::Desc)
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListReqBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListOptionsBuilder {
         self.direction = direction;
         self
     }
 
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListReqBuilder
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListOptionsBuilder
         where A: Into<String>
     {
         self.assignee = Some(assignee.into());
         self
     }
 
-    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListReqBuilder
+    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListOptionsBuilder
         where C: Into<String>
     {
         self.creator = Some(creator.into());
         self
     }
 
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListReqBuilder
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListOptionsBuilder
         where M: Into<String>
     {
         self.mentioned = Some(mentioned.into());
         self
     }
 
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListReqBuilder
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
         where L: Into<String>
     {
         self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
         self
     }
 
-    pub fn since<S>(&mut self, since: S) -> &mut IssueListReqBuilder
+    pub fn since<S>(&mut self, since: S) -> &mut IssueListOptionsBuilder
         where S: Into<String>
     {
         self.since = Some(since.into());
         self
     }
 
-    pub fn build(&self) -> IssueListReq {
-        IssueListReq {
+    pub fn build(&self) -> IssueListOptions {
+        IssueListOptions {
             state: self.state.clone(),
             sort: self.sort.clone(),
             direction: self.direction.clone(),
@@ -756,7 +756,7 @@ impl IssueListReqBuilder {
 }
 
 #[derive(Debug, RustcEncodable)]
-pub struct IssueReq {
+pub struct IssueOptions {
   pub title: String,
   pub body: Option<String>,
   pub assignee: Option<String>,
@@ -764,10 +764,10 @@ pub struct IssueReq {
   pub labels: Vec<String>
 }
 
-impl IssueReq {
+impl IssueOptions {
   pub fn new<T,B,A,L>(title: T, body: Option<B>, assignee: Option<A>,
-             milestone: Option<u64>, labels: Vec<L>) -> IssueReq where T: Into<String>, B: Into<String>, A: Into<String>, L: Into<String> {
-    IssueReq {
+             milestone: Option<u64>, labels: Vec<L>) -> IssueOptions where T: Into<String>, B: Into<String>, A: Into<String>, L: Into<String> {
+    IssueOptions {
       title: title.into(),
       body: body.map(|b|b.into()),
       assignee: assignee.map(|a|a.into()),
@@ -837,7 +837,7 @@ pub struct Release {
 }
 
 #[derive(Debug, RustcEncodable)]
-pub struct ReleaseReq {
+pub struct ReleaseOptions {
   pub tag_name: String,
   pub target_commitish: Option<String>,
   pub name: Option<String>,
@@ -846,9 +846,9 @@ pub struct ReleaseReq {
   pub prerelease: Option<bool>
 }
 
-/// builder interface for ReleaseReq
+/// builder interface for ReleaseOptions
 #[derive(Default)]
-pub struct ReleaseBuilder {
+pub struct ReleaseOptionsBuilder {
   tag: String,
   commitish: Option<String>,
   name: Option<String>,
@@ -857,48 +857,48 @@ pub struct ReleaseBuilder {
   prerelease: Option<bool>
 }
 
-impl ReleaseBuilder {
-  pub fn new<T>(tag: T) -> ReleaseBuilder where T: Into<String> {
-    ReleaseBuilder {
+impl ReleaseOptionsBuilder {
+  pub fn new<T>(tag: T) -> ReleaseOptionsBuilder where T: Into<String> {
+    ReleaseOptionsBuilder {
       tag: tag.into(),
       ..Default::default()
     }
   }
 
-  pub fn commitish<C>(&mut self, commit: C) -> &mut ReleaseBuilder where C: Into<String> {
+  pub fn commitish<C>(&mut self, commit: C) -> &mut ReleaseOptionsBuilder where C: Into<String> {
     self.commitish = Some(commit.into());
     self
   }
 
-  pub fn name<N>(&mut self, name: N) -> &mut ReleaseBuilder where N: Into<String> {
+  pub fn name<N>(&mut self, name: N) -> &mut ReleaseOptionsBuilder where N: Into<String> {
     self.name = Some(name.into());
     self
   }
 
-  pub fn body<B>(&mut self, body: B) -> &mut ReleaseBuilder where B: Into<String> {
+  pub fn body<B>(&mut self, body: B) -> &mut ReleaseOptionsBuilder where B: Into<String> {
     self.body = Some(body.into());
     self
   }
 
-  pub fn draft(&mut self, draft: bool) -> &mut ReleaseBuilder {
+  pub fn draft(&mut self, draft: bool) -> &mut ReleaseOptionsBuilder {
     self.draft = Some(draft);
     self
   }
 
-  pub fn prerelease(&mut self, pre: bool) -> &mut ReleaseBuilder {
+  pub fn prerelease(&mut self, pre: bool) -> &mut ReleaseOptionsBuilder {
     self.prerelease = Some(pre);
     self
   }
 
-  pub fn build(&self) -> ReleaseReq {
-      ReleaseReq::new(
+  pub fn build(&self) -> ReleaseOptions {
+      ReleaseOptions::new(
           self.tag.as_ref(), self.commitish.clone(), self.name.clone(), self.body.clone(), self.draft, self.prerelease)
   }
 }
 
-impl ReleaseReq {
-  pub fn new<T,C,N,B>(tag: T, commit: Option<C>, name: Option<N>, body: Option<B>, draft: Option<bool>, prerelease: Option<bool>) -> ReleaseReq where T: Into<String>, C: Into<String>, N: Into<String>, B: Into<String>{
-    ReleaseReq {
+impl ReleaseOptions {
+  pub fn new<T,C,N,B>(tag: T, commit: Option<C>, name: Option<N>, body: Option<B>, draft: Option<bool>, prerelease: Option<bool>) -> ReleaseOptions where T: Into<String>, C: Into<String>, N: Into<String>, B: Into<String>{
+    ReleaseOptions {
       tag_name: tag.into(),
       target_commitish: commit.map(|c|c.into()),
       name: name.map(|n|n.into()),
@@ -908,8 +908,8 @@ impl ReleaseReq {
     }
   }
 
-  pub fn builder<T>(tag: T) -> ReleaseBuilder where T: Into<String> {
-    ReleaseBuilder::new(tag)
+  pub fn builder<T>(tag: T) -> ReleaseOptionsBuilder where T: Into<String> {
+    ReleaseOptionsBuilder::new(tag)
   }
 }
 
@@ -927,15 +927,15 @@ pub struct DeploymentStatus {
   pub creator: User
 }
 
-impl Encodable for DeploymentStatusReq {
+impl Encodable for DeploymentStatusOptions {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
     match *self {
-      DeploymentStatusReq {
+      DeploymentStatusOptions {
         state: ref this_state,
         target_url: ref this_target_url,
         description: ref this_description
       } => {
-          encoder.emit_struct("DeploymentStatusReq", 1_usize, |encoder| {
+          encoder.emit_struct("DeploymentStatusOptions", 1_usize, |encoder| {
               let mut index = 0;
               try!(encoder.emit_struct_field("state", index, |encoder| this_state.encode(encoder)));
               if this_target_url.is_some() {
@@ -954,33 +954,33 @@ impl Encodable for DeploymentStatusReq {
 }
 
 #[derive(Default)]
-pub struct DeploymentStatusReqBuilder {
+pub struct DeploymentStatusOptionsBuilder {
   state: State,
   target_url: Option<String>,
   description: Option<String>
 }
 
-impl DeploymentStatusReqBuilder {
+impl DeploymentStatusOptionsBuilder {
 
-  pub fn new(state: State) -> DeploymentStatusReqBuilder {
-    DeploymentStatusReqBuilder {
+  pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
+    DeploymentStatusOptionsBuilder {
       state: state,
       ..Default::default()
     }
   }
 
-  pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusReqBuilder where T: Into<String> {
+  pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusOptionsBuilder where T: Into<String> {
     self.target_url = Some(url.into());
     self
   }
 
-  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentStatusReqBuilder where D: Into<String> {
+  pub fn description<D>(&mut self, desc: D) -> &mut DeploymentStatusOptionsBuilder where D: Into<String> {
     self.description = Some(desc.into());
     self
   }
 
-  pub fn build(&self) -> DeploymentStatusReq {
-    DeploymentStatusReq {
+  pub fn build(&self) -> DeploymentStatusOptions {
+    DeploymentStatusOptions {
       state: self.state.clone(),
       target_url: self.target_url.clone(),
       description: self.description.clone()
@@ -989,15 +989,15 @@ impl DeploymentStatusReqBuilder {
 }
 
 #[derive(Debug)]
-pub struct DeploymentStatusReq {
+pub struct DeploymentStatusOptions {
   state: State,
   target_url: Option<String>,
   description: Option<String>
 }
 
-impl DeploymentStatusReq {
-  pub fn builder(state: State) -> DeploymentStatusReqBuilder {
-    DeploymentStatusReqBuilder::new(state)
+impl DeploymentStatusOptions {
+  pub fn builder(state: State) -> DeploymentStatusOptionsBuilder {
+    DeploymentStatusOptionsBuilder::new(state)
   }
 }
 
@@ -1014,16 +1014,16 @@ pub struct Status {
   pub creator: User
 }
 
-impl Encodable for StatusReq {
+impl Encodable for StatusOptions {
   fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), E::Error> {
     match *self {
-      StatusReq {
+      StatusOptions {
         state: ref this_state,
         target_url: ref this_target_url,
         description: ref this_description,
         context: ref this_context
       } => {
-          encoder.emit_struct("StatusReq", 1usize, |encoder| {
+          encoder.emit_struct("StatusOptions", 1usize, |encoder| {
               let mut index = 0;
           try!(encoder.emit_struct_field("state", index, |encoder| this_state.encode(encoder)));
               if this_target_url.is_some() {
@@ -1046,7 +1046,7 @@ impl Encodable for StatusReq {
 }
 
 #[derive(Debug)]
-pub struct StatusReq {
+pub struct StatusOptions {
   state: State,
   target_url: Option<String>,
   description: Option<String>,
@@ -1084,14 +1084,14 @@ impl StatusBuilder {
     self
   }
 
-  pub fn build(&self) -> StatusReq {
-    StatusReq::new(self.state.clone(), self.target_url.clone(), self.description.clone(), self.context.clone())
+  pub fn build(&self) -> StatusOptions {
+    StatusOptions::new(self.state.clone(), self.target_url.clone(), self.description.clone(), self.context.clone())
   }
 }
 
-impl StatusReq {
-  pub fn new<T,D,C>(state: State, target_url: Option<T>, descr: Option<D>, context: Option<C>) -> StatusReq where T: Into<String>, D: Into<String>, C: Into<String> {
-    StatusReq {
+impl StatusOptions {
+  pub fn new<T,D,C>(state: State, target_url: Option<T>, descr: Option<D>, context: Option<C>) -> StatusOptions where T: Into<String>, D: Into<String>, C: Into<String> {
+    StatusOptions {
       state: state,
       target_url: target_url.map(|t|t.into()),
       description: descr.map(|d|d.into()),
@@ -1115,7 +1115,7 @@ pub struct Key {
 }
 
 #[derive(Debug, RustcEncodable)]
-pub struct KeyReq {
+pub struct KeyOptions {
   pub title: String,
   pub key: String,
   pub read_only: bool
@@ -1143,11 +1143,11 @@ mod tests {
         files.insert("foo", "bar");
         let tests = vec![
             (
-                GistReq::new(None as Option<String>, true, files.clone()),
+                GistOptions::new(None as Option<String>, true, files.clone()),
                 r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
             ),
             (
-                GistReq::new(Some("desc"), true, files.clone()),
+                GistOptions::new(Some("desc"), true, files.clone()),
                 r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#
             )
         ];
@@ -1158,11 +1158,11 @@ mod tests {
     fn deployment_reqs() {
         let tests = vec![
             (
-                DeploymentReq::builder("test").build(),
+                DeploymentOptions::builder("test").build(),
                 r#"{"ref":"test"}"#
             ),
             (
-                DeploymentReq::builder("test").task("launchit").build(),
+                DeploymentOptions::builder("test").task("launchit").build(),
                 r#"{"ref":"test","task":"launchit"}"#
             )
         ];
@@ -1173,15 +1173,15 @@ mod tests {
     fn deployment_status_reqs() {
         let tests = vec![
             (
-                DeploymentStatusReq::builder(State::pending).build(),
+                DeploymentStatusOptions::builder(State::pending).build(),
                 r#"{"state":"pending"}"#
             ),
             (
-                DeploymentStatusReq::builder(State::pending).target_url("http://host.com").build(),
+                DeploymentStatusOptions::builder(State::pending).target_url("http://host.com").build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
             (
-                DeploymentStatusReq::builder(State::pending).target_url("http://host.com").description("desc").build(),
+                DeploymentStatusOptions::builder(State::pending).target_url("http://host.com").description("desc").build(),
                 r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
             ),
         ];
@@ -1192,15 +1192,15 @@ mod tests {
     fn pullreq_edits() {
         let tests = vec![
             (
-                PullEdit::builder().title("test").build(),
+                PullEditOptions::builder().title("test").build(),
                 r#"{"title":"test"}"#
             ),
             (
-                PullEdit::builder().title("test").body("desc").build(),
+                PullEditOptions::builder().title("test").body("desc").build(),
                 r#"{"title":"test","body":"desc"}"#
             ),
             (
-                PullEdit::builder().state("closed").build(),
+                PullEditOptions::builder().state("closed").build(),
                 r#"{"state":"closed"}"#
             )
         ];
@@ -1211,19 +1211,19 @@ mod tests {
     fn status_reqs() {
         let tests = vec![
             (
-                StatusReq::builder(State::pending).build(),
+                StatusOptions::builder(State::pending).build(),
                 r#"{"state":"pending"}"#
             ),
             (
-                StatusReq::builder(State::success).target_url("http://acme.com").build(),
+                StatusOptions::builder(State::success).target_url("http://acme.com").build(),
                 r#"{"state":"success","target_url":"http://acme.com"}"#
             ),
             (
-                StatusReq::builder(State::error).description("desc").build(),
+                StatusOptions::builder(State::error).description("desc").build(),
                 r#"{"state":"error","description":"desc"}"#
             ),
             (
-                StatusReq::builder(State::failure).target_url("http://acme.com").description("desc").build(),
+                StatusOptions::builder(State::failure).target_url("http://acme.com").description("desc").build(),
                 r#"{"state":"failure","target_url":"http://acme.com","description":"desc"}"#
             )
         ];
@@ -1232,7 +1232,7 @@ mod tests {
 
     #[test]
     fn list_reqs() {
-        fn test_serialize(tests: Vec<(IssueListReq, &str)>) {
+        fn test_serialize(tests: Vec<(IssueListOptions, &str)>) {
             for test in tests {
                 match test {
                     (k, v) => assert_eq!(k.serialize(), v),
@@ -1241,15 +1241,15 @@ mod tests {
         }
         let tests = vec![
             (
-                IssueListReq::builder().build(),
+                IssueListOptions::builder().build(),
                 "state=open&sort=created&direction=asc"
             ),
             (
-                IssueListReq::builder().state(StdState::Closed).build(),
+                IssueListOptions::builder().state(StdState::Closed).build(),
                 "state=closed&sort=created&direction=asc"
              ),
             (
-                IssueListReq::builder().labels(vec!["foo", "bar"]).build(),
+                IssueListOptions::builder().labels(vec!["foo", "bar"]).build(),
                 "state=open&sort=created&direction=asc&labels=foo%2Cbar"
             ),
         ];

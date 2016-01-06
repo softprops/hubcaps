@@ -1,7 +1,7 @@
 //! Statuses interface
 
 use self::super::{Github, Result};
-use rep::{Status, StatusReq};
+use rep::{Status, StatusOptions};
 use rustc_serialize::json;
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
@@ -42,7 +42,7 @@ impl<'a> Statuses<'a> {
     }
 
     /// creates a new status for a target sha
-    pub fn create(&self, sha: &str, status: &StatusReq) -> Result<Status> {
+    pub fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
         let data = try!(json::encode(&status));
         self.github.post::<Status>(&self.path(&format!("/{}", sha)), data.as_bytes())
     }

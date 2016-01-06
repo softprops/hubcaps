@@ -2,7 +2,7 @@
 
 use self::super::{Github, Result};
 use rustc_serialize::json;
-use rep::{DeploymentReq, DeploymentStatus, DeploymentStatusReq};
+use rep::{DeploymentOptions, DeploymentStatus, DeploymentStatusOptions};
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {
@@ -46,10 +46,10 @@ impl<'a> DeploymentStatuses<'a> {
         self.github.get::<Vec<DeploymentStatus>>(&self.path(""))
     }
 
-    /// creates a new deployment status. For convenience, a DeploymentStatusReq.builder
+    /// creates a new deployment status. For convenience, a DeploymentStatusOptions.builder
     /// interface is required for building up a request
-    pub fn create(&self, status: &DeploymentStatusReq) -> Result<DeploymentStatus> {
-        let data = try!(json::encode::<DeploymentStatusReq>(&status));
+    pub fn create(&self, status: &DeploymentStatusOptions) -> Result<DeploymentStatus> {
+        let data = try!(json::encode::<DeploymentStatusOptions>(&status));
         self.github.post::<DeploymentStatus>(&self.path(""), &data.as_bytes())
     }
 }
@@ -78,7 +78,7 @@ impl<'a> Deployments<'a> {
     }
 
     /// creates a new deployment for this repository
-    pub fn create(&self, dep: &DeploymentReq) -> Result<String> {
+    pub fn create(&self, dep: &DeploymentOptions) -> Result<String> {
         let data = try!(json::encode(&dep));
         let body = try!(self.github.post(&self.path(""), data.as_bytes()));
         Ok(body)

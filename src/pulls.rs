@@ -2,7 +2,7 @@
 
 use url::form_urlencoded;
 use self::super::{Github, Result, SortDirection, State};
-use rep::{Pull, PullEdit, PullReq};
+use rep::{Pull, PullEditOptions, PullOptions};
 use rustc_serialize::json;
 use std::default::Default;
 use std::fmt;
@@ -68,15 +68,15 @@ impl<'a> PullRequest<'a> {
 
     /// short hand for editing state = open
     pub fn open(&self) -> Result<Pull> {
-        self.edit(&PullEdit::builder().state("open").build())
+        self.edit(&PullEditOptions::builder().state("open").build())
     }
 
     /// shorthand for editing state = closed
     pub fn close(&self) -> Result<Pull> {
-        self.edit(&PullEdit::builder().state("closed").build())
+        self.edit(&PullEditOptions::builder().state("closed").build())
     }
 
-    pub fn edit(&self, pr: &PullEdit) -> Result<Pull> {
+    pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
         let data = try!(json::encode(&pr));
         self.github.patch::<Pull>(&self.path(""), data.as_bytes())
     }
@@ -153,7 +153,7 @@ impl<'a> PullRequests<'a> {
         PullRequest::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
     }
 
-    pub fn create(&self, pr: &PullReq) -> Result<Pull> {
+    pub fn create(&self, pr: &PullOptions) -> Result<Pull> {
         let data = try!(json::encode(&pr));
         self.github.post::<Pull>(&self.path(""), data.as_bytes())
     }

@@ -2,7 +2,7 @@ extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::{GistReq, Github};
+use hubcaps::{GistOptions, Github};
 use std::collections::HashMap;
 use std::env;
 
@@ -16,7 +16,7 @@ fn main() {
             let mut files = HashMap::new();
             files.insert("thename", "the contents");
             let gist = github.gists()
-                             .create(&GistReq::builder(files).public(false).build())
+                             .create(&GistOptions::builder(files).public(false).build())
                              .unwrap();
             println!("{:?}", gist)
         }

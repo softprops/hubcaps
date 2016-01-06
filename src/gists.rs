@@ -2,7 +2,7 @@
 
 use self::super::{Error, Github, Result};
 use rustc_serialize::json;
-use rep::{Gist, GistFork, GistReq};
+use rep::{Gist, GistFork, GistOptions};
 
 /// reference to gists associated with a github user
 pub struct UserGists<'a> {
@@ -85,7 +85,7 @@ impl<'a> Gists<'a> {
         self.github.get::<Vec<Gist>>(&self.path("/starred"))
     }
 
-    pub fn create(&self, gist: &GistReq) -> Result<Gist> {
+    pub fn create(&self, gist: &GistOptions) -> Result<Gist> {
         let data = try!(json::encode(&gist));
         self.github.post::<Gist>(&self.path(""), data.as_bytes())
     }

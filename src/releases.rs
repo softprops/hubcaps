@@ -2,7 +2,7 @@
 
 use self::super::{Github, Result};
 use rustc_serialize::json;
-use rep::{Asset, Release, ReleaseReq};
+use rep::{Asset, Release, ReleaseOptions};
 
 pub struct Assets<'a> {
     github: &'a Github<'a>,
@@ -114,12 +114,12 @@ impl<'a> Releases<'a> {
         format!("/repos/{}/{}/releases{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, rel: &ReleaseReq) -> Result<Release> {
+    pub fn create(&self, rel: &ReleaseOptions) -> Result<Release> {
         let data = try!(json::encode(&rel));
         self.github.post::<Release>(&self.path(""), data.as_bytes())
     }
 
-    pub fn edit(&self, id: u64, rel: &ReleaseReq) -> Result<Release> {
+    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Result<Release> {
         let data = try!(json::encode(&rel));
         self.github.patch::<Release>(&self.path(&format!("/{}", id)), data.as_bytes())
     }

@@ -1,7 +1,7 @@
 //! Issues interface
 
 use self::super::{Github, Result};
-use rep::{Issue, IssueReq, IssueListReq, Label};
+use rep::{Issue, IssueOptions, IssueListOptions, Label};
 use rustc_serialize::json;
 use std::fmt;
 use std::default::Default;
@@ -150,7 +150,7 @@ impl<'a> IssueRef<'a> {
                          self.number)
     }
 
-    pub fn edit(&self, is: &IssueReq) -> Result<Issue> {
+    pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
         let data = try!(json::encode(&is));
         self.github.patch::<Issue>(&self.path(""), data.as_bytes())
     }
@@ -184,12 +184,12 @@ impl<'a> Issues<'a> {
         IssueRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
     }
 
-    pub fn create(&self, is: &IssueReq) -> Result<Issue> {
+    pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
         let data = try!(json::encode(&is));
         self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
-    pub fn list(&self, req: &IssueListReq) -> Result<Vec<Issue>> {
+    pub fn list(&self, req: &IssueListOptions) -> Result<Vec<Issue>> {
         let url = self.path(&format!("?{}", req.serialize()));
         self.github.get::<Vec<Issue>>(&url)
     }

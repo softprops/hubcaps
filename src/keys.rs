@@ -2,7 +2,7 @@
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/) for motivation and use
 
 use self::super::{Github, Result};
-use rep::{Key, KeyReq};
+use rep::{Key, KeyOptions};
 use rustc_serialize::json;
 
 pub struct Keys<'a> {
@@ -27,8 +27,8 @@ impl<'a> Keys<'a> {
         format!("/repos/{}/{}/keys{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, key: &KeyReq) -> Result<Key> {
-        let data = try!(json::encode::<KeyReq>(key));
+    pub fn create(&self, key: &KeyOptions) -> Result<Key> {
+        let data = try!(json::encode::<KeyOptions>(key));
         self.github.post::<Key>(&self.path(""), data.as_bytes())
     }
 

@@ -1,7 +1,7 @@
 //! Labels interface
 
 use self::super::{Github, Result};
-use rep::{Label, LabelReq};
+use rep::{Label, LabelOptions};
 use rustc_serialize::json;
 
 pub struct Labels<'a> {
@@ -26,12 +26,12 @@ impl<'a> Labels<'a> {
         format!("/repos/{}/{}/labels{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, lab: &LabelReq) -> Result<Label> {
+    pub fn create(&self, lab: &LabelOptions) -> Result<Label> {
         let data = try!(json::encode(&lab));
         self.github.post::<Label>(&self.path(""), data.as_bytes())
     }
 
-    pub fn update(&self, prevname: &str, lab: &LabelReq) -> Result<Label> {
+    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
         let data = try!(json::encode(&lab));
         self.github.patch::<Label>(&self.path(&format!("/{}", prevname)), data.as_bytes())
     }

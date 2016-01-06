@@ -2,7 +2,7 @@ extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::{Github, IssueListReq};
+use hubcaps::{Github, IssueListOptions};
 use std::env;
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
                                      Some(token));
             let repo = github.repo("softprops", "hubcaps");
             let issues = repo.issues();
-            for issue in issues.list(&IssueListReq::builder().build()).unwrap() {
+            for issue in issues.list(&IssueListOptions::builder().build()).unwrap() {
                 println!("#{} {}", issue.number, issue.title);
             }
         },
