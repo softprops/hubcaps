@@ -659,7 +659,7 @@ impl IssueListOptions {
             params.push(("since", s.to_owned()));
         }
         if !self.labels.is_empty() {
-            params.push(("labels", self.labels.connect(",")));
+            params.push(("labels", self.labels.join(",")));
         }
         form_urlencoded::serialize(params)
     }

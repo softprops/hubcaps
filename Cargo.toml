@@ -10,6 +10,6 @@ keywords = ["hyper", "github"]
 license = "MIT"
 
 [dependencies]
-hyper = "0.6"
+hyper = "0.7"
 rustc-serialize = "0.3"
-url = "0.2"
+url = "0.5.2"
