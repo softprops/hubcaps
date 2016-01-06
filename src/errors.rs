@@ -1,7 +1,7 @@
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
-use rustc_serialize::json::{DecoderError,EncoderError};
+use rustc_serialize::json::{DecoderError, EncoderError};
 use rep::ClientError;
 
 /// enumerated types of client errors
@@ -13,7 +13,7 @@ pub enum Error {
     IO(IoError),
     Fault {
         code: StatusCode,
-        error: ClientError
+        error: ClientError,
     },
 }
 

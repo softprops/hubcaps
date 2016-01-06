@@ -57,11 +57,7 @@ impl<'a> Statuses<'a> {
 
     /// list the combined statuses for a given git sha
     pub fn combined(&self, sha: &str) -> Result<String> {
-        self.github.get::<String>(&format!("/repos/{}/{}/commits/{}/status",
-                                                 self.owner,
-                                                 self.repo,
-                                                 sha))
+        self.github
+            .get::<String>(&format!("/repos/{}/{}/commits/{}/status", self.owner, self.repo, sha))
     }
-
-
 }
