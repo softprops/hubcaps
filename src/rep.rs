@@ -1296,15 +1296,15 @@ mod tests {
     fn deployment_status_reqs() {
         let tests = vec![
             (
-                DeploymentStatusOptions::builder(State::pending).build(),
+                DeploymentStatusOptions::builder(State::Pending).build(),
                 r#"{"state":"pending"}"#
             ),
             (
-                DeploymentStatusOptions::builder(State::pending).target_url("http://host.com").build(),
+                DeploymentStatusOptions::builder(State::Pending).target_url("http://host.com").build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
             (
-                DeploymentStatusOptions::builder(State::pending).target_url("http://host.com").description("desc").build(),
+                DeploymentStatusOptions::builder(State::Pending).target_url("http://host.com").description("desc").build(),
                 r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
             ),
         ];
@@ -1325,13 +1325,13 @@ mod tests {
     #[test]
     fn status_reqs() {
         let tests =
-            vec![(StatusOptions::builder(State::pending).build(),
+            vec![(StatusOptions::builder(State::Pending).build(),
                   r#"{"state":"pending"}"#),
-                 (StatusOptions::builder(State::success).target_url("http://acme.com").build(),
+                 (StatusOptions::builder(State::Success).target_url("http://acme.com").build(),
                   r#"{"state":"success","target_url":"http://acme.com"}"#),
-                 (StatusOptions::builder(State::error).description("desc").build(),
+                 (StatusOptions::builder(State::Error).description("desc").build(),
                   r#"{"state":"error","description":"desc"}"#),
-                 (StatusOptions::builder(State::failure)
+                 (StatusOptions::builder(State::Failure)
                       .target_url("http://acme.com")
                       .description("desc")
                       .build(),
