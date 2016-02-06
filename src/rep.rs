@@ -1324,8 +1324,7 @@ mod tests {
 
     #[test]
     fn status_reqs() {
-        let tests =
-            vec![(StatusOptions::builder(State::Pending).build(),
+        let tests = vec![(StatusOptions::builder(State::Pending).build(),
                   r#"{"state":"pending"}"#),
                  (StatusOptions::builder(State::Success).target_url("http://acme.com").build(),
                   r#"{"state":"success","target_url":"http://acme.com"}"#),

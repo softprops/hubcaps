@@ -3,7 +3,7 @@
 use self::super::{Github, Result};
 use rep::{Status, StatusOptions};
 use rustc_serialize::{json, Decoder, Decodable, Encodable, Encoder};
-use std::result::{Result as StdResult};
+use std::result::Result as StdResult;
 
 #[derive(Clone, Debug)]
 pub enum State {
@@ -22,7 +22,7 @@ impl Decodable for State {
                     1 => Ok(State::Success),
                     2 => Ok(State::Error),
                     3 => Ok(State::Failure),
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             })
         })
@@ -33,18 +33,22 @@ impl Decodable for State {
 impl Encodable for State {
     fn encode<E: Encoder>(&self, encoder: &mut E) -> StdResult<(), E::Error> {
         try!(match *self {
-            State::Pending => encoder.emit_enum("State", |e| {
-                e.emit_enum_variant("pending", 0, 0, |e| "pending".encode(e))
-            }),
-            State::Success => encoder.emit_enum("State", |e| {
-                 e.emit_enum_variant("success", 1, 0, |e| "success".encode(e))
-            }),
-            State::Error => encoder.emit_enum("State", |e| {
-                e.emit_enum_variant("error", 2, 0, |e| "error".encode(e))
-            }),
-            State::Failure => encoder.emit_enum("State", |e| {
-                e.emit_enum_variant("failure", 3, 0, |e| "failure".encode(e))
-            })
+            State::Pending => {
+                encoder.emit_enum("State",
+                                  |e| e.emit_enum_variant("pending", 0, 0, |e| "pending".encode(e)))
+            }
+            State::Success => {
+                encoder.emit_enum("State",
+                                  |e| e.emit_enum_variant("success", 1, 0, |e| "success".encode(e)))
+            }
+            State::Error => {
+                encoder.emit_enum("State",
+                                  |e| e.emit_enum_variant("error", 2, 0, |e| "error".encode(e)))
+            }
+            State::Failure => {
+                encoder.emit_enum("State",
+                                  |e| e.emit_enum_variant("failure", 3, 0, |e| "failure".encode(e)))
+            }
         });
         Ok(())
     }
