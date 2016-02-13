@@ -13,7 +13,7 @@ fn main() {
                                      &client,
                                      Some(token));
             for repo in github.repos().list().unwrap() {
-                println!("{:?}", repo)
+                println!("{:#?}", repo)
             }
         }
         _ => println!("example missing GITHUB_TOKEN"),

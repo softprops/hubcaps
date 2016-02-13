@@ -18,7 +18,7 @@ fn main() {
             let gist = github.gists()
                              .create(&GistOptions::builder(files).public(false).build())
                              .unwrap();
-            println!("{:?}", gist)
+            println!("{:#?}", gist)
         }
         _ => println!("example missing GITHUB_TOKEN"),
     }
