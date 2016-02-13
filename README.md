@@ -110,4 +110,4 @@ Gists is a service for micro repositories
 let gists = github.gists();
 ```
 
-Doug Tangren (softprops) 2015
+Doug Tangren (softprops) 2015-2016
