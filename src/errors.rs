@@ -1,3 +1,5 @@
+//! Client errors
+
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
