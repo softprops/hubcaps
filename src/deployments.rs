@@ -2,7 +2,7 @@
 
 use self::super::{Github, Result};
 use rustc_serialize::json;
-use rep::{DeploymentOptions, DeploymentStatus, DeploymentStatusOptions};
+use rep::{Deployment, DeploymentOptions, DeploymentListOptions, DeploymentStatus, DeploymentStatusOptions};
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {
@@ -54,7 +54,7 @@ impl<'a> DeploymentStatuses<'a> {
     }
 }
 
-impl<'a> Deployments<'a> {
+impl <'a> Deployments<'a> {
     /// Create a new deployments instance
     pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Deployments<'a>
         where O: Into<String>,
@@ -72,16 +72,18 @@ impl<'a> Deployments<'a> {
     }
 
     /// lists all deployments for a repository
-    pub fn list(&self) -> Result<String> {
-        let body = try!(self.github.get(&self.path("")));
-        Ok(body)
+    pub fn list(&self, opts: &DeploymentListOptions) -> Result<Vec<Deployment>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = opts.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Deployment>>(&uri.join("?"))
     }
 
     /// creates a new deployment for this repository
-    pub fn create(&self, dep: &DeploymentOptions) -> Result<String> {
+    pub fn create(&self, dep: &DeploymentOptions) -> Result<Deployment> {
         let data = try!(json::encode(&dep));
-        let body = try!(self.github.post(&self.path(""), data.as_bytes()));
-        Ok(body)
+        self.github.post::<Deployment>(&self.path(""), data.as_bytes())
     }
 
     /// get a reference to the statuses api for a give deployment

@@ -23,15 +23,17 @@ pub struct ClientError {
     pub errors: Option<Vec<FieldErr>>,
 }
 
+
 impl Decodable for Deployment {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Deployment, D::Error> {
         decoder.read_struct("root", 0, |decoder| {
       Ok(Deployment {
-        url: try!(decoder.read_struct_field("url", 0, |decoder| Decodable::decode(decoder))),
-        id: try!(decoder.read_struct_field("id", 0, |decoder| Decodable::decode(decoder))),
-        sha: try!(decoder.read_struct_field("sha", 0, |decoder| Decodable::decode(decoder))),
-        commit_ref: try!(decoder.read_struct_field("ref", 0, |decoder| Decodable::decode(decoder))),
-        task: try!(decoder.read_struct_field("task", 0, |decoder| Decodable::decode(decoder))),
+          url: try!(decoder.read_struct_field("url", 0, |decoder| Decodable::decode(decoder))),
+          id: try!(decoder.read_struct_field("id", 0, |decoder| Decodable::decode(decoder))),
+          sha: try!(decoder.read_struct_field("sha", 0, |decoder| Decodable::decode(decoder))),
+          commit_ref: try!(decoder.read_struct_field("ref", 0, |decoder| Decodable::decode(decoder))),
+          task: try!(decoder.read_struct_field("task", 0, |decoder| Decodable::decode(decoder))),
+//          payload: try!(decoder.read_struct_field("payload", 0, |decoder| Decodable::decode(decoder))),
         environment: try!(decoder.read_struct_field("environment", 0, |decoder| Decodable::decode(decoder))),
         description: try!(decoder.read_struct_field("description", 0, |decoder| Decodable::decode(decoder))),
         creator: try!(decoder.read_struct_field("creator", 0, |decoder| Decodable::decode(decoder))),
@@ -51,9 +53,10 @@ pub struct Deployment {
     pub sha: String,
     pub commit_ref: String,
     pub task: String,
-    // payload: Json,
+    // put for now,
+    //    pub payload: PayloadJson,
     pub environment: String,
-    pub description: String,
+    pub description: Option<String>,
     pub creator: User,
     pub created_at: String,
     pub updated_at: String,
@@ -208,6 +211,69 @@ impl DeploymentOptionsBuilder {
     }
 }
 
+#[derive(Default)]
+pub struct DeploymentListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl DeploymentListOptions {
+    /// return a new instance of a builder for options
+    pub fn builder() -> DeploymentListOptionsBuilder {
+        DeploymentListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct DeploymentListOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl DeploymentListOptionsBuilder {
+    pub fn new() -> DeploymentListOptionsBuilder {
+        DeploymentListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder
+        where S: Into<String>
+    {
+        self.params.insert("sha", s.into());
+        self
+    }
+
+    pub fn commit_ref<G>(&mut self, r: G) -> &mut DeploymentListOptionsBuilder
+        where G: Into<String>
+    {
+        self.params.insert("ref", r.into());
+        self
+    }
+
+    pub fn task<T>(&mut self, t: T) -> &mut DeploymentListOptionsBuilder
+        where T: Into<String>
+    {
+        self.params.insert("task", t.into());
+        self
+    }
+
+    pub fn environment<E>(&mut self, e: E) -> &mut DeploymentListOptionsBuilder
+        where E: Into<String>
+    {
+        self.params.insert("environment", e.into());
+        self
+    }
+
+    pub fn build(&self) -> DeploymentListOptions {
+        DeploymentListOptions { params: self.params.clone() }
+    }
+}
 #[derive(Debug, RustcDecodable)]
 pub struct GistFile {
     pub size: u64,
