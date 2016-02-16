@@ -12,7 +12,6 @@ matrix:
 script:
 - cargo build
 - cargo test
-- cargo bench
 
 cache:
   apt: true
