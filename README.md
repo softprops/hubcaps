@@ -31,7 +31,7 @@ fn main() {
 
 Github instances define functions for accessing api services that map closely to their url structure.
 
-As a convention api methods, that expect arguments are exposed as functions that take struct arguments representing those arguments with an optional builder interface for convenience.
+As a convention, api methods that expect arguments are represented as functions that accept a struct representing those arguments with an optional builder interface for convenience.
 
 ### repositories
 
@@ -41,7 +41,7 @@ Typically the reference point of most github services is a repository
 let repo = github.repo("user", "repo");
 ```
 
-With a repo on hand, you can access a number of sub services, like `labels`, `deployments`, `pulls`, `issues`, and `releases`.
+With a repo instance on hand, you can access a number of sub services, like `labels`, `deployments`, `pulls`, `issues`, and `releases`. Each of this are named functions exported from the repo interface.
 
 ### labels
 
