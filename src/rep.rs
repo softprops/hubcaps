@@ -761,6 +761,7 @@ pub struct Pull {
 }
 
 
+#[derive(Default)]
 pub struct IssueListOptions {
     state: StdState,
     sort: Sort,
