@@ -490,6 +490,7 @@ pub struct Repo {
     pub compare_url: String,
     pub contents_url: String,
     pub contributors_url: String,
+    pub deployments_url: String,
     pub downloads_url: String,
     pub events_url: String,
     pub forks_url: String,
