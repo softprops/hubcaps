@@ -1,6 +1,8 @@
 
 //! Hubcaps provides a set of building blocks for interacting with the Github API
 
+#[macro_use]
+extern crate log;
 extern crate hyper;
 extern crate rustc_serialize;
 extern crate url;
@@ -169,7 +171,9 @@ impl<'a> Github<'a> {
             _ => String::new(),
         };
         try!(res.read_to_string(&mut body));
+        debug!("rev response {:#?} {:#?}", res.status, body);
         match res.status {
+            StatusCode::Conflict |
             StatusCode::BadRequest |
             StatusCode::UnprocessableEntity |
             StatusCode::Unauthorized |
