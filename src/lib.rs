@@ -1,13 +1,15 @@
-
 //! Hubcaps provides a set of building blocks for interacting with the Github API
 
 #[macro_use]
+extern crate serializable_enum;
+#[macro_use]
 extern crate log;
 extern crate hyper;
-extern crate rustc_serialize;
+extern crate serde;
+extern crate serde_json;
 extern crate url;
 
-use rustc_serialize::{json, Decodable};
+use serde::de::Deserialize;
 pub mod keys;
 pub mod gists;
 pub mod deployments;
@@ -39,8 +41,11 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// enum representation of github pull and issue state
 #[derive(Clone, Debug, PartialEq)]
 pub enum State {
+    /// Only open issues
     Open,
+    /// Only closed issues
     Closed,
+    /// All issues, open or closed
     All,
 }
 
@@ -65,7 +70,9 @@ impl Default for State {
 /// enum representation of Github list sorting options
 #[derive(Clone, Debug, PartialEq)]
 pub enum SortDirection {
+    /// Sort in ascending order
     Asc,
+    /// Sort in descending order
     Desc,
 }
 
@@ -154,7 +161,7 @@ impl<'a> Github<'a> {
     }
 
     fn request<D>(&self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D>
-        where D: Decodable
+        where D: Deserialize
     {
         let url = format!("{}{}", self.host, uri);
         let builder = self.client.request(method, &url).header(UserAgent(self.agent.to_owned()));
@@ -181,40 +188,40 @@ impl<'a> Github<'a> {
             StatusCode::Forbidden => {
                 Err(Error::Fault {
                     code: res.status,
-                    error: try!(json::decode::<ClientError>(&body)),
+                    error: try!(serde_json::from_str::<ClientError>(&body)),
                 })
             }
-            _ => Ok(try!(json::decode::<D>(&body))),
+            _ => Ok(try!(serde_json::from_str::<D>(&body))),
         }
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
-        where D: Decodable
+        where D: Deserialize
     {
         self.request(Method::Get, uri, None)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
         match self.request::<()>(Method::Delete, uri, None) {
-            Err(Error::Decoding(_)) => Ok(()),
+            Err(Error::Encoding(_)) => Ok(()),
             otherwise => otherwise,
         }
     }
 
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Decodable
+        where D: Deserialize
     {
         self.request(Method::Post, uri, Some(message))
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Decodable
+        where D: Deserialize
     {
         self.request(Method::Patch, uri, Some(message))
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Decodable
+        where D: Deserialize
     {
         self.request(Method::Put, uri, Some(message))
     }

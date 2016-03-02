@@ -1,17 +1,22 @@
 //! Pull requests interface
+extern crate serde_json;
 
 use url::form_urlencoded;
 use self::super::{Github, Result, SortDirection, State};
 use rep::{Pull, PullEditOptions, PullOptions};
-use rustc_serialize::json;
 use std::default::Default;
 use std::fmt;
 
+/// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
 pub enum Sort {
+    /// Sort by time created
     Created,
+    /// Sort by last updated
     Updated,
+    /// Sort by popularity
     Popularity,
+    /// Sort by long running issues
     LongRunning,
 }
 
@@ -34,6 +39,7 @@ impl Default for Sort {
     }
 }
 
+/// A structure for accessing interfacing with a specific pull request
 pub struct PullRequest<'a> {
     github: &'a Github<'a>,
     owner: String,
@@ -62,6 +68,7 @@ impl<'a> PullRequest<'a> {
                 more)
     }
 
+    /// Request a pull requests information
     pub fn get(&self) -> Result<Pull> {
         self.github.get::<Pull>(&self.path(""))
     }
@@ -76,18 +83,21 @@ impl<'a> PullRequest<'a> {
         self.edit(&PullEditOptions::builder().state("closed").build())
     }
 
+    /// Edit a pull request
     pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
-        let data = try!(json::encode(&pr));
+        let data = try!(serde_json::to_string(&pr));
         self.github.patch::<Pull>(&self.path(""), data.as_bytes())
     }
 }
 
+/// A structure for interfacing with a repositories list of pull requests
 pub struct PullRequests<'a> {
     github: &'a Github<'a>,
     owner: String,
     repo: String,
 }
 
+/// A structure for building a pull request listing request
 pub struct ListBuilder<'a> {
     pulls: &'a PullRequests<'a>,
     state: State,
@@ -149,15 +159,18 @@ impl<'a> PullRequests<'a> {
         format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
     }
 
+    /// Get a reference to a strucuture for interfacing with a specific pull request
     pub fn get(&self, number: u64) -> PullRequest {
         PullRequest::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
     }
 
+    /// Create a new pull request
     pub fn create(&self, pr: &PullOptions) -> Result<Pull> {
-        let data = try!(json::encode(&pr));
+        let data = try!(serde_json::to_string(&pr));
         self.github.post::<Pull>(&self.path(""), data.as_bytes())
     }
 
+    /// list pull requests
     pub fn list(&self) -> ListBuilder {
         ListBuilder::new(self)
     }

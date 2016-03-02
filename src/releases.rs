@@ -1,7 +1,7 @@
 //! Releases inteface
+extern crate serde_json;
 
 use self::super::{Github, Result};
-use rustc_serialize::json;
 use rep::{Asset, Release, ReleaseOptions};
 
 pub struct Assets<'a> {
@@ -115,12 +115,12 @@ impl<'a> Releases<'a> {
     }
 
     pub fn create(&self, rel: &ReleaseOptions) -> Result<Release> {
-        let data = try!(json::encode(&rel));
+        let data = try!(serde_json::to_string(&rel));
         self.github.post::<Release>(&self.path(""), data.as_bytes())
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Result<Release> {
-        let data = try!(json::encode(&rel));
+        let data = try!(serde_json::to_string(&rel));
         self.github.patch::<Release>(&self.path(&format!("/{}", id)), data.as_bytes())
     }
 

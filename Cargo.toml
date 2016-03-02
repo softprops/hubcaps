@@ -8,9 +8,16 @@ homepage = "https://github.com/softprops/hubcaps"
 repository = "https://github.com/softprops/hubcaps"
 keywords = ["hyper", "github"]
 license = "MIT"
+build = "build.rs"
+
+[build-dependencies]
+serde_codegen = "0.7"
+syntex = "0.29"
 
 [dependencies]
 log = "0.3"
 hyper = "0.7"
-rustc-serialize = "0.3"
 url = "0.5"
+serde = "0.7"
+serde_json = "0.7"
+serializable_enum = "0.3"

@@ -1,7 +1,7 @@
 //! Gists interface
+extern crate serde_json;
 
 use self::super::{Error, Github, Result};
-use rustc_serialize::json;
 use rep::{Gist, GistFork, GistOptions};
 
 /// reference to gists associated with a github user
@@ -42,7 +42,7 @@ impl<'a> Gists<'a> {
         match self.github
                   .put::<String>(&self.path(&format!("/{}/star", id)), &[])
                   .map(|_| ()) {
-            Err(Error::Decoding(_)) => Ok(()),
+            Err(Error::Encoding(_)) => Ok(()),
             otherwise => otherwise,
         }
     }
@@ -86,7 +86,7 @@ impl<'a> Gists<'a> {
     }
 
     pub fn create(&self, gist: &GistOptions) -> Result<Gist> {
-        let data = try!(json::encode(&gist));
+        let data = try!(serde_json::to_string(&gist));
         self.github.post::<Gist>(&self.path(""), data.as_bytes())
     }
 

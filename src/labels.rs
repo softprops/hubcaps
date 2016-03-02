@@ -1,8 +1,9 @@
 //! Labels interface
 
+extern crate serde_json;
+
 use self::super::{Github, Result};
 use rep::{Label, LabelOptions};
-use rustc_serialize::json;
 
 pub struct Labels<'a> {
     github: &'a Github<'a>,
@@ -27,12 +28,12 @@ impl<'a> Labels<'a> {
     }
 
     pub fn create(&self, lab: &LabelOptions) -> Result<Label> {
-        let data = try!(json::encode(&lab));
+        let data = try!(serde_json::to_string(&lab));
         self.github.post::<Label>(&self.path(""), data.as_bytes())
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
-        let data = try!(json::encode(&lab));
+        let data = try!(serde_json::to_string(&lab));
         self.github.patch::<Label>(&self.path(&format!("/{}", prevname)), data.as_bytes())
     }
 

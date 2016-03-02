@@ -1,9 +1,9 @@
 //! Deploy keys interface
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/) for motivation and use
+extern crate serde_json;
 
 use self::super::{Github, Result};
 use rep::{Key, KeyOptions};
-use rustc_serialize::json;
 
 pub struct Keys<'a> {
     github: &'a Github<'a>,
@@ -28,7 +28,7 @@ impl<'a> Keys<'a> {
     }
 
     pub fn create(&self, key: &KeyOptions) -> Result<Key> {
-        let data = try!(json::encode::<KeyOptions>(key));
+        let data = try!(serde_json::to_string::<KeyOptions>(key));
         self.github.post::<Key>(&self.path(""), data.as_bytes())
     }
 
