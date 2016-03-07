@@ -196,9 +196,9 @@ pub struct GistFile {
     pub size: u64,
     pub raw_url: String,
     pub content: String,
-    // type: String
+    #[serde(rename="type")]
+    pub content_type: String,
     pub truncated: bool,
-    #[serde(skip_serializing_if="Option::is_none")]
     pub language: Option<String>,
 }
 
