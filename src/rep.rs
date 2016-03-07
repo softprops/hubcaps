@@ -49,7 +49,7 @@ impl Default for StatusState {
 mod tests {
     use super::super::State as StdState;
     use serde::ser::Serialize;
-    use std::collections::HashMap;
+    use std::collections::{HashMap, BTreeMap};
     use super::*;
     use super::serde_json;
 
@@ -90,10 +90,23 @@ mod tests {
 
     #[test]
     fn deployment_reqs() {
-        let tests = vec![(DeploymentOptions::builder("test").build(),
-                          r#"{"ref":"test"}"#),
-                         (DeploymentOptions::builder("test").task("launchit").build(),
-                          r#"{"ref":"test","task":"launchit"}"#)];
+        let mut payload = BTreeMap::new();
+        payload.insert("user", "atmos");
+        payload.insert("room_id", "123456");
+        let tests = vec![
+            (
+                DeploymentOptions::builder("test").build(),
+                r#"{"ref":"test"}"#
+            ),
+            (
+                DeploymentOptions::builder("test").task("launchit").build(),
+                r#"{"ref":"test","task":"launchit"}"#
+            ),
+            (
+                DeploymentOptions::builder("topic-branch").description("description").payload(payload).build(),
+                r#"{"ref":"topic-branch","payload":"{\"room_id\":\"123456\",\"user\":\"atmos\"}","description":"description"}"#
+            )
+        ];
         test_encoding(tests)
     }
 
@@ -128,7 +141,7 @@ mod tests {
             (
                 GistOptions::builder(files.clone()).description("desc").build(),
                 r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#
-                    ),
+            ),
             (
                 GistOptions::builder(files.clone()).description("desc").public(false).build(),
                 r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#
