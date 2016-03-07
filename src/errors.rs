@@ -4,7 +4,7 @@ use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
 use rep::ClientError;
-use serde_json::error::{Error as SerdeError};
+use serde_json::error::Error as SerdeError;
 
 /// enumerated types of client errors
 #[derive(Debug)]

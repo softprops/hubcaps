@@ -2,7 +2,8 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::{Deployment, DeploymentOptions, DeploymentListOptions, DeploymentStatus, DeploymentStatusOptions};
+use rep::{Deployment, DeploymentOptions, DeploymentListOptions, DeploymentStatus,
+          DeploymentStatusOptions};
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {
@@ -54,7 +55,7 @@ impl<'a> DeploymentStatuses<'a> {
     }
 }
 
-impl <'a> Deployments<'a> {
+impl<'a> Deployments<'a> {
     /// Create a new deployments instance
     pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Deployments<'a>
         where O: Into<String>,

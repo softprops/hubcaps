@@ -92,7 +92,8 @@ impl<'a> IssueLabels<'a> {
     /// add a set of labels to this issue ref
     pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
         self.github
-            .post::<Vec<Label>>(&self.path(""), try!(serde_json::to_string(&labels)).as_bytes())
+            .post::<Vec<Label>>(&self.path(""),
+                                try!(serde_json::to_string(&labels)).as_bytes())
     }
 
     /// remove a label from this issue
@@ -105,7 +106,8 @@ impl<'a> IssueLabels<'a> {
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github.put::<Vec<Label>>(&self.path(""), try!(serde_json::to_string(&labels)).as_bytes())
+        self.github.put::<Vec<Label>>(&self.path(""),
+                                      try!(serde_json::to_string(&labels)).as_bytes())
     }
 
     /// remove all labels from an issue

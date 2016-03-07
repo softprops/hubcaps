@@ -80,12 +80,10 @@ mod tests {
 
     #[test]
     fn deserialize_status_state() {
-        for (json, expect) in vec![
-            ("\"pending\"", StatusState::Pending),
-            ("\"success\"", StatusState::Success),
-            ("\"error\"", StatusState::Error),
-            ("\"failure\"", StatusState::Failure)
-        ] {
+        for (json, expect) in vec![("\"pending\"", StatusState::Pending),
+                                   ("\"success\"", StatusState::Success),
+                                   ("\"error\"", StatusState::Error),
+                                   ("\"failure\"", StatusState::Failure)] {
             assert_eq!(serde_json::from_str::<StatusState>(json).unwrap(), expect)
         }
     }
@@ -119,6 +117,27 @@ mod tests {
     }
 
     #[test]
+    fn gist_req() {
+        let mut files = HashMap::new();
+        files.insert("test", "foo");
+        let tests = vec![
+            (
+                GistOptions::builder(files.clone()).build(),
+                r#"{"files":{"test":{"content":"foo"}}}"#
+            ),
+            (
+                GistOptions::builder(files.clone()).description("desc").build(),
+                r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#
+                    ),
+            (
+                GistOptions::builder(files.clone()).description("desc").public(false).build(),
+                r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#
+            )
+        ];
+        test_encoding(tests)
+    }
+
+    #[test]
     fn pullreq_edits() {
         let tests = vec![(PullEditOptions::builder().title("test").build(),
                           r#"{"title":"test"}"#),
@@ -133,7 +152,9 @@ mod tests {
     fn status_reqs() {
         let tests = vec![(StatusOptions::builder(StatusState::Pending).build(),
                   r#"{"state":"pending"}"#),
-                 (StatusOptions::builder(StatusState::Success).target_url("http://acme.com").build(),
+                 (StatusOptions::builder(StatusState::Success)
+                      .target_url("http://acme.com")
+                      .build(),
                   r#"{"state":"success","target_url":"http://acme.com"}"#),
                  (StatusOptions::builder(StatusState::Error).description("desc").build(),
                   r#"{"state":"error","description":"desc"}"#),
