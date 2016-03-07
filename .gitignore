@@ -2,3 +2,4 @@ target
 Cargo.lock
 src/main.rs
 src/bin/hc.rs
+*.bk
