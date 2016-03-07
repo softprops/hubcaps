@@ -5,6 +5,7 @@
 * renamed `hubcaps::statuses::State` to `hubcaps::StatusState`
 * added `payload` field to `hubcaps::Deployment` represented as a `serde_json::Value`
 * added `content_type` field to `hubcaps::GistFile` represented as `String`
+* added `truncated` field to `hubcaps::Gist` represented as an `Option<bool>`
 
 # 0.1.1
 

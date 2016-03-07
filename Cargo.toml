@@ -10,6 +10,9 @@ keywords = ["hyper", "github"]
 license = "MIT"
 build = "build.rs"
 
+[dev-dependencies]
+env_logger="0.3"
+
 [build-dependencies]
 serde_codegen = "0.7"
 syntex = "0.29"

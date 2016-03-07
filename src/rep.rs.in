@@ -195,10 +195,10 @@ impl DeploymentListOptionsBuilder {
 pub struct GistFile {
     pub size: u64,
     pub raw_url: String,
-    pub content: String,
+    pub content: Option<String>,
     #[serde(rename="type")]
     pub content_type: String,
-    pub truncated: bool,
+    pub truncated: Option<bool>,
     pub language: Option<String>,
 }
 
@@ -213,6 +213,7 @@ pub struct Gist {
     pub owner: User,
     pub user: Option<User>,
     pub files: HashMap<String, GistFile>,
+    pub truncated: bool,
     pub comments: u64,
     pub comments_url: String,
     pub html_url: String,
