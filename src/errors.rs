@@ -1,5 +1,6 @@
 //! Client errors
 
+use std::error::Error as StdError;
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
@@ -17,6 +18,27 @@ pub enum Error {
         code: StatusCode,
         error: ClientError,
     },
+}
+
+impl StdError for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::Codec(ref e) => e.description(),
+            Error::Http(ref e) => e.description(),
+            Error::IO(ref e) => e.description(),
+            Error::Parse(ref e) => &e[..],
+            Error::Fault { ref error, .. } => &error.message[..],
+        }
+    }
+
+    fn cause(&self) -> Option<&StdError> {
+        match *self {
+            Error::Codec(ref e) => Some(e),
+            Error::Http(ref e) => Some(e),
+            Error::IO(ref e) => Some(e),
+            _ => None
+        }
+    }
 }
 
 impl ::std::fmt::Display for Error {
