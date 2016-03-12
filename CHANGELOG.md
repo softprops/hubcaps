@@ -6,6 +6,7 @@
 * added `payload` field to `hubcaps::Deployment` represented as a `serde_json::Value`
 * added `content_type` field to `hubcaps::GistFile` represented as `String`
 * added `truncated` field to `hubcaps::Gist` represented as an `bool` and updated `truncated` field of `hubcaps::GistFile` to be `Option<bool>` (this field is omitted in gist listing responses)
+* introduces `hubcaps::Credentials` as the means of authenticating with the Github api. A `Credentials` value is needed to instantiate a `Github` instance. This is a breaking change from the previous `Option<String>` token api, with a more flexible set options. `hubcaps::Credentials::{None, Token, Client}`. `hubcaps::Credentials` implements `Default` returning `hubcaps::Credentials::None`
 
 # 0.1.1
 

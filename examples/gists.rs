@@ -3,7 +3,7 @@ extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::{GistOptions, Github};
+use hubcaps::{Credentials, GistOptions, Github};
 use std::collections::HashMap;
 use std::env;
 
@@ -14,7 +14,7 @@ fn main() {
             let client = Client::new();
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                                      &client,
-                                     Some(token));
+                                     Credentials::Token(token));
             /*let mut files = HashMap::new();
             files.insert("thename", "the contents");
             let gist = github.gists()

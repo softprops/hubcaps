@@ -26,12 +26,14 @@ pub use rep::*;
 pub use errors::Error;
 use gists::{Gists, UserGists};
 use hyper::Client;
+use hyper::client::RequestBuilder;
 use hyper::method::Method;
 use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories};
 use std::fmt;
 use std::io::Read;
+use url::Url;
 
 const DEFAULT_HOST: &'static str = "https://api.github.com";
 
@@ -93,35 +95,51 @@ impl Default for SortDirection {
     }
 }
 
+/// Various forms of authentication credentials supported by Github
+pub enum Credentials {
+    /// No authentication
+    None,
+    /// Oauth token string
+    /// https://developer.github.com/v3/#oauth2-token-sent-in-a-header
+    Token(String),
+    /// Oauth client id and secret
+    /// https://developer.github.com/v3/#oauth2-keysecret
+    Client(String, String)
+}
+
+impl Default for Credentials {
+    fn default() -> Credentials {
+        Credentials::None
+    }
+}
+
 /// Entry point interface for interacting with Github API
 pub struct Github<'a> {
     host: String,
     agent: String,
     client: &'a Client,
-    token: Option<String>,
+    credentials: Credentials
 }
 
 impl<'a> Github<'a> {
     /// Create a new Github instance
-    pub fn new<A, T>(agent: A, client: &'a Client, token: Option<T>) -> Github<'a>
-        where A: Into<String>,
-              T: Into<String>
+    pub fn new<A>(agent: A, client: &'a Client, credentials: Credentials) -> Github<'a>
+        where A: Into<String>
     {
-        Github::host(DEFAULT_HOST, agent, client, token)
+        Github::host(DEFAULT_HOST, agent, client, credentials)
     }
 
     /// Create a new Github instance hosted at a custom location.
     /// Useful for github enterprise installations ( yourdomain.com/api/v3/ )
-    pub fn host<H, A, T>(host: H, agent: A, client: &'a Client, token: Option<T>) -> Github<'a>
+    pub fn host<H, A>(host: H, agent: A, client: &'a Client, credentials: Credentials) -> Github<'a>
         where H: Into<String>,
-              A: Into<String>,
-              T: Into<String>
+              A: Into<String>
     {
         Github {
             host: host.into(),
             agent: agent.into(),
             client: client,
-            token: token.map(|t| t.into()),
+            credentials: credentials
         }
     }
 
@@ -160,25 +178,41 @@ impl<'a> Github<'a> {
         Gists::new(self)
     }
 
+    fn authenticate(&self, method: Method, uri: &str) -> RequestBuilder {
+        let url = format!("{}{}", self.host, uri);
+        match self.credentials {
+            Credentials::Token(ref token) =>
+                self.client.request(method, &url).header(
+                    Authorization(
+                        format!("token {}", token)
+                            )
+                        ),
+            Credentials::Client(ref id, ref secret) => {
+                let mut parsed = Url::parse(&url).unwrap();
+                let mut query = parsed.query_pairs().unwrap_or(vec![]);
+                query.push(("client_id".to_owned(), id.to_owned()));
+                query.push(("client_secret".to_owned(), secret.to_owned()));
+                parsed.set_query_from_pairs(query);
+                self.client.request(method, parsed)
+            },
+            Credentials::None => self.client.request(method, &url)
+        }
+    }
+
     fn request<D>(&self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D>
         where D: Deserialize
     {
-        let url = format!("{}{}", self.host, uri);
-        let builder = self.client.request(method, &url).header(UserAgent(self.agent.to_owned()));
-        let authenticated = match self.token {
-            Some(ref token) => builder.header(Authorization(format!("token {}", token))),
-            _ => builder,
-        };
+        let builder = self.authenticate(method, uri).header(UserAgent(self.agent.to_owned()));
         let mut res = try!(match body {
-            Some(ref bod) => authenticated.body(*bod).send(),
-            _ => authenticated.send(),
+            Some(ref bod) => builder.body(*bod).send(),
+            _ => builder.send(),
         });
         let mut body = match res.headers.clone().get::<ContentLength>() {
             Some(&ContentLength(len)) => String::with_capacity(len as usize),
             _ => String::new(),
         };
         try!(res.read_to_string(&mut body));
-        debug!("rev response {:#?} {:#?}", res.status, body);
+        debug!("rev response {:#?} {:#?} {:#?}", res.status, res.headers, body);
         match res.status {
             StatusCode::Conflict |
             StatusCode::BadRequest |
