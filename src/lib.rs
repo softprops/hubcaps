@@ -96,6 +96,7 @@ impl Default for SortDirection {
 }
 
 /// Various forms of authentication credentials supported by Github
+#[derive(Debug, PartialEq)]
 pub enum Credentials {
     /// No authentication
     None,
@@ -275,5 +276,11 @@ mod tests {
     fn default_sort_direction() {
         let default: SortDirection = Default::default();
         assert_eq!(default, SortDirection::Asc)
+    }
+
+    #[test]
+    fn default_credentials() {
+        let default: Credentials = Default::default();
+        assert_eq!(default, Credentials::None)
     }
 }
