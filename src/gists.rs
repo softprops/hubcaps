@@ -42,7 +42,7 @@ impl<'a> Gists<'a> {
         match self.github
                   .put::<String>(&self.path(&format!("/{}/star", id)), &[])
                   .map(|_| ()) {
-            Err(Error::Serialize(_)) => Ok(()),
+            Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
     }

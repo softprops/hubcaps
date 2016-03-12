@@ -9,7 +9,7 @@ use serde_json::error::Error as SerdeError;
 /// enumerated types of client errors
 #[derive(Debug)]
 pub enum Error {
-    Serialize(SerdeError),
+    Codec(SerdeError),
     Http(HttpError),
     IO(IoError),
     Parse(String),
@@ -27,7 +27,7 @@ impl ::std::fmt::Display for Error {
 
 impl From<SerdeError> for Error {
     fn from(error: SerdeError) -> Error {
-        Error::Serialize(error)
+        Error::Codec(error)
     }
 }
 

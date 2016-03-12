@@ -203,7 +203,7 @@ impl<'a> Github<'a> {
 
     fn delete(&self, uri: &str) -> Result<()> {
         match self.request::<()>(Method::Delete, uri, None) {
-            Err(Error::Serialize(_)) => Ok(()),
+            Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
     }

@@ -1,7 +1,7 @@
 # 0.2.0
 
 * port serialization from `rustc-serialize` to `serde`!
-* as a result of the serde port, `Error::{Decoding, Encoding}` were removed and replaced with `Error::Serialize`
+* as a result of the serde port, `Error::{Decoding, Encoding}` which were wrappers around rustc-serialize error types, were removed and replaced with a unified `Error::Codec` which wraps serde's error type
 * renamed `hubcaps::statuses::State` to `hubcaps::StatusState`
 * added `payload` field to `hubcaps::Deployment` represented as a `serde_json::Value`
 * added `content_type` field to `hubcaps::GistFile` represented as `String`
