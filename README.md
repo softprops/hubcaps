@@ -10,21 +10,22 @@ Find them [here](http://softprops.github.io/hubcaps)
 
 ## usage
 
-Basic usage requires a user-defined useragent string, a `hyper::Client` instance and optionally a [personal access token](https://github.com/settings/tokens).
+Basic usage requires a user-defined useragent string, a `hyper::Client` instance and a flavor of `hubcaps::Credentials` for authorization.
+For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For anonymous requests you can use `hubcaps::Credentials::None`
 
 ```rust
 extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::Github;
+use hubcaps::{Credentials, Github};
 
 fn main() {
   let client = Client::new();
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
     &client,
-    Some("personal-access-token")
+    Credentials::Token("personal-access-token")
   );
 }
 ```
