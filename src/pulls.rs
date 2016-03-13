@@ -1,9 +1,8 @@
 //! Pull requests interface
 extern crate serde_json;
 
-use url::form_urlencoded;
-use self::super::{Github, Result, SortDirection, State};
-use rep::{Pull, PullEditOptions, PullOptions};
+use self::super::{Github, Result};
+use rep::{Pull, PullEditOptions, PullOptions, PullListOptions};
 use std::default::Default;
 use std::fmt;
 
@@ -97,52 +96,6 @@ pub struct PullRequests<'a> {
     repo: String,
 }
 
-/// A structure for building a pull request listing request
-pub struct ListBuilder<'a> {
-    pulls: &'a PullRequests<'a>,
-    state: State,
-    sort: Sort,
-    direction: SortDirection,
-}
-
-impl<'a> ListBuilder<'a> {
-    pub fn new(pulls: &'a PullRequests<'a>) -> ListBuilder<'a> {
-        ListBuilder {
-            pulls: pulls,
-            state: Default::default(),
-            sort: Default::default(),
-            direction: Default::default(),
-        }
-    }
-
-    pub fn state(&mut self, state: State) -> &mut ListBuilder<'a> {
-        self.state = state;
-        self
-    }
-
-    pub fn sort(&mut self, sort: Sort) -> &mut ListBuilder<'a> {
-        self.sort = sort;
-        self
-    }
-
-    pub fn direction(&mut self, direction: SortDirection) -> &mut ListBuilder<'a> {
-        self.direction = direction;
-        self
-    }
-
-    pub fn get(&self) -> Result<Vec<Pull>> {
-        self.pulls.github.get::<Vec<Pull>>(&self.pulls.path(&format!(
-            "?{}", form_urlencoded::serialize(
-              vec![
-                ("state", self.state.to_string()),
-                ("sort", self.sort.to_string()),
-                ("direction", self.direction.to_string())
-              ]
-            )
-          )))
-    }
-}
-
 impl<'a> PullRequests<'a> {
     pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> PullRequests<'a>
         where O: Into<String>,
@@ -171,8 +124,12 @@ impl<'a> PullRequests<'a> {
     }
 
     /// list pull requests
-    pub fn list(&self) -> ListBuilder {
-        ListBuilder::new(self)
+    pub fn list(&self, options: &PullListOptions) -> Result<Vec<Pull>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Pull>>(&uri.join("?"))
     }
 }
 

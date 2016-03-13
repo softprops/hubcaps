@@ -437,7 +437,7 @@ pub struct Commit {
     pub commit_ref: String,
     pub sha: String,
     pub user: User,
-    pub repo: Option<Repo>,
+//    pub repo: Option<Repo>,
 }
 
 #[derive(Debug, Serialize)]
@@ -597,15 +597,63 @@ pub struct Pull {
 
 
 #[derive(Default)]
+pub struct PullListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl PullListOptions {
+    pub fn builder() -> PullListOptionsBuilder {
+        PullListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct PullListOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl PullListOptionsBuilder {
+    pub fn new() -> PullListOptionsBuilder {
+        PullListOptionsBuilder {
+            ..Default::default()
+        }
+    }
+
+    pub fn state(&mut self, state: StdState) -> &mut PullListOptionsBuilder {
+        self.params.insert("state", state.to_string());
+        self
+    }
+
+    pub fn sort(&mut self, sort: Sort) -> &mut PullListOptionsBuilder {
+        self.params.insert("sort", sort.to_string());
+        self
+    }
+
+    pub fn direction(&mut self, direction: SortDirection) -> &mut PullListOptionsBuilder {
+        self.params.insert("direction", direction.to_string());
+        self
+    }
+
+    pub fn build(&self) -> PullListOptions {
+        PullListOptions {
+            params: self.params.clone()
+        }
+    }
+}
+
+// todo: simplify with param
+#[derive(Default)]
 pub struct IssueListOptions {
-    state: StdState,
-    sort: Sort,
-    direction: SortDirection,
-    assignee: Option<String>,
-    creator: Option<String>,
-    mentioned: Option<String>,
-    labels: Vec<String>,
-    since: Option<String>,
+    params: HashMap<&'static str, String>
 }
 
 impl IssueListOptions {
@@ -613,41 +661,19 @@ impl IssueListOptions {
         IssueListOptionsBuilder::new()
     }
 
-    pub fn serialize(&self) -> String {
-        let mut params = Vec::new();
-        params.push(("state", self.state.to_string()));
-        params.push(("sort", self.sort.to_string()));
-        params.push(("direction", self.direction.to_string()));
-        if let Some(ref a) = self.assignee {
-            params.push(("assignee", a.to_owned()));
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
         }
-        if let Some(ref c) = self.creator {
-            params.push(("creator", c.to_owned()));
-        }
-        if let Some(ref m) = self.mentioned {
-            params.push(("mentioned", m.to_owned()));
-        }
-        if let Some(ref s) = self.since {
-            params.push(("since", s.to_owned()));
-        }
-        if !self.labels.is_empty() {
-            params.push(("labels", self.labels.join(",")));
-        }
-        form_urlencoded::serialize(params)
     }
 }
 
 /// a mutable issue list builder
 #[derive(Default)]
 pub struct IssueListOptionsBuilder {
-    state: StdState,
-    sort: Sort,
-    direction: SortDirection,
-    assignee: Option<String>,
-    creator: Option<String>,
-    mentioned: Option<String>,
-    labels: Vec<String>,
-    since: Option<String>,
+    params: HashMap<&'static str, String>,
 }
 
 impl IssueListOptionsBuilder {
@@ -656,12 +682,12 @@ impl IssueListOptionsBuilder {
     }
 
     pub fn state(&mut self, state: StdState) -> &mut IssueListOptionsBuilder {
-        self.state = state;
+        self.params.insert("state", state.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
-        self.sort = sort;
+        self.params.insert("sort", sort.to_string());
         self
     }
 
@@ -674,56 +700,47 @@ impl IssueListOptionsBuilder {
     }
 
     pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListOptionsBuilder {
-        self.direction = direction;
+        self.params.insert("direction", direction.to_string());
         self
     }
 
     pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListOptionsBuilder
         where A: Into<String>
     {
-        self.assignee = Some(assignee.into());
+        self.params.insert("assignee", assignee.into());
         self
     }
 
     pub fn creator<C>(&mut self, creator: C) -> &mut IssueListOptionsBuilder
         where C: Into<String>
     {
-        self.creator = Some(creator.into());
+        self.params.insert("creator", creator.into());
         self
     }
 
     pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListOptionsBuilder
         where M: Into<String>
     {
-        self.mentioned = Some(mentioned.into());
+        self.params.insert("mentioned", mentioned.into());
         self
     }
 
     pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
         where L: Into<String>
     {
-        self.labels = labels.into_iter().map(|l| l.into()).collect::<Vec<String>>();
+        self.params.insert("labels", labels.into_iter().map(|l|l.into()).collect::<Vec<_>>().join(","));
         self
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut IssueListOptionsBuilder
         where S: Into<String>
     {
-        self.since = Some(since.into());
+        self.params.insert("since", since.into());
         self
     }
 
     pub fn build(&self) -> IssueListOptions {
-        IssueListOptions {
-            state: self.state.clone(),
-            sort: self.sort.clone(),
-            direction: self.direction.clone(),
-            assignee: self.assignee.clone(),
-            creator: self.creator.clone(),
-            mentioned: self.mentioned.clone(),
-            labels: self.labels.clone(),
-            since: self.since.clone(),
-        }
+        IssueListOptions { params: self.params.clone() }
     }
 }
 

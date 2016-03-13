@@ -192,9 +192,12 @@ impl<'a> Issues<'a> {
         self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
-    pub fn list(&self, req: &IssueListOptions) -> Result<Vec<Issue>> {
-        let url = self.path(&format!("?{}", req.serialize()));
-        self.github.get::<Vec<Issue>>(&url)
+    pub fn list(&self, options: &IssueListOptions) -> Result<Vec<Issue>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Issue>>(&uri.join("?"))
     }
 }
 

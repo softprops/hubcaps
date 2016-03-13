@@ -105,7 +105,7 @@ pub enum Credentials {
     Token(String),
     /// Oauth client id and secret
     /// https://developer.github.com/v3/#oauth2-keysecret
-    Client(String, String)
+    Client(String, String),
 }
 
 impl Default for Credentials {
@@ -119,7 +119,7 @@ pub struct Github<'a> {
     host: String,
     agent: String,
     client: &'a Client,
-    credentials: Credentials
+    credentials: Credentials,
 }
 
 impl<'a> Github<'a> {
@@ -140,7 +140,7 @@ impl<'a> Github<'a> {
             host: host.into(),
             agent: agent.into(),
             client: client,
-            credentials: credentials
+            credentials: credentials,
         }
     }
 
@@ -182,12 +182,9 @@ impl<'a> Github<'a> {
     fn authenticate(&self, method: Method, uri: &str) -> RequestBuilder {
         let url = format!("{}{}", self.host, uri);
         match self.credentials {
-            Credentials::Token(ref token) =>
-                self.client.request(method, &url).header(
-                    Authorization(
-                        format!("token {}", token)
-                            )
-                        ),
+            Credentials::Token(ref token) => {
+                self.client.request(method, &url).header(Authorization(format!("token {}", token)))
+            }
             Credentials::Client(ref id, ref secret) => {
                 let mut parsed = Url::parse(&url).unwrap();
                 let mut query = parsed.query_pairs().unwrap_or(vec![]);
@@ -195,8 +192,8 @@ impl<'a> Github<'a> {
                 query.push(("client_secret".to_owned(), secret.to_owned()));
                 parsed.set_query_from_pairs(query);
                 self.client.request(method, parsed)
-            },
-            Credentials::None => self.client.request(method, &url)
+            }
+            Credentials::None => self.client.request(method, &url),
         }
     }
 
@@ -213,7 +210,10 @@ impl<'a> Github<'a> {
             _ => String::new(),
         };
         try!(res.read_to_string(&mut body));
-        debug!("rev response {:#?} {:#?} {:#?}", res.status, res.headers, body);
+        debug!("rev response {:#?} {:#?} {:#?}",
+               res.status,
+               res.headers,
+               body);
         match res.status {
             StatusCode::Conflict |
             StatusCode::BadRequest |

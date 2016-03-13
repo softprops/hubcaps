@@ -36,7 +36,7 @@ impl StdError for Error {
             Error::Codec(ref e) => Some(e),
             Error::Http(ref e) => Some(e),
             Error::IO(ref e) => Some(e),
-            _ => None
+            _ => None,
         }
     }
 }

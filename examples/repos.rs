@@ -14,7 +14,7 @@ fn main() {
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                                      &client,
                                      Credentials::Token(token));
-            for repo in github.repos().list().unwrap() {
+            for repo in github.user_repos("softprops").list().unwrap() {
                 println!("{:#?}", repo)
             }
         }

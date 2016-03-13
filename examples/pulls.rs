@@ -3,7 +3,7 @@ extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::{Credentials, Github};
+use hubcaps::{Credentials, Github, PullListOptions};
 use std::env;
 
 fn main() {
@@ -15,9 +15,9 @@ fn main() {
                                      &client,
                                      Credentials::Token(token));
             let repo = github.repo("softprops", "hubcat");
-            let issues = repo.issues();
-            for issue in issues.list(&Default::default()).unwrap() {
-                println!("{:#?}", issue)
+            let pulls = repo.pulls();
+            for pull in pulls.list(&Default::default()).unwrap() {
+                println!("{:#?}", pull);
             }
         },
         _ => println!("example missing GITHUB_TOKEN")

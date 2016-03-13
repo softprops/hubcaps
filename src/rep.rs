@@ -180,8 +180,8 @@ mod tests {
     }
 
     #[test]
-    fn list_reqs() {
-        fn test_serialize(tests: Vec<(IssueListOptions, &str)>) {
+    fn issue_list_reqs() {
+        fn test_serialize(tests: Vec<(IssueListOptions, Option<String>)>) {
             for test in tests {
                 match test {
                     (k, v) => assert_eq!(k.serialize(), v),
@@ -191,17 +191,32 @@ mod tests {
         let tests = vec![
             (
                 IssueListOptions::builder().build(),
-                "state=open&sort=created&direction=asc"
+                None
             ),
             (
                 IssueListOptions::builder().state(StdState::Closed).build(),
-                "state=closed&sort=created&direction=asc"
+                Some("state=closed".to_owned())
              ),
             (
                 IssueListOptions::builder().labels(vec!["foo", "bar"]).build(),
-                "state=open&sort=created&direction=asc&labels=foo%2Cbar"
+                Some("labels=foo%2Cbar".to_owned())
             ),
         ];
+        test_serialize(tests)
+    }
+
+    #[test]
+    fn pull_list_reqs() {
+        fn test_serialize(tests: Vec<(PullListOptions, Option<String>)>) {
+            for test in tests {
+                match test {
+                    (k, v) => assert_eq!(k.serialize(), v),
+                }
+            }
+        }
+        let tests = vec![(PullListOptions::builder().build(), None),
+                         (PullListOptions::builder().state(StdState::Closed).build(),
+                          Some("state=closed".to_owned()))];
         test_serialize(tests)
     }
 }
