@@ -30,18 +30,17 @@ addons:
 
 after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
-  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-  tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build && cmake .. && make && make install DESTDIR=../tmp && cd ../.. &&
-  ls target/debug &&
-  ./kcov-master/tmp/usr/local/bin/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/hubcaps-* &&
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
-  [ $TRAVIS_RUST_VERSION = stable ] &&
   cargo doc --no-deps &&
   echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
   pip install --user ghp-import &&
   /home/travis/.local/bin/ghp-import -n target/doc &&
-  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages &&
+  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+  tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build && cmake .. && make && make install DESTDIR=../tmp && cd ../.. &&
+  ls target/debug &&
+  ./kcov-master/tmp/usr/local/bin/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/hubcaps-*
 env:
   global:
     secure: gHWn3H6NsBIVoD0mHltchtXX3RXBs8xvKKlPTR0EiQTYyQFoaf9EcXvQs8KSoyr+vRr2aHWr50+Wn/rgMFPAAZH7tpg2+nr/eDp6hse+RLLQ4lEIqfvvqYStA6N7M6W/X4oZn6V91j5N6UoHi543TuTM9pE7XkE87JwwRteJWcXacZxMjcq1CIW5HblNmHtPAL9Sf7ae3am1qa2rebm+WlCybJYkZ8t0wfH2L1WmFYU9xDibLaX9hGaM9j1DVbKxRCMDpAAIoPT/z9YWuCIkHQEhrmBNp5izsLEFMs+fTpy1+cyMIPY47ewQRB4EOdztwLfZqTwuW4dezs+qbqtRNOBY4oRPTSpvr8vNQEyrNOPs0kvPXvGWnI3nxUBVl9V9t2sHkANeQen+oNAMs59ocWyJlOlUWNOT3vN52JJqvfMWVw7P5IVDPiWxAGEM0DCZy7F++9Ls08nl+HM3luDiSCJDPUzq35BBLBa/SchdX6uUAo1uimfINfz9pnmjSPDoHwXYoPZv60msHwgsZTVUeBpm8bBRb+vc3ZnonPsRVK/JKwr3cjrSebBW7FZbaF9vZo/l5FxdPewJd/N1mU3l+djWMXdjKcdxM8+3JGACx3gjCLZwSaBd2ii4Qy7/FK2byrhBvZv8I0k08GhQ9uJfFgbklMxVbvz8qhuKjIkgrYM=
