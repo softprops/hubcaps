@@ -7,8 +7,95 @@ use issues::{IssueRef, Issues};
 use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
-use rep::Repo;
+use rep::{Repo, RepoListOptions, UserRepoListOptions};
 use statuses::Statuses;
+use std::fmt;
+
+/// describes repository visibilities
+#[derive(Clone, Debug, PartialEq)]
+pub enum Visibility {
+    All,
+    Public,
+    Private
+}
+
+impl fmt::Display for Visibility {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Visibility::All => "all",
+                   Visibility::Public => "public",
+                   Visibility::Private => "private"
+               })
+    }
+}
+
+/// Describes sorting options for repositories
+#[derive(Clone, Debug, PartialEq)]
+pub enum Sort {
+    Created,
+    Updated,
+    Pushed,
+    FullName
+}
+
+impl fmt::Display for Sort {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Sort::Created => "created",
+                   Sort::Updated => "updated",
+                   Sort::Pushed => "pushed",
+                   Sort::FullName => "full_name",
+               })
+    }
+}
+
+/// Describes member affiliation types for repositories
+#[derive(Clone, Debug, PartialEq)]
+pub enum Affiliation {
+    Owner,
+    Collaborator,
+    OrganizationMember,
+}
+
+impl fmt::Display for Affiliation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Affiliation::Owner => "owner",
+                   Affiliation::Collaborator => "collaborator",
+                   Affiliation::OrganizationMember => "organization_member",
+               })
+    }
+}
+
+/// Describes types of repositories
+#[derive(Clone, Debug, PartialEq)]
+pub enum Type {
+    All,
+    Owner,
+    Public,
+    Private,
+    Member
+}
+
+impl fmt::Display for Type {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Type::All => "all",
+                   Type::Owner => "owner",
+                   Type::Public => "public",
+                   Type::Private => "private",
+                   Type::Member => "member"
+               })
+    }
+}
 
 pub struct Repositories<'a> {
     github: &'a Github<'a>,
@@ -25,9 +112,12 @@ impl<'a> Repositories<'a> {
 
     /// list the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    // todo: params
-    pub fn list(&self) -> Result<Vec<Repo>> {
-        self.github.get::<Vec<Repo>>(&self.path(""))
+    pub fn list(&self, options: &RepoListOptions) -> Result<Vec<Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
 }
 
@@ -51,9 +141,13 @@ impl<'a> UserRepositories<'a> {
         format!("/users/{}/repos{}", self.owner, more)
     }
 
-    /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn list(&self) -> Result<Vec<Repo>> {
-        self.github.get::<Vec<Repo>>(&self.path(""))
+    /// https://developer.github.com/v3/repos/#list-user-repositories
+    pub fn list(&self, options: &UserRepoListOptions) -> Result<Vec<Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
 }
 

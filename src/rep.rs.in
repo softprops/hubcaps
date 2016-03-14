@@ -595,6 +595,131 @@ pub struct Pull {
     pub changed_files: Option<u64>,
 }
 
+#[derive(Default)]
+pub struct UserRepoListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl UserRepoListOptions {
+    pub fn builder() -> UserRepoListOptionsBuilder {
+        UserRepoListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct UserRepoListOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl UserRepoListOptionsBuilder {
+    pub fn new() -> UserRepoListOptionsBuilder {
+        UserRepoListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn repo_type(&mut self, tpe: RepoType) -> &mut UserRepoListOptionsBuilder {
+        self.params.insert("type", tpe.to_string());
+        self
+    }
+
+    pub fn sort(&mut self, sort: RepoSort) -> &mut UserRepoListOptionsBuilder {
+        self.params.insert("sort", sort.to_string());
+        self
+    }
+
+    pub fn asc(&mut self) -> &mut UserRepoListOptionsBuilder {
+        self.direction(SortDirection::Asc)
+    }
+
+    pub fn desc(&mut self) -> &mut UserRepoListOptionsBuilder {
+        self.direction(SortDirection::Desc)
+    }
+
+    pub fn direction(&mut self, direction: SortDirection) -> &mut UserRepoListOptionsBuilder {
+        self.params.insert("direction", direction.to_string());
+        self
+    }
+
+    pub fn build(&self) -> UserRepoListOptions {
+        UserRepoListOptions { params: self.params.clone() }
+    }
+}
+
+#[derive(Default)]
+pub struct RepoListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl RepoListOptions {
+    pub fn builder() -> RepoListOptionsBuilder {
+        RepoListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct RepoListOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl RepoListOptionsBuilder {
+    pub fn new() -> RepoListOptionsBuilder {
+        RepoListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn visibility(&mut self, vis: RepoVisibility) -> &mut RepoListOptionsBuilder {
+        self.params.insert("visibility", vis.to_string());
+        self
+    }
+
+    pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut RepoListOptionsBuilder {
+        self.params.insert("affiliation", affiliations.into_iter().map(|a| a.to_string()).collect::<Vec<String>>().join(","));
+        self
+    }
+
+    pub fn repo_type(&mut self, tpe: RepoType) -> &mut RepoListOptionsBuilder {
+        self.params.insert("type", tpe.to_string());
+        self
+    }
+
+    pub fn sort(&mut self, sort: RepoSort) -> &mut RepoListOptionsBuilder {
+        self.params.insert("sort", sort.to_string());
+        self
+    }
+
+    pub fn asc(&mut self) -> &mut RepoListOptionsBuilder {
+        self.direction(SortDirection::Asc)
+    }
+
+    pub fn desc(&mut self) -> &mut RepoListOptionsBuilder {
+        self.direction(SortDirection::Desc)
+    }
+
+    pub fn direction(&mut self, direction: SortDirection) -> &mut RepoListOptionsBuilder {
+        self.params.insert("direction", direction.to_string());
+        self
+    }
+
+    pub fn build(&self) -> RepoListOptions {
+        RepoListOptions { params: self.params.clone() }
+    }
+}
 
 #[derive(Default)]
 pub struct PullListOptions {
@@ -633,7 +758,7 @@ impl PullListOptionsBuilder {
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut PullListOptionsBuilder {
+    pub fn sort(&mut self, sort: IssueSort) -> &mut PullListOptionsBuilder {
         self.params.insert("sort", sort.to_string());
         self
     }
@@ -686,7 +811,7 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
+    pub fn sort(&mut self, sort: IssueSort) -> &mut IssueListOptionsBuilder {
         self.params.insert("sort", sort.to_string());
         self
     }

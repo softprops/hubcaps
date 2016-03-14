@@ -1,7 +1,8 @@
 //! Rust representations of Github API data structures
 
 use super::{SortDirection, Error, State as StdState};
-use super::issues::Sort;
+use super::issues::{Sort as IssueSort};
+use super::repositories::{Sort as RepoSort, Affiliation, Type as RepoType, Visibility as RepoVisibility};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::option::Option;
