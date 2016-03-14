@@ -16,7 +16,7 @@ use std::fmt;
 pub enum Visibility {
     All,
     Public,
-    Private
+    Private,
 }
 
 impl fmt::Display for Visibility {
@@ -26,7 +26,7 @@ impl fmt::Display for Visibility {
                match *self {
                    Visibility::All => "all",
                    Visibility::Public => "public",
-                   Visibility::Private => "private"
+                   Visibility::Private => "private",
                })
     }
 }
@@ -37,7 +37,7 @@ pub enum Sort {
     Created,
     Updated,
     Pushed,
-    FullName
+    FullName,
 }
 
 impl fmt::Display for Sort {
@@ -80,7 +80,7 @@ pub enum Type {
     Owner,
     Public,
     Private,
-    Member
+    Member,
 }
 
 impl fmt::Display for Type {
@@ -92,7 +92,7 @@ impl fmt::Display for Type {
                    Type::Owner => "owner",
                    Type::Public => "public",
                    Type::Private => "private",
-                   Type::Member => "member"
+                   Type::Member => "member",
                })
     }
 }
