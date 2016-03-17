@@ -6,4 +6,8 @@ clean:
 
 test:
 	@cargo test
-.PHONY: build clean test
+
+doc:
+	@cargo doc
+
+.PHONY: build clean doc test
