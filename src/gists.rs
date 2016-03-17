@@ -2,7 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Error, Github, Result};
-use rep::{Gist, GistFork, GistOptions};
+use rep::{Gist, GistFork, GistOptions, GistListOptions};
 
 /// reference to gists associated with a github user
 pub struct UserGists<'a> {
@@ -20,8 +20,12 @@ impl<'a> UserGists<'a> {
         }
     }
 
-    pub fn list(&self) -> Result<Vec<Gist>> {
-        self.github.get::<Vec<Gist>>(&format!("/users/{}/gists", self.owner))
+    pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
+        let mut uri = vec![format!("/users/{}/gists", self.owner)];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Gist>>(&uri.join("?"))
     }
 }
 
@@ -73,8 +77,12 @@ impl<'a> Gists<'a> {
         self.github.get::<Gist>(&self.path(&format!("/{}/{}", id, sha)))
     }
 
-    pub fn list(&self) -> Result<Vec<Gist>> {
-        self.github.get::<Vec<Gist>>(&self.path(""))
+    pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Gist>>(&uri.join("?"))
     }
 
     pub fn public(&self) -> Result<Vec<Gist>> {

@@ -129,6 +129,30 @@ impl DeploymentOptionsBuilder {
 }
 
 #[derive(Default)]
+pub struct GistListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl GistListOptions {
+    pub fn since<T>(timestamp: T) -> DeploymentListOptionsBuilder where T: Into<String> {
+        let mut params = HashMap::new();
+        params.insert("since", timestamp);
+        GistListOptions {
+            params: params
+        }
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct DeploymentListOptions {
     params: HashMap<&'static str, String>
 }
