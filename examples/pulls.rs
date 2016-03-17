@@ -3,7 +3,7 @@ extern crate hyper;
 extern crate hubcaps;
 
 use hyper::Client;
-use hubcaps::{Credentials, Github, PullListOptions};
+use hubcaps::{Credentials, Github};
 use std::env;
 
 fn main() {
