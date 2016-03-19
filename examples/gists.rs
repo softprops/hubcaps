@@ -14,7 +14,7 @@ fn main() {
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                                      &client,
                                      Credentials::Token(token));
-            for gist in github.gists().list().unwrap() {
+            for gist in github.gists().list(&Default::default()).unwrap() {
                 println!("{:#?}", gist)
             }
         }
