@@ -30,7 +30,7 @@ use hyper::client::RequestBuilder;
 use hyper::method::Method;
 use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
-use repositories::{Repository, Repositories, UserRepositories};
+use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use std::fmt;
 use std::io::Read;
 use url::Url;
@@ -177,6 +177,13 @@ impl<'a> Github<'a> {
     /// gists belonging to the owner of the token used to configure this client
     pub fn gists(&self) -> Gists {
         Gists::new(self)
+    }
+
+    /// Return a reference to a Github Organization
+    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
+        where O: Into<String>
+    {
+        OrganizationRepositories::new(self, org)
     }
 
     fn authenticate(&self, method: Method, uri: &str) -> RequestBuilder {
