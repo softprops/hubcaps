@@ -10,6 +10,7 @@
 * `hubcaps::Error` enum now implements `std::error::Error`
 * pull request and issue listing fn's now both take options structs. This is a breaking change.
 * repo listing fn's now take option structs. This is a breaking change.
+* gist listing fn's now take option structs. This is a breaking change.
 
 # 0.1.1
 
