@@ -22,6 +22,7 @@ pub mod repositories;
 pub mod statuses;
 pub mod pulls;
 pub mod organizations;
+pub mod collaborators;
 
 pub use rep::*;
 pub use errors::Error;

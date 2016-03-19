@@ -10,6 +10,7 @@ use pulls::PullRequests;
 use releases::Releases;
 use rep::{Repo, RepoOptions, RepoListOptions, UserRepoListOptions, OrganizationRepoListOptions};
 use statuses::Statuses;
+use collaborators::Collaborators;
 use std::fmt;
 
 /// describes repository visibilities
@@ -276,5 +277,11 @@ impl<'a> Repository<'a> {
     /// associated with this reposoitory ref
     pub fn statuses(&self) -> Statuses {
         Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to the [collaborators](https://developer.github.com/v3/repos/collaborators/)
+    /// associated with this repository ref
+    pub fn collaborators(&self) -> Collaborators {
+        Collaborators::new(self.github, self.owner.as_ref(), self.repo.as_ref())
     }
 }
