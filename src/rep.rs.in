@@ -134,9 +134,9 @@ pub struct GistListOptions {
 }
 
 impl GistListOptions {
-    pub fn since<T>(timestamp: T) -> DeploymentListOptionsBuilder where T: Into<String> {
+    pub fn since<T>(timestamp: T) -> GistListOptions where T: Into<String> {
         let mut params = HashMap::new();
-        params.insert("since", timestamp);
+        params.insert("since", timestamp.into());
         GistListOptions {
             params: params
         }
