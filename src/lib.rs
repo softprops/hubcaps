@@ -251,6 +251,7 @@ impl<'a> Github<'a> {
                     error: try!(serde_json::from_str::<ClientError>(&body)),
                 })
             }
+            StatusCode::NoContent => Ok(try!(serde_json::from_str::<D>("null"))),
             _ => Ok(try!(serde_json::from_str::<D>(&body))),
         }
     }
