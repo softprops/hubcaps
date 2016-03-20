@@ -30,7 +30,7 @@ use hyper::client::RequestBuilder;
 use hyper::method::Method;
 use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
-use repositories::{Repository, Repositories, UserRepositories};
+use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use std::fmt;
 use std::io::Read;
 use url::Url;
@@ -152,7 +152,7 @@ impl<'a> Github<'a> {
         Repository::new(self, owner, repo)
     }
 
-    /// Return a reference to the collection of repositories owned by an
+    /// Return a reference to the collection of repositories owned by and
     /// associated with an owner
     pub fn user_repos<S>(&self, owner: S) -> UserRepositories
         where S: Into<String>
@@ -160,7 +160,7 @@ impl<'a> Github<'a> {
         UserRepositories::new(self, owner)
     }
 
-    /// Return a reference to  the collection of repositores owned by the user
+    /// Return a reference to the collection of repositories owned by the user
     /// associated with the current authentication credentials
     pub fn repos(&self) -> Repositories {
         Repositories::new(self)
@@ -177,6 +177,14 @@ impl<'a> Github<'a> {
     /// gists belonging to the owner of the token used to configure this client
     pub fn gists(&self) -> Gists {
         Gists::new(self)
+    }
+
+    /// Return a reference to the collection of repositories owned by and
+    /// associated with an organization
+    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
+        where O: Into<String>
+    {
+        OrganizationRepositories::new(self, org)
     }
 
     fn authenticate(&self, method: Method, uri: &str) -> RequestBuilder {
