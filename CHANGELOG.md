@@ -11,6 +11,7 @@
 * pull request and issue listing fn's now both take options structs. This is a breaking change.
 * repo listing fn's now take option structs. This is a breaking change.
 * gist listing fn's now take option structs. This is a breaking change.
+* added support for fetching organization repoistory listings [via @carols10cents](https://github.com/softprops/hubcaps/pull/28)
 
 # 0.1.1
 
