@@ -678,6 +678,46 @@ impl UserRepoListOptionsBuilder {
 }
 
 #[derive(Default)]
+pub struct OrganizationRepoListOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl OrganizationRepoListOptions {
+    pub fn builder() -> OrganizationRepoListOptionsBuilder {
+        OrganizationRepoListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(form_urlencoded::serialize(&self.params))
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct OrganizationRepoListOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl OrganizationRepoListOptionsBuilder {
+    pub fn new() -> OrganizationRepoListOptionsBuilder {
+        OrganizationRepoListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut OrganizationRepoListOptionsBuilder {
+        self.params.insert("type", tpe.to_string());
+        self
+    }
+
+    pub fn build(&self) -> OrganizationRepoListOptions {
+        OrganizationRepoListOptions { params: self.params.clone() }
+    }
+}
+
+#[derive(Default)]
 pub struct RepoListOptions {
     params: HashMap<&'static str, String>
 }

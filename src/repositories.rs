@@ -7,7 +7,7 @@ use issues::{IssueRef, Issues};
 use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
-use rep::{Repo, RepoListOptions, UserRepoListOptions};
+use rep::{Repo, RepoListOptions, UserRepoListOptions, OrganizationRepoListOptions};
 use statuses::Statuses;
 use std::fmt;
 
@@ -97,6 +97,32 @@ impl fmt::Display for Type {
     }
 }
 
+/// Describes types of organization repositories
+#[derive(Clone, Debug, PartialEq)]
+pub enum OrgRepoType {
+    All,
+    Public,
+    Private,
+    Forks,
+    Sources,
+    Member,
+}
+
+impl fmt::Display for OrgRepoType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   OrgRepoType::All => "all",
+                   OrgRepoType::Public => "public",
+                   OrgRepoType::Private => "private",
+                   OrgRepoType::Forks => "forks",
+                   OrgRepoType::Sources => "sources",
+                   OrgRepoType::Member => "member",
+               })
+    }
+}
+
 pub struct Repositories<'a> {
     github: &'a Github<'a>,
 }
@@ -143,6 +169,36 @@ impl<'a> UserRepositories<'a> {
 
     /// https://developer.github.com/v3/repos/#list-user-repositories
     pub fn list(&self, options: &UserRepoListOptions) -> Result<Vec<Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Repo>>(&uri.join("?"))
+    }
+}
+
+/// Provides access to an organization's repositories
+pub struct OrganizationRepositories<'a> {
+    github: &'a Github<'a>,
+    org: String,
+}
+
+impl<'a> OrganizationRepositories<'a> {
+    pub fn new<O>(github: &'a Github<'a>, org: O) -> OrganizationRepositories<'a>
+        where O: Into<String>
+    {
+        OrganizationRepositories {
+            github: github,
+            org: org.into(),
+        }
+    }
+
+    fn path(&self, more: &str) -> String {
+        format!("/orgs/{}/repos{}", self.org, more)
+    }
+
+    /// https://developer.github.com/v3/repos/#list-organization-repositories
+    pub fn list(&self, options: &OrganizationRepoListOptions) -> Result<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
