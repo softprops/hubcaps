@@ -1,5 +1,6 @@
 use rep::User;
-use self::super::{Github, Result};
+use self::super::{Github, Result, Error};
+use hyper::status::StatusCode;
 
 pub struct Collaborators<'a> {
     github: &'a Github<'a>,
@@ -25,5 +26,13 @@ impl<'a> Collaborators<'a> {
 
     pub fn list(&self) -> Result<Vec<User>> {
         self.github.get::<Vec<User>>(&self.path(""))
+    }
+
+    pub fn is_collaborator(&self, username: &str) -> Result<bool> {
+        match self.github.get::<()>(&self.path(&format!("/{}", username))) {
+            Ok(_) => Ok(true),
+            Err(Error::Fault { code: c, .. }) if c == StatusCode::NotFound => Ok(false),
+            Err(other) => Err(other),
+        }
     }
 }
