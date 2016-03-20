@@ -1,5 +1,7 @@
 # 0.2.0
 
+Many changes were made to transition into using serde as a serialization backend an focusong on  make interfaces more consistent across the board. A more flexible interface for authenticating requests was added as well as a new interface for requesting organization repository listings. Relevant itemized changes are listed below.
+
 * port serialization from `rustc-serialize` to `serde`!
 * as a result of the serde port, `Error::{Decoding, Encoding}` which were wrappers around rustc-serialize error types, were removed and replaced with a unified `Error::Codec` which wraps serde's error type
 * renamed `hubcaps::statuses::State` to `hubcaps::StatusState`
