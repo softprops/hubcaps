@@ -152,7 +152,7 @@ impl<'a> Github<'a> {
         Repository::new(self, owner, repo)
     }
 
-    /// Return a reference to the collection of repositories owned by an
+    /// Return a reference to the collection of repositories owned by and
     /// associated with an owner
     pub fn user_repos<S>(&self, owner: S) -> UserRepositories
         where S: Into<String>
@@ -160,7 +160,7 @@ impl<'a> Github<'a> {
         UserRepositories::new(self, owner)
     }
 
-    /// Return a reference to  the collection of repositores owned by the user
+    /// Return a reference to the collection of repositories owned by the user
     /// associated with the current authentication credentials
     pub fn repos(&self) -> Repositories {
         Repositories::new(self)
@@ -179,7 +179,8 @@ impl<'a> Github<'a> {
         Gists::new(self)
     }
 
-    /// Return a reference to a Github Organization
+    /// Return a reference to the collection of repositories owned by and
+    /// associated with an organization
     pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
         where O: Into<String>
     {
