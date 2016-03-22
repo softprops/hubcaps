@@ -21,6 +21,7 @@ pub mod releases;
 pub mod repositories;
 pub mod statuses;
 pub mod pulls;
+pub mod organizations;
 
 pub use rep::*;
 pub use errors::Error;
@@ -31,6 +32,7 @@ use hyper::method::Method;
 use hyper::header::{Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
+use organizations::{Organizations, UserOrganizations};
 use std::fmt;
 use std::io::Read;
 use url::Url;
@@ -164,6 +166,20 @@ impl<'a> Github<'a> {
     /// associated with the current authentication credentials
     pub fn repos(&self) -> Repositories {
         Repositories::new(self)
+    }
+
+    /// Return a reference to the collection of organizations that the user
+    /// associated with the current authentication credentials is in
+    pub fn orgs(&self) -> Organizations {
+        Organizations::new(self)
+    }
+
+    /// Return a reference to the collection of organizations a user
+    /// is publicly associated with
+    pub fn user_orgs<U>(&self, user: U) -> UserOrganizations
+        where U: Into<String>
+    {
+        UserOrganizations::new(self, user)
     }
 
     /// Return a reference to an interface that provides access to a user's gists

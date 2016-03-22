@@ -23,6 +23,20 @@ fn main() {
             for repo in github.org_repos("rust-lang").list(&options).unwrap() {
                 println!("{}", repo.name)
             }
+
+            println!("");
+
+            println!("My organizations:");
+            for org in github.orgs().list().unwrap() {
+                println!("{}", org.login)
+            }
+
+            println!("");
+
+            println!("softprops' organizations:");
+            for org in github.user_orgs("softprops").list().unwrap() {
+                println!("{}", org.login)
+            }
         }
         _ => println!("example missing GITHUB_TOKEN"),
     }
