@@ -431,7 +431,7 @@ pub struct Repo {
     pub has_wiki: bool,
     pub has_pages: bool,
     pub has_downloads: bool,
-    pub pushed_at: String,
+    pub pushed_at: Option<String>,
     pub created_at: String,
     pub updated_at: String, // permissions: Permissions
 }
