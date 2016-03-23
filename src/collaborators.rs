@@ -78,4 +78,8 @@ impl<'a> Collaborators<'a> {
         )
     }
 
+    pub fn remove(&self, username: &str) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", username)))
+    }
+
 }
