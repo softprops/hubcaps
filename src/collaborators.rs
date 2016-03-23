@@ -1,6 +1,37 @@
+extern crate serde_json;
+
 use rep::User;
 use self::super::{Github, Result, Error};
 use hyper::status::StatusCode;
+
+use std::collections::HashMap;
+use std::fmt;
+
+#[derive(Debug)]
+pub enum Permissions {
+    Admin,
+    Push,
+    Pull,
+}
+
+impl Default for Permissions {
+    fn default() -> Permissions {
+        Permissions::Push
+    }
+}
+
+impl fmt::Display for Permissions {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Permissions::Admin => "admin",
+                   Permissions::Push => "push",
+                   Permissions::Pull => "pull",
+               }
+        )
+    }
+}
 
 pub struct Collaborators<'a> {
     github: &'a Github<'a>,
@@ -35,4 +66,16 @@ impl<'a> Collaborators<'a> {
             Err(other) => Err(other),
         }
     }
+
+    pub fn add(&self, username: &str, permissions: &Permissions) -> Result<()> {
+        let mut permission_params = HashMap::new();
+        permission_params.insert("permission", permissions.to_string());
+        let data = try!(serde_json::to_string(&permission_params));
+
+        self.github.put::<()>(
+            &self.path(&format!("/{}", username)),
+            data.as_bytes()
+        )
+    }
+
 }
