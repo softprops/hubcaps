@@ -15,7 +15,11 @@ fn main() {
                                      &client,
                                      Credentials::Token(token));
             for repo in github.user_repos("softprops").list(&Default::default()).unwrap() {
-                println!("{:#?}", repo)
+                println!("{}", repo.name);
+                for (language, bytes_of_code) in &repo.languages(&github).unwrap() {
+                    println!("{}: {} bytes", language, bytes_of_code);
+                }
+                println!("");
             }
         }
         _ => println!("example missing GITHUB_TOKEN"),

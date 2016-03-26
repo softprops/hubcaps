@@ -1,4 +1,7 @@
 // this file is input for rep.rs output
+use self::super::{Github, Result};
+
+use url::Url;
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct FieldErr {
@@ -425,6 +428,20 @@ pub struct Repo {
     pub pushed_at: String,
     pub created_at: String,
     pub updated_at: String, // permissions: Permissions
+}
+
+impl Repo {
+    /// Returns a map containing the
+    /// [languages](https://developer.github.com/v3/repos/#list-languages) that the repository is
+    /// implemented in.
+    ///
+    /// The keys are the language names, and the values are the number of bytes of code written in
+    /// that language.
+    pub fn languages(&self, github: &Github) -> Result<HashMap<String, i64>> {
+        let url = Url::parse(&self.languages_url).unwrap();
+        let uri: String = url.serialize_path().unwrap();
+        github.get(&uri)
+    }
 }
 
 #[derive(Debug, Deserialize)]
