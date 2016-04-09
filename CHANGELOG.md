@@ -1,3 +1,8 @@
+# 0.2.1
+
+* Added support for listing organization repositories [via @carols10cents](https://github.com/softprops/hubcaps/pull/29)
+* Fixed deserialization issue related to error response in release api calls [issue #31](https://github.com/softprops/hubcaps/issues/31)
+
 # 0.2.0
 
 Many changes were made to transition into using serde as a serialization backend and to focus on making interfaces more consistent across the board. A more flexible interface for authenticating requests was added as well as a new interface for requesting organization repository listings. Relevant itemized changes are listed below.
