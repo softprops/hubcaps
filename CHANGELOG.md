@@ -1,4 +1,9 @@
-# 0.2.1
+# 0.2.2 (unreleased)
+
+* upgrade to [hyper 0.8](https://github.com/hyperium/hyper/blob/master/CHANGELOG.md#v080-2016-03-14)
+
+
+# 0.2.1 (2016-04-09)
 
 * Added support for listing organization repositories [via @carols10cents](https://github.com/softprops/hubcaps/pull/29)
 * Fixed deserialization issue related to error response in release api calls [issue #31](https://github.com/softprops/hubcaps/issues/31)
