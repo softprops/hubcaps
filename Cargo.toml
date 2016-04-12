@@ -15,7 +15,7 @@ env_logger="0.3"
 
 [build-dependencies]
 serde_codegen = "0.7"
-syntex = "0.30"
+syntex = "0.31"
 
 [dependencies]
 log = "0.3"
