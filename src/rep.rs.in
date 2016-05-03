@@ -152,7 +152,10 @@ impl GistListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -173,7 +176,10 @@ impl DeploymentListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -439,7 +445,7 @@ impl Repo {
     /// that language.
     pub fn languages(&self, github: &Github) -> Result<HashMap<String, i64>> {
         let url = Url::parse(&self.languages_url).unwrap();
-        let uri: String = url.serialize_path().unwrap();
+        let uri: String = url.path().into();
         github.get(&uri)
     }
 }
@@ -668,7 +674,10 @@ impl UserRepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -726,7 +735,10 @@ impl OrganizationRepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -766,7 +778,10 @@ impl RepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -834,7 +849,10 @@ impl PullListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -888,7 +906,10 @@ impl IssueListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
