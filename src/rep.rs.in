@@ -450,6 +450,67 @@ impl Repo {
     }
 }
 
+
+#[derive(Debug, Serialize)]
+pub struct RepoOptions {
+    pub name: String,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub homepage: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub private: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_issues: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_wiki: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_downloads: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub team_id: Option<i32>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub auto_init: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub gitignore_template: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub license_template: Option<String>,
+}
+
+impl RepoOptions {
+    pub fn new<N, D, H, GI, L>(name: N,
+                            description: Option<D>,
+                            homepage: Option<H>,
+                            private: Option<bool>,
+                            has_issues: Option<bool>,
+                            has_wiki: Option<bool>,
+                            has_downloads: Option<bool>,
+                            team_id: Option<i32>,
+                            auto_init: Option<bool>,
+                            gitignore_template: Option<GI>,
+                            license_template: Option<L>)
+                            -> RepoOptions
+        where N: Into<String>,
+              D: Into<String>,
+              H: Into<String>,
+              GI: Into<String>,
+              L: Into<String>
+    {
+        RepoOptions {
+            name: name.into(),
+            description: description.map(|h| h.into()),
+            homepage: homepage.map(|h| h.into()),
+            private: private,
+            has_issues: has_issues,
+            has_wiki: has_wiki,
+            has_downloads: has_downloads,
+            team_id: team_id,
+            auto_init: auto_init,
+            gitignore_template: gitignore_template.map(|gi| gi.into()),
+            license_template: license_template.map(|l| l.into()),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct RepoDetails {
     pub id: u64,
