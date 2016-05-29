@@ -374,7 +374,7 @@ pub struct Repo {
     pub name: String,
     pub full_name: String,
     pub description: String,
-    // private (keyword)
+    pub private: bool,
     pub fork: bool,
     pub url: String,
     pub html_url: String,
