@@ -476,19 +476,120 @@ pub struct RepoOptions {
     pub license_template: Option<String>,
 }
 
+#[derive(Default)]
+pub struct RepoOptionsBuilder {
+    name: String,
+    description: Option<String>,
+    homepage: Option<String>,
+    private: Option<bool>,
+    has_issues: Option<bool>,
+    has_wiki: Option<bool>,
+    has_downloads: Option<bool>,
+    team_id: Option<i32>,
+    auto_init: Option<bool>,
+    gitignore_template: Option<String>,
+    license_template: Option<String>,
+}
+
+impl RepoOptionsBuilder {
+    pub fn new<N>(name: N) -> RepoOptionsBuilder
+        where N: Into<String>
+    {
+        RepoOptionsBuilder { name: name.into(), ..Default::default() }
+    }
+
+    pub fn description<D>(&mut self, description: D) -> &mut RepoOptionsBuilder
+        where D: Into<String>
+    {
+        self.description = Some(description.into());
+        self
+    }
+
+    pub fn homepage<H>(&mut self, homepage: H) -> &mut RepoOptionsBuilder
+        where H: Into<String>
+    {
+        self.homepage = Some(homepage.into());
+        self
+    }
+
+    pub fn private(&mut self, private: bool) -> &mut RepoOptionsBuilder
+    {
+        self.private = Some(private);
+        self
+    }
+
+    pub fn has_issues(&mut self, has_issues: bool) -> &mut RepoOptionsBuilder
+    {
+        self.has_issues = Some(has_issues);
+        self
+    }
+
+    pub fn has_wiki(&mut self, has_wiki: bool) -> &mut RepoOptionsBuilder
+    {
+        self.has_wiki = Some(has_wiki);
+        self
+    }
+
+    pub fn has_downloads(&mut self, has_downloads: bool) -> &mut RepoOptionsBuilder
+    {
+        self.has_downloads = Some(has_downloads);
+        self
+    }
+
+    pub fn team_id(&mut self, team_id: i32) -> &mut RepoOptionsBuilder
+    {
+        self.team_id = Some(team_id);
+        self
+    }
+
+    pub fn auto_init(&mut self, auto_init: bool) -> &mut RepoOptionsBuilder
+    {
+        self.auto_init = Some(auto_init);
+        self
+    }
+
+    pub fn gitignore_template<GI>(&mut self, gitignore_template: GI) -> &mut RepoOptionsBuilder
+        where GI: Into<String>
+    {
+        self.gitignore_template = Some(gitignore_template.into());
+        self
+    }
+
+    pub fn license_template<L>(&mut self, license_template: L) -> &mut RepoOptionsBuilder
+        where L: Into<String>
+    {
+        self.license_template = Some(license_template.into());
+        self
+    }
+
+    pub fn build(&self) -> RepoOptions {
+        RepoOptions::new(self.name.as_ref(),
+                         self.description.clone(),
+                         self.homepage.clone(),
+                         self.private,
+                         self.has_issues,
+                         self.has_wiki,
+                         self.has_downloads,
+                         self.team_id,
+                         self.auto_init,
+                         self.gitignore_template.clone(),
+                         self.license_template.clone())
+    }
+}
+
 impl RepoOptions {
     pub fn new<N, D, H, GI, L>(name: N,
-                            description: Option<D>,
-                            homepage: Option<H>,
-                            private: Option<bool>,
-                            has_issues: Option<bool>,
-                            has_wiki: Option<bool>,
-                            has_downloads: Option<bool>,
-                            team_id: Option<i32>,
-                            auto_init: Option<bool>,
-                            gitignore_template: Option<GI>,
-                            license_template: Option<L>)
-                            -> RepoOptions
+                               description: Option<D>,
+                               homepage: Option<H>,
+                               private: Option<bool>,
+                               has_issues: Option<bool>,
+                               has_wiki: Option<bool>,
+                               has_downloads: Option<bool>,
+                               team_id: Option<i32>,
+                               auto_init: Option<bool>,
+                               gitignore_template: Option<GI>,
+                               license_template: Option<L>)
+                               -> RepoOptions
         where N: Into<String>,
               D: Into<String>,
               H: Into<String>,
@@ -508,6 +609,10 @@ impl RepoOptions {
             gitignore_template: gitignore_template.map(|gi| gi.into()),
             license_template: license_template.map(|l| l.into()),
         }
+    }
+
+    pub fn builder<N: Into<String>>(name: N) -> RepoOptionsBuilder {
+        RepoOptionsBuilder::new(name)
     }
 }
 
