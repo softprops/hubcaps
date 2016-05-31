@@ -1,4 +1,7 @@
 // this file is input for rep.rs output
+use self::super::{Github, Result};
+
+use url::Url;
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct FieldErr {
@@ -149,7 +152,10 @@ impl GistListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -170,7 +176,10 @@ impl DeploymentListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -427,6 +436,20 @@ pub struct Repo {
     pub updated_at: String, // permissions: Permissions
 }
 
+impl Repo {
+    /// Returns a map containing the
+    /// [languages](https://developer.github.com/v3/repos/#list-languages) that the repository is
+    /// implemented in.
+    ///
+    /// The keys are the language names, and the values are the number of bytes of code written in
+    /// that language.
+    pub fn languages(&self, github: &Github) -> Result<HashMap<String, i64>> {
+        let url = Url::parse(&self.languages_url).unwrap();
+        let uri: String = url.path().into();
+        github.get(&uri)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct RepoDetails {
     pub id: u64,
@@ -651,7 +674,10 @@ impl UserRepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -709,7 +735,10 @@ impl OrganizationRepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -749,7 +778,10 @@ impl RepoListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -817,7 +849,10 @@ impl PullListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }
@@ -871,7 +906,10 @@ impl IssueListOptions {
         if self.params.is_empty() {
             None
         } else {
-            Some(form_urlencoded::serialize(&self.params))
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
         }
     }
 }

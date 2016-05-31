@@ -210,11 +210,11 @@ impl<'a> Github<'a> {
                 self.client.request(method, &url).header(Authorization(format!("token {}", token)))
             }
             Credentials::Client(ref id, ref secret) => {
+
                 let mut parsed = Url::parse(&url).unwrap();
-                let mut query = parsed.query_pairs().unwrap_or(vec![]);
-                query.push(("client_id".to_owned(), id.to_owned()));
-                query.push(("client_secret".to_owned(), secret.to_owned()));
-                parsed.set_query_from_pairs(query);
+                parsed.query_pairs_mut()
+                      .append_pair("client_id", id)
+                      .append_pair("client_secret", secret);
                 self.client.request(method, parsed)
             }
             Credentials::None => self.client.request(method, &url),

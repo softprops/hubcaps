@@ -19,8 +19,8 @@ syntex = "0.33"
 
 [dependencies]
 log = "0.3"
-hyper = "0.8"
-url = "0.5"
+hyper = "0.9"
+url = "1.0"
 serde = "0.7"
 serde_json = "0.7"
 serializable_enum = "0.3"
