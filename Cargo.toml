@@ -1,6 +1,6 @@
 [package]
 name = "hubcaps"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["softprops <d.tangren@gmail.com>"]
 description = "Rust interface for Github"
 documentation = "https://softprops.github.io/hubcaps"
@@ -15,7 +15,7 @@ env_logger="0.3"
 
 [build-dependencies]
 serde_codegen = "0.7"
-syntex = "0.30"
+syntex = "0.33"
 
 [dependencies]
 log = "0.3"

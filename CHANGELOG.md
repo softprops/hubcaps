@@ -1,7 +1,7 @@
-# 0.2.2 (unreleased)
+# 0.2.2
 
 * upgrade to [hyper 0.8](https://github.com/hyperium/hyper/blob/master/CHANGELOG.md#v080-2016-03-14)
-
+* upgrade syntex build dependency to 0.33
 
 # 0.2.1 (2016-04-09)
 
