@@ -467,7 +467,7 @@ pub struct RepoOptions {
     #[serde(skip_serializing_if="Option::is_none")]
     pub has_downloads: Option<bool>,
     #[serde(skip_serializing_if="Option::is_none")]
-    pub team_id: Option<u32>,
+    pub team_id: Option<i32>,
     #[serde(skip_serializing_if="Option::is_none")]
     pub auto_init: Option<bool>,
     #[serde(skip_serializing_if="Option::is_none")]
@@ -485,7 +485,7 @@ pub struct RepoOptionsBuilder {
     has_issues: Option<bool>,
     has_wiki: Option<bool>,
     has_downloads: Option<bool>,
-    team_id: Option<u32>,
+    team_id: Option<i32>,
     auto_init: Option<bool>,
     gitignore_template: Option<String>,
     license_template: Option<String>,
