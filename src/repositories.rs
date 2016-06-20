@@ -1,4 +1,5 @@
 //! Repository interface
+extern crate serde_json;
 
 use self::super::{Github, Result};
 use deployments::Deployments;
@@ -7,7 +8,7 @@ use issues::{IssueRef, Issues};
 use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
-use rep::{Repo, RepoListOptions, UserRepoListOptions, OrganizationRepoListOptions};
+use rep::{Repo, RepoOptions, RepoListOptions, UserRepoListOptions, OrganizationRepoListOptions};
 use statuses::Statuses;
 use std::fmt;
 
@@ -134,6 +135,13 @@ impl<'a> Repositories<'a> {
 
     fn path(&self, more: &str) -> String {
         format!("/user/repos{}", more)
+    }
+
+    /// Create a new repository
+    /// https://developer.github.com/v3/repos/#create
+    pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
+        let data = try!(serde_json::to_string(&repo));
+        self.github.post::<Repo>(&self.path(""), data.as_bytes())
     }
 
     /// list the authenticated users repositories
