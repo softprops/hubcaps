@@ -1,3 +1,8 @@
+# 0.2.3 (unrelased)
+
+* added support for repo creation [#38](https://github.com/softprops/hubcaps/pull/38)
+* upgrade syntex build dependency to 0.35
+
 # 0.2.2
 
 * upgrade to [hyper 0.8](https://github.com/hyperium/hyper/blob/master/CHANGELOG.md#v080-2016-03-14)
