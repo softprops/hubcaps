@@ -1156,22 +1156,24 @@ impl IssueListOptionsBuilder {
 
 #[derive(Debug, Serialize)]
 pub struct IssueOptions {
-    pub title: String,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub title: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
     pub body: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
     pub assignee: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
     pub milestone: Option<u64>,
-    pub labels: Vec<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub labels: Option<Vec<String>>,
 }
 
 impl IssueOptions {
-    pub fn new<T, B, A, L>(title: T,
+    pub fn new<T, B, A, L>(title: Option<T>,
                            body: Option<B>,
                            assignee: Option<A>,
                            milestone: Option<u64>,
-                           labels: Vec<L>)
+                           labels: Option<Vec<L>>)
                            -> IssueOptions
         where T: Into<String>,
               B: Into<String>,
@@ -1179,11 +1181,11 @@ impl IssueOptions {
               L: Into<String>
     {
         IssueOptions {
-            title: title.into(),
+            title: title.map(|t| t.into()),
             body: body.map(|b| b.into()),
             assignee: assignee.map(|a| a.into()),
             milestone: milestone,
-            labels: labels.into_iter().map(|l| l.into()).collect::<Vec<String>>(),
+            labels: labels.map(|lb| lb.into_iter().map(|l| l.into()).collect::<Vec<String>>()),
         }
     }
 }
