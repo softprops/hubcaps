@@ -89,6 +89,6 @@ impl<'a> Deployments<'a> {
 
     /// get a reference to the statuses api for a give deployment
     pub fn statuses(&self, id: u64) -> DeploymentStatuses {
-        DeploymentStatuses::new(self.github, self.owner.as_ref(), self.repo.as_ref(), id)
+        DeploymentStatuses::new(self.github, self.owner.as_str(), self.repo.as_str(), id)
     }
 }

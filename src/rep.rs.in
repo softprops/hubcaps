@@ -563,7 +563,7 @@ impl RepoOptionsBuilder {
     }
 
     pub fn build(&self) -> RepoOptions {
-        RepoOptions::new(self.name.as_ref(),
+        RepoOptions::new(self.name.as_str(),
                          self.description.clone(),
                          self.homepage.clone(),
                          self.private,
@@ -1312,7 +1312,7 @@ impl ReleaseOptionsBuilder {
     }
 
     pub fn build(&self) -> ReleaseOptions {
-        ReleaseOptions::new(self.tag.as_ref(),
+        ReleaseOptions::new(self.tag.as_str(),
                             self.commitish.clone(),
                             self.name.clone(),
                             self.body.clone(),

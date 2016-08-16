@@ -148,8 +148,8 @@ impl<'a> IssueRef<'a> {
 
     pub fn labels(&self) -> IssueLabels {
         IssueLabels::new(self.github,
-                         self.owner.as_ref(),
-                         self.repo.as_ref(),
+                         self.owner.as_str(),
+                         self.repo.as_str(),
                          self.number)
     }
 
@@ -184,7 +184,7 @@ impl<'a> Issues<'a> {
     }
 
     pub fn get(&self, number: u64) -> IssueRef {
-        IssueRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
+        IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }
 
     pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
