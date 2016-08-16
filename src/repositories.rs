@@ -236,45 +236,45 @@ impl<'a> Repository<'a> {
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
     /// associated with this repository ref
     pub fn deployments(&self) -> Deployments {
-        Deployments::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Deployments::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to a specific github issue associated with this repoistory ref
     pub fn issue(&self, number: u64) -> IssueRef {
-        IssueRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
+        IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }
 
     /// get a reference to github issues associated with this repoistory ref
     pub fn issues(&self) -> Issues {
-        Issues::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Issues::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)
     /// associated with this repository ref
     pub fn keys(&self) -> Keys {
-        Keys::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Keys::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a list of labels associated with this repository ref
     pub fn labels(&self) -> Labels {
-        Labels::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Labels::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a list of [pulls](https://developer.github.com/v3/pulls/)
     /// associated with this repository ref
     pub fn pulls(&self) -> PullRequests {
-        PullRequests::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        PullRequests::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [releases](https://developer.github.com/v3/repos/releases/)
     /// associated with this repository ref
     pub fn releases(&self) -> Releases {
-        Releases::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Releases::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a references to [statuses](https://developer.github.com/v3/repos/statuses/)
     /// associated with this reposoitory ref
     pub fn statuses(&self) -> Statuses {
-        Statuses::new(self.github, self.owner.as_ref(), self.repo.as_ref())
+        Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 }

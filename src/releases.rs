@@ -85,8 +85,8 @@ impl<'a> ReleaseRef<'a> {
 
     pub fn assets(&self) -> Assets {
         Assets::new(self.github,
-                    self.owner.as_ref(),
-                    self.repo.as_ref(),
+                    self.owner.as_str(),
+                    self.repo.as_str(),
                     self.id)
     }
 }
@@ -135,6 +135,6 @@ impl<'a> Releases<'a> {
     }
 
     pub fn get(&self, id: u64) -> ReleaseRef {
-        ReleaseRef::new(self.github, self.owner.as_ref(), self.repo.as_ref(), id)
+        ReleaseRef::new(self.github, self.owner.as_str(), self.repo.as_str(), id)
     }
 }

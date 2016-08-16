@@ -114,7 +114,7 @@ impl<'a> PullRequests<'a> {
 
     /// Get a reference to a strucuture for interfacing with a specific pull request
     pub fn get(&self, number: u64) -> PullRequest {
-        PullRequest::new(self.github, self.owner.as_ref(), self.repo.as_ref(), number)
+        PullRequest::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }
 
     /// Create a new pull request

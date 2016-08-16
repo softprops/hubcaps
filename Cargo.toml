@@ -14,13 +14,12 @@ build = "build.rs"
 env_logger="0.3"
 
 [build-dependencies]
-serde_codegen = "0.7"
-syntex = "0.35"
+serde_codegen = "0.8"
 
 [dependencies]
 log = "0.3"
 hyper = "0.9"
 url = "1.0"
-serde = "0.7"
-serde_json = "0.7"
+serde = "0.8"
+serde_json = "0.8"
 serializable_enum = "0.3"
