@@ -332,6 +332,12 @@ impl<'a> Repository<'a> {
         Hooks::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
+    /// get a reference to the GitHub repository object that this `Respository` refers to
+    pub fn get(&self) -> Result<Repo> {
+        let uri = format!("/repos/{}/{}", self.owner, self.repo);
+        self.github.get(&uri)
+    }
+
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
     /// associated with this repository ref
     pub fn deployments(&self) -> Deployments {
