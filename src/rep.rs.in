@@ -373,7 +373,7 @@ pub struct Repo {
     pub owner: User,
     pub name: String,
     pub full_name: String,
-    pub description: String,
+    pub description: Option<String>,
     pub private: bool,
     pub fork: bool,
     pub url: String,
