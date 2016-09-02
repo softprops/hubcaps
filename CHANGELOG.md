@@ -1,4 +1,4 @@
-# 0.2.3 (unrelased)
+# 0.2.3
 
 * added support for repo creation [#38](https://github.com/softprops/hubcaps/pull/38)
 * upgrade syntex build dependency to 0.35
