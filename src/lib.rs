@@ -22,6 +22,7 @@ pub mod repositories;
 pub mod statuses;
 pub mod pulls;
 pub mod organizations;
+pub mod collaborators;
 
 pub use rep::*;
 pub use errors::Error;
@@ -250,6 +251,7 @@ impl<'a> Github<'a> {
                     error: try!(serde_json::from_str::<ClientError>(&body)),
                 })
             }
+            StatusCode::NoContent => Ok(try!(serde_json::from_str::<D>("null"))),
             _ => Ok(try!(serde_json::from_str::<D>(&body))),
         }
     }
