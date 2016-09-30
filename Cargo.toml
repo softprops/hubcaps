@@ -12,7 +12,7 @@ build = "build.rs"
 
 [features]
 default = ["serde_codegen"]
-nightly = ["serde_macros"]
+nightly = ["serde_derive"]
 
 [dev-dependencies]
 env_logger = "0.3"
@@ -26,5 +26,5 @@ hyper = "0.9"
 url = "1.2"
 serde = "0.8"
 serde_json = "0.8"
-serde_macros = { version = "0.8", optional = true }
+serde_derive = { version = "0.8", optional = true }
 serializable_enum = "0.3"
