@@ -1,6 +1,6 @@
 //! Hubcaps provides a set of building blocks for interacting with the Github API
 
-#![cfg_attr(feature = "serde_derive", feature(rustc_macro))]
+#![cfg_attr(feature = "serde_derive", feature(proc_macro))]
 
 #[cfg(feature = "serde_derive")]
 #[macro_use]
@@ -218,8 +218,8 @@ impl<'a> Github<'a> {
 
                 let mut parsed = Url::parse(&url).unwrap();
                 parsed.query_pairs_mut()
-                      .append_pair("client_id", id)
-                      .append_pair("client_secret", secret);
+                    .append_pair("client_id", id)
+                    .append_pair("client_secret", secret);
                 self.client.request(method, parsed)
             }
             Credentials::None => self.client.request(method, &url),
