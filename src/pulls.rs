@@ -2,7 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::{Pull, PullEditOptions, PullOptions, PullListOptions};
+use rep::{FileDiff, Pull, PullEditOptions, PullOptions, PullListOptions};
 use std::default::Default;
 use std::fmt;
 
@@ -86,6 +86,10 @@ impl<'a> PullRequest<'a> {
     pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
         let data = try!(serde_json::to_string(&pr));
         self.github.patch::<Pull>(&self.path(""), data.as_bytes())
+    }
+
+    pub fn files(&self) -> Result<Vec<FileDiff>> {
+        self.github.get::<Vec<FileDiff>>(&self.path("/files"))
     }
 }
 

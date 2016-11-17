@@ -67,16 +67,11 @@ mod tests {
     fn gist_reqs() {
         let mut files = HashMap::new();
         files.insert("foo", "bar");
-        let tests = vec![
-            (
-                GistOptions::new(None as Option<String>, true, files.clone()),
-                r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
-            ),
-            (
-                GistOptions::new(Some("desc"), true, files.clone()),
-                r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#
-            )
-        ];
+        let tests =
+            vec![(GistOptions::new(None as Option<String>, true, files.clone()),
+                  r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#),
+                 (GistOptions::new(Some("desc"), true, files.clone()),
+                  r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#)];
         test_encoding(tests);
     }
 
@@ -159,27 +154,19 @@ mod tests {
     fn gist_req() {
         let mut files = HashMap::new();
         files.insert("test", "foo");
-        let tests = vec![
-            (
-                GistOptions::builder(files.clone()).build(),
-                r#"{"files":{"test":{"content":"foo"}}}"#
-            ),
-            (
-                GistOptions::builder(files.clone()).description("desc").build(),
-                r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#
-            ),
-            (
-                GistOptions::builder(files.clone()).description("desc").public(false).build(),
-                r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#
-            )
-        ];
+        let tests =
+            vec![(GistOptions::builder(files.clone()).build(),
+                  r#"{"files":{"test":{"content":"foo"}}}"#),
+                 (GistOptions::builder(files.clone()).description("desc").build(),
+                  r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#),
+                 (GistOptions::builder(files.clone()).description("desc").public(false).build(),
+                  r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#)];
         test_encoding(tests)
     }
 
     #[test]
     fn pullreq_edits() {
-        let tests = vec![(PullEditOptions::builder().title("test").build(),
-                          r#"{"title":"test"}"#),
+        let tests = vec![(PullEditOptions::builder().title("test").build(), r#"{"title":"test"}"#),
                          (PullEditOptions::builder().title("test").body("desc").build(),
                           r#"{"title":"test","body":"desc"}"#),
                          (PullEditOptions::builder().state("closed").build(),

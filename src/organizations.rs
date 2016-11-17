@@ -30,7 +30,10 @@ impl<'a> UserOrganizations<'a> {
     pub fn new<U>(github: &'a Github<'a>, user: U) -> UserOrganizations<'a>
         where U: Into<String>
     {
-        UserOrganizations { github: github, user: user.into() }
+        UserOrganizations {
+            github: github,
+            user: user.into(),
+        }
     }
 
     fn path(&self, more: &str) -> String {

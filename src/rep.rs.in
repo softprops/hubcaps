@@ -226,6 +226,7 @@ impl DeploymentListOptionsBuilder {
         DeploymentListOptions { params: self.params.clone() }
     }
 }
+
 #[derive(Debug, Deserialize)]
 pub struct GistFile {
     pub size: u64,
@@ -791,6 +792,21 @@ impl PullOptions {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct FileDiff {
+  pub sha: String,
+  pub filename: String,
+  pub status: String,
+  pub additions: usize,
+  pub deletions: usize,
+  pub changes: usize,
+  pub blob_url: String,
+  pub raw_url: String,
+  pub contents_url: String,
+  /// patch is typically None for binary files
+  pub patch: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Pull {
     pub id: u64,
     pub url: String,
@@ -806,7 +822,7 @@ pub struct Pull {
     pub number: u64,
     pub state: String,
     pub title: String,
-    pub body: String,
+    pub body: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,
@@ -815,6 +831,8 @@ pub struct Pull {
     pub base: Commit,
     // links
     pub user: User,
+    pub assignee: Option<User>,
+    pub assignees: Vec<User>,
     pub merge_commit_sha: Option<String>,
     pub mergeable: Option<bool>,
     pub merged_by: Option<User>,

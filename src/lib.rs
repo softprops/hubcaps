@@ -29,13 +29,14 @@ use gists::{Gists, UserGists};
 use hyper::Client;
 use hyper::client::RequestBuilder;
 use hyper::method::Method;
-use hyper::header::{Authorization, ContentLength, UserAgent};
+use hyper::header::{Accept, Authorization, ContentLength, UserAgent};
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use organizations::{Organizations, UserOrganizations};
 use std::fmt;
 use std::io::Read;
 use url::Url;
+
 
 const DEFAULT_HOST: &'static str = "https://api.github.com";
 
@@ -224,7 +225,11 @@ impl<'a> Github<'a> {
     fn request<D>(&self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D>
         where D: Deserialize
     {
-        let builder = self.authenticate(method, uri).header(UserAgent(self.agent.to_owned()));
+        let builder = self.authenticate(method, uri)
+            .header(UserAgent(self.agent.to_owned()))
+            // todo: parameterize media type
+            .header(Accept(vec!["application/vnd.github.v3+json".parse().unwrap()]));
+
         let mut res = try!(match body {
             Some(ref bod) => builder.body(*bod).send(),
             _ => builder.send(),
@@ -234,7 +239,7 @@ impl<'a> Github<'a> {
             _ => String::new(),
         };
         try!(res.read_to_string(&mut body));
-        debug!("rev response {:#?} {:#?} {:#?}",
+        debug!("rec response {:#?} {:#?} {}",
                res.status,
                res.headers,
                body);

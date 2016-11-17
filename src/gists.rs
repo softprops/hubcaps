@@ -44,8 +44,8 @@ impl<'a> Gists<'a> {
 
     pub fn star(&self, id: &str) -> Result<()> {
         match self.github
-                  .put::<String>(&self.path(&format!("/{}/star", id)), &[])
-                  .map(|_| ()) {
+            .put::<String>(&self.path(&format!("/{}/star", id)), &[])
+            .map(|_| ()) {
             Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }

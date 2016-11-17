@@ -1,3 +1,11 @@
+# 0.2.4 (unreleased)
+
+Improved coverage of pull request api
+
+* Pull.body is now represented as an `Option<String>`
+* Pull.assignees is now deserialized
+* added `pull.files()` which returns a `Vec<FileDiff>`
+
 # 0.2.3
 
 * added support for repo creation [#38](https://github.com/softprops/hubcaps/pull/38)
