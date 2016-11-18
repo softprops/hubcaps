@@ -1018,6 +1018,108 @@ impl RepoListOptionsBuilder {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct SearchIssuesResult {
+    pub total_count: usize,
+    pub incomplete_results: bool,
+    pub items: Vec<SearchIssuesItem>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SearchIssuesItem {
+    pub url: String,
+    pub repository_url: String,
+    pub labels_url: String,
+    pub comments_url: String,
+    pub events_url: String,
+    pub html_url: String,
+    pub id: usize,
+    pub number: usize,
+    pub title: String,
+    pub user: User,
+    pub labels: Vec<Label>,
+    pub state: String,
+    pub locked: bool,
+    pub assignee: Option<User>,
+    pub assignees: Vec<User>,
+    pub comments: usize,
+    pub created_at: String,
+    pub updated_at: String,
+    pub closed_at: Option<String>,
+    pub pull_request: Option<PullRequestInfo>,
+    pub body: Option<String>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PullRequestInfo {
+  pub url: String,
+  pub html_url: String,
+  pub diff_url: String,
+  pub patch_url: String,
+}
+
+#[derive(Default)]
+pub struct SearchIssuesOptions {
+    params: HashMap<&'static str, String>
+}
+
+impl SearchIssuesOptions {
+    pub fn new<Q>(q: Q) -> SearchIssuesOptions where Q: Into<String> {
+      let mut params = HashMap::new();
+      params.insert("q", q.into());
+      SearchIssuesOptions {
+        params: params
+          }
+    }
+    pub fn builder<Q>(q: Q) -> SearchIssuesOptionsBuilder where Q: Into<String> {
+        SearchIssuesOptionsBuilder::new(q)
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
+        }
+    }
+}
+
+/// https://developer.github.com/v3/search/#search-issues
+#[derive(Default)]
+pub struct SearchIssuesOptionsBuilder {
+    params: HashMap<&'static str, String>
+}
+
+impl SearchIssuesOptionsBuilder {
+    pub fn new<Q>(q: Q) -> SearchIssuesOptionsBuilder where Q: Into<String> {
+        let mut params = HashMap::new();
+        params.insert("q", q.into());
+        SearchIssuesOptionsBuilder {
+            params: params
+        }
+    }
+
+    pub fn sort(&mut self, sort: SearchSort) -> &mut SearchIssuesOptionsBuilder {
+      self.params.insert("sort", sort.to_string());
+      self
+    }
+
+    pub fn order(&mut self, direction: SortDirection) -> &mut SearchIssuesOptionsBuilder {
+      self.params.insert("order", direction.to_string());
+      self
+    }
+
+    pub fn build(&self) -> SearchIssuesOptions {
+        SearchIssuesOptions {
+            params: self.params.clone()
+        }
+    }
+  }
+
 #[derive(Default)]
 pub struct PullListOptions {
     params: HashMap<&'static str, String>

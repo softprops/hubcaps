@@ -4,6 +4,7 @@
 extern crate serializable_enum;
 #[macro_use]
 extern crate log;
+#[macro_use]
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;
@@ -21,11 +22,13 @@ pub mod releases;
 pub mod repositories;
 pub mod statuses;
 pub mod pulls;
+pub mod search;
 pub mod organizations;
 
 pub use rep::*;
 pub use errors::Error;
 use gists::{Gists, UserGists};
+use search::Search;
 use hyper::Client;
 use hyper::client::RequestBuilder;
 use hyper::method::Method;
@@ -36,7 +39,9 @@ use organizations::{Organizations, UserOrganizations};
 use std::fmt;
 use std::io::Read;
 use url::Url;
+use std::collections::HashMap;
 
+header! { (Link, "Link") => [String] }
 
 const DEFAULT_HOST: &'static str = "https://api.github.com";
 
@@ -196,6 +201,10 @@ impl<'a> Github<'a> {
         Gists::new(self)
     }
 
+    pub fn search(&self) -> Search {
+        Search::new(self)
+    }
+
     /// Return a reference to the collection of repositories owned by and
     /// associated with an organization
     pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
@@ -204,8 +213,7 @@ impl<'a> Github<'a> {
         OrganizationRepositories::new(self, org)
     }
 
-    fn authenticate(&self, method: Method, uri: &str) -> RequestBuilder {
-        let url = format!("{}{}", self.host, uri);
+    fn authenticate(&self, method: Method, url: String) -> RequestBuilder {
         match self.credentials {
             Credentials::Token(ref token) => {
                 self.client.request(method, &url).header(Authorization(format!("token {}", token)))
@@ -214,15 +222,19 @@ impl<'a> Github<'a> {
 
                 let mut parsed = Url::parse(&url).unwrap();
                 parsed.query_pairs_mut()
-                      .append_pair("client_id", id)
-                      .append_pair("client_secret", secret);
+                    .append_pair("client_id", id)
+                    .append_pair("client_secret", secret);
                 self.client.request(method, parsed)
             }
             Credentials::None => self.client.request(method, &url),
         }
     }
 
-    fn request<D>(&self, method: Method, uri: &str, body: Option<&'a [u8]>) -> Result<D>
+    fn request<D>(&self,
+                  method: Method,
+                  uri: String,
+                  body: Option<&'a [u8]>)
+                  -> Result<(Option<Links>, D)>
         where D: Deserialize
     {
         let builder = self.authenticate(method, uri)
@@ -234,15 +246,16 @@ impl<'a> Github<'a> {
             Some(ref bod) => builder.body(*bod).send(),
             _ => builder.send(),
         });
+
         let mut body = match res.headers.clone().get::<ContentLength>() {
             Some(&ContentLength(len)) => String::with_capacity(len as usize),
             _ => String::new(),
         };
         try!(res.read_to_string(&mut body));
-        debug!("rec response {:#?} {:#?} {}",
-               res.status,
-               res.headers,
-               body);
+
+        let links = res.headers.get::<Link>().map(|&Link(ref value)| Links::new(value.to_owned()));
+
+        debug!("rec response {:#?} {:#?} {}", res.status, res.headers, body);
         match res.status {
             StatusCode::Conflict |
             StatusCode::BadRequest |
@@ -255,18 +268,24 @@ impl<'a> Github<'a> {
                     error: try!(serde_json::from_str::<ClientError>(&body)),
                 })
             }
-            _ => Ok(try!(serde_json::from_str::<D>(&body))),
+            _ => Ok((links, try!(serde_json::from_str::<D>(&body)))),
         }
+    }
+
+    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&'a [u8]>) -> Result<D>
+        where D: Deserialize
+    {
+        self.request(method, uri, body).map(|(_, entity)| entity)
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
         where D: Deserialize
     {
-        self.request(Method::Get, uri, None)
+        self.request_entity(Method::Get, format!("{}{}", self.host, uri), None)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        match self.request::<()>(Method::Delete, uri, None) {
+        match self.request_entity::<()>(Method::Delete, format!("{}{}", self.host, uri), None) {
             Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
@@ -275,25 +294,121 @@ impl<'a> Github<'a> {
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request(Method::Post, uri, Some(message))
+        self.request_entity(Method::Post, format!("{}{}", self.host, uri), Some(message))
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request(Method::Patch, uri, Some(message))
+        self.request_entity(Method::Patch,
+                            format!("{}{}", self.host, uri),
+                            Some(message))
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request(Method::Put, uri, Some(message))
+        self.request_entity(Method::Put, format!("{}{}", self.host, uri), Some(message))
+    }
+}
+
+pub struct Iter<'a, D> {
+    github: &'a Github<'a>,
+    next_link: Option<String>,
+    items: Vec<D>,
+}
+
+impl<'a, D> Iter<'a, D>
+    where D: Deserialize
+{
+    pub fn new(github: &'a Github<'a>, uri: String) -> Result<Iter<'a, D>> {
+        let (links, items) = try!(github.request::<Vec<D>>(Method::Get, uri, None));
+        Ok(Iter {
+            github: github,
+            next_link: links.and_then(|l| l.next()),
+            items: items,
+        })
+    }
+
+    fn set_next(&mut self, next: Option<String>) {
+        self.next_link = next;
+    }
+}
+
+impl<'a, D> Iterator for Iter<'a, D>
+    where D: Deserialize
+{
+    type Item = D;
+    fn next(&mut self) -> Option<D> {
+        match self.items.pop() {
+            None => {
+                match self.next_link.clone() {
+                    None => None,
+                    Some(ref next_link) => {
+                        match self.github
+                            .request::<Vec<D>>(Method::Get, next_link.to_owned(), None) {
+                            Ok((links, items)) => {
+                                self.set_next(links.and_then(|l| l.next()));
+                                self.items = items;
+                                None
+                            }
+                            _ => None,
+                        }
+                    }
+                }
+            }
+            item => item,
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub struct Links {
+    values: HashMap<String, String>,
+}
+
+impl Links {
+    pub fn new<V>(value: V) -> Links
+        where V: Into<String>
+    {
+        let values = value.into()
+            .split(",")
+            .map(|link| {
+                let parts = link.split(";").collect::<Vec<_>>();
+                (parts[1].to_owned().replace(" rel=\\\"", "").replace("\\\"", ""),
+                 parts[0].to_owned().replace("<", "").replace(">", "").replace(" ", ""))
+            })
+            .fold(HashMap::new(), |mut acc, (rel, link)| {
+                acc.insert(rel, link);
+                acc
+            });
+        Links { values: values }
+    }
+
+    pub fn next(&self) -> Option<String> {
+        self.values.get("next").map(|s| s.to_owned())
+    }
+
+    pub fn prev(&self) -> Option<String> {
+        self.values.get("prev").map(|s| s.to_owned())
+    }
+
+    pub fn last(&self) -> Option<String> {
+        self.values.get("last").map(|s| s.to_owned())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_links() {
+        let links = Links::new(r#"<linknext>; rel=\"next\", <linklast>; rel=\"last\""#);
+        assert_eq!(links.next(), Some("linknext".to_owned()));
+        assert_eq!(links.last(), Some("linklast".to_owned()));
+    }
 
     #[test]
     fn default_state() {

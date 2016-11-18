@@ -2,6 +2,7 @@
 
 use super::{SortDirection, Error, State as StdState};
 use super::issues::Sort as IssueSort;
+use super::search::Sort as SearchSort;
 use super::repositories::{Sort as RepoSort, Affiliation, Type as RepoType,
                           Visibility as RepoVisibility, OrgRepoType};
 use std::collections::HashMap;
@@ -67,8 +68,7 @@ mod tests {
     fn gist_reqs() {
         let mut files = HashMap::new();
         files.insert("foo", "bar");
-        let tests =
-            vec![(GistOptions::new(None as Option<String>, true, files.clone()),
+        let tests = vec![(GistOptions::new(None as Option<String>, true, files.clone()),
                   r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#),
                  (GistOptions::new(Some("desc"), true, files.clone()),
                   r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#)];
@@ -154,8 +154,7 @@ mod tests {
     fn gist_req() {
         let mut files = HashMap::new();
         files.insert("test", "foo");
-        let tests =
-            vec![(GistOptions::builder(files.clone()).build(),
+        let tests = vec![(GistOptions::builder(files.clone()).build(),
                   r#"{"files":{"test":{"content":"foo"}}}"#),
                  (GistOptions::builder(files.clone()).description("desc").build(),
                   r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#),
