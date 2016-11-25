@@ -1,4 +1,8 @@
-# 0.2.4 (unreleased)
+# 0.2.5 (unreleased)
+
+* added support for search issues api
+
+# 0.2.4
 
 Improved coverage of pull request api
 

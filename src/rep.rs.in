@@ -1019,10 +1019,10 @@ impl RepoListOptionsBuilder {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct SearchIssuesResult {
+pub struct SearchResult<D: ::serde::Deserialize> {
     pub total_count: usize,
     pub incomplete_results: bool,
-    pub items: Vec<SearchIssuesItem>,
+    pub items: Vec<D>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1064,15 +1064,8 @@ pub struct SearchIssuesOptions {
 }
 
 impl SearchIssuesOptions {
-    pub fn new<Q>(q: Q) -> SearchIssuesOptions where Q: Into<String> {
-      let mut params = HashMap::new();
-      params.insert("q", q.into());
-      SearchIssuesOptions {
-        params: params
-          }
-    }
-    pub fn builder<Q>(q: Q) -> SearchIssuesOptionsBuilder where Q: Into<String> {
-        SearchIssuesOptionsBuilder::new(q)
+    pub fn builder() -> SearchIssuesOptionsBuilder {
+        SearchIssuesOptionsBuilder::new()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -1095,15 +1088,13 @@ pub struct SearchIssuesOptionsBuilder {
 }
 
 impl SearchIssuesOptionsBuilder {
-    pub fn new<Q>(q: Q) -> SearchIssuesOptionsBuilder where Q: Into<String> {
-        let mut params = HashMap::new();
-        params.insert("q", q.into());
+    pub fn new() -> SearchIssuesOptionsBuilder {
         SearchIssuesOptionsBuilder {
-            params: params
+            ..Default::default()
         }
     }
 
-    pub fn sort(&mut self, sort: SearchSort) -> &mut SearchIssuesOptionsBuilder {
+    pub fn sort(&mut self, sort: SearchIssuesSort) -> &mut SearchIssuesOptionsBuilder {
       self.params.insert("sort", sort.to_string());
       self
     }

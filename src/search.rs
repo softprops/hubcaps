@@ -1,10 +1,12 @@
 use self::super::{Github, Result};
-use rep::{SearchIssuesOptions, SearchIssuesResult};
+use rep::{SearchIssuesOptions, SearchResult, SearchIssuesItem};
+use serde::Deserialize;
 use std::fmt;
+use url::form_urlencoded;
 
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
-pub enum Sort {
+pub enum SearchIssuesSort {
     /// Sort by time created
     Created,
     /// Sort by last updated
@@ -13,14 +15,14 @@ pub enum Sort {
     Comments,
 }
 
-impl fmt::Display for Sort {
+impl fmt::Display for SearchIssuesSort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
                "{}",
                match *self {
-                   Sort::Comments => "comments",
-                   Sort::Created => "created",
-                   Sort::Updated => "updated",
+                   SearchIssuesSort::Comments => "comments",
+                   SearchIssuesSort::Created => "created",
+                   SearchIssuesSort::Updated => "updated",
                })
     }
 }
@@ -36,25 +38,35 @@ impl<'a> Search<'a> {
     }
 
     pub fn issues(&self) -> SearchIssues {
-        SearchIssues::new(&self.github)
+        SearchIssues::new(&self)
+    }
+
+    fn search<D: Deserialize>(&self, url: &str) -> Result<SearchResult<D>> {
+        self.github.get::<SearchResult<D>>(url)
     }
 }
 
 // https://developer.github.com/v3/search/#search-issues
 pub struct SearchIssues<'a> {
-    github: &'a Github<'a>,
+    search: &'a Search<'a>,
 }
 
 impl<'a> SearchIssues<'a> {
-    pub fn new(github: &'a Github<'a>) -> SearchIssues<'a> {
-        SearchIssues { github: github }
+    pub fn new(search: &'a Search<'a>) -> SearchIssues<'a> {
+        SearchIssues { search: search }
     }
 
-    pub fn list(&self, options: &SearchIssuesOptions) -> Result<SearchIssuesResult> {
+    pub fn list<Q>(&self,
+                   q: Q,
+                   options: &SearchIssuesOptions)
+                   -> Result<SearchResult<SearchIssuesItem>>
+        where Q: Into<String>
+    {
         let mut uri = vec!["/search/issues".to_string()];
-        if let Some(query) = options.serialize() {
-            uri.push(query);
-        }
-        self.github.get::<SearchIssuesResult>(&uri.join("?"))
+        let query_options = options.serialize().unwrap_or(String::new());
+        let query =
+            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
+        uri.push(query);
+        self.search.search::<SearchIssuesItem>(&uri.join("?"))
     }
 }
