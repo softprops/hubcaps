@@ -793,7 +793,8 @@ impl PullOptions {
 
 #[derive(Debug, Deserialize)]
 pub struct FileDiff {
-  pub sha: String,
+  // sha may be null when file mode changed without contents changing
+  pub sha: Option<String>,
   pub filename: String,
   pub status: String,
   pub additions: u64,
