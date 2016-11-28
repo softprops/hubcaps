@@ -41,6 +41,7 @@ impl<'a> Search<'a> {
         Search { github: github }
     }
 
+    /// return a reference to a search interface for issues
     pub fn issues(&self) -> SearchIssues {
         SearchIssues::new(&self)
     }
@@ -64,31 +65,34 @@ impl<'a> SearchIssues<'a> {
         SearchIssues { search: search }
     }
 
+    fn search_uri<Q>(q: Q, options: &SearchIssuesOptions) -> String
+        where Q: Into<String>
+    {
+        let mut uri = vec!["/search/issues".to_string()];
+        let query_options = options.serialize().unwrap_or(String::new());
+        let query =
+            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
+        uri.push(query);
+        uri.join("?")
+    }
+
+    /// returns an Iterator over pages of search results
     pub fn iter<Q>(&'a self,
                    q: Q,
                    options: &SearchIssuesOptions)
                    -> Result<Iter<'a, SearchResult<SearchIssuesItem>, SearchIssuesItem>>
         where Q: Into<String>
     {
-        let mut uri = vec!["/search/issues".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
-        let query =
-            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
-        uri.push(query);
-        self.search.iter::<SearchIssuesItem>(&uri.join("?"))
+        self.search.iter::<SearchIssuesItem>(&Self::search_uri(q, options))
     }
 
+    /// returns a single page of search results
     pub fn list<Q>(&self,
                    q: Q,
                    options: &SearchIssuesOptions)
                    -> Result<SearchResult<SearchIssuesItem>>
         where Q: Into<String>
     {
-        let mut uri = vec!["/search/issues".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
-        let query =
-            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
-        uri.push(query);
-        self.search.search::<SearchIssuesItem>(&uri.join("?"))
+        self.search.search::<SearchIssuesItem>(&Self::search_uri(q, options))
     }
 }
