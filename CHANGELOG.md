@@ -1,6 +1,7 @@
 # 0.2.5 (unreleased)
 
 * added support for search issues api
+* add partial support for new Iter type which serves as an transparent iterator over pages of results
 
 # 0.2.4
 
