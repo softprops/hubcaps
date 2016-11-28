@@ -307,9 +307,7 @@ impl<'a> Github<'a> {
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Patch,
-                            self.host.clone() + uri,
-                            Some(message))
+        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message))
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
