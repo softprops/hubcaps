@@ -11,7 +11,7 @@ Find them [here](http://softprops.github.io/hubcaps)
 ## usage
 
 Basic usage requires a user-defined useragent string, a `hyper::Client` instance and a flavor of `hubcaps::Credentials` for authorization.
-For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For anonymous requests you can use `hubcaps::Credentials::None`
+For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For requests that permit anonymous access, you can subsitute `hubcaps::Credentials::Token` with `hubcaps::Credentials::None`
 
 ```rust
 extern crate hyper;
