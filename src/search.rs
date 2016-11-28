@@ -1,4 +1,4 @@
-use self::super::{Github, Result};
+use self::super::{Github, Result, Iter};
 use rep::{SearchIssuesOptions, SearchResult, SearchIssuesItem};
 use serde::Deserialize;
 use std::fmt;
@@ -32,6 +32,10 @@ pub struct Search<'a> {
     github: &'a Github<'a>,
 }
 
+fn items<D: Deserialize>(result: SearchResult<D>) -> Vec<D> {
+    result.items
+}
+
 impl<'a> Search<'a> {
     pub fn new(github: &'a Github<'a>) -> Search<'a> {
         Search { github: github }
@@ -39,6 +43,10 @@ impl<'a> Search<'a> {
 
     pub fn issues(&self) -> SearchIssues {
         SearchIssues::new(&self)
+    }
+
+    fn iter<D: Deserialize>(&'a self, url: &str) -> Result<Iter<'a, SearchResult<D>, D>> {
+        self.github.iter(url.to_owned(), items)
     }
 
     fn search<D: Deserialize>(&self, url: &str) -> Result<SearchResult<D>> {
@@ -54,6 +62,20 @@ pub struct SearchIssues<'a> {
 impl<'a> SearchIssues<'a> {
     pub fn new(search: &'a Search<'a>) -> SearchIssues<'a> {
         SearchIssues { search: search }
+    }
+
+    pub fn iter<Q>(&'a self,
+                   q: Q,
+                   options: &SearchIssuesOptions)
+                   -> Result<Iter<'a, SearchResult<SearchIssuesItem>, SearchIssuesItem>>
+        where Q: Into<String>
+    {
+        let mut uri = vec!["/search/issues".to_string()];
+        let query_options = options.serialize().unwrap_or(String::new());
+        let query =
+            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
+        uri.push(query);
+        self.search.iter::<SearchIssuesItem>(&uri.join("?"))
     }
 
     pub fn list<Q>(&self,
