@@ -32,7 +32,7 @@ fn main() {
 
 Github instances define functions for accessing api services that map closely to their url structure.
 
-As a convention, api methods that expect arguments are represented as functions that accept a struct representing those arguments with an optional builder interface for convenience.
+As a convention, api methods that expect arguments are represented as functions that accept a struct representing those arguments with an optional builder interface for convenience of construction.
 
 ### repositories
 
@@ -109,6 +109,14 @@ Gists is a service for micro repositories
 
 ```rust
 let gists = github.gists();
+```
+
+### search
+
+Search provides a raw string query search for indexed data. Currently only search for issues is supported
+
+```rust
+let search_issues = github.search().issues();
 ```
 
 Doug Tangren (softprops) 2015-2016
