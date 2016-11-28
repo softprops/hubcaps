@@ -10,6 +10,7 @@ use std::hash::Hash;
 use std::option::Option;
 use url::form_urlencoded;
 
+use super::url;
 extern crate serializable_enum;
 extern crate serde;
 extern crate serde_json;

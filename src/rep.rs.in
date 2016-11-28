@@ -796,9 +796,9 @@ pub struct FileDiff {
   pub sha: String,
   pub filename: String,
   pub status: String,
-  pub additions: usize,
-  pub deletions: usize,
-  pub changes: usize,
+  pub additions: u64,
+  pub deletions: u64,
+  pub changes: u64,
   pub blob_url: String,
   pub raw_url: String,
   pub contents_url: String,
@@ -1020,7 +1020,7 @@ impl RepoListOptionsBuilder {
 
 #[derive(Debug, Deserialize)]
 pub struct SearchResult<D: ::serde::Deserialize> {
-    pub total_count: usize,
+    pub total_count: u64,
     pub incomplete_results: bool,
     pub items: Vec<D>,
 }
@@ -1033,8 +1033,8 @@ pub struct SearchIssuesItem {
     pub comments_url: String,
     pub events_url: String,
     pub html_url: String,
-    pub id: usize,
-    pub number: usize,
+    pub id: u64,
+    pub number: u64,
     pub title: String,
     pub user: User,
     pub labels: Vec<Label>,
@@ -1042,12 +1042,22 @@ pub struct SearchIssuesItem {
     pub locked: bool,
     pub assignee: Option<User>,
     pub assignees: Vec<User>,
-    pub comments: usize,
+    pub comments: u64,
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,
     pub pull_request: Option<PullRequestInfo>,
     pub body: Option<String>
+}
+
+impl SearchIssuesItem {
+    /// returns a tuple of (repo owner name, repo name) associated with this issue
+    pub fn repo_tuple(&self) -> (String, String) {
+        let parsed = url::Url::parse(&self.repository_url).unwrap();
+        let mut path = parsed.path().split("/").collect::<Vec<_>>();
+        path.reverse();
+        (path[0].to_owned(), path[1].to_owned())
+    }
 }
 
 #[derive(Debug, Deserialize)]
