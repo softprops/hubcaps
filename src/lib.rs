@@ -230,6 +230,13 @@ impl<'a> Github<'a> {
         }
     }
 
+
+    fn iter<D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
+        where D: Deserialize
+    {
+        Iter::new(self, self.host.clone() + &uri, into_items)
+    }
+
     fn request<D>(&self,
                   method: Method,
                   uri: String,
@@ -281,11 +288,11 @@ impl<'a> Github<'a> {
     fn get<D>(&self, uri: &str) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Get, format!("{}{}", self.host, uri), None)
+        self.request_entity(Method::Get, self.host.clone() + uri, None)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(Method::Delete, format!("{}{}", self.host, uri), None) {
+        match self.request_entity::<()>(Method::Delete, self.host.clone() + uri, None) {
             Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
@@ -294,39 +301,44 @@ impl<'a> Github<'a> {
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Post, format!("{}{}", self.host, uri), Some(message))
+        self.request_entity(Method::Post, self.host.clone() + uri, Some(message))
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
         self.request_entity(Method::Patch,
-                            format!("{}{}", self.host, uri),
+                            self.host.clone() + uri,
                             Some(message))
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Put, format!("{}{}", self.host, uri), Some(message))
+        self.request_entity(Method::Put, self.host.clone() + uri, Some(message))
     }
 }
 
-pub struct Iter<'a, D> {
+pub struct Iter<'a, D, I> {
     github: &'a Github<'a>,
     next_link: Option<String>,
-    items: Vec<D>,
+    into_items: fn(D) -> Vec<I>,
+    items: Vec<I>,
 }
 
-impl<'a, D> Iter<'a, D>
+impl<'a, D, I> Iter<'a, D, I>
     where D: Deserialize
 {
-    pub fn new(github: &'a Github<'a>, uri: String) -> Result<Iter<'a, D>> {
-        let (links, items) = try!(github.request::<Vec<D>>(Method::Get, uri, None));
+    pub fn new(github: &'a Github<'a>,
+               uri: String,
+               into_items: fn(D) -> Vec<I>)
+               -> Result<Iter<'a, D, I>> {
+        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None));
         Ok(Iter {
             github: github,
             next_link: links.and_then(|l| l.next()),
-            items: items,
+            into_items: into_items,
+            items: into_items(payload),
         })
     }
 
@@ -335,22 +347,22 @@ impl<'a, D> Iter<'a, D>
     }
 }
 
-impl<'a, D> Iterator for Iter<'a, D>
+impl<'a, D, I> Iterator for Iter<'a, D, I>
     where D: Deserialize
 {
-    type Item = D;
-    fn next(&mut self) -> Option<D> {
+    type Item = I;
+    fn next(&mut self) -> Option<I> {
         match self.items.pop() {
             None => {
                 match self.next_link.clone() {
                     None => None,
                     Some(ref next_link) => {
                         match self.github
-                            .request::<Vec<D>>(Method::Get, next_link.to_owned(), None) {
-                            Ok((links, items)) => {
+                            .request::<D>(Method::Get, next_link.to_owned(), None) {
+                            Ok((links, payload)) => {
                                 self.set_next(links.and_then(|l| l.next()));
-                                self.items = items;
-                                None
+                                self.items = (self.into_items)(payload);
+                                self.next()
                             }
                             _ => None,
                         }
@@ -361,7 +373,6 @@ impl<'a, D> Iterator for Iter<'a, D>
         }
     }
 }
-
 
 #[derive(Debug)]
 pub struct Links {
@@ -376,7 +387,7 @@ impl Links {
             .split(",")
             .map(|link| {
                 let parts = link.split(";").collect::<Vec<_>>();
-                (parts[1].to_owned().replace(" rel=\\\"", "").replace("\\\"", ""),
+                (parts[1].to_owned().replace(" rel=\"", "").replace("\"", ""),
                  parts[0].to_owned().replace("<", "").replace(">", "").replace(" ", ""))
             })
             .fold(HashMap::new(), |mut acc, (rel, link)| {
@@ -405,7 +416,7 @@ mod tests {
 
     #[test]
     fn test_parse_links() {
-        let links = Links::new(r#"<linknext>; rel=\"next\", <linklast>; rel=\"last\""#);
+        let links = Links::new(r#"<linknext>; rel="next", <linklast>; rel="last""#);
         assert_eq!(links.next(), Some("linknext".to_owned()));
         assert_eq!(links.last(), Some("linklast".to_owned()));
     }
