@@ -8,6 +8,8 @@ matrix:
   - rust: nightly
   - rust: beta
   - rust: stable
+  allow_failures:
+  - rust: nightly
 
 script:
 - RUSTFLAGS="$RUSTFLAGS -C link-dead-code" cargo test
