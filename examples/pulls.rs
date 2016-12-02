@@ -19,6 +19,14 @@ fn main() {
             for pull in pulls.list(&Default::default()).unwrap() {
                 println!("{:#?}", pull);
             }
+            println!("comments");
+            for c in github.repo("softprops", "hubcaps")
+                .pulls()
+                .get(28)
+                .comments()
+                .list(&Default::default()).unwrap() {
+                    println!("{:#?}", c);
+                }
         },
         _ => println!("example missing GITHUB_TOKEN")
     }

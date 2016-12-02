@@ -1,7 +1,9 @@
 //! Pull requests interface
 extern crate serde_json;
 
-use self::super::{Github, Result};
+use super::{Github, Result};
+use comments::Comments;
+use review_comments::ReviewComments;
 use rep::{FileDiff, Pull, PullEditOptions, PullOptions, PullListOptions};
 use std::default::Default;
 use std::fmt;
@@ -90,6 +92,22 @@ impl<'a> PullRequest<'a> {
 
     pub fn files(&self) -> Result<Vec<FileDiff>> {
         self.github.get::<Vec<FileDiff>>(&self.path("/files"))
+    }
+
+    /// returns issue comments interface
+    pub fn comments(&self) -> Comments {
+        Comments::new(self.github,
+                      self.owner.clone(),
+                      self.repo.clone(),
+                      self.number)
+    }
+
+    /// returns review comments interface
+    pub fn review_comments(&self) -> ReviewComments {
+        ReviewComments::new(self.github,
+                            self.owner.clone(),
+                            self.repo.clone(),
+                            self.number)
     }
 }
 

@@ -2,7 +2,8 @@
 
 extern crate serde_json;
 
-use self::super::{Github, Result};
+use super::{Github, Result};
+use comments::Comments;
 use rep::{Issue, IssueOptions, IssueListOptions, Label};
 use std::fmt;
 use std::default::Default;
@@ -156,6 +157,13 @@ impl<'a> IssueRef<'a> {
     pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
         let data = try!(serde_json::to_string(&is));
         self.github.patch::<Issue>(&self.path(""), data.as_bytes())
+    }
+
+    pub fn comments(&self) -> Comments {
+        Comments::new(self.github,
+                      self.owner.clone(),
+                      self.repo.clone(),
+                      self.number)
     }
 }
 

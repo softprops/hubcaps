@@ -1,4 +1,9 @@
-# 0.2.5 (unreleased)
+# 0.2.6
+
+* added support for listing issue/pull comments
+* added support for listing review comments 
+
+# 0.2.5
 
 * added support for search issues api
 * add partial support for new Iter type which serves as an transparent iterator over pages of results

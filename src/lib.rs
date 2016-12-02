@@ -11,6 +11,8 @@ extern crate serde_json;
 extern crate url;
 
 use serde::de::Deserialize;
+pub mod comments;
+pub mod review_comments;
 pub mod keys;
 pub mod gists;
 pub mod deployments;
