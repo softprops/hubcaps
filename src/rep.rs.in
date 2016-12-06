@@ -1667,10 +1667,10 @@ pub struct PullCommit {
   pub sha: String,
   pub html_url: String,
   pub comments_url: String,
-  commit: CommitDetails,
-  author: User,
-  committer: User,
-  parents: Vec<CommitRef>
+  pub commit: CommitDetails,
+  pub author: User,
+  pub committer: User,
+  pub parents: Vec<CommitRef>
 }
 
 #[derive(Debug, Deserialize)]

@@ -1,3 +1,7 @@
+# 0.2.8
+
+* expose more pub fields on pull commits
+
 # 0.2.7
 
 * added support for listing pull commits
