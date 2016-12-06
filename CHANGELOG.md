@@ -1,7 +1,12 @@
+# 0.2.7
+
+* added support for listing pull commits
+* added support for returning an iterator over all pull commits
+
 # 0.2.6
 
 * added support for listing issue/pull comments
-* added support for listing review comments 
+* added support for listing review comments
 
 # 0.2.5
 

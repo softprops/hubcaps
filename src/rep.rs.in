@@ -1662,6 +1662,41 @@ pub struct ReviewComment {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct PullCommit {
+  pub url: String,
+  pub sha: String,
+  pub html_url: String,
+  pub comments_url: String,
+  commit: CommitDetails,
+  author: User,
+  committer: User,
+  parents: Vec<CommitRef>
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CommitDetails {
+  pub url: String,
+  pub author: UserStamp,
+  pub committer: Option<UserStamp>,
+  pub message: String,
+  pub tree: CommitRef,
+  pub comment_count: u64
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UserStamp {
+  pub name: String,
+  pub email: String,
+  pub date: String
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CommitRef {
+  pub url: String,
+  pub sha: String
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Comment {
   pub id: u64,
   pub url: String,
