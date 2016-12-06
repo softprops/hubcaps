@@ -13,6 +13,7 @@ extern crate url;
 use serde::de::Deserialize;
 pub mod comments;
 pub mod review_comments;
+pub mod pull_commits;
 pub mod keys;
 pub mod gists;
 pub mod deployments;
@@ -352,25 +353,22 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
 {
     type Item = I;
     fn next(&mut self) -> Option<I> {
-        match self.items.pop() {
-            None => {
-                match self.next_link.clone() {
-                    None => None,
-                    Some(ref next_link) => {
-                        match self.github
-                            .request::<D>(Method::Get, next_link.to_owned(), None) {
-                            Ok((links, payload)) => {
-                                self.set_next(links.and_then(|l| l.next()));
-                                self.items = (self.into_items)(payload);
-                                self.next()
-                            }
-                            _ => None,
+        self.items.pop().or_else(|| {
+            match self.next_link.clone() {
+                None => None,
+                Some(ref next_link) => {
+                    match self.github
+                        .request::<D>(Method::Get, next_link.to_owned(), None) {
+                        Ok((links, payload)) => {
+                            self.set_next(links.and_then(|l| l.next()));
+                            self.items = (self.into_items)(payload);
+                            self.next()
                         }
+                        _ => None,
                     }
                 }
             }
-            item => item,
-        }
+        })
     }
 }
 

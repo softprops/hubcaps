@@ -3,6 +3,7 @@ extern crate serde_json;
 
 use super::{Github, Result};
 use comments::Comments;
+use pull_commits::PullCommits;
 use review_comments::ReviewComments;
 use rep::{FileDiff, Pull, PullEditOptions, PullOptions, PullListOptions};
 use std::default::Default;
@@ -108,6 +109,14 @@ impl<'a> PullRequest<'a> {
                             self.owner.clone(),
                             self.repo.clone(),
                             self.number)
+    }
+
+    /// returns pull commits interface
+    pub fn commits(&self) -> PullCommits {
+        PullCommits::new(self.github,
+                         self.owner.clone(),
+                         self.repo.clone(),
+                         self.number)
     }
 }
 

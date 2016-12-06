@@ -1,6 +1,6 @@
 [package]
 name = "hubcaps"
-version = "0.2.6"
+version = "0.2.7"
 authors = ["softprops <d.tangren@gmail.com>"]
 description = "Rust interface for Github"
 documentation = "https://softprops.github.io/hubcaps"
