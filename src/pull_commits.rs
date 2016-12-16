@@ -2,7 +2,9 @@
 use super::{Github, Result, Iter};
 use rep::PullCommit;
 
-fn identity<T>(x: T) -> T { x }
+fn identity<T>(x: T) -> T {
+    x
+}
 
 /// A structure for interfacing with a pull commits
 pub struct PullCommits<'a> {

@@ -1753,3 +1753,37 @@ impl CommentListOptionsBuilder {
         }
     }
   }
+
+  #[derive(Debug, Deserialize)]
+  pub struct Hook {
+    pub id: u64,
+    pub url: String,
+    pub test_url: String,
+    pub ping_url: String,
+    pub name: String,
+    pub events: Vec<String>,
+    pub config: ::serde_json::Value,
+    pub created_at: String,
+    pub updated_at: String
+  }
+
+impl Hook {
+  pub fn config_value(&self, name: &str) -> Option<&::serde_json::Value> {
+    self.config.find(name)
+  }
+
+  pub fn config_string(&self, name: &str) -> Option<String> {
+    self.config_value(name).and_then(|value| match *value  {
+      ::serde_json::Value::String(ref val) =>  Some(val.clone()),
+      _ => None
+    })
+  }
+
+  pub fn url(&self) -> Option<String> {
+    self.config_string("url")
+  }
+
+  pub fn content_type(&self) -> Option<String> {
+    self.config_string("content_type")
+  }
+}

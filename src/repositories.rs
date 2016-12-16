@@ -2,6 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
+use hooks::Hooks;
 use deployments::Deployments;
 use keys::Keys;
 use issues::{IssueRef, Issues};
@@ -231,6 +232,10 @@ impl<'a> Repository<'a> {
             owner: owner.into(),
             repo: repo.into(),
         }
+    }
+
+    pub fn hooks(&self) -> Hooks {
+        Hooks::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)

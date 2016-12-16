@@ -1,3 +1,7 @@
+# 0.2.9 (unreleased)
+
+* added support for listing repo hooks
+
 # 0.2.8
 
 * expose more pub fields on pull commits

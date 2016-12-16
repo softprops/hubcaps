@@ -18,6 +18,7 @@ pub mod keys;
 pub mod gists;
 pub mod deployments;
 pub mod errors;
+pub mod hooks;
 pub mod issues;
 pub mod labels;
 pub mod rep;
