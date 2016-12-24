@@ -1754,6 +1754,94 @@ impl CommentListOptionsBuilder {
     }
   }
 
+/// options for creating a repository hook
+/// see [this](https://developer.github.com/v3/repos/hooks/#create-a-hook)
+/// for githubs official documentation
+#[derive(Debug, Serialize)]
+pub struct HookCreateOptions {
+  name: String,
+  config: BTreeMap<String, ::serde_json::Value>,
+  events: Vec<String>,
+  active: bool
+}
+
+impl HookCreateOptions {
+  /// creates a new builder instance with a hook name
+  /// are should be taken with respect to the hook name as you can only
+  /// use "web" or the a valid service name listed [here](https://api.github.com/hooks)
+  pub fn builder<N>(name: N) -> HookCreateOptionsBuilder where N: Into<String> {
+    HookCreateOptionsBuilder::new(name)
+  }
+
+  /// use this for creating a builder for webhook options
+  pub fn web() -> HookCreateOptionsBuilder {
+    Self::builder("web")
+  }
+}
+
+#[derive(Default)]
+pub struct HookCreateOptionsBuilder {
+  name: String,
+  config: BTreeMap<String, ::serde_json::Value>,
+  events: Vec<String>,
+  active: bool
+}
+
+impl HookCreateOptionsBuilder {
+  pub fn new<N>(name: N) -> HookCreateOptionsBuilder
+      where N: Into<String>
+  {
+      HookCreateOptionsBuilder { name: name.into(), active: true, ..Default::default() }
+  }
+
+
+  pub fn active(&mut self, active: bool) -> &mut Self {
+      self.active = active;
+      self
+  }
+
+  pub fn events<E>(&mut self, events: Vec<E>) -> &mut Self where E: Into<String> {
+    self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+    self
+  }
+
+  /// web hook should have an associated url
+  pub fn url<U>(&mut self, url: U) -> &mut Self where U: Into<String> {
+    self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
+  }
+
+  // fixme: use enum for form/json
+  /// web hooks can optionally specify a content_type of "form" or "json"
+  /// which indicates the type of payload they will expect to receive
+  pub fn content_type<T>(&mut self, content_type: T) -> &mut Self where T: Into<String> {
+    self.config_entry("content_type".to_owned(), ::serde_json::Value::String(content_type.into()));
+    self
+  }
+
+  /// web hooks can optionally provide a secret used to sign deliveries
+  /// to identify that their source was indeed github
+  pub fn secret<S>(&mut self, sec: S) -> &mut Self where S: Into<String> {
+    self.config_entry("secret".to_owned(), ::serde_json::Value::String(sec.into()));
+    self
+  }
+
+  pub fn config_entry<N>(&mut self, name: N, value: ::serde_json::Value) -> &mut Self where N: Into<String> {
+    self.config.insert(name.into(), value);
+    self
+  }
+
+
+  pub fn build(&self) -> HookCreateOptions {
+    HookCreateOptions {
+      name: self.name.clone(),
+      config: self.config.clone(),
+      events: self.events.clone(),
+      active: self.active
+    }
+  }
+}
+
+
   #[derive(Debug, Deserialize)]
   pub struct Hook {
     pub id: u64,
@@ -1764,7 +1852,8 @@ impl CommentListOptionsBuilder {
     pub events: Vec<String>,
     pub config: ::serde_json::Value,
     pub created_at: String,
-    pub updated_at: String
+    pub updated_at: String,
+    pub active: bool
   }
 
 impl Hook {
