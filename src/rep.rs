@@ -5,7 +5,7 @@ use super::issues::Sort as IssueSort;
 use super::search::SearchIssuesSort;
 use super::repositories::{Sort as RepoSort, Affiliation, Type as RepoType,
                           Visibility as RepoVisibility, OrgRepoType};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::hash::Hash;
 use std::option::Option;
 use url::form_urlencoded;
