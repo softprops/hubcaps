@@ -2,9 +2,9 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::Hook;
+use rep::{Hook, HookCreateOptions};
 
-/// Interface for repository hooks
+/// Interface for mangaing repository hooks
 pub struct Hooks<'a> {
     github: &'a Github<'a>,
     owner: String,
@@ -24,7 +24,20 @@ impl<'a> Hooks<'a> {
         }
     }
 
+    /// lists hook associated with a repoistory
     pub fn list(&self) -> Result<Vec<Hook>> {
         self.github.get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
+    }
+
+    /// creates a new repository hook
+    pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
+        let data = try!(serde_json::to_string(&options));
+        self.github.post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
+                                 data.as_bytes())
+    }
+
+    /// deletes a repoistory hook by id
+    pub fn delete(&self, id: u64) -> Result<()> {
+        self.github.delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
     }
 }
