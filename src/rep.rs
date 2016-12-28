@@ -15,6 +15,10 @@ extern crate serializable_enum;
 extern crate serde;
 extern crate serde_json;
 
+#[cfg(feature = "serde_derive")]
+include!("rep.rs.in");
+
+#[cfg(feature = "serde_codegen")]
 include!(concat!(env!("OUT_DIR"), "/rep.rs"));
 
 serializable_enum! {

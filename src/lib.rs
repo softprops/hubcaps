@@ -1,5 +1,10 @@
 //! Hubcaps provides a set of building blocks for interacting with the Github API
 
+#![cfg_attr(feature = "serde_derive", feature(proc_macro))]
+
+#[cfg(feature = "serde_derive")]
+#[macro_use]
+extern crate serde_derive;
 #[macro_use]
 extern crate serializable_enum;
 #[macro_use]
