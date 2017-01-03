@@ -1800,12 +1800,15 @@ impl HookCreateOptionsBuilder {
       self
   }
 
+  /// a list of github events this hook should receive deliveries for
+  /// the default is "push". for a full list, see
+  /// the [Github api docs](https://developer.github.com/webhooks/#events)
   pub fn events<E>(&mut self, events: Vec<E>) -> &mut Self where E: Into<String> {
     self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
     self
   }
 
-  /// web hook should have an associated url
+  /// web hooks must have an associated url
   pub fn url<U>(&mut self, url: U) -> &mut Self where U: Into<String> {
     self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
   }
@@ -1814,14 +1817,19 @@ impl HookCreateOptionsBuilder {
   /// web hooks can optionally specify a content_type of "form" or "json"
   /// which indicates the type of payload they will expect to receive
   pub fn content_type<T>(&mut self, content_type: T) -> &mut Self where T: Into<String> {
-    self.config_entry("content_type".to_owned(), ::serde_json::Value::String(content_type.into()));
+    self.config_str_entry("content_type", content_type);
     self
   }
 
   /// web hooks can optionally provide a secret used to sign deliveries
   /// to identify that their source was indeed github
   pub fn secret<S>(&mut self, sec: S) -> &mut Self where S: Into<String> {
-    self.config_entry("secret".to_owned(), ::serde_json::Value::String(sec.into()));
+    self.config_str_entry("secret", sec);
+    self
+  }
+
+  pub fn config_str_entry<K, V>(&mut self, k: K, v: V) -> &mut Self where K: Into<String>, V: Into<String> {
+    self.config_entry(k.into(), ::serde_json::Value::String(v.into()));
     self
   }
 
@@ -1829,7 +1837,6 @@ impl HookCreateOptionsBuilder {
     self.config.insert(name.into(), value);
     self
   }
-
 
   pub fn build(&self) -> HookCreateOptions {
     HookCreateOptions {

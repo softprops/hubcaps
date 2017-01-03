@@ -30,6 +30,10 @@ impl<'a> Hooks<'a> {
     }
 
     /// creates a new repository hook
+    /// Repository service hooks (like email or Campfire) can have at most one configured at a time.
+    /// Creating hooks for a service that already has one configured will update the existing hook. 
+    /// see [github docs](https://developer.github.com/v3/repos/hooks/)
+    /// for more information
     pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
         let data = try!(serde_json::to_string(&options));
         self.github.post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
