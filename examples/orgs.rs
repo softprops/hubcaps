@@ -15,7 +15,8 @@ fn main() {
                                      Client::new(),
                                      Credentials::Token(token));
 
-            let options = OrganizationRepoListOptions::builder().repo_type(OrgRepoType::Forks).build();
+            let options =
+                OrganizationRepoListOptions::builder().repo_type(OrgRepoType::Forks).build();
 
             println!("Forks in the rust-lang organization:");
 

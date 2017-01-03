@@ -13,12 +13,13 @@ fn main() {
                                      Credentials::Token(token));
             let repo = github.repo("softprops", "hubcaps");
             let deployments = repo.deployments();
-            //let deploy = deployments.create(&DeploymentOptions::builder("master").payload("this is the payload".to_owned()).build());
-            //println!("{:?}", deploy);
+            // let deploy = deployments.create(&DeploymentOptions::builder("master")
+            // .payload("this is the payload".to_owned()).build());
+            // println!("{:?}", deploy);
             for d in deployments.list(&Default::default()).unwrap() {
                 println!("{:#?}", d)
             }
-        },
-        _ => println!("example missing GITHUB_TOKEN")
+        }
+        _ => println!("example missing GITHUB_TOKEN"),
     }
 }

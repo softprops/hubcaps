@@ -24,19 +24,21 @@ fn main() {
                 .pulls()
                 .get(28)
                 .comments()
-                .list(&Default::default()).unwrap() {
-                    println!("{:#?}", c);
-                }
+                .list(&Default::default())
+                .unwrap() {
+                println!("{:#?}", c);
+            }
 
             println!("commits");
             for c in github.repo("softprops", "hubcaps")
                 .pulls()
                 .get(28)
                 .commits()
-                .iter().unwrap() {
-                    println!("{:#?}", c);
-                }
-        },
-        _ => println!("example missing GITHUB_TOKEN")
+                .iter()
+                .unwrap() {
+                println!("{:#?}", c);
+            }
+        }
+        _ => println!("example missing GITHUB_TOKEN"),
     }
 }

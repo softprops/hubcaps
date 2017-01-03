@@ -18,7 +18,7 @@ fn main() {
             for issue in issues.list(&Default::default()).unwrap() {
                 println!("{:#?}", issue)
             }
-        },
-        _ => println!("example missing GITHUB_TOKEN")
+        }
+        _ => println!("example missing GITHUB_TOKEN"),
     }
 }
