@@ -1,6 +1,7 @@
 //! Rust representations of Github API data structures
 
 use super::{SortDirection, Error, State as StdState};
+use super::hooks::WebHookContentType;
 use super::issues::Sort as IssueSort;
 use super::search::SearchIssuesSort;
 use super::repositories::{Sort as RepoSort, Affiliation, Type as RepoType,

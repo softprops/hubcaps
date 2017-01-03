@@ -1813,11 +1813,10 @@ impl HookCreateOptionsBuilder {
     self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
   }
 
-  // fixme: use enum for form/json
   /// web hooks can optionally specify a content_type of "form" or "json"
   /// which indicates the type of payload they will expect to receive
-  pub fn content_type<T>(&mut self, content_type: T) -> &mut Self where T: Into<String> {
-    self.config_str_entry("content_type", content_type);
+  pub fn content_type(&mut self, content_type: WebHookContentType) -> &mut Self {
+    self.config_str_entry("content_type", content_type.to_string());
     self
   }
 
