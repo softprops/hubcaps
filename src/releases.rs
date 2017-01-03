@@ -5,14 +5,14 @@ use self::super::{Github, Result};
 use rep::{Asset, Release, ReleaseOptions};
 
 pub struct Assets<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     releaseid: u64,
 }
 
 impl<'a> Assets<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, releaseid: u64) -> Assets<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, releaseid: u64) -> Assets<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -52,14 +52,14 @@ impl<'a> Assets<'a> {
 }
 
 pub struct ReleaseRef<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     id: u64,
 }
 
 impl<'a> ReleaseRef<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: u64) -> ReleaseRef<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> ReleaseRef<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -93,13 +93,13 @@ impl<'a> ReleaseRef<'a> {
 
 
 pub struct Releases<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Releases<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Releases<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Releases<'a>
         where O: Into<String>,
               R: Into<String>
     {

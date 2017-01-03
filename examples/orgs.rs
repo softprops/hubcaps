@@ -11,9 +11,8 @@ fn main() {
     env_logger::init().unwrap();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let client = Client::new();
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                                     &client,
+                                     Client::new(),
                                      Credentials::Token(token));
 
             let options = OrganizationRepoListOptions::builder().repo_type(OrgRepoType::Forks).build();

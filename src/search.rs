@@ -29,7 +29,7 @@ impl fmt::Display for SearchIssuesSort {
 
 // https://developer.github.com/v3/search/#search-issues
 pub struct Search<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
 }
 
 fn items<D: Deserialize>(result: SearchResult<D>) -> Vec<D> {
@@ -37,7 +37,7 @@ fn items<D: Deserialize>(result: SearchResult<D>) -> Vec<D> {
 }
 
 impl<'a> Search<'a> {
-    pub fn new(github: &'a Github<'a>) -> Search<'a> {
+    pub fn new(github: &'a Github) -> Search<'a> {
         Search { github: github }
     }
 

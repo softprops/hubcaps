@@ -127,16 +127,16 @@ impl Default for Credentials {
 }
 
 /// Entry point interface for interacting with Github API
-pub struct Github<'a> {
+pub struct Github {
     host: String,
     agent: String,
-    client: &'a Client,
+    client: Client,
     credentials: Credentials,
 }
 
-impl<'a> Github<'a> {
+impl Github {
     /// Create a new Github instance
-    pub fn new<A>(agent: A, client: &'a Client, credentials: Credentials) -> Github<'a>
+    pub fn new<A>(agent: A, client: Client, credentials: Credentials) -> Github
         where A: Into<String>
     {
         Github::host(DEFAULT_HOST, agent, client, credentials)
@@ -144,7 +144,7 @@ impl<'a> Github<'a> {
 
     /// Create a new Github instance hosted at a custom location.
     /// Useful for github enterprise installations ( yourdomain.com/api/v3/ )
-    pub fn host<H, A>(host: H, agent: A, client: &'a Client, credentials: Credentials) -> Github<'a>
+    pub fn host<H, A>(host: H, agent: A, client: Client, credentials: Credentials) -> Github
         where H: Into<String>,
               A: Into<String>
     {
@@ -235,7 +235,7 @@ impl<'a> Github<'a> {
     }
 
 
-    fn iter<D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
+    fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
         where D: Deserialize
     {
         Iter::new(self, self.host.clone() + &uri, into_items)
@@ -244,7 +244,7 @@ impl<'a> Github<'a> {
     fn request<D>(&self,
                   method: Method,
                   uri: String,
-                  body: Option<&'a [u8]>)
+                  body: Option<&[u8]>)
                   -> Result<(Option<Links>, D)>
         where D: Deserialize
     {
@@ -283,7 +283,7 @@ impl<'a> Github<'a> {
         }
     }
 
-    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&'a [u8]>) -> Result<D>
+    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&[u8]>) -> Result<D>
         where D: Deserialize
     {
         self.request(method, uri, body).map(|(_, entity)| entity)
@@ -322,7 +322,7 @@ impl<'a> Github<'a> {
 }
 
 pub struct Iter<'a, D, I> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     next_link: Option<String>,
     into_items: fn(D) -> Vec<I>,
     items: Vec<I>,
@@ -331,7 +331,7 @@ pub struct Iter<'a, D, I> {
 impl<'a, D, I> Iter<'a, D, I>
     where D: Deserialize
 {
-    pub fn new(github: &'a Github<'a>,
+    pub fn new(github: &'a Github,
                uri: String,
                into_items: fn(D) -> Vec<I>)
                -> Result<Iter<'a, D, I>> {

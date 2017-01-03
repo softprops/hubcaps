@@ -6,14 +6,14 @@ use rep::{Hook, HookCreateOptions};
 
 /// Interface for mangaing repository hooks
 pub struct Hooks<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Hooks<'a> {
     /// Create a new deployments instance
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Hooks<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Hooks<'a>
         where O: Into<String>,
               R: Into<String>
     {

@@ -63,14 +63,14 @@ impl Default for Sort {
 }
 
 pub struct IssueLabels<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
 impl<'a> IssueLabels<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: u64) -> IssueLabels<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueLabels<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -119,7 +119,7 @@ impl<'a> IssueLabels<'a> {
 }
 
 pub struct IssueRef<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     number: u64,
@@ -127,7 +127,7 @@ pub struct IssueRef<'a> {
 
 impl<'a> IssueRef<'a> {
     /// create a new instance of a github repo issue ref
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: u64) -> IssueRef<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueRef<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -169,14 +169,14 @@ impl<'a> IssueRef<'a> {
 
 
 pub struct Issues<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Issues<'a> {
     /// create a new instance of a github repo issue ref
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Issues<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Issues<'a>
         where O: Into<String>,
               R: Into<String>
     {

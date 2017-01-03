@@ -6,12 +6,12 @@ use rep::{Gist, GistFork, GistOptions, GistListOptions};
 
 /// reference to gists associated with a github user
 pub struct UserGists<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
 }
 
 impl<'a> UserGists<'a> {
-    pub fn new<O>(github: &'a Github<'a>, owner: O) -> UserGists<'a>
+    pub fn new<O>(github: &'a Github, owner: O) -> UserGists<'a>
         where O: Into<String>
     {
         UserGists {
@@ -30,11 +30,11 @@ impl<'a> UserGists<'a> {
 }
 
 pub struct Gists<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
 }
 
 impl<'a> Gists<'a> {
-    pub fn new(github: &'a Github<'a>) -> Gists<'a> {
+    pub fn new(github: &'a Github) -> Gists<'a> {
         Gists { github: github }
     }
 

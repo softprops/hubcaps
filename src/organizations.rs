@@ -2,11 +2,11 @@ use self::super::{Github, Result};
 use rep::Org;
 
 pub struct Organizations<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
 }
 
 impl<'a> Organizations<'a> {
-    pub fn new(github: &'a Github<'a>) -> Organizations<'a> {
+    pub fn new(github: &'a Github) -> Organizations<'a> {
         Organizations { github: github }
     }
 
@@ -22,12 +22,12 @@ impl<'a> Organizations<'a> {
 }
 
 pub struct UserOrganizations<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     user: String,
 }
 
 impl<'a> UserOrganizations<'a> {
-    pub fn new<U>(github: &'a Github<'a>, user: U) -> UserOrganizations<'a>
+    pub fn new<U>(github: &'a Github, user: U) -> UserOrganizations<'a>
         where U: Into<String>
     {
         UserOrganizations {

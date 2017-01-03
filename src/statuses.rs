@@ -7,13 +7,13 @@ use rep::{Status, StatusOptions};
 
 /// interface for statuses assocaited with a repository
 pub struct Statuses<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Statuses<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Statuses<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Statuses<'a>
         where O: Into<String>,
               R: Into<String>
     {

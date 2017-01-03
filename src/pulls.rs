@@ -43,14 +43,14 @@ impl Default for Sort {
 
 /// A structure for accessing interfacing with a specific pull request
 pub struct PullRequest<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
 impl<'a> PullRequest<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: u64) -> PullRequest<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullRequest<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -122,13 +122,13 @@ impl<'a> PullRequest<'a> {
 
 /// A structure for interfacing with a repositories list of pull requests
 pub struct PullRequests<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> PullRequests<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> PullRequests<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> PullRequests<'a>
         where O: Into<String>,
               R: Into<String>
     {

@@ -126,11 +126,11 @@ impl fmt::Display for OrgRepoType {
 }
 
 pub struct Repositories<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
 }
 
 impl<'a> Repositories<'a> {
-    pub fn new(github: &'a Github<'a>) -> Repositories<'a> {
+    pub fn new(github: &'a Github) -> Repositories<'a> {
         Repositories { github: github }
     }
 
@@ -158,12 +158,12 @@ impl<'a> Repositories<'a> {
 
 /// Provides access to the authenticated user's repositories
 pub struct UserRepositories<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
 }
 
 impl<'a> UserRepositories<'a> {
-    pub fn new<O>(github: &'a Github<'a>, owner: O) -> UserRepositories<'a>
+    pub fn new<O>(github: &'a Github, owner: O) -> UserRepositories<'a>
         where O: Into<String>
     {
         UserRepositories {
@@ -188,12 +188,12 @@ impl<'a> UserRepositories<'a> {
 
 /// Provides access to an organization's repositories
 pub struct OrganizationRepositories<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     org: String,
 }
 
 impl<'a> OrganizationRepositories<'a> {
-    pub fn new<O>(github: &'a Github<'a>, org: O) -> OrganizationRepositories<'a>
+    pub fn new<O>(github: &'a Github, org: O) -> OrganizationRepositories<'a>
         where O: Into<String>
     {
         OrganizationRepositories {
@@ -217,13 +217,13 @@ impl<'a> OrganizationRepositories<'a> {
 }
 
 pub struct Repository<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Repository<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Repository<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Repository<'a>
         where O: Into<String>,
               R: Into<String>
     {

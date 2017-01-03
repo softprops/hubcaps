@@ -7,14 +7,14 @@ use rep::{Deployment, DeploymentOptions, DeploymentListOptions, DeploymentStatus
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 /// INterface for deployment statuses
 pub struct DeploymentStatuses<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     id: u64,
@@ -22,7 +22,7 @@ pub struct DeploymentStatuses<'a> {
 
 impl<'a> DeploymentStatuses<'a> {
     /// creates a new deployment status
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
         where O: Into<String>,
               R: Into<String>
     {
@@ -57,7 +57,7 @@ impl<'a> DeploymentStatuses<'a> {
 
 impl<'a> Deployments<'a> {
     /// Create a new deployments instance
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Deployments<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Deployments<'a>
         where O: Into<String>,
               R: Into<String>
     {

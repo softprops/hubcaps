@@ -8,14 +8,14 @@ fn identity<T>(x: T) -> T {
 
 /// A structure for interfacing with a pull commits
 pub struct PullCommits<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
 impl<'a> PullCommits<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R, number: u64) -> PullCommits<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullCommits<'a>
         where O: Into<String>,
               R: Into<String>
     {

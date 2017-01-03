@@ -6,13 +6,13 @@ use self::super::{Github, Result};
 use rep::{Label, LabelOptions};
 
 pub struct Labels<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Labels<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Labels<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Labels<'a>
         where O: Into<String>,
               R: Into<String>
     {

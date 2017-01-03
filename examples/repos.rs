@@ -10,9 +10,8 @@ fn main() {
     env_logger::init().unwrap();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let client = Client::new();
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                                     &client,
+                                     Client::new(),
                                      Credentials::Token(token));
             for repo in github.user_repos("softprops").list(&Default::default()).unwrap() {
                 println!("{}", repo.name);

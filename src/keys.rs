@@ -7,13 +7,13 @@ use self::super::{Github, Result};
 use rep::{Key, KeyOptions};
 
 pub struct Keys<'a> {
-    github: &'a Github<'a>,
+    github: &'a Github,
     owner: String,
     repo: String,
 }
 
 impl<'a> Keys<'a> {
-    pub fn new<O, R>(github: &'a Github<'a>, owner: O, repo: R) -> Keys<'a>
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Keys<'a>
         where O: Into<String>,
               R: Into<String>
     {

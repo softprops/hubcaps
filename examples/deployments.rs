@@ -8,9 +8,8 @@ use std::env;
 fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let client = Client::new();
             let github = Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                                     &client,
+                                     Client::new(),
                                      Credentials::Token(token));
             let repo = github.repo("softprops", "hubcaps");
             let deployments = repo.deployments();

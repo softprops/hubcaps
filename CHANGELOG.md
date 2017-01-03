@@ -1,6 +1,8 @@
-# 0.2.9 (unreleased)
+# 0.3.0 (unreleased)
 
 * added support for listing repo hooks
+* `Github::new` now takes an owned reference to a hyper::Client. this makes it possible
+  to pass a github instance into threaded context.
 
 # 0.2.8
 
