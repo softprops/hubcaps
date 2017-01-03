@@ -1,3 +1,5 @@
+//! Organizations interface
+
 use self::super::{Github, Result};
 use rep::Org;
 

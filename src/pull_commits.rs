@@ -1,3 +1,4 @@
+//! Pull Commits interface
 
 use super::{Github, Result, Iter};
 use rep::PullCommit;

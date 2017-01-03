@@ -1,3 +1,4 @@
+//! Comments interface
 
 use super::{Github, Result};
 use rep::{Comment, CommentListOptions};
