@@ -15,6 +15,7 @@ env_logger = "0.3"
 
 [build-dependencies]
 serde_codegen = "0.8"
+glob = "0.2.11"
 
 [dependencies]
 log = "0.3"
