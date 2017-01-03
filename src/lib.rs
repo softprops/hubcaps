@@ -355,20 +355,16 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
     type Item = I;
     fn next(&mut self) -> Option<I> {
         self.items.pop().or_else(|| {
-            match self.next_link.clone() {
-                None => None,
-                Some(ref next_link) => {
-                    match self.github
-                        .request::<D>(Method::Get, next_link.to_owned(), None) {
-                        Ok((links, payload)) => {
-                            self.set_next(links.and_then(|l| l.next()));
-                            self.items = (self.into_items)(payload);
-                            self.next()
-                        }
-                        _ => None,
-                    }
-                }
-            }
+            self.next_link.clone().and_then(|ref next_link| {
+                self.github
+                    .request::<D>(Method::Get, next_link.to_owned(), None)
+                    .ok()
+                    .and_then(|(links, payload)| {
+                        self.set_next(links.and_then(|l| l.next()));
+                        self.items = (self.into_items)(payload);
+                        self.next()
+                    })
+            })
         })
     }
 }
