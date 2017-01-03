@@ -1,5 +1,6 @@
 //! Deploy keys interface
-//! This [this document](https://developer.github.com/guides/managing-deploy-keys/) for motivation and use
+//! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
+//! for motivation and use
 extern crate serde_json;
 
 use self::super::{Github, Result};

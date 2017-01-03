@@ -78,24 +78,25 @@ mod tests {
 
     #[test]
     fn deserialize_client_field_errors() {
-        for (json, expect) in vec![
-            // see https://github.com/softprops/hubcaps/issues/31
-            (
-                r#"{"message": "Validation Failed","errors": [{"resource": "Release","code": "custom","message": "Published releases must have a valid tag"}]}"#,
-                ClientError {
-                    message:"Validation Failed".to_owned(),
-                    errors: Some(vec![
-                        FieldErr {
-                            resource: "Release".to_owned(),
-                            code:"custom".to_owned(),
-                            field: None,
-                            message: Some("Published releases must have a valid tag".to_owned()),
-                            documentation_url: None
-                        }
-                     ])
-                }
-             )
-        ] {
+        for (json, expect) in vec![// see https://github.com/softprops/hubcaps/issues/31
+                                   (r#"{"message": "Validation Failed","errors":
+                [{
+                    "resource": "Release",
+                    "code": "custom",
+                    "message": "Published releases must have a valid tag"
+                }]}"#,
+                                    ClientError {
+                                       message: "Validation Failed".to_owned(),
+                                       errors: Some(vec![FieldErr {
+                                                             resource: "Release".to_owned(),
+                                                             code: "custom".to_owned(),
+                                                             field: None,
+                                                             message: Some("Published releases \
+                                                                            must have a valid tag"
+                                                                 .to_owned()),
+                                                             documentation_url: None,
+                                                         }]),
+                                   })] {
             assert_eq!(serde_json::from_str::<ClientError>(json).unwrap(), expect);
         }
     }
@@ -125,7 +126,10 @@ mod tests {
                 r#"{"ref":"test","task":"launchit"}"#
             ),
             (
-                DeploymentOptions::builder("topic-branch").description("description").payload(payload).build(),
+                DeploymentOptions::builder("topic-branch")
+                    .description("description")
+                    .payload(payload)
+                    .build(),
                 r#"{"ref":"topic-branch","payload":"{\"room_id\":\"123456\",\"user\":\"atmos\"}","description":"description"}"#
             )
         ];
@@ -136,15 +140,21 @@ mod tests {
     fn deployment_status_reqs() {
         let tests = vec![
             (
-                DeploymentStatusOptions::builder(StatusState::Pending).build(),
+                DeploymentStatusOptions::builder(StatusState::Pending)
+                    .build(),
                 r#"{"state":"pending"}"#
             ),
             (
-                DeploymentStatusOptions::builder(StatusState::Pending).target_url("http://host.com").build(),
+                DeploymentStatusOptions::builder(StatusState::Pending)
+                    .target_url("http://host.com")
+                    .build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
             (
-                DeploymentStatusOptions::builder(StatusState::Pending).target_url("http://host.com").description("desc").build(),
+                DeploymentStatusOptions::builder(StatusState::Pending)
+                    .target_url("http://host.com")
+                    .description("desc")
+                    .build(),
                 r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
             ),
         ];
