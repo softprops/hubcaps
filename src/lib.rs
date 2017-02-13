@@ -36,7 +36,9 @@ use search::Search;
 use hyper::Client;
 use hyper::client::RequestBuilder;
 use hyper::method::Method;
-use hyper::header::{Accept, Authorization, ContentLength, UserAgent};
+use hyper::header::{qitem, Accept, Authorization, ContentLength,
+                    UserAgent};
+use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use organizations::{Organizations, UserOrganizations};
@@ -51,6 +53,26 @@ const DEFAULT_HOST: &'static str = "https://api.github.com";
 
 /// alias for Result that infers hubcaps::Error as Err
 pub type Result<T> = std::result::Result<T, Error>;
+
+enum MediaType {
+    Json,
+    Preview(&'static str),
+}
+
+impl Default for MediaType {
+    fn default() -> MediaType {
+        MediaType::Json
+    }
+}
+
+impl From<MediaType> for Mime {
+    fn from(media: MediaType) -> Mime {
+        match media {
+            MediaType::Json => "application/vnd.github.v3+json".parse().unwrap(),
+            MediaType::Preview(codename) => format!("application/vnd.github.{}-preview+json", codename).parse().unwrap(),
+        }
+    }
+}
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Debug, PartialEq)]
@@ -244,14 +266,14 @@ impl Github {
     fn request<D>(&self,
                   method: Method,
                   uri: String,
-                  body: Option<&[u8]>)
+                  body: Option<&[u8]>,
+                  media_type: MediaType)
                   -> Result<(Option<Links>, D)>
         where D: Deserialize
     {
         let builder = self.authenticate(method, uri)
             .header(UserAgent(self.agent.to_owned()))
-            // todo: parameterize media type
-            .header(Accept(vec!["application/vnd.github.v3+json".parse().unwrap()]));
+            .header(Accept(vec![qitem(From::from(media_type))]));
 
         let mut res = try!(match body {
             Some(ref bod) => builder.body(*bod).send(),
@@ -283,20 +305,20 @@ impl Github {
         }
     }
 
-    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&[u8]>) -> Result<D>
+    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&[u8]>, media_type: MediaType) -> Result<D>
         where D: Deserialize
     {
-        self.request(method, uri, body).map(|(_, entity)| entity)
+        self.request(method, uri, body, media_type).map(|(_, entity)| entity)
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Get, self.host.clone() + uri, None)
+        self.request_entity(Method::Get, self.host.clone() + uri, None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(Method::Delete, self.host.clone() + uri, None) {
+        match self.request_entity::<()>(Method::Delete, self.host.clone() + uri, None, MediaType::Json) {
             Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
@@ -305,19 +327,19 @@ impl Github {
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Post, self.host.clone() + uri, Some(message))
+        self.request_entity(Method::Post, self.host.clone() + uri, Some(message), MediaType::Json)
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message))
+        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), MediaType::Json)
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Put, self.host.clone() + uri, Some(message))
+        self.request_entity(Method::Put, self.host.clone() + uri, Some(message), MediaType::Json)
     }
 }
 
@@ -335,7 +357,7 @@ impl<'a, D, I> Iter<'a, D, I>
                uri: String,
                into_items: fn(D) -> Vec<I>)
                -> Result<Iter<'a, D, I>> {
-        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None));
+        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, MediaType::Json));
         Ok(Iter {
             github: github,
             next_link: links.and_then(|l| l.next()),
@@ -357,7 +379,7 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
         self.items.pop().or_else(|| {
             self.next_link.clone().and_then(|ref next_link| {
                 self.github
-                    .request::<D>(Method::Get, next_link.to_owned(), None)
+                    .request::<D>(Method::Get, next_link.to_owned(), None, MediaType::Json)
                     .ok()
                     .and_then(|(links, payload)| {
                         self.set_next(links.and_then(|l| l.next()));

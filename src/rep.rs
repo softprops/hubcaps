@@ -113,6 +113,16 @@ mod tests {
     }
 
     #[test]
+    fn hook_create_reqs() {
+
+    }
+
+    #[test]
+    fn hook_edit_reqs() {
+        
+    }
+
+    #[test]
     fn deployment_reqs() {
         let mut payload = BTreeMap::new();
         payload.insert("user", "atmos");

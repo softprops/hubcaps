@@ -1,8 +1,10 @@
 //! Hooks interface
+//! See the [github docs](https://developer.github.com/v3/repos/hooks/) for more information
+
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::{Hook, HookCreateOptions};
+use rep::{Hook, HookCreateOptions, HookEditOptions};
 use std::fmt;
 
 /// Content-Type web hooks will recieve
@@ -65,6 +67,13 @@ impl<'a> Hooks<'a> {
     pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
         let data = try!(serde_json::to_string(&options));
         self.github.post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
+                                 data.as_bytes())
+    }
+
+    /// edits an existing repository hook
+    pub fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
+        let data = try!(serde_json::to_string(&options));
+        self.github.patch::<Hook>(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
                                  data.as_bytes())
     }
 

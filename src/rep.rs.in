@@ -1848,6 +1848,95 @@ impl HookCreateOptionsBuilder {
 }
 
 
+/// options for editing a repository hook
+/// see [this](https://developer.github.com/v3/repos/hooks/#edit-a-hook)
+/// for githubs official documentation
+#[derive(Debug, Serialize)]
+pub struct HookEditOptions {
+  config: BTreeMap<String, ::serde_json::Value>,
+  events: Vec<String>,
+  add_events: Vec<String>,
+  remove_events: Vec<String>,
+  active: bool
+}
+
+impl HookEditOptions {
+  /// creates a new builder instance
+  pub fn builder() -> HookEditOptionsBuilder {
+    HookEditOptionsBuilder::new()
+  }
+}
+
+#[derive(Default)]
+pub struct HookEditOptionsBuilder {
+  config: BTreeMap<String, ::serde_json::Value>,
+  events: Vec<String>,
+  add_events: Vec<String>,
+  remove_events: Vec<String>,
+  active: bool
+}
+
+impl HookEditOptionsBuilder {
+  pub fn new() -> HookEditOptionsBuilder
+  {
+      HookEditOptionsBuilder { ..Default::default() }
+  }
+
+
+  pub fn active(&mut self, active: bool) -> &mut Self {
+      self.active = active;
+      self
+  }
+
+  /// a list of github events this hook should receive deliveries for
+  /// the default is "push". for a full list, see
+  /// the [Github api docs](https://developer.github.com/webhooks/#events)
+  pub fn events<E>(&mut self, events: Vec<E>) -> &mut Self where E: Into<String> {
+    self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+    self
+  }
+
+  /// web hooks must have an associated url
+  pub fn url<U>(&mut self, url: U) -> &mut Self where U: Into<String> {
+    self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
+  }
+
+  /// web hooks can optionally specify a content_type of "form" or "json"
+  /// which indicates the type of payload they will expect to receive
+  pub fn content_type(&mut self, content_type: WebHookContentType) -> &mut Self {
+    self.config_str_entry("content_type", content_type.to_string());
+    self
+  }
+
+  /// web hooks can optionally provide a secret used to sign deliveries
+  /// to identify that their source was indeed github
+  pub fn secret<S>(&mut self, sec: S) -> &mut Self where S: Into<String> {
+    self.config_str_entry("secret", sec);
+    self
+  }
+
+  pub fn config_str_entry<K, V>(&mut self, k: K, v: V) -> &mut Self where K: Into<String>, V: Into<String> {
+    self.config_entry(k.into(), ::serde_json::Value::String(v.into()));
+    self
+  }
+
+  pub fn config_entry<N>(&mut self, name: N, value: ::serde_json::Value) -> &mut Self where N: Into<String> {
+    self.config.insert(name.into(), value);
+    self
+  }
+
+  pub fn build(&self) -> HookEditOptions {
+    HookEditOptions {
+      config: self.config.clone(),
+      events: self.events.clone(),
+      add_events: self.add_events.clone(),
+      remove_events: self.remove_events.clone(),
+      active: self.active
+    }
+  }
+}
+
+
   #[derive(Debug, Deserialize)]
   pub struct Hook {
     pub id: u64,
