@@ -9,11 +9,13 @@ use std::fmt;
 
 /// Content-Type web hooks will recieve
 /// deliveries in
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum WebHookContentType {
     /// application/json
+    #[serde(rename = "json")]
     Json,
     /// application/x-form-url-encoded
+    #[serde(rename = "form")]
     Form,
 }
 
@@ -74,7 +76,7 @@ impl<'a> Hooks<'a> {
     pub fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
         let data = try!(serde_json::to_string(&options));
         self.github.patch::<Hook>(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-                                 data.as_bytes())
+                                  data.as_bytes())
     }
 
     /// deletes a repoistory hook by id

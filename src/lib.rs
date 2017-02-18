@@ -6,6 +6,8 @@ extern crate serializable_enum;
 extern crate log;
 #[macro_use]
 extern crate hyper;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 extern crate url;
@@ -36,8 +38,7 @@ use search::Search;
 use hyper::Client;
 use hyper::client::RequestBuilder;
 use hyper::method::Method;
-use hyper::header::{qitem, Accept, Authorization, ContentLength,
-                    UserAgent};
+use hyper::header::{qitem, Accept, Authorization, ContentLength, UserAgent};
 use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
@@ -69,7 +70,9 @@ impl From<MediaType> for Mime {
     fn from(media: MediaType) -> Mime {
         match media {
             MediaType::Json => "application/vnd.github.v3+json".parse().unwrap(),
-            MediaType::Preview(codename) => format!("application/vnd.github.{}-preview+json", codename).parse().unwrap(),
+            MediaType::Preview(codename) => {
+                format!("application/vnd.github.{}-preview+json", codename).parse().unwrap()
+            }
         }
     }
 }
@@ -305,7 +308,12 @@ impl Github {
         }
     }
 
-    fn request_entity<D>(&self, method: Method, uri: String, body: Option<&[u8]>, media_type: MediaType) -> Result<D>
+    fn request_entity<D>(&self,
+                         method: Method,
+                         uri: String,
+                         body: Option<&[u8]>,
+                         media_type: MediaType)
+                         -> Result<D>
         where D: Deserialize
     {
         self.request(method, uri, body, media_type).map(|(_, entity)| entity)
@@ -318,7 +326,10 @@ impl Github {
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(Method::Delete, self.host.clone() + uri, None, MediaType::Json) {
+        match self.request_entity::<()>(Method::Delete,
+                                        self.host.clone() + uri,
+                                        None,
+                                        MediaType::Json) {
             Err(Error::Codec(_)) => Ok(()),
             otherwise => otherwise,
         }
@@ -327,19 +338,28 @@ impl Github {
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Post, self.host.clone() + uri, Some(message), MediaType::Json)
+        self.request_entity(Method::Post,
+                            self.host.clone() + uri,
+                            Some(message),
+                            MediaType::Json)
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), MediaType::Json)
+        self.request_entity(Method::Patch,
+                            self.host.clone() + uri,
+                            Some(message),
+                            MediaType::Json)
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Put, self.host.clone() + uri, Some(message), MediaType::Json)
+        self.request_entity(Method::Put,
+                            self.host.clone() + uri,
+                            Some(message),
+                            MediaType::Json)
     }
 }
 
