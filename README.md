@@ -4,14 +4,21 @@
 
 > a rust interface for github
 
-## docs
+[Documentation](http://softprops.github.io/hubcaps)
 
-Find them [here](http://softprops.github.io/hubcaps)
+## /!\ planned API changes
+
+* implement error handling in terms of error-chain crate
+* implement async interface when hyper adopts it
+
+The goal and motivation behinds are not to intentionally make breaking changes,
+but rather to adopt community standards
 
 ## usage
 
-Basic usage requires a user-defined useragent string, a `hyper::Client` instance and a flavor of `hubcaps::Credentials` for authorization.
-For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For requests that permit anonymous access, you can subsitute `hubcaps::Credentials::Token` with `hubcaps::Credentials::None`
+Basic usage requires a user-defined user agent string (because github requires this),
+a `hyper::Client` instance, and a flavor of `hubcaps::Credentials` for authorization.
+For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For requests that permit anonymous access, you can substitute `hubcaps::Credentials::Token` with `hubcaps::Credentials::None`
 
 > Note: hyper 0.10 no longer includes a tls implementation by default. you will need
 >       to provide one to your choosing
@@ -27,12 +34,14 @@ use hyper_native_tls::NativeTlsClient;
 use hubcaps::{Credentials, Github};
 
 fn main() {
-  // tls configured hyper client
-  let client = Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                    .unwrap()));
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    client,
+    // tls configured hyper client
+    Client::with_connector(
+      HttpsConnector::new(
+        NativeTlsClient::new().unwrap()
+      )
+    ),
     Credentials::Token("personal-access-token")
   );
 }
@@ -81,7 +90,7 @@ labels.delete("rustic").unwrap();
 
 ### deployments
 
-Deployments is a service for orchestating deployments of applications sourced from github repositories
+Deployments is a service for orchestrating deployments of applications sourced from github repositories
 
 ```rust
 let deployments = repo.deployments();
@@ -127,4 +136,4 @@ Search provides a raw string query search for indexed data. Currently only searc
 let search_issues = github.search().issues();
 ```
 
-Doug Tangren (softprops) 2015-2016
+Doug Tangren (softprops) 2015-2017
