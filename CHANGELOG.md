@@ -3,6 +3,9 @@
 * added support for listing repo hooks
 * `Github::new` now takes an owned reference to a hyper::Client. this makes it possible
   to pass a github instance into threaded context.
+* upgrade to serde 0.9
+* code restructure to support scalability in future growth. move foo.rs modules to foo/mod.rs files. moved respective rep.rs reps into mods
+* update hyper to 0.10. the implications are that you now need to bring your own tls-configured hyper client
 
 # 0.2.8
 

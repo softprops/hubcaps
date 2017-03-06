@@ -11,14 +11,13 @@ license = "MIT"
 
 [dev-dependencies]
 env_logger = "0.3"
+hyper-native-tls = "0.2"
 
 
 [dependencies]
 log = "0.3"
 hyper = "0.10"
-hyper-openssl = "0.2"
 url = "1.2"
 serde = "0.9"
 serde_derive = "0.9"
 serde_json = "0.9"
-serializable_enum = "0.3"

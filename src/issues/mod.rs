@@ -4,9 +4,15 @@ extern crate serde_json;
 
 use super::{Github, Result};
 use comments::Comments;
-use rep::{Issue, IssueOptions, IssueListOptions, Label};
+// use rep::{Issue, IssueOptions, IssueListOptions, Label};
+use rep::User;
+use labels::Label;
+use super::{SortDirection, State as StdState};
 use std::fmt;
-use std::default::Default;
+// use std::default::Default;
+use std::collections::HashMap;
+use url::form_urlencoded;
+
 
 #[derive(Debug, PartialEq)]
 pub enum Filter {
@@ -209,9 +215,192 @@ impl<'a> Issues<'a> {
     }
 }
 
+// representations
+
+// todo: simplify with param
+#[derive(Default)]
+pub struct IssueListOptions {
+    params: HashMap<&'static str, String>,
+}
+
+impl IssueListOptions {
+    pub fn builder() -> IssueListOptionsBuilder {
+        IssueListOptionsBuilder::new()
+    }
+
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
+        }
+    }
+}
+
+/// a mutable issue list builder
+#[derive(Default)]
+pub struct IssueListOptionsBuilder {
+    params: HashMap<&'static str, String>,
+}
+
+impl IssueListOptionsBuilder {
+    pub fn new() -> IssueListOptionsBuilder {
+        IssueListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn state(&mut self, state: StdState) -> &mut IssueListOptionsBuilder {
+        self.params.insert("state", state.to_string());
+        self
+    }
+
+    pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
+        self.params.insert("sort", sort.to_string());
+        self
+    }
+
+    pub fn asc(&mut self) -> &mut IssueListOptionsBuilder {
+        self.direction(SortDirection::Asc)
+    }
+
+    pub fn desc(&mut self) -> &mut IssueListOptionsBuilder {
+        self.direction(SortDirection::Desc)
+    }
+
+    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListOptionsBuilder {
+        self.params.insert("direction", direction.to_string());
+        self
+    }
+
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListOptionsBuilder
+        where A: Into<String>
+    {
+        self.params.insert("assignee", assignee.into());
+        self
+    }
+
+    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListOptionsBuilder
+        where C: Into<String>
+    {
+        self.params.insert("creator", creator.into());
+        self
+    }
+
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListOptionsBuilder
+        where M: Into<String>
+    {
+        self.params.insert("mentioned", mentioned.into());
+        self
+    }
+
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
+        where L: Into<String>
+    {
+        self.params.insert("labels",
+                           labels.into_iter().map(|l| l.into()).collect::<Vec<_>>().join(","));
+        self
+    }
+
+    pub fn since<S>(&mut self, since: S) -> &mut IssueListOptionsBuilder
+        where S: Into<String>
+    {
+        self.params.insert("since", since.into());
+        self
+    }
+
+    pub fn build(&self) -> IssueListOptions {
+        IssueListOptions { params: self.params.clone() }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct IssueOptions {
+    pub title: String,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub body: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub assignee: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub milestone: Option<u64>,
+    pub labels: Vec<String>,
+}
+
+impl IssueOptions {
+    pub fn new<T, B, A, L>(title: T,
+                           body: Option<B>,
+                           assignee: Option<A>,
+                           milestone: Option<u64>,
+                           labels: Vec<L>)
+                           -> IssueOptions
+        where T: Into<String>,
+              B: Into<String>,
+              A: Into<String>,
+              L: Into<String>
+    {
+        IssueOptions {
+            title: title.into(),
+            body: body.map(|b| b.into()),
+            assignee: assignee.map(|a| a.into()),
+            milestone: milestone,
+            labels: labels.into_iter().map(|l| l.into()).collect::<Vec<String>>(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Issue {
+    pub id: u64,
+    pub url: String,
+    pub labels_url: String,
+    pub comments_url: String,
+    pub events_url: String,
+    pub html_url: String,
+    pub number: u64,
+    pub state: String,
+    pub title: String,
+    pub body: String,
+    pub user: User,
+    pub labels: Vec<Label>,
+    pub assignee: Option<User>,
+    pub locked: bool,
+    pub comments: u64,
+    pub closed_at: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn issue_list_reqs() {
+        fn test_serialize(tests: Vec<(IssueListOptions, Option<String>)>) {
+            for test in tests {
+                match test {
+                    (k, v) => assert_eq!(k.serialize(), v),
+                }
+            }
+        }
+        let tests = vec![
+            (
+                IssueListOptions::builder().build(),
+                None
+            ),
+            (
+                IssueListOptions::builder().state(StdState::Closed).build(),
+                Some("state=closed".to_owned())
+             ),
+            (
+                IssueListOptions::builder().labels(vec!["foo", "bar"]).build(),
+                Some("labels=foo%2Cbar".to_owned())
+            ),
+        ];
+        test_serialize(tests)
+    }
 
     #[test]
     fn filter_default() {

@@ -7,6 +7,8 @@ use hyper::status::StatusCode;
 use rep::ClientError;
 use serde_json::error::Error as SerdeError;
 
+// todo: look into error_chain crate to remove boiler plate
+
 /// enumerated types of client errors
 #[derive(Debug)]
 pub enum Error {

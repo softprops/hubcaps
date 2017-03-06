@@ -1,8 +1,6 @@
 //! Hubcaps provides a set of building blocks for interacting with the Github API
 
 #[macro_use]
-extern crate serializable_enum;
-#[macro_use]
 extern crate log;
 #[macro_use]
 extern crate hyper;
@@ -12,6 +10,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate url;
 
+// all the modules!
 use serde::de::Deserialize;
 pub mod comments;
 pub mod review_comments;
@@ -31,7 +30,9 @@ pub mod pulls;
 pub mod search;
 pub mod organizations;
 
+// fixme: move reps to modules
 pub use rep::*;
+
 pub use errors::Error;
 use gists::{Gists, UserGists};
 use search::Search;

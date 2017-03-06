@@ -1,7 +1,7 @@
 //! Pull Commits interface
 
 use super::{Github, Result, Iter};
-use rep::PullCommit;
+use rep::{CommitRef, User, UserStamp};
 
 fn identity<T>(x: T) -> T {
     x
@@ -45,4 +45,28 @@ impl<'a> PullCommits<'a> {
                           self.number);
         self.github.iter(uri, identity)
     }
+}
+
+// representations
+
+#[derive(Debug, Deserialize)]
+pub struct PullCommit {
+    pub url: String,
+    pub sha: String,
+    pub html_url: String,
+    pub comments_url: String,
+    pub commit: CommitDetails,
+    pub author: User,
+    pub committer: User,
+    pub parents: Vec<CommitRef>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CommitDetails {
+    pub url: String,
+    pub author: UserStamp,
+    pub committer: Option<UserStamp>,
+    pub message: String,
+    pub tree: CommitRef,
+    pub comment_count: u64,
 }
