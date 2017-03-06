@@ -14,6 +14,15 @@
 The goal and motivation behinds are not to intentionally make breaking changes,
 but rather to adopt community standards
 
+## installation
+
+Add the following to your `Cargo.toml` filter
+
+```toml
+[dependencies]
+hubcaps = "0.3"
+```
+
 ## usage
 
 Basic usage requires a user-defined user agent string (because github requires this),
