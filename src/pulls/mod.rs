@@ -5,7 +5,6 @@ use super::{Github, Result};
 use comments::Comments;
 use pull_commits::PullCommits;
 use review_comments::ReviewComments;
-use rep::Commit;
 use users::User;
 use std::default::Default;
 use std::fmt;
@@ -206,6 +205,15 @@ pub struct Pull {
     pub additions: Option<u64>,
     pub deletions: Option<u64>,
     pub changed_files: Option<u64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Commit {
+    pub label: String,
+    #[serde(rename="ref")]
+    pub commit_ref: String,
+    pub sha: String,
+    pub user: User, //    pub repo: Option<Repo>,
 }
 
 #[derive(Default)]

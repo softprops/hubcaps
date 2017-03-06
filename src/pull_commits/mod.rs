@@ -2,7 +2,6 @@
 
 use super::{Github, Result, Iter};
 use users::User;
-use rep::{CommitRef, UserStamp};
 
 fn identity<T>(x: T) -> T {
     x
@@ -70,4 +69,17 @@ pub struct CommitDetails {
     pub message: String,
     pub tree: CommitRef,
     pub comment_count: u64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CommitRef {
+    pub url: String,
+    pub sha: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UserStamp {
+    pub name: String,
+    pub email: String,
+    pub date: String,
 }

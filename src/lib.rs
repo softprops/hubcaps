@@ -77,16 +77,12 @@ pub mod errors;
 pub mod hooks;
 pub mod issues;
 pub mod labels;
-pub mod rep;
 pub mod releases;
 pub mod repositories;
 pub mod statuses;
 pub mod pulls;
 pub mod search;
 pub mod organizations;
-
-// fixme: move reps to modules
-pub use rep::*;
 
 pub use errors::Error;
 use gists::{Gists, UserGists};
