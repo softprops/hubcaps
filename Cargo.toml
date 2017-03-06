@@ -8,7 +8,7 @@ homepage = "https://github.com/softprops/hubcaps"
 repository = "https://github.com/softprops/hubcaps"
 keywords = ["hyper", "github"]
 license = "MIT"
-categories = ["api-bindings"]
+categories = ["api-bindings", "web-programming::http-client"]
 
 [badges]
 travis-ci = { repository = "softprops/hubcaps" }
