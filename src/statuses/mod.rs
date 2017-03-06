@@ -56,7 +56,7 @@ impl<'a> Statuses<'a> {
 pub struct Status {
     pub created_at: String,
     pub updated_at: String,
-    pub state: StatusState,
+    pub state: State,
     pub target_url: String,
     pub description: String,
     pub id: u64,
@@ -67,7 +67,7 @@ pub struct Status {
 
 #[derive(Debug, Serialize)]
 pub struct StatusOptions {
-    state: StatusState,
+    state: State,
     #[serde(skip_serializing_if="Option::is_none")]
     target_url: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
@@ -78,14 +78,14 @@ pub struct StatusOptions {
 
 #[derive(Default)]
 pub struct StatusBuilder {
-    state: StatusState,
+    state: State,
     target_url: Option<String>,
     description: Option<String>,
     context: Option<String>,
 }
 
 impl StatusBuilder {
-    pub fn new(state: StatusState) -> StatusBuilder {
+    pub fn new(state: State) -> StatusBuilder {
         StatusBuilder { state: state, ..Default::default() }
     }
 
@@ -119,7 +119,7 @@ impl StatusBuilder {
 }
 
 impl StatusOptions {
-    pub fn new<T, D, C>(state: StatusState,
+    pub fn new<T, D, C>(state: State,
                         target_url: Option<T>,
                         descr: Option<D>,
                         context: Option<C>)
@@ -136,13 +136,13 @@ impl StatusOptions {
         }
     }
 
-    pub fn builder(state: StatusState) -> StatusBuilder {
+    pub fn builder(state: State) -> StatusBuilder {
         StatusBuilder::new(state)
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub enum StatusState {
+pub enum State {
     /// pending
     #[serde(rename = "pending")]
     Pending,
@@ -157,9 +157,9 @@ pub enum StatusState {
     Failure,
 }
 
-impl Default for StatusState {
-    fn default() -> StatusState {
-        StatusState::Pending
+impl Default for State {
+    fn default() -> State {
+        State::Pending
     }
 }
 
@@ -180,20 +180,20 @@ mod tests {
 
     #[test]
     fn deserialize_status_state() {
-        for (json, value) in vec![("\"pending\"", StatusState::Pending),
-                                  ("\"success\"", StatusState::Success),
-                                  ("\"error\"", StatusState::Error),
-                                  ("\"failure\"", StatusState::Failure)] {
-            assert_eq!(serde_json::from_str::<StatusState>(json).unwrap(), value)
+        for (json, value) in vec![("\"pending\"", State::Pending),
+                                  ("\"success\"", State::Success),
+                                  ("\"error\"", State::Error),
+                                  ("\"failure\"", State::Failure)] {
+            assert_eq!(serde_json::from_str::<State>(json).unwrap(), value)
         }
     }
 
     #[test]
     fn serialize_status_state() {
-        for (json, value) in vec![("\"pending\"", StatusState::Pending),
-                                  ("\"success\"", StatusState::Success),
-                                  ("\"error\"", StatusState::Error),
-                                  ("\"failure\"", StatusState::Failure)] {
+        for (json, value) in vec![("\"pending\"", State::Pending),
+                                  ("\"success\"", State::Success),
+                                  ("\"error\"", State::Error),
+                                  ("\"failure\"", State::Failure)] {
             assert_eq!(serde_json::to_string(&value).unwrap(), json)
         }
     }
@@ -201,15 +201,15 @@ mod tests {
 
     #[test]
     fn status_reqs() {
-        let tests = vec![(StatusOptions::builder(StatusState::Pending).build(),
+        let tests = vec![(StatusOptions::builder(State::Pending).build(),
                   r#"{"state":"pending"}"#),
-                 (StatusOptions::builder(StatusState::Success)
+                 (StatusOptions::builder(State::Success)
                       .target_url("http://acme.com")
                       .build(),
                   r#"{"state":"success","target_url":"http://acme.com"}"#),
-                 (StatusOptions::builder(StatusState::Error).description("desc").build(),
+                 (StatusOptions::builder(State::Error).description("desc").build(),
                   r#"{"state":"error","description":"desc"}"#),
-                 (StatusOptions::builder(StatusState::Failure)
+                 (StatusOptions::builder(State::Failure)
                       .target_url("http://acme.com")
                       .description("desc")
                       .build(),

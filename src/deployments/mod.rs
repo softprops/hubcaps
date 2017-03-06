@@ -6,7 +6,7 @@ use url::form_urlencoded;
 use serde;
 
 use self::super::{Github, Result};
-use statuses::StatusState;
+use statuses::State;
 use users::User;
 
 /// Interface for repository deployements
@@ -219,7 +219,7 @@ pub struct DeploymentStatus {
     pub url: String,
     pub created_at: String,
     pub updated_at: String,
-    pub state: StatusState,
+    pub state: State,
     pub target_url: Option<String>,
     pub description: Option<String>,
     pub id: u64,
@@ -230,13 +230,13 @@ pub struct DeploymentStatus {
 
 #[derive(Default)]
 pub struct DeploymentStatusOptionsBuilder {
-    state: StatusState,
+    state: State,
     target_url: Option<String>,
     description: Option<String>,
 }
 
 impl DeploymentStatusOptionsBuilder {
-    pub fn new(state: StatusState) -> DeploymentStatusOptionsBuilder {
+    pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
         DeploymentStatusOptionsBuilder { state: state, ..Default::default() }
     }
 
@@ -265,7 +265,7 @@ impl DeploymentStatusOptionsBuilder {
 
 #[derive(Debug, Serialize)]
 pub struct DeploymentStatusOptions {
-    state: StatusState,
+    state: State,
     #[serde(skip_serializing_if="Option::is_none")]
     target_url: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
@@ -273,7 +273,7 @@ pub struct DeploymentStatusOptions {
 }
 
 impl DeploymentStatusOptions {
-    pub fn builder(state: StatusState) -> DeploymentStatusOptionsBuilder {
+    pub fn builder(state: State) -> DeploymentStatusOptionsBuilder {
         DeploymentStatusOptionsBuilder::new(state)
     }
 }
@@ -350,7 +350,7 @@ mod tests {
     use super::{DeploymentStatusOptions, DeploymentOptions};
     use serde::ser::Serialize;
     use serde_json;
-    use statuses::StatusState;
+    use statuses::State;
     use std::collections::BTreeMap;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
@@ -390,18 +390,18 @@ mod tests {
     fn deployment_status_reqs() {
         let tests = vec![
             (
-                DeploymentStatusOptions::builder(StatusState::Pending)
+                DeploymentStatusOptions::builder(State::Pending)
                     .build(),
                 r#"{"state":"pending"}"#
             ),
             (
-                DeploymentStatusOptions::builder(StatusState::Pending)
+                DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
             (
-                DeploymentStatusOptions::builder(StatusState::Pending)
+                DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .description("desc")
                     .build(),
