@@ -1,35 +1,5 @@
 //! Rust representations of Github API data structures
 
-#[derive(Debug, Deserialize, PartialEq)]
-pub struct FieldErr {
-    pub resource: String,
-    pub field: Option<String>,
-    pub code: String,
-    pub message: Option<String>,
-    pub documentation_url: Option<String>,
-}
-
-#[derive(Debug, Deserialize, PartialEq)]
-pub struct ClientError {
-    pub message: String,
-    pub errors: Option<Vec<FieldErr>>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Permissions {
-    pub admin: bool,
-    pub push: bool,
-    pub pull: bool,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RepoDetails {
-    pub id: u64,
-    pub owner: User,
-    pub name: String,
-    pub full_name: String, // todo
-}
-
 #[derive(Debug, Deserialize)]
 pub struct User {
     pub login: String,

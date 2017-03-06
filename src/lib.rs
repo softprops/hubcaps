@@ -302,7 +302,7 @@ impl Github {
             StatusCode::Forbidden => {
                 Err(Error::Fault {
                     code: res.status,
-                    error: try!(serde_json::from_str::<ClientError>(&body)),
+                    error: try!(serde_json::from_str::<errors::ClientError>(&body)),
                 })
             }
             _ => Ok((links, try!(serde_json::from_str::<D>(&body)))),

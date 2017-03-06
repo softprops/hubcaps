@@ -4,7 +4,6 @@ use std::error::Error as StdError;
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
-use rep::ClientError;
 use serde_json::error::Error as SerdeError;
 
 // todo: look into error_chain crate to remove boiler plate
@@ -65,4 +64,21 @@ impl From<IoError> for Error {
     fn from(error: IoError) -> Error {
         Error::IO(error)
     }
+}
+
+// preresentations
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct FieldErr {
+    pub resource: String,
+    pub field: Option<String>,
+    pub code: String,
+    pub message: Option<String>,
+    pub documentation_url: Option<String>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct ClientError {
+    pub message: String,
+    pub errors: Option<Vec<FieldErr>>,
 }

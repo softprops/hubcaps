@@ -5,6 +5,7 @@
   to pass a github instance into threaded context.
 * upgrade to serde 0.9
 * code restructure to support scalability in future growth. move foo.rs modules to foo/mod.rs files. moved respective rep.rs reps into mods
+* the effect of the above is that everything may no longer be accessible via the top level `hubcaps` module. For instance, in the past you would be able to to access `hubcaps::Pull` directly, now you would access it via is api category `hubcaps::pulls::Pull`.
 * update hyper to 0.10. the implications are that you now need to bring your own tls-configured hyper client
 
 # 0.2.8
