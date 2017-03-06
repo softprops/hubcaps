@@ -1,3 +1,5 @@
+//! Users interface
+
 #[derive(Debug, Deserialize)]
 pub struct User {
     pub login: String,
