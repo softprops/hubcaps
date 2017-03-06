@@ -13,18 +13,26 @@ Find them [here](http://softprops.github.io/hubcaps)
 Basic usage requires a user-defined useragent string, a `hyper::Client` instance and a flavor of `hubcaps::Credentials` for authorization.
 For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For requests that permit anonymous access, you can subsitute `hubcaps::Credentials::Token` with `hubcaps::Credentials::None`
 
+> Note: hyper 0.10 no longer includes a tls implementation by default. you will need
+>       to provide one to your choosing
+
 ```rust
 extern crate hyper;
 extern crate hubcaps;
+extern crate hyper_native_tls;
 
 use hyper::Client;
+use hyper::net::HttpsConnector;
+use hyper_native_tls::NativeTlsClient;
 use hubcaps::{Credentials, Github};
 
 fn main() {
-  let client = Client::new();
+  // tls configured hyper client
+  let client = Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
+                    .unwrap()));
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    &client,
+    client,
     Credentials::Token("personal-access-token")
   );
 }
