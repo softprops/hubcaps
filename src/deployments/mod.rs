@@ -6,7 +6,7 @@ use url::form_urlencoded;
 use serde;
 
 use self::super::{Github, Result};
-use rep::{StatusState};
+use statuses::StatusState;
 use users::User;
 
 /// Interface for repository deployements
