@@ -350,7 +350,7 @@ mod tests {
     use super::{DeploymentStatusOptions, DeploymentOptions};
     use serde::ser::Serialize;
     use serde_json;
-    use rep::StatusState;
+    use statuses::StatusState;
     use std::collections::BTreeMap;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
