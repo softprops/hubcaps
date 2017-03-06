@@ -1,5 +1,39 @@
 //! Hubcaps provides a set of building blocks for interacting with the Github API
-
+//!
+//! # Examples
+//!
+//!  Typical use will require instantiation of a Github client. Which requires
+//! a user agent string, a `hyper::Client`, and set of `hubcaps::Credentials`.
+//!
+//! The hyper client should be configured with tls.
+//!
+//! ```no_run
+//! extern crate hubcaps;
+//! extern crate hyper;
+//! extern crate hyper_native_tls;
+//!
+//! use hubcaps::{Credentials, Github};
+//! use hyper::Client;
+//! use hyper::net::HttpsConnector;
+//! use hyper_native_tls::NativeTlsClient;
+//!
+//! fn main() {
+//!   let github = Github::new(
+//!     String::from("user-agent-name"),
+//!     Client::with_connector(
+//!       HttpsConnector::new(
+//!         NativeTlsClient::new().unwrap()
+//!       )
+//!     ),
+//!     Credentials::Token(
+//!       String::from("personal-access-token")
+//!     )
+//!   );
+//! }
+//! ```
+//!
+//! Github enterprise users will want to create a client with the [Github#host](struct.Github.html#method.host) method
+//!
 #[macro_use]
 extern crate log;
 #[macro_use]
