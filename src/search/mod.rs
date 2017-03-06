@@ -33,7 +33,8 @@ impl fmt::Display for IssuesSort {
     }
 }
 
-// https://developer.github.com/v3/search/#search-issues
+/// Provides access to search operations
+/// https://developer.github.com/v3/search/#search-issues
 pub struct Search<'a> {
     github: &'a Github,
 }
@@ -61,7 +62,8 @@ impl<'a> Search<'a> {
     }
 }
 
-// https://developer.github.com/v3/search/#search-issues
+/// Provides access to issue search operations
+/// https://developer.github.com/v3/search/#search-issues
 pub struct SearchIssues<'a> {
     search: &'a Search<'a>,
 }
@@ -82,7 +84,9 @@ impl<'a> SearchIssues<'a> {
         uri.join("?")
     }
 
-    /// returns an Iterator over pages of search results
+    /// Returns an Iterator over pages of search results
+    /// Use this interface if you wish to iterate over all items
+    /// in a result set
     pub fn iter<Q>(&'a self,
                    q: Q,
                    options: &SearchIssuesOptions)
@@ -92,7 +96,7 @@ impl<'a> SearchIssues<'a> {
         self.search.iter::<IssuesItem>(&Self::search_uri(q, options))
     }
 
-    /// returns a single page of search results
+    /// Returns a single page of search results
     pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Result<SearchResult<IssuesItem>>
         where Q: Into<String>
     {

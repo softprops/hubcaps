@@ -32,7 +32,24 @@
 //! }
 //! ```
 //!
-//! Github enterprise users will want to create a client with the [Github#host](struct.Github.html#method.host) method
+//! Github enterprise users will want to create a client with the
+//! [Github#host](struct.Github.html#method.host) method
+//!
+//! Access to various services are provided via methods on instances of the `Github` type.
+//!
+//! The convention for executing operations typically looks like
+//! `github.repo(.., ..).service().operation(OperationOptions)` where operation may be `create`,
+//! `delete`, ect.
+//!
+//! A service interface will provide access to operations and operations may access options types
+//! this define the various parameter options available for the operation. Most operation option
+//! types expose `builder()` methods for a builder oriented style of constructing options.
+//!
+//! # Errors
+//!
+//! Operations typically result in a `hubcaps::Result` Type which is an alias for Rust's
+//! built-in Result with the Err Type fixed to the
+//! [hubcaps::Error](errors/enum.Error.html) enum type.
 //!
 #[macro_use]
 extern crate log;
