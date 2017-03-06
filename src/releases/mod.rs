@@ -2,8 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::User;
-// use rep::{Asset, Release, ReleaseOptions};
+use users::User;
 
 pub struct Assets<'a> {
     github: &'a Github,

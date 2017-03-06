@@ -1,7 +1,6 @@
 
 use super::{Github, Result};
-// use rep::ReviewComment;
-use rep::User;
+use users::User;
 
 /// A structure for interfacing with a issue comments
 pub struct ReviewComments<'a> {

@@ -6,9 +6,8 @@ use url::form_urlencoded;
 use serde;
 
 use self::super::{Github, Result};
-// use rep::{Deployment, DeploymentOptions, DeploymentListOptions, DeploymentStatus,
-//          DeploymentStatusOptions};
-use rep::{User, StatusState};
+use rep::{StatusState};
+use users::User;
 
 /// Interface for repository deployements
 pub struct Deployments<'a> {

@@ -1,25 +1,6 @@
 //! Rust representations of Github API data structures
+use users::User;
 
-#[derive(Debug, Deserialize)]
-pub struct User {
-    pub login: String,
-    pub id: u64,
-    pub avatar_url: String,
-    pub gravatar_id: String,
-    pub url: String,
-    pub html_url: String,
-    pub followers_url: String,
-    pub following_url: String,
-    pub gists_url: String,
-    pub starred_url: String,
-    pub subscriptions_url: String,
-    pub organizations_url: String,
-    pub repos_url: String,
-    pub events_url: String,
-    pub received_events_url: String,
-    // type (keyword)
-    pub site_admin: bool,
-}
 
 #[derive(Debug, Deserialize)]
 pub struct Commit {
@@ -167,32 +148,6 @@ mod tests {
             match test {
                 (k, v) => assert_eq!(serde_json::to_string(&k).unwrap(), v),
             }
-        }
-    }
-
-
-    #[test]
-    fn deserialize_client_field_errors() {
-        for (json, expect) in vec![// see https://github.com/softprops/hubcaps/issues/31
-                                   (r#"{"message": "Validation Failed","errors":
-                [{
-                    "resource": "Release",
-                    "code": "custom",
-                    "message": "Published releases must have a valid tag"
-                }]}"#,
-                                    ClientError {
-                                       message: "Validation Failed".to_owned(),
-                                       errors: Some(vec![FieldErr {
-                                                             resource: "Release".to_owned(),
-                                                             code: "custom".to_owned(),
-                                                             field: None,
-                                                             message: Some("Published releases \
-                                                                            must have a valid tag"
-                                                                 .to_owned()),
-                                                             documentation_url: None,
-                                                         }]),
-                                   })] {
-            assert_eq!(serde_json::from_str::<ClientError>(json).unwrap(), expect);
         }
     }
 

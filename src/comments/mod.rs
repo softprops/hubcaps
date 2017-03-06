@@ -3,7 +3,7 @@
 use super::{Github, Result};
 use std::collections::HashMap;
 use url::form_urlencoded;
-use rep::User;
+use users::User;
 
 /// A structure for interfacing with a issue comments
 pub struct Comments<'a> {

@@ -2,9 +2,8 @@
 extern crate serde_json;
 
 use self::super::{Error, Github, Result};
-// use rep::{Gist, GistFork, GistOptions, GistListOptions};
 use url::form_urlencoded;
-use rep::User;
+use users::User;
 use std::collections::HashMap;
 use std::hash::Hash;
 

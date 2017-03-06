@@ -1,7 +1,6 @@
 //! Organizations interface
 
 use self::super::{Github, Result};
-// use rep::Org;
 
 pub struct Organizations<'a> {
     github: &'a Github,

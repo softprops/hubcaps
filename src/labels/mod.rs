@@ -3,7 +3,6 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-// use rep::{Label, LabelOptions};
 
 pub struct Labels<'a> {
     github: &'a Github,

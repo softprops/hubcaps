@@ -1,7 +1,8 @@
 //! Pull Commits interface
 
 use super::{Github, Result, Iter};
-use rep::{CommitRef, User, UserStamp};
+use users::User;
+use rep::{CommitRef, UserStamp};
 
 fn identity<T>(x: T) -> T {
     x

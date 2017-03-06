@@ -4,12 +4,10 @@ extern crate serde_json;
 
 use super::{Github, Result};
 use comments::Comments;
-// use rep::{Issue, IssueOptions, IssueListOptions, Label};
-use rep::User;
+use users::User;
 use labels::Label;
 use super::{SortDirection, State as StdState};
 use std::fmt;
-// use std::default::Default;
 use std::collections::HashMap;
 use url::form_urlencoded;
 

@@ -4,7 +4,6 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-// use rep::{Key, KeyOptions};
 
 pub struct Keys<'a> {
     github: &'a Github,

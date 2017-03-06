@@ -4,7 +4,6 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-// use rep::{Hook, HookCreateOptions, HookEditOptions};
 use std::fmt;
 use std::collections::BTreeMap;
 

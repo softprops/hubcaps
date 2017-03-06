@@ -1,11 +1,10 @@
 use self::super::{Github, Result, Iter};
-// use rep::{SearchIssuesOptions, SearchResult, SearchIssuesItem};
 use serde::Deserialize;
 use std::fmt;
 use url::form_urlencoded;
 use std::collections::HashMap;
 use super::SortDirection;
-use rep::User;
+use users::User;
 use url;
 use labels::Label;
 
