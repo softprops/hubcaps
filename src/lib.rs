@@ -40,7 +40,8 @@
 //! The convention for executing operations typically looks like
 //! `github.repo(.., ..).service().operation(OperationOptions)` where operation may be `create`,
 //! `delete`, ect.
-//!
+
+//! Services and their types are packaged under their own module namespace.
 //! A service interface will provide access to operations and operations may access options types
 //! this define the various parameter options available for the operation. Most operation option
 //! types expose `builder()` methods for a builder oriented style of constructing options.
