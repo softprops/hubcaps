@@ -1,10 +1,10 @@
-# 0.3.0 (unreleased)
+# 0.3.0
 
-* added support for listing repo hooks
+* added support for repo hooks
 * `Github::new` now takes an owned reference to a hyper::Client. this makes it possible
   to pass a github instance into a threaded context.
-* upgrade to serde 0.9
-* code restructure to support scalability in future growth. move foo.rs modules to foo/mod.rs files. moved respective rep.rs reps into mods
+* upgrade to serde 0.9 (and now uneeded build.rs machinery)
+* sizable code restructure to support scalability in future growth. move foo.rs modules to foo/mod.rs files. moved respective rep.rs reps into mods
 * the effect of the above is that everything may no longer be accessible via the top level `hubcaps` module. For instance, in the past you would be able to to access `hubcaps::Pull` directly, now you would access it via is api category `hubcaps::pulls::Pull`.
 * update hyper to 0.10. the implications are that you now need to bring your own tls-configured hyper client
 
