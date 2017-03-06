@@ -1,4 +1,4 @@
-//! Comments interface
+//! Search interface
 
 use self::super::{Github, Result, Iter};
 use serde::Deserialize;

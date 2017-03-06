@@ -11,7 +11,6 @@ use std::fmt;
 use std::collections::HashMap;
 use url::form_urlencoded;
 
-
 /// enum representation of github pull and issue state
 #[derive(Clone, Debug, PartialEq)]
 pub enum State {
