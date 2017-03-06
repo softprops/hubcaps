@@ -54,6 +54,8 @@ pub struct PullRequest<'a> {
 }
 
 impl<'a> PullRequest<'a> {
+    /// Creates a new instance
+    /// Use `github.repo(...).pulls().get(num)` instead
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullRequest<'a>
         where O: Into<String>,
               R: Into<String>
@@ -95,6 +97,7 @@ impl<'a> PullRequest<'a> {
         self.github.patch::<Pull>(&self.path(""), data.as_bytes())
     }
 
+    /// Returns a vector of file diffs associated with this pull
     pub fn files(&self) -> Result<Vec<FileDiff>> {
         self.github.get::<Vec<FileDiff>>(&self.path("/files"))
     }
@@ -132,6 +135,8 @@ pub struct PullRequests<'a> {
 }
 
 impl<'a> PullRequests<'a> {
+    /// Creates a new instance
+    /// Use `github.repo(..).pulls()` instead
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> PullRequests<'a>
         where O: Into<String>,
               R: Into<String>
@@ -170,6 +175,7 @@ impl<'a> PullRequests<'a> {
 
 // representations
 
+/// representation of a github pull request
 #[derive(Debug, Deserialize)]
 pub struct Pull {
     pub id: u64,
@@ -228,6 +234,7 @@ impl PullEditOptionsBuilder {
         PullEditOptionsBuilder { ..Default::default() }
     }
 
+    /// set the title of the pull
     pub fn title<T>(&mut self, title: T) -> &mut PullEditOptionsBuilder
         where T: Into<String>
     {
@@ -235,6 +242,7 @@ impl PullEditOptionsBuilder {
         self
     }
 
+    /// set the body of the pull
     pub fn body<B>(&mut self, body: B) -> &mut PullEditOptionsBuilder
         where B: Into<String>
     {
@@ -242,6 +250,7 @@ impl PullEditOptionsBuilder {
         self
     }
 
+    /// set the state of the pull
     pub fn state<S>(&mut self, state: S) -> &mut PullEditOptionsBuilder
         where S: Into<String>
     {
@@ -249,6 +258,7 @@ impl PullEditOptionsBuilder {
         self
     }
 
+    /// create a new set of pull edit options
     pub fn build(&self) -> PullEditOptions {
         PullEditOptions {
             title: self.title.clone(),

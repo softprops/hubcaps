@@ -16,6 +16,8 @@ pub struct PullCommits<'a> {
 }
 
 impl<'a> PullCommits<'a> {
+    /// creates a new instance
+    /// use `github.repo(...).pulls().get(number).commits()` instead
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullCommits<'a>
         where O: Into<String>,
               R: Into<String>
@@ -37,7 +39,7 @@ impl<'a> PullCommits<'a> {
         self.github.get::<Vec<PullCommit>>(&uri)
     }
 
-    // provides an iterator over all pages of pull commits
+    /// provides an iterator over all pages of pull commits
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<PullCommit>, PullCommit>> {
         let uri = format!("/repos/{}/{}/pulls/{}/commits",
                           self.owner,
@@ -49,6 +51,7 @@ impl<'a> PullCommits<'a> {
 
 // representations
 
+/// Representation of a pull request commit
 #[derive(Debug, Deserialize)]
 pub struct PullCommit {
     pub url: String,
@@ -61,6 +64,7 @@ pub struct PullCommit {
     pub parents: Vec<CommitRef>,
 }
 
+/// Representation of a pull request commit details
 #[derive(Debug, Deserialize)]
 pub struct CommitDetails {
     pub url: String,
@@ -71,12 +75,14 @@ pub struct CommitDetails {
     pub comment_count: u64,
 }
 
+/// Representation of a reference to a commit
 #[derive(Debug, Deserialize)]
 pub struct CommitRef {
     pub url: String,
     pub sha: String,
 }
 
+/// Representation of a git user
 #[derive(Debug, Deserialize)]
 pub struct UserStamp {
     pub name: String,
