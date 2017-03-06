@@ -3,7 +3,6 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::{Label, LabelOptions};
 
 pub struct Labels<'a> {
     github: &'a Github,
@@ -46,4 +45,31 @@ impl<'a> Labels<'a> {
     pub fn list(&self) -> Result<Vec<Label>> {
         self.github.get::<Vec<Label>>(&self.path(""))
     }
+}
+
+// representations
+
+#[derive(Debug, Serialize)]
+pub struct LabelOptions {
+    pub name: String,
+    pub color: String,
+}
+
+impl LabelOptions {
+    pub fn new<N, C>(name: N, color: C) -> LabelOptions
+        where N: Into<String>,
+              C: Into<String>
+    {
+        LabelOptions {
+            name: name.into(),
+            color: color.into(),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Label {
+    pub url: String,
+    pub name: String,
+    pub color: String,
 }

@@ -1,6 +1,7 @@
+//! Review comments interface
 
 use super::{Github, Result};
-use rep::ReviewComment;
+use users::User;
 
 /// A structure for interfacing with a issue comments
 pub struct ReviewComments<'a> {
@@ -30,4 +31,24 @@ impl<'a> ReviewComments<'a> {
                                                        self.repo,
                                                        self.number))
     }
+}
+
+// representations
+
+#[derive(Debug, Deserialize)]
+pub struct ReviewComment {
+    pub id: u64,
+    pub url: String,
+    pub diff_hunk: String,
+    pub path: String,
+    pub position: u64,
+    pub original_position: u64,
+    pub commit_id: String,
+    pub original_commit_id: String,
+    pub user: User,
+    pub body: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub html_url: String,
+    pub pull_request_url: String,
 }

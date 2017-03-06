@@ -4,7 +4,6 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
-use rep::{Key, KeyOptions};
 
 pub struct Keys<'a> {
     github: &'a Github,
@@ -46,4 +45,23 @@ impl<'a> Keys<'a> {
             .delete(&self.path(&format!("/{}", id)))
             .map(|_| ())
     }
+}
+
+// representations
+
+#[derive(Debug, Deserialize)]
+pub struct Key {
+    pub id: u64,
+    pub key: String,
+    pub title: String,
+    pub verified: bool,
+    pub created_at: String,
+    pub read_only: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct KeyOptions {
+    pub title: String,
+    pub key: String,
+    pub read_only: bool,
 }

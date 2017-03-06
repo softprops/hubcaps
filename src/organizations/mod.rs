@@ -1,7 +1,6 @@
 //! Organizations interface
 
 use self::super::{Github, Result};
-use rep::Org;
 
 pub struct Organizations<'a> {
     github: &'a Github,
@@ -47,4 +46,21 @@ impl<'a> UserOrganizations<'a> {
     pub fn list(&self) -> Result<Vec<Org>> {
         self.github.get::<Vec<Org>>(&self.path(""))
     }
+}
+
+// representations
+
+#[derive(Debug, Deserialize)]
+pub struct Org {
+    pub login: String,
+    pub id: u64,
+    pub url: String,
+    pub repos_url: String,
+    pub events_url: String,
+    pub hooks_url: String,
+    pub issues_url: String,
+    pub members_url: String,
+    pub public_members_url: String,
+    pub avatar_url: String,
+    pub description: Option<String>,
 }
