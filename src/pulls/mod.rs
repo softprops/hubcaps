@@ -11,8 +11,8 @@ use std::default::Default;
 use std::fmt;
 use url::form_urlencoded;
 use std::collections::HashMap;
-use issues::Sort as IssueSort;
-use super::{SortDirection, State as StdState};
+use issues::{Sort as IssueSort, State};
+use super::SortDirection;
 
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
@@ -352,7 +352,7 @@ impl PullListOptionsBuilder {
         PullListOptionsBuilder { ..Default::default() }
     }
 
-    pub fn state(&mut self, state: StdState) -> &mut PullListOptionsBuilder {
+    pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {
         self.params.insert("state", state.to_string());
         self
     }
@@ -396,12 +396,10 @@ mod tests {
             }
         }
         let tests = vec![(PullListOptions::builder().build(), None),
-                         (PullListOptions::builder().state(StdState::Closed).build(),
+                         (PullListOptions::builder().state(State::Closed).build(),
                           Some("state=closed".to_owned()))];
         test_serialize(tests)
     }
-
-
 
     #[test]
     fn pullreq_edits() {

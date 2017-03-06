@@ -6,11 +6,40 @@ use super::{Github, Result};
 use comments::Comments;
 use users::User;
 use labels::Label;
-use super::{SortDirection, State as StdState};
+use super::SortDirection;
 use std::fmt;
 use std::collections::HashMap;
 use url::form_urlencoded;
 
+
+/// enum representation of github pull and issue state
+#[derive(Clone, Debug, PartialEq)]
+pub enum State {
+    /// Only open issues
+    Open,
+    /// Only closed issues
+    Closed,
+    /// All issues, open or closed
+    All,
+}
+
+impl fmt::Display for State {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   State::Open => "open",
+                   State::Closed => "closed",
+                   State::All => "all",
+               })
+    }
+}
+
+impl Default for State {
+    fn default() -> State {
+        State::Open
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Sort {
@@ -37,7 +66,7 @@ impl Default for Sort {
     }
 }
 
-/// Provides access to label operations available for a single issues
+/// Provides access to label operations available for a individual issues
 pub struct IssueLabels<'a> {
     github: &'a Github,
     owner: String,
@@ -224,7 +253,7 @@ impl IssueListOptionsBuilder {
         IssueListOptionsBuilder { ..Default::default() }
     }
 
-    pub fn state(&mut self, state: StdState) -> &mut IssueListOptionsBuilder {
+    pub fn state(&mut self, state: State) -> &mut IssueListOptionsBuilder {
         self.params.insert("state", state.to_string());
         self
     }
@@ -344,10 +373,15 @@ pub struct Issue {
     pub updated_at: String,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn default_state() {
+        let default: State = Default::default();
+        assert_eq!(default, State::Open)
+    }
 
     #[test]
     fn issue_list_reqs() {
@@ -364,7 +398,7 @@ mod tests {
                 None
             ),
             (
-                IssueListOptions::builder().state(StdState::Closed).build(),
+                IssueListOptions::builder().state(State::Closed).build(),
                 Some("state=closed".to_owned())
              ),
             (
@@ -373,25 +407,6 @@ mod tests {
             ),
         ];
         test_serialize(tests)
-    }
-
-    #[test]
-    fn filter_default() {
-        let default: Filter = Default::default();
-        assert_eq!(default, Filter::Assigned)
-    }
-
-    #[test]
-    fn filter_display() {
-        for (k, v) in vec![
-            (Filter::Assigned, "assigned"),
-            (Filter::Created, "created"),
-            (Filter::Mentioned, "mentioned"),
-            (Filter::Subscribed, "subscribed"),
-            (Filter::All, "all"),
-        ] {
-            assert_eq!(k.to_string(), v)
-        }
     }
 
     #[test]

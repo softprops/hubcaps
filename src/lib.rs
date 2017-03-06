@@ -130,35 +130,6 @@ impl From<MediaType> for Mime {
     }
 }
 
-/// enum representation of github pull and issue state
-#[derive(Clone, Debug, PartialEq)]
-pub enum State {
-    /// Only open issues
-    Open,
-    /// Only closed issues
-    Closed,
-    /// All issues, open or closed
-    All,
-}
-
-impl fmt::Display for State {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   State::Open => "open",
-                   State::Closed => "closed",
-                   State::All => "all",
-               })
-    }
-}
-
-impl Default for State {
-    fn default() -> State {
-        State::Open
-    }
-}
-
 /// enum representation of Github list sorting options
 #[derive(Clone, Debug, PartialEq)]
 pub enum SortDirection {
@@ -509,12 +480,6 @@ mod tests {
         let links = Links::new(r#"<linknext>; rel="next", <linklast>; rel="last""#);
         assert_eq!(links.next(), Some("linknext".to_owned()));
         assert_eq!(links.last(), Some("linklast".to_owned()));
-    }
-
-    #[test]
-    fn default_state() {
-        let default: State = Default::default();
-        assert_eq!(default, State::Open)
     }
 
     #[test]
