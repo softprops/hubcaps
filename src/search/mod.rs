@@ -1,3 +1,5 @@
+//! Comments interface
+
 use self::super::{Github, Result, Iter};
 use serde::Deserialize;
 use std::fmt;
@@ -10,7 +12,7 @@ use labels::Label;
 
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
-pub enum SearchIssuesSort {
+pub enum IssuesSort {
     /// Sort by time created
     Created,
     /// Sort by last updated
@@ -19,14 +21,14 @@ pub enum SearchIssuesSort {
     Comments,
 }
 
-impl fmt::Display for SearchIssuesSort {
+impl fmt::Display for IssuesSort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
                "{}",
                match *self {
-                   SearchIssuesSort::Comments => "comments",
-                   SearchIssuesSort::Created => "created",
-                   SearchIssuesSort::Updated => "updated",
+                   IssuesSort::Comments => "comments",
+                   IssuesSort::Created => "created",
+                   IssuesSort::Updated => "updated",
                })
     }
 }
@@ -84,20 +86,17 @@ impl<'a> SearchIssues<'a> {
     pub fn iter<Q>(&'a self,
                    q: Q,
                    options: &SearchIssuesOptions)
-                   -> Result<Iter<'a, SearchResult<SearchIssuesItem>, SearchIssuesItem>>
+                   -> Result<Iter<'a, SearchResult<IssuesItem>, IssuesItem>>
         where Q: Into<String>
     {
-        self.search.iter::<SearchIssuesItem>(&Self::search_uri(q, options))
+        self.search.iter::<IssuesItem>(&Self::search_uri(q, options))
     }
 
     /// returns a single page of search results
-    pub fn list<Q>(&self,
-                   q: Q,
-                   options: &SearchIssuesOptions)
-                   -> Result<SearchResult<SearchIssuesItem>>
+    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Result<SearchResult<IssuesItem>>
         where Q: Into<String>
     {
-        self.search.search::<SearchIssuesItem>(&Self::search_uri(q, options))
+        self.search.search::<IssuesItem>(&Self::search_uri(q, options))
     }
 }
 
@@ -137,7 +136,7 @@ impl SearchIssuesOptionsBuilder {
         SearchIssuesOptionsBuilder { ..Default::default() }
     }
 
-    pub fn sort(&mut self, sort: SearchIssuesSort) -> &mut SearchIssuesOptionsBuilder {
+    pub fn sort(&mut self, sort: IssuesSort) -> &mut SearchIssuesOptionsBuilder {
         self.params.insert("sort", sort.to_string());
         self
     }
@@ -161,7 +160,7 @@ pub struct SearchResult<D: ::serde::Deserialize> {
 
 
 #[derive(Debug, Deserialize)]
-pub struct SearchIssuesItem {
+pub struct IssuesItem {
     pub url: String,
     pub repository_url: String,
     pub labels_url: String,
@@ -185,7 +184,7 @@ pub struct SearchIssuesItem {
     pub body: Option<String>,
 }
 
-impl SearchIssuesItem {
+impl IssuesItem {
     /// returns a tuple of (repo owner name, repo name) associated with this issue
     pub fn repo_tuple(&self) -> (String, String) {
         let parsed = url::Url::parse(&self.repository_url).unwrap();
