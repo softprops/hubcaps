@@ -52,6 +52,8 @@
 //! built-in Result with the Err Type fixed to the
 //! [hubcaps::Error](errors/enum.Error.html) enum type.
 //!
+#![warn(missing_docs)] // todo: make this a deny eventually
+
 #[macro_use]
 extern crate log;
 #[macro_use]
@@ -102,6 +104,7 @@ use std::io::Read;
 use url::Url;
 use std::collections::HashMap;
 
+/// Link header type
 header! { (Link, "Link") => [String] }
 
 const DEFAULT_HOST: &'static str = "https://api.github.com";
@@ -109,8 +112,12 @@ const DEFAULT_HOST: &'static str = "https://api.github.com";
 /// alias for Result that infers hubcaps::Error as Err
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Github defined Media types
+/// See [this doc](https://developer.github.com/v3/media/) for more for more information
 enum MediaType {
+    /// Return json (the default)
     Json,
+    /// Return json in preview form
     Preview(&'static str),
 }
 
@@ -134,7 +141,7 @@ impl From<MediaType> for Mime {
 /// enum representation of Github list sorting options
 #[derive(Clone, Debug, PartialEq)]
 pub enum SortDirection {
-    /// Sort in ascending order
+    /// Sort in ascending order (the default)
     Asc,
     /// Sort in descending order
     Desc,
@@ -160,7 +167,7 @@ impl Default for SortDirection {
 /// Various forms of authentication credentials supported by Github
 #[derive(Debug, PartialEq)]
 pub enum Credentials {
-    /// No authentication
+    /// No authentication (the default)
     None,
     /// Oauth token string
     /// https://developer.github.com/v3/#oauth2-token-sent-in-a-header
@@ -185,7 +192,8 @@ pub struct Github {
 }
 
 impl Github {
-    /// Create a new Github instance
+    /// Create a new Github instance. This will typically be how you interface with all
+    /// other operations
     pub fn new<A>(agent: A, client: Client, credentials: Credentials) -> Github
         where A: Into<String>
     {
@@ -255,6 +263,7 @@ impl Github {
         Gists::new(self)
     }
 
+    /// Return a reference to an interface that provides access to search operations
     pub fn search(&self) -> Search {
         Search::new(self)
     }
@@ -388,6 +397,7 @@ impl Github {
     }
 }
 
+/// An abstract type used for iterating over result sets
 pub struct Iter<'a, D, I> {
     github: &'a Github,
     next_link: Option<String>,
@@ -398,6 +408,7 @@ pub struct Iter<'a, D, I> {
 impl<'a, D, I> Iter<'a, D, I>
     where D: Deserialize
 {
+    /// creates a new instance of an Iter
     pub fn new(github: &'a Github,
                uri: String,
                into_items: fn(D) -> Vec<I>)
@@ -436,12 +447,16 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
     }
 }
 
+/// An abstract collection of Link header urls
+/// Exposes interfaces to access link relations github typically
+/// sends as headers
 #[derive(Debug)]
 pub struct Links {
     values: HashMap<String, String>,
 }
 
 impl Links {
+    /// Creates a new Links instance given a raw header string value
     pub fn new<V>(value: V) -> Links
         where V: Into<String>
     {
@@ -459,14 +474,17 @@ impl Links {
         Links { values: values }
     }
 
+    /// Returns next link url, when vailable
     pub fn next(&self) -> Option<String> {
         self.values.get("next").map(|s| s.to_owned())
     }
 
+    /// Returns prev link url, when vailable
     pub fn prev(&self) -> Option<String> {
         self.values.get("prev").map(|s| s.to_owned())
     }
 
+    /// Returns last link url, when vailable
     pub fn last(&self) -> Option<String> {
         self.values.get("last").map(|s| s.to_owned())
     }
