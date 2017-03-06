@@ -12,35 +12,6 @@ use std::collections::HashMap;
 use url::form_urlencoded;
 
 
-#[derive(Debug, PartialEq)]
-pub enum Filter {
-    Assigned,
-    Created,
-    Mentioned,
-    Subscribed,
-    All,
-}
-
-impl fmt::Display for Filter {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Filter::Assigned => "assigned",
-                   Filter::Created => "created",
-                   Filter::Mentioned => "mentioned",
-                   Filter::Subscribed => "subscribed",
-                   Filter::All => "all",
-               })
-    }
-}
-
-impl Default for Filter {
-    fn default() -> Filter {
-        Filter::Assigned
-    }
-}
-
 #[derive(Clone, Debug, PartialEq)]
 pub enum Sort {
     Created,
@@ -66,6 +37,7 @@ impl Default for Sort {
     }
 }
 
+/// Provides access to label operations available for a single issues
 pub struct IssueLabels<'a> {
     github: &'a Github,
     owner: String,
@@ -122,6 +94,8 @@ impl<'a> IssueLabels<'a> {
     }
 }
 
+/// Provides access to operations available for a single issue
+/// Typically accessed from `github.repo(.., ..).issues().get(number)`
 pub struct IssueRef<'a> {
     github: &'a Github,
     owner: String,
@@ -171,7 +145,8 @@ impl<'a> IssueRef<'a> {
     }
 }
 
-
+/// Provides access to operations available for a repository issues
+/// Typically accessed via `github.repo(..., ...).issues()`
 pub struct Issues<'a> {
     github: &'a Github,
     owner: String,
