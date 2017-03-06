@@ -1,3 +1,4 @@
+//! Review comments interface
 
 use super::{Github, Result};
 use users::User;
