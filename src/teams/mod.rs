@@ -29,7 +29,6 @@ impl<'a> OrgTeams<'a> {
     }
 }
 
-
 // representations
 
 #[derive(Debug, Deserialize)]

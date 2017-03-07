@@ -66,6 +66,7 @@ extern crate url;
 
 // all the modules!
 use serde::de::Deserialize;
+pub mod branches;
 pub mod users;
 pub mod comments;
 pub mod review_comments;
@@ -359,7 +360,13 @@ impl Github {
     fn get<D>(&self, uri: &str) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Get, self.host.clone() + uri, None, MediaType::Json)
+        self.get_media(uri, MediaType::Json)
+    }
+
+    fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
+        where D: Deserialize
+    {
+        self.request_entity(Method::Get, self.host.clone() + uri, None, media)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {

@@ -2,6 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Github, Result};
+use branches::Branches;
 use hooks::Hooks;
 use deployments::Deployments;
 use keys::Keys;
@@ -238,6 +239,12 @@ impl<'a> Repository<'a> {
         }
     }
 
+    /// get a reference to branch operations
+    pub fn branches(&self) -> Branches {
+        Branches::new(self.github, self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to repo hook operations
     pub fn hooks(&self) -> Hooks {
         Hooks::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
