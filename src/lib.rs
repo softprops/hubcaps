@@ -82,6 +82,7 @@ pub mod repositories;
 pub mod statuses;
 pub mod pulls;
 pub mod search;
+pub mod teams;
 pub mod organizations;
 
 pub use errors::Error;
@@ -94,7 +95,7 @@ use hyper::header::{qitem, Accept, Authorization, ContentLength, UserAgent};
 use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
-use organizations::{Organizations, UserOrganizations};
+use organizations::{Organization, Organizations, UserOrganizations};
 use std::fmt;
 use std::io::Read;
 use url::Url;
@@ -230,6 +231,12 @@ impl Github {
     /// associated with the current authentication credentials
     pub fn repos(&self) -> Repositories {
         Repositories::new(self)
+    }
+
+    pub fn org<O>(&self, org: O) -> Organization
+        where O: Into<String>
+    {
+        Organization::new(self, org)
     }
 
     /// Return a reference to the collection of organizations that the user

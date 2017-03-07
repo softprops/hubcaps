@@ -40,10 +40,14 @@ impl Default for State {
     }
 }
 
+/// Sort options available for github issues
 #[derive(Clone, Debug, PartialEq)]
 pub enum Sort {
+    /// sort by creation time of issue
     Created,
+    /// sort by the last time issue was updated
     Updated,
+    /// sort by number of comments
     Comments,
 }
 
@@ -65,7 +69,7 @@ impl Default for Sort {
     }
 }
 
-/// Provides access to label operations available for a individual issues
+/// Provides access to label operations available for an individual issues
 pub struct IssueLabels<'a> {
     github: &'a Github,
     owner: String,

@@ -1,6 +1,30 @@
 //! Organizations interface
 
 use self::super::{Github, Result};
+use teams::OrgTeams;
+
+/// Provides access to label operations available for an individual organization
+pub struct Organization<'a> {
+    github: &'a Github,
+    org: String,
+}
+
+impl<'a> Organization<'a> {
+    pub fn new<O>(github: &'a Github, org: O) -> Self
+        where O: Into<String>
+    {
+        Organization {
+            github: github,
+            org: org.into(),
+        }
+    }
+
+    /// returns a reference to an iterface for team operations
+    pub fn teams(&self) -> OrgTeams {
+        OrgTeams::new(self.github, self.org.clone())
+    }
+}
+
 
 pub struct Organizations<'a> {
     github: &'a Github,
