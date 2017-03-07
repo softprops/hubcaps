@@ -1,7 +1,7 @@
 //! Gists interface
 extern crate serde_json;
 
-use self::super::{Error, Github, Result};
+use self::super::{Error, ErrorKind, Github, Result};
 use url::form_urlencoded;
 use users::User;
 use std::collections::HashMap;
@@ -49,7 +49,7 @@ impl<'a> Gists<'a> {
         match self.github
             .put::<String>(&self.path(&format!("/{}/star", id)), &[])
             .map(|_| ()) {
-            Err(Error::Codec(_)) => Ok(()),
+            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
             otherwise => otherwise,
         }
     }

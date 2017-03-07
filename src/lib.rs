@@ -55,6 +55,8 @@
 #![warn(missing_docs)] // todo: make this a deny eventually
 
 #[macro_use]
+extern crate error_chain;
+#[macro_use]
 extern crate log;
 #[macro_use]
 extern crate hyper;
@@ -86,7 +88,7 @@ pub mod search;
 pub mod teams;
 pub mod organizations;
 
-pub use errors::Error;
+pub use errors::{Error, ErrorKind, Result};
 use gists::{Gists, UserGists};
 use search::Search;
 use hyper::Client;
@@ -108,8 +110,7 @@ header! { (Link, "Link") => [String] }
 const DEFAULT_HOST: &'static str = "https://api.github.com";
 
 /// alias for Result that infers hubcaps::Error as Err
-pub type Result<T> = std::result::Result<T, Error>;
-
+// pub type Result<T> = std::result::Result<T, Error>;
 /// Github defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information
 enum MediaType {
@@ -337,10 +338,11 @@ impl Github {
             StatusCode::Unauthorized |
             StatusCode::NotFound |
             StatusCode::Forbidden => {
-                Err(Error::Fault {
-                    code: res.status,
-                    error: try!(serde_json::from_str::<errors::ClientError>(&body)),
-                })
+                Err(ErrorKind::Fault {
+                        code: res.status,
+                        error: try!(serde_json::from_str::<errors::ClientError>(&body)),
+                    }
+                    .into())
             }
             _ => Ok((links, try!(serde_json::from_str::<D>(&body)))),
         }
@@ -374,7 +376,7 @@ impl Github {
                                         self.host.clone() + uri,
                                         None,
                                         MediaType::Json) {
-            Err(Error::Codec(_)) => Ok(()),
+            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
             otherwise => otherwise,
         }
     }
