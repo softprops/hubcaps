@@ -58,7 +58,8 @@ impl<'a> Hooks<'a> {
 
     /// lists hook associated with a repoistory
     pub fn list(&self) -> Result<Vec<Hook>> {
-        self.github.get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
+        self.github
+            .get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
     }
 
     /// creates a new repository hook
@@ -68,20 +69,23 @@ impl<'a> Hooks<'a> {
     /// for more information
     pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
         let data = try!(serde_json::to_string(&options));
-        self.github.post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
-                                 data.as_bytes())
+        self.github
+            .post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
+                          data.as_bytes())
     }
 
     /// edits an existing repository hook
     pub fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
         let data = try!(serde_json::to_string(&options));
-        self.github.patch::<Hook>(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-                                  data.as_bytes())
+        self.github
+            .patch::<Hook>(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
+                           data.as_bytes())
     }
 
     /// deletes a repoistory hook by id
     pub fn delete(&self, id: u64) -> Result<()> {
-        self.github.delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
+        self.github
+            .delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
     }
 }
 
@@ -317,10 +321,11 @@ impl Hook {
     }
 
     pub fn config_string(&self, name: &str) -> Option<String> {
-        self.config_value(name).and_then(|value| match *value {
-            ::serde_json::Value::String(ref val) => Some(val.clone()),
-            _ => None,
-        })
+        self.config_value(name)
+            .and_then(|value| match *value {
+                          ::serde_json::Value::String(ref val) => Some(val.clone()),
+                          _ => None,
+                      })
     }
 
     pub fn url(&self) -> Option<String> {

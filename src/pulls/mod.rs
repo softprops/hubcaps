@@ -94,7 +94,8 @@ impl<'a> PullRequest<'a> {
     /// Edit a pull request
     pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
         let data = try!(serde_json::to_string(&pr));
-        self.github.patch::<Pull>(&self.path(""), data.as_bytes())
+        self.github
+            .patch::<Pull>(&self.path(""), data.as_bytes())
     }
 
     /// Returns a vector of file diffs associated with this pull
@@ -422,7 +423,10 @@ mod tests {
     #[test]
     fn pullreq_edits() {
         let tests = vec![(PullEditOptions::builder().title("test").build(), r#"{"title":"test"}"#),
-                         (PullEditOptions::builder().title("test").body("desc").build(),
+                         (PullEditOptions::builder()
+                              .title("test")
+                              .body("desc")
+                              .build(),
                           r#"{"title":"test","body":"desc"}"#),
                          (PullEditOptions::builder().state("closed").build(),
                           r#"{"state":"closed"}"#)];

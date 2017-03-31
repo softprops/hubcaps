@@ -16,9 +16,12 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
-            for repo in github.user_repos("softprops").list(&Default::default()).unwrap() {
+            for repo in github
+                    .user_repos("softprops")
+                    .list(&Default::default())
+                    .unwrap() {
                 println!("{}", repo.name);
                 for (language, bytes_of_code) in &repo.languages(&github).unwrap() {
                     println!("{}: {} bytes", language, bytes_of_code);

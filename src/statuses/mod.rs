@@ -31,15 +31,17 @@ impl<'a> Statuses<'a> {
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
         let data = try!(serde_json::to_string(&status));
-        self.github.post::<Status>(&self.path(&format!("/{}", sha)), data.as_bytes())
+        self.github
+            .post::<Status>(&self.path(&format!("/{}", sha)), data.as_bytes())
     }
 
     /// lists all statuses associated with a given git sha
     pub fn list(&self, sha: &str) -> Result<Vec<Status>> {
-        self.github.get::<Vec<Status>>(&format!("/repos/{}/{}/commits/{}/statuses",
-                                                self.owner,
-                                                self.repo,
-                                                sha))
+        self.github
+            .get::<Vec<Status>>(&format!("/repos/{}/{}/commits/{}/statuses",
+                                         self.owner,
+                                         self.repo,
+                                         sha))
     }
 
     /// list the combined statuses for a given git sha
@@ -86,7 +88,10 @@ pub struct StatusBuilder {
 
 impl StatusBuilder {
     pub fn new(state: State) -> StatusBuilder {
-        StatusBuilder { state: state, ..Default::default() }
+        StatusBuilder {
+            state: state,
+            ..Default::default()
+        }
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut StatusBuilder
@@ -201,13 +206,15 @@ mod tests {
 
     #[test]
     fn status_reqs() {
-        let tests = vec![(StatusOptions::builder(State::Pending).build(),
-                  r#"{"state":"pending"}"#),
+        let tests =
+            vec![(StatusOptions::builder(State::Pending).build(), r#"{"state":"pending"}"#),
                  (StatusOptions::builder(State::Success)
                       .target_url("http://acme.com")
                       .build(),
                   r#"{"state":"success","target_url":"http://acme.com"}"#),
-                 (StatusOptions::builder(State::Error).description("desc").build(),
+                 (StatusOptions::builder(State::Error)
+                      .description("desc")
+                      .build(),
                   r#"{"state":"error","description":"desc"}"#),
                  (StatusOptions::builder(State::Failure)
                       .target_url("http://acme.com")

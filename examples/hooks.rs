@@ -17,14 +17,14 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
             let repo = github.repo("softprops", "hubcaps");
             let hook = repo.hooks()
                 .create(&HookCreateOptions::web()
-                    .url("http://localhost:8080")
-                    .content_type(WebHookContentType::Json)
-                    .build());
+                             .url("http://localhost:8080")
+                             .content_type(WebHookContentType::Json)
+                             .build());
             println!("{:#?}", hook);
             let hooks = repo.hooks();
             for hook in hooks.list().unwrap() {

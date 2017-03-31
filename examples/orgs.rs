@@ -17,11 +17,12 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
 
-            let options =
-                OrganizationRepoListOptions::builder().repo_type(OrgRepoType::Forks).build();
+            let options = OrganizationRepoListOptions::builder()
+                .repo_type(OrgRepoType::Forks)
+                .build();
 
             println!("Forks in the rust-lang organization:");
 

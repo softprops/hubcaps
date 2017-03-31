@@ -26,10 +26,11 @@ impl<'a> ReviewComments<'a> {
 
     /// list pull requests
     pub fn list(&self) -> Result<Vec<ReviewComment>> {
-        self.github.get::<Vec<ReviewComment>>(&format!("/repos/{}/{}/pulls/{}/comments",
-                                                       self.owner,
-                                                       self.repo,
-                                                       self.number))
+        self.github
+            .get::<Vec<ReviewComment>>(&format!("/repos/{}/{}/pulls/{}/comments",
+                                                self.owner,
+                                                self.repo,
+                                                self.number))
     }
 }
 

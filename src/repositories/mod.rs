@@ -426,7 +426,10 @@ impl RepoOptionsBuilder {
     pub fn new<N>(name: N) -> RepoOptionsBuilder
         where N: Into<String>
     {
-        RepoOptionsBuilder { name: name.into(), ..Default::default() }
+        RepoOptionsBuilder {
+            name: name.into(),
+            ..Default::default()
+        }
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut RepoOptionsBuilder
@@ -580,11 +583,13 @@ impl RepoListOptionsBuilder {
     }
 
     pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut RepoListOptionsBuilder {
-        self.params.insert("affiliation",
-                           affiliations.into_iter()
-                               .map(|a| a.to_string())
-                               .collect::<Vec<String>>()
-                               .join(","));
+        self.params
+            .insert("affiliation",
+                    affiliations
+                        .into_iter()
+                        .map(|a| a.to_string())
+                        .collect::<Vec<String>>()
+                        .join(","));
         self
     }
 

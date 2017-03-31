@@ -54,17 +54,18 @@ mod tests {
                     "message": "Published releases must have a valid tag"
                 }]}"#,
                                     ClientError {
-                                       message: "Validation Failed".to_owned(),
-                                       errors: Some(vec![FieldErr {
-                                                             resource: "Release".to_owned(),
-                                                             code: "custom".to_owned(),
-                                                             field: None,
-                                                             message: Some("Published releases \
+                                        message: "Validation Failed".to_owned(),
+                                        errors: Some(vec![FieldErr {
+                                                              resource: "Release".to_owned(),
+                                                              code: "custom".to_owned(),
+                                                              field: None,
+                                                              message:
+                                                                  Some("Published releases \
                                                                             must have a valid tag"
-                                                                 .to_owned()),
-                                                             documentation_url: None,
-                                                         }]),
-                                   })] {
+                                                                               .to_owned()),
+                                                              documentation_url: None,
+                                                          }]),
+                                    })] {
             assert_eq!(serde_json::from_str::<ClientError>(json).unwrap(), expect);
         }
     }

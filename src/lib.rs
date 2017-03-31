@@ -131,7 +131,9 @@ impl From<MediaType> for Mime {
         match media {
             MediaType::Json => "application/vnd.github.v3+json".parse().unwrap(),
             MediaType::Preview(codename) => {
-                format!("application/vnd.github.{}-preview+json", codename).parse().unwrap()
+                format!("application/vnd.github.{}-preview+json", codename)
+                    .parse()
+                    .unwrap()
             }
         }
     }
@@ -284,12 +286,15 @@ impl Github {
     fn authenticate(&self, method: Method, url: String) -> RequestBuilder {
         match self.credentials {
             Credentials::Token(ref token) => {
-                self.client.request(method, &url).header(Authorization(format!("token {}", token)))
+                self.client
+                    .request(method, &url)
+                    .header(Authorization(format!("token {}", token)))
             }
             Credentials::Client(ref id, ref secret) => {
 
                 let mut parsed = Url::parse(&url).unwrap();
-                parsed.query_pairs_mut()
+                parsed
+                    .query_pairs_mut()
                     .append_pair("client_id", id)
                     .append_pair("client_secret", secret);
                 self.client.request(method, parsed)
@@ -318,9 +323,9 @@ impl Github {
             .header(Accept(vec![qitem(From::from(media_type))]));
 
         let mut res = try!(match body {
-            Some(ref bod) => builder.body(*bod).send(),
-            _ => builder.send(),
-        });
+                               Some(ref bod) => builder.body(*bod).send(),
+                               _ => builder.send(),
+                           });
 
         let mut body = match res.headers.clone().get::<ContentLength>() {
             Some(&ContentLength(len)) => String::with_capacity(len as usize),
@@ -328,7 +333,9 @@ impl Github {
         };
         try!(res.read_to_string(&mut body));
 
-        let links = res.headers.get::<Link>().map(|&Link(ref value)| Links::new(value.to_owned()));
+        let links = res.headers
+            .get::<Link>()
+            .map(|&Link(ref value)| Links::new(value.to_owned()));
 
         debug!("rec response {:#?} {:#?} {}", res.status, res.headers, body);
         match res.status {
@@ -339,10 +346,10 @@ impl Github {
             StatusCode::NotFound |
             StatusCode::Forbidden => {
                 Err(ErrorKind::Fault {
-                        code: res.status,
-                        error: try!(serde_json::from_str::<errors::ClientError>(&body)),
-                    }
-                    .into())
+                            code: res.status,
+                            error: try!(serde_json::from_str::<errors::ClientError>(&body)),
+                        }
+                        .into())
             }
             _ => Ok((links, try!(serde_json::from_str::<D>(&body)))),
         }
@@ -356,7 +363,8 @@ impl Github {
                          -> Result<D>
         where D: Deserialize
     {
-        self.request(method, uri, body, media_type).map(|(_, entity)| entity)
+        self.request(method, uri, body, media_type)
+            .map(|(_, entity)| entity)
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
@@ -427,11 +435,11 @@ impl<'a, D, I> Iter<'a, D, I>
                -> Result<Iter<'a, D, I>> {
         let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, MediaType::Json));
         Ok(Iter {
-            github: github,
-            next_link: links.and_then(|l| l.next()),
-            into_items: into_items,
-            items: into_items(payload),
-        })
+               github: github,
+               next_link: links.and_then(|l| l.next()),
+               into_items: into_items,
+               items: into_items(payload),
+           })
     }
 
     fn set_next(&mut self, next: Option<String>) {
@@ -444,18 +452,22 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
 {
     type Item = I;
     fn next(&mut self) -> Option<I> {
-        self.items.pop().or_else(|| {
-            self.next_link.clone().and_then(|ref next_link| {
-                self.github
-                    .request::<D>(Method::Get, next_link.to_owned(), None, MediaType::Json)
-                    .ok()
-                    .and_then(|(links, payload)| {
-                        self.set_next(links.and_then(|l| l.next()));
-                        self.items = (self.into_items)(payload);
-                        self.next()
+        self.items
+            .pop()
+            .or_else(|| {
+                self.next_link
+                    .clone()
+                    .and_then(|ref next_link| {
+                        self.github
+                            .request::<D>(Method::Get, next_link.to_owned(), None, MediaType::Json)
+                            .ok()
+                            .and_then(|(links, payload)| {
+                                          self.set_next(links.and_then(|l| l.next()));
+                                          self.items = (self.into_items)(payload);
+                                          self.next()
+                                      })
                     })
             })
-        })
     }
 }
 
@@ -472,12 +484,20 @@ impl Links {
     pub fn new<V>(value: V) -> Links
         where V: Into<String>
     {
-        let values = value.into()
+        let values = value
+            .into()
             .split(",")
             .map(|link| {
                 let parts = link.split(";").collect::<Vec<_>>();
-                (parts[1].to_owned().replace(" rel=\"", "").replace("\"", ""),
-                 parts[0].to_owned().replace("<", "").replace(">", "").replace(" ", ""))
+                (parts[1]
+                     .to_owned()
+                     .replace(" rel=\"", "")
+                     .replace("\"", ""),
+                 parts[0]
+                     .to_owned()
+                     .replace("<", "")
+                     .replace(">", "")
+                     .replace(" ", ""))
             })
             .fold(HashMap::new(), |mut acc, (rel, link)| {
                 acc.insert(rel, link);

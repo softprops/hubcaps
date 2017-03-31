@@ -25,10 +25,11 @@ impl<'a> Branches<'a> {
 
     /// list of teams for this org
     pub fn list(&self) -> Result<Vec<Branch>> {
-        self.github.get_media::<Vec<Branch>>(&format!("/repos/{owner}/{repo}/branches",
-                                                      owner = self.owner,
-                                                      repo = self.repo),
-                                             MediaType::Preview("loki"))
+        self.github
+            .get_media::<Vec<Branch>>(&format!("/repos/{owner}/{repo}/branches",
+                                               owner = self.owner,
+                                               repo = self.repo),
+                                      MediaType::Preview("loki"))
     }
 }
 

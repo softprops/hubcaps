@@ -47,29 +47,29 @@ impl<'a> Gists<'a> {
 
     pub fn star(&self, id: &str) -> Result<()> {
         match self.github
-            .put::<String>(&self.path(&format!("/{}/star", id)), &[])
-            .map(|_| ()) {
+                  .put::<String>(&self.path(&format!("/{}/star", id)), &[])
+                  .map(|_| ()) {
             Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
             otherwise => otherwise,
         }
     }
 
     pub fn unstar(&self, id: &str) -> Result<()> {
-        self.github
-            .delete(&self.path(&format!("/{}/star", id)))
+        self.github.delete(&self.path(&format!("/{}/star", id)))
     }
 
     pub fn fork(&self, id: &str) -> Result<Gist> {
-        self.github.post::<Gist>(&self.path(&format!("/{}/forks", id)), &[])
+        self.github
+            .post::<Gist>(&self.path(&format!("/{}/forks", id)), &[])
     }
 
     pub fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
-        self.github.get::<Vec<GistFork>>(&self.path(&format!("/{}/forks", id)))
+        self.github
+            .get::<Vec<GistFork>>(&self.path(&format!("/{}/forks", id)))
     }
 
     pub fn delete(&self, id: &str) -> Result<()> {
-        self.github
-            .delete(&self.path(&format!("/{}", id)))
+        self.github.delete(&self.path(&format!("/{}", id)))
     }
 
     pub fn get(&self, id: &str) -> Result<Gist> {
@@ -77,7 +77,8 @@ impl<'a> Gists<'a> {
     }
 
     pub fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
-        self.github.get::<Gist>(&self.path(&format!("/{}/{}", id, sha)))
+        self.github
+            .get::<Gist>(&self.path(&format!("/{}/{}", id, sha)))
     }
 
     pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
@@ -209,7 +210,10 @@ impl GistOptionsBuilder {
         for (k, v) in files.into_iter() {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
-        GistOptionsBuilder { files: contents, ..Default::default() }
+        GistOptionsBuilder {
+            files: contents,
+            ..Default::default()
+        }
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut GistOptionsBuilder
@@ -285,10 +289,11 @@ mod tests {
     fn gist_reqs() {
         let mut files = HashMap::new();
         files.insert("foo", "bar");
-        let tests = vec![(GistOptions::new(None as Option<String>, true, files.clone()),
-                      r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#),
-                     (GistOptions::new(Some("desc"), true, files.clone()),
-                      r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#)];
+        let tests =
+            vec![(GistOptions::new(None as Option<String>, true, files.clone()),
+                  r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#),
+                 (GistOptions::new(Some("desc"), true, files.clone()),
+                  r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#)];
         test_encoding(tests);
     }
 
@@ -297,11 +302,17 @@ mod tests {
     fn gist_req() {
         let mut files = HashMap::new();
         files.insert("test", "foo");
-        let tests = vec![(GistOptions::builder(files.clone()).build(),
+        let tests =
+            vec![(GistOptions::builder(files.clone()).build(),
                   r#"{"files":{"test":{"content":"foo"}}}"#),
-                 (GistOptions::builder(files.clone()).description("desc").build(),
+                 (GistOptions::builder(files.clone())
+                      .description("desc")
+                      .build(),
                   r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#),
-                 (GistOptions::builder(files.clone()).description("desc").public(false).build(),
+                 (GistOptions::builder(files.clone())
+                      .description("desc")
+                      .public(false)
+                      .build(),
                   r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#)];
         test_encoding(tests)
     }
