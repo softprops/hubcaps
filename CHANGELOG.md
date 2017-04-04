@@ -1,3 +1,6 @@
+# 0.3.1
+* fix order of Iter traversal
+
 # 0.3.0
 
 * added support for repo hooks

@@ -424,11 +424,13 @@ impl<'a, D, I> Iter<'a, D, I>
                into_items: fn(D) -> Vec<I>)
                -> Result<Iter<'a, D, I>> {
         let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, MediaType::Json));
+        let mut items = into_items(payload);
+        items.reverse(); // we pop from the tail
         Ok(Iter {
             github: github,
             next_link: links.and_then(|l| l.next()),
             into_items: into_items,
-            items: into_items(payload),
+            items: items,
         })
     }
 
@@ -448,8 +450,10 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
                     .request::<D>(Method::Get, next_link.to_owned(), None, MediaType::Json)
                     .ok()
                     .and_then(|(links, payload)| {
+                        let mut next_items = (self.into_items)(payload);
+                        next_items.reverse(); // we pop() from the tail
                         self.set_next(links.and_then(|l| l.next()));
-                        self.items = (self.into_items)(payload);
+                        self.items = next_items;
                         self.next()
                     })
             })
