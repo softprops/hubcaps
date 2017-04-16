@@ -10,8 +10,10 @@ use issues::{IssueRef, Issues};
 use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
-use users::User;
+use teams::RepoTeams;
 use statuses::Statuses;
+use users::User;
+
 use std::fmt;
 use super::SortDirection;
 use url::form_urlencoded;
@@ -288,10 +290,16 @@ impl<'a> Repository<'a> {
         Releases::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
-    /// get a references to [statuses](https://developer.github.com/v3/repos/statuses/)
+    /// get a reference to [statuses](https://developer.github.com/v3/repos/statuses/)
     /// associated with this reposoitory ref
     pub fn statuses(&self) -> Statuses {
         Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
+    }
+
+    // get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)
+    /// associated with this repository ref
+    pub fn teams(&self) -> RepoTeams {
+        RepoTeams::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 }
 

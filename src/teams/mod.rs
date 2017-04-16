@@ -7,6 +7,31 @@ use users::User;
 use std::collections::HashMap;
 use std::hash::Hash;
 
+pub struct RepoTeams<'a> {
+    github: &'a Github,
+    owner: String,
+    repo: String,
+}
+
+impl<'a> RepoTeams<'a> {
+    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
+        where O: Into<String>,
+              R: Into<String>
+    {
+        RepoTeams {
+            github: github,
+            owner: owner.into(),
+            repo: repo.into(),
+        }
+    }
+
+    /// list of teams for this repo
+    pub fn list(&self) -> Result<Vec<Team>> {
+        self.github
+            .get::<Vec<Team>>(&format!("/repos/{}/{}/teams", self.owner, self.repo))
+    }
+}
+
 /// reference to gists associated with a github user
 pub struct OrgTeams<'a> {
     github: &'a Github,
@@ -42,4 +67,5 @@ pub struct Team {
     pub privacy: String,
     pub members_url: String,
     pub repositories_url: String,
+    pub permission: String,
 }
