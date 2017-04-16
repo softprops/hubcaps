@@ -1,5 +1,7 @@
 //! Comments interface
 
+extern crate serde_json;
+
 use super::{Github, Result};
 use std::collections::HashMap;
 use url::form_urlencoded;
@@ -26,16 +28,23 @@ impl<'a> Comments<'a> {
         }
     }
 
+    /// add a new comment
+    pub fn create(&self, comment: &CommentOptions) -> Result<Comment> {
+        let data = try!(serde_json::to_string(&comment));
+        self.github.post::<Comment>(&self.path(), data.as_bytes())
+    }
+
     /// list pull requests
     pub fn list(&self, options: &CommentListOptions) -> Result<Vec<Comment>> {
-        let mut uri = vec![format!("/repos/{}/{}/issues/{}/comments",
-                                   self.owner,
-                                   self.repo,
-                                   self.number)];
+        let mut uri = vec![self.path()];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
         self.github.get::<Vec<Comment>>(&uri.join("?"))
+    }
+
+    fn path(&self) -> String {
+        format!("/repos/{}/{}/issues/{}/comments", self.owner, self.repo, self.number)
     }
 }
 
@@ -50,6 +59,11 @@ pub struct Comment {
     pub user: User,
     pub created_at: String,
     pub updated_at: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CommentOptions {
+    pub body: String,
 }
 
 #[derive(Default)]
