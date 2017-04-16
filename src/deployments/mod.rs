@@ -55,7 +55,8 @@ impl<'a> DeploymentStatuses<'a> {
     /// interface is required for building up a request
     pub fn create(&self, status: &DeploymentStatusOptions) -> Result<DeploymentStatus> {
         let data = try!(serde_json::to_string(&status));
-        self.github.post::<DeploymentStatus>(&self.path(""), &data.as_bytes())
+        self.github
+            .post::<DeploymentStatus>(&self.path(""), &data.as_bytes())
     }
 }
 
@@ -88,7 +89,8 @@ impl<'a> Deployments<'a> {
     /// creates a new deployment for this repository
     pub fn create(&self, dep: &DeploymentOptions) -> Result<Deployment> {
         let data = try!(serde_json::to_string(&dep));
-        self.github.post::<Deployment>(&self.path(""), data.as_bytes())
+        self.github
+            .post::<Deployment>(&self.path(""), data.as_bytes())
     }
 
     /// get a reference to the statuses api for a give deployment
@@ -160,7 +162,10 @@ impl DeploymentOptionsBuilder {
     pub fn new<C>(commit: C) -> DeploymentOptionsBuilder
         where C: Into<String>
     {
-        DeploymentOptionsBuilder { commit_ref: commit.into(), ..Default::default() }
+        DeploymentOptionsBuilder {
+            commit_ref: commit.into(),
+            ..Default::default()
+        }
     }
 
     pub fn task<T>(&mut self, task: T) -> &mut DeploymentOptionsBuilder
@@ -178,7 +183,9 @@ impl DeploymentOptionsBuilder {
     pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentOptionsBuilder
         where C: Into<String>
     {
-        self.required_contexts = Some(ctxs.into_iter().map(|c| c.into()).collect::<Vec<String>>());
+        self.required_contexts = Some(ctxs.into_iter()
+                                          .map(|c| c.into())
+                                          .collect::<Vec<String>>());
         self
     }
 
@@ -237,7 +244,10 @@ pub struct DeploymentStatusOptionsBuilder {
 
 impl DeploymentStatusOptionsBuilder {
     pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
-        DeploymentStatusOptionsBuilder { state: state, ..Default::default() }
+        DeploymentStatusOptionsBuilder {
+            state: state,
+            ..Default::default()
+        }
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusOptionsBuilder
@@ -388,26 +398,21 @@ mod tests {
 
     #[test]
     fn deployment_status_reqs() {
-        let tests = vec![
-            (
-                DeploymentStatusOptions::builder(State::Pending)
-                    .build(),
-                r#"{"state":"pending"}"#
-            ),
-            (
+        let tests = vec![(DeploymentStatusOptions::builder(State::Pending).build(),
+                  r#"{"state":"pending"}"#),
+                 (
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
-            (
+                 (
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .description("desc")
                     .build(),
                 r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
-            ),
-        ];
+            )];
         test_encoding(tests)
     }
 }

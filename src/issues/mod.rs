@@ -107,22 +107,21 @@ impl<'a> IssueLabels<'a> {
 
     /// remove a label from this issue
     pub fn remove(&self, label: &str) -> Result<()> {
-        self.github
-            .delete(&self.path(&format!("/{}", label)))
+        self.github.delete(&self.path(&format!("/{}", label)))
     }
 
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github.put::<Vec<Label>>(&self.path(""),
-                                      try!(serde_json::to_string(&labels)).as_bytes())
+        self.github
+            .put::<Vec<Label>>(&self.path(""),
+                               try!(serde_json::to_string(&labels)).as_bytes())
     }
 
     /// remove all labels from an issue
     pub fn clear(&self) -> Result<()> {
-        self.github
-            .delete(&self.path(""))
+        self.github.delete(&self.path(""))
     }
 }
 
@@ -166,7 +165,8 @@ impl<'a> IssueRef<'a> {
 
     pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
         let data = try!(serde_json::to_string(&is));
-        self.github.patch::<Issue>(&self.path(""), data.as_bytes())
+        self.github
+            .patch::<Issue>(&self.path(""), data.as_bytes())
     }
 
     pub fn comments(&self) -> Comments {
@@ -208,7 +208,8 @@ impl<'a> Issues<'a> {
 
     pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
         let data = try!(serde_json::to_string(&is));
-        self.github.post::<Issue>(&self.path(""), data.as_bytes())
+        self.github
+            .post::<Issue>(&self.path(""), data.as_bytes())
     }
 
     pub fn list(&self, options: &IssueListOptions) -> Result<Vec<Issue>> {
@@ -303,8 +304,13 @@ impl IssueListOptionsBuilder {
     pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
         where L: Into<String>
     {
-        self.params.insert("labels",
-                           labels.into_iter().map(|l| l.into()).collect::<Vec<_>>().join(","));
+        self.params
+            .insert("labels",
+                    labels
+                        .into_iter()
+                        .map(|l| l.into())
+                        .collect::<Vec<_>>()
+                        .join(","));
         self
     }
 
@@ -349,7 +355,10 @@ impl IssueOptions {
             body: body.map(|b| b.into()),
             assignee: assignee.map(|a| a.into()),
             milestone: milestone,
-            labels: labels.into_iter().map(|l| l.into()).collect::<Vec<String>>(),
+            labels: labels
+                .into_iter()
+                .map(|l| l.into())
+                .collect::<Vec<String>>(),
         }
     }
 }
@@ -395,20 +404,13 @@ mod tests {
                 }
             }
         }
-        let tests = vec![
-            (
-                IssueListOptions::builder().build(),
-                None
-            ),
-            (
-                IssueListOptions::builder().state(State::Closed).build(),
-                Some("state=closed".to_owned())
-             ),
-            (
-                IssueListOptions::builder().labels(vec!["foo", "bar"]).build(),
-                Some("labels=foo%2Cbar".to_owned())
-            ),
-        ];
+        let tests = vec![(IssueListOptions::builder().build(), None),
+                         (IssueListOptions::builder().state(State::Closed).build(),
+                          Some("state=closed".to_owned())),
+                         (IssueListOptions::builder()
+                              .labels(vec!["foo", "bar"])
+                              .build(),
+                          Some("labels=foo%2Cbar".to_owned()))];
         test_serialize(tests)
     }
 

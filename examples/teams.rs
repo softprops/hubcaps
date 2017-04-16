@@ -16,7 +16,7 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
             for team in github.org("meetup").teams().list().unwrap() {
                 println!("{:#?}", team)

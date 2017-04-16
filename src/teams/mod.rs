@@ -25,7 +25,8 @@ impl<'a> OrgTeams<'a> {
 
     /// list of teams for this org
     pub fn list(&self) -> Result<Vec<Team>> {
-        self.github.get::<Vec<Team>>(&format!("/orgs/{}/teams", self.org))
+        self.github
+            .get::<Vec<Team>>(&format!("/orgs/{}/teams", self.org))
     }
 }
 

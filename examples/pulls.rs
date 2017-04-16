@@ -16,7 +16,7 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
@@ -25,22 +25,24 @@ fn main() {
             }
 
             println!("comments");
-            for c in github.repo("softprops", "hubcaps")
-                .pulls()
-                .get(28)
-                .comments()
-                .list(&Default::default())
-                .unwrap() {
+            for c in github
+                    .repo("softprops", "hubcaps")
+                    .pulls()
+                    .get(28)
+                    .comments()
+                    .list(&Default::default())
+                    .unwrap() {
                 println!("{:#?}", c);
             }
 
             println!("commits");
-            for c in github.repo("softprops", "hubcaps")
-                .pulls()
-                .get(28)
-                .commits()
-                .iter()
-                .unwrap() {
+            for c in github
+                    .repo("softprops", "hubcaps")
+                    .pulls()
+                    .get(28)
+                    .commits()
+                    .iter()
+                    .unwrap() {
                 println!("{:#?}", c);
             }
         }

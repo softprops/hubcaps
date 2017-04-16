@@ -78,8 +78,9 @@ impl<'a> SearchIssues<'a> {
     {
         let mut uri = vec!["/search/issues".to_string()];
         let query_options = options.serialize().unwrap_or(String::new());
-        let query =
-            form_urlencoded::Serializer::new(query_options).append_pair("q", &q.into()).finish();
+        let query = form_urlencoded::Serializer::new(query_options)
+            .append_pair("q", &q.into())
+            .finish();
         uri.push(query);
         uri.join("?")
     }
@@ -93,14 +94,16 @@ impl<'a> SearchIssues<'a> {
                    -> Result<Iter<'a, SearchResult<IssuesItem>, IssuesItem>>
         where Q: Into<String>
     {
-        self.search.iter::<IssuesItem>(&Self::search_uri(q, options))
+        self.search
+            .iter::<IssuesItem>(&Self::search_uri(q, options))
     }
 
     /// Returns a single page of search results
     pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Result<SearchResult<IssuesItem>>
         where Q: Into<String>
     {
-        self.search.search::<IssuesItem>(&Self::search_uri(q, options))
+        self.search
+            .search::<IssuesItem>(&Self::search_uri(q, options))
     }
 }
 

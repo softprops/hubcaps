@@ -115,12 +115,14 @@ impl<'a> Releases<'a> {
 
     pub fn create(&self, rel: &ReleaseOptions) -> Result<Release> {
         let data = try!(serde_json::to_string(&rel));
-        self.github.post::<Release>(&self.path(""), data.as_bytes())
+        self.github
+            .post::<Release>(&self.path(""), data.as_bytes())
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Result<Release> {
         let data = try!(serde_json::to_string(&rel));
-        self.github.patch::<Release>(&self.path(&format!("/{}", id)), data.as_bytes())
+        self.github
+            .patch::<Release>(&self.path(&format!("/{}", id)), data.as_bytes())
     }
 
     pub fn delete(&self, id: u64) -> Result<()> {
@@ -207,7 +209,10 @@ impl ReleaseOptionsBuilder {
     pub fn new<T>(tag: T) -> ReleaseOptionsBuilder
         where T: Into<String>
     {
-        ReleaseOptionsBuilder { tag: tag.into(), ..Default::default() }
+        ReleaseOptionsBuilder {
+            tag: tag.into(),
+            ..Default::default()
+        }
     }
 
     pub fn commitish<C>(&mut self, commit: C) -> &mut ReleaseOptionsBuilder

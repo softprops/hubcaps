@@ -16,9 +16,13 @@ fn main() {
             let github =
                 Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                .unwrap())),
+                                                                           .unwrap())),
                             Credentials::Token(token));
-            for team in github.repo("softprops", "hubcaps").branches().list().unwrap() {
+            for team in github
+                    .repo("softprops", "hubcaps")
+                    .branches()
+                    .list()
+                    .unwrap() {
                 println!("{:#?}", team)
             }
         }
