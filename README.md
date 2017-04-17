@@ -8,7 +8,6 @@
 
 ## /!\ planned API changes
 
-* implement error handling in terms of error-chain crate
 * implement async interface when hyper adopts it
 
 The goal and motivation behind these are not to intentionally make breaking changes,
