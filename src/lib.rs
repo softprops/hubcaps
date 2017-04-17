@@ -113,7 +113,8 @@ const DEFAULT_HOST: &'static str = "https://api.github.com";
 // pub type Result<T> = std::result::Result<T, Error>;
 /// Github defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information
-enum MediaType {
+#[derive(Clone, Copy)]
+pub enum MediaType {
     /// Return json (the default)
     Json,
     /// Return json in preview form
@@ -307,7 +308,17 @@ impl Github {
     fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
         where D: Deserialize
     {
-        Iter::new(self, self.host.clone() + &uri, into_items)
+        self.iter_media(uri, into_items, MediaType::Json)
+    }
+
+    fn iter_media<'a, D, I>(&'a self,
+                            uri: String,
+                            into_items: fn(D) -> Vec<I>,
+                            media_type: MediaType)
+                            -> Result<Iter<'a, D, I>>
+        where D: Deserialize
+    {
+        Iter::new(self, self.host.clone() + &uri, into_items, media_type)
     }
 
     fn request<D>(&self,
@@ -423,6 +434,7 @@ pub struct Iter<'a, D, I> {
     next_link: Option<String>,
     into_items: fn(D) -> Vec<I>,
     items: Vec<I>,
+    media_type: MediaType,
 }
 
 impl<'a, D, I> Iter<'a, D, I>
@@ -431,9 +443,10 @@ impl<'a, D, I> Iter<'a, D, I>
     /// creates a new instance of an Iter
     pub fn new(github: &'a Github,
                uri: String,
-               into_items: fn(D) -> Vec<I>)
+               into_items: fn(D) -> Vec<I>,
+               media_type: MediaType)
                -> Result<Iter<'a, D, I>> {
-        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, MediaType::Json));
+        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, media_type));
         let mut items = into_items(payload);
         items.reverse(); // we pop from the tail
         Ok(Iter {
@@ -441,6 +454,7 @@ impl<'a, D, I> Iter<'a, D, I>
                next_link: links.and_then(|l| l.next()),
                into_items: into_items,
                items: items,
+               media_type: media_type,
            })
     }
 
@@ -461,7 +475,7 @@ impl<'a, D, I> Iterator for Iter<'a, D, I>
                     .clone()
                     .and_then(|ref next_link| {
                         self.github
-                            .request::<D>(Method::Get, next_link.to_owned(), None, MediaType::Json)
+                            .request::<D>(Method::Get, next_link.to_owned(), None, self.media_type)
                             .ok()
                             .and_then(|(links, payload)| {
                                           let mut next_items = (self.into_items)(payload);
