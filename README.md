@@ -88,7 +88,7 @@ let branches = repo.branches();
 Labels is a service for tagging resources like issues and pulls with names which you can later group and filter on.
 
 ```rust
-use hubcaps::LabelOptions;
+use hubcaps::labels::LabelOptions;
 
 let labels = repo.labels();
 
