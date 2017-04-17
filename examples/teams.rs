@@ -18,7 +18,16 @@ fn main() {
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
                                                                            .unwrap())),
                             Credentials::Token(token));
-            for team in github.org("meetup").teams().list().unwrap() {
+            println!("org teams");
+            for team in github.org("meetup").teams().iter().unwrap() {
+                println!("{:#?}", team)
+            }
+            println!("repo teams");
+            for team in github
+                    .repo("meetup", "k8s-nginx-dogstats")
+                    .teams()
+                    .iter()
+                    .unwrap() {
                 println!("{:#?}", team)
             }
         }
