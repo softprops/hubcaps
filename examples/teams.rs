@@ -19,14 +19,14 @@ fn main() {
                                                                            .unwrap())),
                             Credentials::Token(token));
             println!("org teams");
-            for team in github.org("meetup").teams().list().unwrap() {
+            for team in github.org("meetup").teams().iter().unwrap() {
                 println!("{:#?}", team)
             }
             println!("repo teams");
             for team in github
                     .repo("meetup", "k8s-nginx-dogstats")
                     .teams()
-                    .list()
+                    .iter()
                     .unwrap() {
                 println!("{:#?}", team)
             }
