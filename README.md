@@ -60,6 +60,9 @@ Github instances define functions for accessing api services that map closely to
 
 As a convention, api methods that expect arguments are represented as functions that accept a struct representing those arguments with an optional builder interface for convenience of construction.
 
+
+See [examples directory](examples/) for some getting started examples
+
 ### repositories
 
 Typically the reference point of most github services is a repository
@@ -69,6 +72,16 @@ let repo = github.repo("user", "repo");
 ```
 
 With a repo instance on hand, you can access a number of sub services, like `labels`, `deployments`, `pulls`, `issues`, and `releases`. Each of this are named functions exported from the repo interface.
+
+See [examples directory](examples/repos.rs) for examples
+
+### branches
+
+Branches is a service for listing repository branches
+
+```rust
+let branches = repo.branches();
+```
 
 ### labels
 
@@ -105,6 +118,8 @@ Deployments is a service for orchestrating deployments of applications sourced f
 let deployments = repo.deployments();
 ```
 
+See [examples directory](examples/deployments.rs) for examples
+
 ### pulls
 
 Pulls is a service for issuing code change requests against a repository
@@ -113,6 +128,8 @@ Pulls is a service for issuing code change requests against a repository
 let pulls = repo.pulls();
 ```
 
+See [examples directory](examples/pulls.rs) for examples
+
 ### issues
 
 Issues is a service for tracking bugs for a repository
@@ -120,6 +137,8 @@ Issues is a service for tracking bugs for a repository
 ```rust
 let issues = repo.issues();
 ```
+
+See [examples directory](examples/issues.rs) for examples
 
 ### releases
 
@@ -137,6 +156,19 @@ Gists is a service for micro repositories
 let gists = github.gists();
 ```
 
+See [examples directory](examples/gists.rs) for examples
+
+
+### gists
+
+Gists is a service for managing repository hooks
+
+```rust
+let hooks = repo.hooks();
+```
+
+See [examples directory](examples/hooks.rs) for examples
+
 ### search
 
 Search provides a raw string query search for indexed data. Currently only search for issues is supported
@@ -144,5 +176,15 @@ Search provides a raw string query search for indexed data. Currently only searc
 ```rust
 let search_issues = github.search().issues();
 ```
+
+### teams
+
+Teams is a service for listing repository and organization teams
+
+```rust
+let teams = repo.teams();
+```
+
+See [examples directory](examples/teams.rs) for examples
 
 Doug Tangren (softprops) 2015-2017
