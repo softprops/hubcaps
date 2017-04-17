@@ -1,7 +1,7 @@
 //! Pull requests interface
 extern crate serde_json;
 
-use super::{Github, Result};
+use super::{Iter, Github, Result};
 use comments::Comments;
 use pull_commits::PullCommits;
 use review_comments::ReviewComments;
@@ -12,6 +12,10 @@ use url::form_urlencoded;
 use std::collections::HashMap;
 use issues::{Sort as IssueSort, State};
 use super::SortDirection;
+
+fn identity<T>(x: T) -> T {
+    x
+}
 
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
@@ -171,6 +175,15 @@ impl<'a> PullRequests<'a> {
             uri.push(query);
         }
         self.github.get::<Vec<Pull>>(&uri.join("?"))
+    }
+
+    /// provides an iterator over all pages of pull requests
+    pub fn iter(&self, options: &PullListOptions) -> Result<Iter<Vec<Pull>, Pull>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.iter(uri.join("?"), identity)
     }
 }
 
@@ -403,7 +416,6 @@ mod tests {
             }
         }
     }
-
 
     #[test]
     fn pull_list_reqs() {
