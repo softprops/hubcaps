@@ -178,6 +178,46 @@ impl<'a> Repositories<'a> {
 }
 
 /// Provides access to the authenticated user's repositories
+pub struct OrgRepositories<'a> {
+    github: &'a Github,
+    org: String,
+}
+
+impl<'a> OrgRepositories<'a> {
+    pub fn new<O>(github: &'a Github, org: O) -> Self
+        where O: Into<String>
+    {
+        OrgRepositories {
+            github: github,
+            org: org.into(),
+        }
+    }
+
+    fn path(&self, more: &str) -> String {
+        format!("/orgs/{}/repos{}", self.org, more)
+    }
+
+    /// https://developer.github.com/v3/repos/#list-organization-repositories
+    pub fn list(&self, options: &OrgRepoListOptions) -> Result<Vec<Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get::<Vec<Repo>>(&uri.join("?"))
+    }
+
+    /// provides an iterator over all pages of an orgs's repositories
+    /// https://developer.github.com/v3/repos/#list-organization-repositories
+    pub fn iter(&self, options: &OrgRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.iter(uri.join("?"), identity)
+    }
+}
+
+/// Provides access to the authenticated user's repositories
 pub struct UserRepositories<'a> {
     github: &'a Github,
     owner: String,
@@ -661,6 +701,50 @@ impl RepoListOptionsBuilder {
 
     pub fn build(&self) -> RepoListOptions {
         RepoListOptions { params: self.params.clone() }
+    }
+}
+
+#[derive(Default)]
+pub struct OrgRepoListOptions {
+    params: HashMap<&'static str, String>,
+}
+
+impl OrgRepoListOptions {
+    pub fn builder() -> OrgRepoListOptionsBuilder {
+        OrgRepoListOptionsBuilder::new()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
+        }
+    }
+}
+
+
+#[derive(Default)]
+pub struct OrgRepoListOptionsBuilder {
+    params: HashMap<&'static str, String>,
+}
+
+impl OrgRepoListOptionsBuilder {
+    pub fn new() -> Self {
+        OrgRepoListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
+        self.params.insert("type", tpe.to_string());
+        self
+    }
+
+    pub fn build(&self) -> OrgRepoListOptions {
+        OrgRepoListOptions { params: self.params.clone() }
     }
 }
 

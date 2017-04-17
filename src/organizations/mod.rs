@@ -2,6 +2,7 @@
 
 use self::super::{Github, Result};
 use teams::OrgTeams;
+use repositories::OrgRepositories;
 
 /// Provides access to label operations available for an individual organization
 pub struct Organization<'a> {
@@ -19,9 +20,14 @@ impl<'a> Organization<'a> {
         }
     }
 
-    /// returns a reference to an iterface for team operations
+    /// returns a reference to an interface for team operations
     pub fn teams(&self) -> OrgTeams {
         OrgTeams::new(self.github, self.org.clone())
+    }
+
+    /// returns a reference to an interface for repo operations
+    pub fn repos(&self) -> OrgRepositories {
+        OrgRepositories::new(self.github, self.org.clone())
     }
 }
 

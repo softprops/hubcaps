@@ -1,4 +1,9 @@
+# 0.3.3
+
+* added org repos interface
+
 # 0.3.2
+
 * use error_chain to generate error types
 * add support for posting issue comments [#71](https://github.com/softprops/hubcaps/pull/71)
 * add support for repo teams
@@ -6,6 +11,7 @@
 * add iter support to branches, repos, pulls, and teams
 
 # 0.3.1
+
 * fix order of Iter traversal
 
 # 0.3.0
