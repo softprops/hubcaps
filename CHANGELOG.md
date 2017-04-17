@@ -1,9 +1,9 @@
 # 0.3.2
 * use error_chain to generate error types
-* add support for issue comments [#71](https://github.com/softprops/hubcaps/pull/71)
-* add support for repo teams, and iterators over all pages of both org and repo teams 
-* add team permission
-* add iter support to branches, repos, and pull request listing
+* add support for posting issue comments [#71](https://github.com/softprops/hubcaps/pull/71)
+* add support for repo teams
+* add team permissions
+* add iter support to branches, repos, pulls, and teams
 
 # 0.3.1
 * fix order of Iter traversal
