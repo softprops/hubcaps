@@ -21,9 +21,16 @@ fn main() {
             for team in github
                     .repo("softprops", "hubcaps")
                     .branches()
-                    .list()
+                    .iter()
                     .unwrap() {
                 println!("{:#?}", team)
+            }
+            match github
+                      .repo("softprops", "hubcaps")
+                      .branches()
+                      .get("master") {
+                Ok(branch) => println!("{:#?}", branch),
+                Err(err) => println!("err {:#?}", err),
             }
         }
         _ => println!("example missing GITHUB_TOKEN"),
