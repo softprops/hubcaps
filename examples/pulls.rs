@@ -20,7 +20,7 @@ fn main() {
                             Credentials::Token(token));
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
-            for pull in pulls.list(&Default::default()).unwrap() {
+            for pull in pulls.iter(&Default::default()).unwrap() {
                 println!("{:#?}", pull);
             }
 

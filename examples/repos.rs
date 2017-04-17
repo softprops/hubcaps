@@ -20,7 +20,7 @@ fn main() {
                             Credentials::Token(token));
             for repo in github
                     .user_repos("softprops")
-                    .list(&Default::default())
+                    .iter(&Default::default())
                     .unwrap() {
                 println!("{}", repo.name);
                 for (language, bytes_of_code) in &repo.languages(&github).unwrap() {

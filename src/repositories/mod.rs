@@ -1,7 +1,7 @@
 //! Repository interface
 extern crate serde_json;
 
-use self::super::{Github, Result};
+use self::super::{Iter, Github, Result};
 use branches::Branches;
 use hooks::Hooks;
 use deployments::Deployments;
@@ -19,6 +19,10 @@ use super::SortDirection;
 use url::form_urlencoded;
 use std::collections::HashMap;
 use url::Url;
+
+fn identity<T>(x: T) -> T {
+    x
+}
 
 /// describes repository visibilities
 #[derive(Clone, Debug, PartialEq)]
@@ -161,6 +165,16 @@ impl<'a> Repositories<'a> {
         }
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
+
+    /// provides an iterator over all pages of the authenticated users repositories
+    /// https://developer.github.com/v3/repos/#list-your-repositories
+    pub fn iter(&self, options: &RepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.iter(uri.join("?"), identity)
+    }
 }
 
 /// Provides access to the authenticated user's repositories
@@ -191,6 +205,16 @@ impl<'a> UserRepositories<'a> {
         }
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
+
+    /// provides an iterator over all pages of a user's repositories
+    /// https://developer.github.com/v3/repos/#list-your-repositories
+    pub fn iter(&self, options: &UserRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.iter(uri.join("?"), identity)
+    }
 }
 
 /// Provides access to an organization's repositories
@@ -213,6 +237,7 @@ impl<'a> OrganizationRepositories<'a> {
         format!("/orgs/{}/repos{}", self.org, more)
     }
 
+    /// list an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
     pub fn list(&self, options: &OrganizationRepoListOptions) -> Result<Vec<Repo>> {
         let mut uri = vec![self.path("")];
@@ -220,6 +245,16 @@ impl<'a> OrganizationRepositories<'a> {
             uri.push(query);
         }
         self.github.get::<Vec<Repo>>(&uri.join("?"))
+    }
+
+    /// Provides an iterator over all pages of an organization's repositories
+    /// https://developer.github.com/v3/repos/#list-organization-repositories
+    pub fn iter(&self, options: &OrganizationRepoListOptions) -> Result<Iter<Vec<Repo>, Repo>> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.iter(uri.join("?"), identity)
     }
 }
 
