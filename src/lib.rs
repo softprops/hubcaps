@@ -69,6 +69,7 @@ extern crate url;
 // all the modules!
 use serde::de::Deserialize;
 pub mod branches;
+pub mod git;
 pub mod users;
 pub mod comments;
 pub mod review_comments;
