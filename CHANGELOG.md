@@ -1,3 +1,7 @@
+# 0.3.4
+
+* added git tree and blob fetching interfaces
+
 # 0.3.3
 
 * added org repos interface
