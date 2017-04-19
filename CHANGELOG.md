@@ -1,3 +1,8 @@
+# 0.3.5
+
+* hubcaps::git::GitFile's now have an optional url because commits types don't
+  have urls.
+
 # 0.3.4
 
 * added git tree and blob fetching interfaces

@@ -66,7 +66,8 @@ pub struct GitFile {
     /// size will be None for directories
     pub size: Option<usize>,
     pub sha: String,
-    pub url: String,
+    /// url will be None for commits
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
