@@ -666,6 +666,11 @@ impl RepoListOptionsBuilder {
         RepoListOptionsBuilder { ..Default::default() }
     }
 
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.params.insert("per_page", n.to_string());
+        self
+    }
+
     pub fn visibility(&mut self, vis: Visibility) -> &mut RepoListOptionsBuilder {
         self.params.insert("visibility", vis.to_string());
         self
@@ -681,6 +686,7 @@ impl RepoListOptionsBuilder {
                         .join(","));
         self
     }
+
 
     pub fn repo_type(&mut self, tpe: Sort) -> &mut RepoListOptionsBuilder {
         self.params.insert("type", tpe.to_string());
@@ -744,7 +750,12 @@ impl OrgRepoListOptionsBuilder {
         OrgRepoListOptionsBuilder { ..Default::default() }
     }
 
-    pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.params.insert("per_page", n.to_string());
+        self
+    }
+
+    pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut Self {
         self.params.insert("type", tpe.to_string());
         self
     }
@@ -789,6 +800,11 @@ impl UserRepoListOptionsBuilder {
 
     pub fn repo_type(&mut self, tpe: Type) -> &mut UserRepoListOptionsBuilder {
         self.params.insert("type", tpe.to_string());
+        self
+    }
+
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.params.insert("per_page", n.to_string());
         self
     }
 
@@ -846,6 +862,11 @@ pub struct OrganizationRepoListOptionsBuilder {
 impl OrganizationRepoListOptionsBuilder {
     pub fn new() -> OrganizationRepoListOptionsBuilder {
         OrganizationRepoListOptionsBuilder { ..Default::default() }
+    }
+
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.params.insert("per_page", n.to_string());
+        self
     }
 
     pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut OrganizationRepoListOptionsBuilder {

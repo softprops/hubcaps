@@ -1,3 +1,8 @@
+# 0.3.6
+
+* added `per_page` to various repo list builder interfaces
+* fixed org list builder's type filter to use org repo type
+
 # 0.3.5
 
 * hubcaps::git::GitFile's now have an optional url because commits types don't
