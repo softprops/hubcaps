@@ -30,8 +30,9 @@ impl<'a> Comments<'a> {
 
     /// add a new comment
     pub fn create(&self, comment: &CommentOptions) -> Result<Comment> {
-        let data = try!(serde_json::to_string(&comment));
-        self.github.post::<Comment>(&self.path(), data.as_bytes())
+        let data = serde_json::to_string(&comment)?;
+        self.github
+            .post::<Comment>(&self.path(), data.as_bytes())
     }
 
     /// list pull requests
@@ -44,7 +45,10 @@ impl<'a> Comments<'a> {
     }
 
     fn path(&self) -> String {
-        format!("/repos/{}/{}/issues/{}/comments", self.owner, self.repo, self.number)
+        format!("/repos/{}/{}/issues/{}/comments",
+                self.owner,
+                self.repo,
+                self.number)
     }
 }
 

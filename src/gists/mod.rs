@@ -98,7 +98,7 @@ impl<'a> Gists<'a> {
     }
 
     pub fn create(&self, gist: &GistOptions) -> Result<Gist> {
-        let data = try!(serde_json::to_string(&gist));
+        let data = serde_json::to_string(&gist)?;
         self.github.post::<Gist>(&self.path(""), data.as_bytes())
     }
 

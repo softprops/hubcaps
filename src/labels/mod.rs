@@ -27,13 +27,13 @@ impl<'a> Labels<'a> {
     }
 
     pub fn create(&self, lab: &LabelOptions) -> Result<Label> {
-        let data = try!(serde_json::to_string(&lab));
+        let data = serde_json::to_string(&lab)?;
         self.github
             .post::<Label>(&self.path(""), data.as_bytes())
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
-        let data = try!(serde_json::to_string(&lab));
+        let data = serde_json::to_string(&lab)?;
         self.github
             .patch::<Label>(&self.path(&format!("/{}", prevname)), data.as_bytes())
     }

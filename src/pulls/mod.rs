@@ -97,7 +97,7 @@ impl<'a> PullRequest<'a> {
 
     /// Edit a pull request
     pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
-        let data = try!(serde_json::to_string(&pr));
+        let data = serde_json::to_string(&pr)?;
         self.github
             .patch::<Pull>(&self.path(""), data.as_bytes())
     }
@@ -164,7 +164,7 @@ impl<'a> PullRequests<'a> {
 
     /// Create a new pull request
     pub fn create(&self, pr: &PullOptions) -> Result<Pull> {
-        let data = try!(serde_json::to_string(&pr));
+        let data = serde_json::to_string(&pr)?;
         self.github.post::<Pull>(&self.path(""), data.as_bytes())
     }
 

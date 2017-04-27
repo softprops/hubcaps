@@ -28,7 +28,7 @@ impl<'a> Keys<'a> {
     }
 
     pub fn create(&self, key: &KeyOptions) -> Result<Key> {
-        let data = try!(serde_json::to_string::<KeyOptions>(key));
+        let data = serde_json::to_string::<KeyOptions>(key)?;
         self.github.post::<Key>(&self.path(""), data.as_bytes())
     }
 

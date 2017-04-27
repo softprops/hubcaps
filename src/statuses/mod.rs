@@ -30,7 +30,7 @@ impl<'a> Statuses<'a> {
 
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
-        let data = try!(serde_json::to_string(&status));
+        let data = serde_json::to_string(&status)?;
         self.github
             .post::<Status>(&self.path(&format!("/{}", sha)), data.as_bytes())
     }

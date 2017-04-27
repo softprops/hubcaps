@@ -101,8 +101,7 @@ impl<'a> IssueLabels<'a> {
     /// add a set of labels to this issue ref
     pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
         self.github
-            .post::<Vec<Label>>(&self.path(""),
-                                try!(serde_json::to_string(&labels)).as_bytes())
+            .post::<Vec<Label>>(&self.path(""), serde_json::to_string(&labels)?.as_bytes())
     }
 
     /// remove a label from this issue
@@ -115,8 +114,7 @@ impl<'a> IssueLabels<'a> {
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
         self.github
-            .put::<Vec<Label>>(&self.path(""),
-                               try!(serde_json::to_string(&labels)).as_bytes())
+            .put::<Vec<Label>>(&self.path(""), serde_json::to_string(&labels)?.as_bytes())
     }
 
     /// remove all labels from an issue
@@ -164,7 +162,7 @@ impl<'a> IssueRef<'a> {
     }
 
     pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
-        let data = try!(serde_json::to_string(&is));
+        let data = serde_json::to_string(&is)?;
         self.github
             .patch::<Issue>(&self.path(""), data.as_bytes())
     }
@@ -207,7 +205,7 @@ impl<'a> Issues<'a> {
     }
 
     pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
-        let data = try!(serde_json::to_string(&is));
+        let data = serde_json::to_string(&is)?;
         self.github
             .post::<Issue>(&self.path(""), data.as_bytes())
     }

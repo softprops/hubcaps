@@ -334,16 +334,16 @@ impl Github {
             .header(UserAgent(self.agent.to_owned()))
             .header(Accept(vec![qitem(From::from(media_type))]));
 
-        let mut res = try!(match body {
-                               Some(ref bod) => builder.body(*bod).send(),
-                               _ => builder.send(),
-                           });
+        let mut res = (match body {
+                           Some(ref bod) => builder.body(*bod).send(),
+                           _ => builder.send(),
+                       })?;
 
         let mut body = match res.headers.clone().get::<ContentLength>() {
             Some(&ContentLength(len)) => String::with_capacity(len as usize),
             _ => String::new(),
         };
-        try!(res.read_to_string(&mut body));
+        res.read_to_string(&mut body)?;
 
         let links = res.headers
             .get::<Link>()
@@ -359,11 +359,11 @@ impl Github {
             StatusCode::Forbidden => {
                 Err(ErrorKind::Fault {
                             code: res.status,
-                            error: try!(serde_json::from_str::<errors::ClientError>(&body)),
+                            error: serde_json::from_str::<errors::ClientError>(&body)?,
                         }
                         .into())
             }
-            _ => Ok((links, try!(serde_json::from_str::<D>(&body)))),
+            _ => Ok((links, serde_json::from_str::<D>(&body)?)),
         }
     }
 
@@ -450,7 +450,7 @@ impl<'a, D, I> Iter<'a, D, I>
                into_items: fn(D) -> Vec<I>,
                media_type: MediaType)
                -> Result<Iter<'a, D, I>> {
-        let (links, payload) = try!(github.request::<D>(Method::Get, uri, None, media_type));
+        let (links, payload) = github.request::<D>(Method::Get, uri, None, media_type)?;
         let mut items = into_items(payload);
         items.reverse(); // we pop from the tail
         Ok(Iter {

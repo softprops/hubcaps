@@ -153,7 +153,7 @@ impl<'a> Repositories<'a> {
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
     pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
-        let data = try!(serde_json::to_string(&repo));
+        let data = serde_json::to_string(&repo)?;
         self.github.post::<Repo>(&self.path(""), data.as_bytes())
     }
 
@@ -220,7 +220,7 @@ impl<'a> OrgRepositories<'a> {
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
     pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
-        let data = try!(serde_json::to_string(&repo));
+        let data = serde_json::to_string(&repo)?;
         self.github.post::<Repo>(&self.path(""), data.as_bytes())
     }
 }
