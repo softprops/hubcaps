@@ -410,13 +410,16 @@ impl Github {
                             MediaType::Json)
     }
 
+    fn patch_media<D>(&self, uri: &str, message: &[u8], media: MediaType) -> Result<D>
+        where D: Deserialize
+    {
+        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
+    }
+
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
         where D: Deserialize
     {
-        self.request_entity(Method::Patch,
-                            self.host.clone() + uri,
-                            Some(message),
-                            MediaType::Json)
+        self.patch_media(uri, message, MediaType::Json)
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>

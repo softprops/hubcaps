@@ -18,13 +18,14 @@ fn main() {
                             Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
                                                                            .unwrap())),
                             Credentials::Token(token));
-            for team in github
+            for branch in github
                     .repo("softprops", "hubcaps")
                     .branches()
                     .iter()
                     .unwrap() {
-                println!("{:#?}", team)
+                println!("{:#?}", branch)
             }
+
             match github
                       .repo("softprops", "hubcaps")
                       .branches()

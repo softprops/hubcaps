@@ -2,6 +2,7 @@
 extern crate serde_json;
 
 use self::super::{Iter, MediaType, Github, Result};
+use std::collections::BTreeMap;
 
 fn identity<T>(x: T) -> T {
     x
@@ -57,6 +58,22 @@ impl<'a> Branches<'a> {
                                 branch = branch.into()),
                        MediaType::Preview("loki"))
     }
+
+    /// update branch production for a given branch
+    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<Branch>
+        where B: Into<String>
+    {
+        let mut payload = BTreeMap::new();
+        payload.insert("protection", pro);
+        let data = serde_json::to_string(&payload)?;
+        self.github
+            .patch_media::<Branch>(&format!("/repos/{owner}/{repo}/branches/{branch}",
+                                            owner = self.owner,
+                                            repo = self.repo,
+                                            branch = branch.into()),
+                                   data.as_bytes(),
+                                   MediaType::Preview("loki"))
+    }
 }
 
 
@@ -70,13 +87,15 @@ pub struct Branch {
     pub protection: Protection, // todo: pub commit: CommitRef
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Protection {
     pub enabled: bool,
-    pub required_status_checks: StatusChecks,
+    /// when set to None in branch updates, github will apply a set of defaults
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub required_status_checks: Option<StatusChecks>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct StatusChecks {
     pub enforcement_level: String,
     pub contexts: Vec<String>,
