@@ -410,6 +410,16 @@ impl Github {
                             MediaType::Json)
     }
 
+    fn patch_nothing(&self, uri: &str) -> Result<()> {
+        match self.request_entity::<()>(Method::Patch,
+                                        self.host.clone() + uri,
+                                        None,
+                                        MediaType::Json) {
+            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
+            otherwise => otherwise,
+        }
+    }
+
     fn patch_media<D>(&self, uri: &str, message: &[u8], media: MediaType) -> Result<D>
         where D: Deserialize
     {

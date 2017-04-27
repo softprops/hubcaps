@@ -1,5 +1,25 @@
 //! Teams interface
 use self::super::{Iter, Github, Result};
+use std::fmt;
+
+/// Team repository permissions
+pub enum Permission {
+    Pull,
+    Push,
+    Admin,
+}
+
+impl fmt::Display for Permission {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match *self {
+                   Permission::Pull => "pull",
+                   Permission::Push => "push",
+                   Permission::Admin => "admin",
+               })
+    }
+}
 
 fn identity<T>(x: T) -> T {
     x
@@ -64,6 +84,22 @@ impl<'a> OrgTeams<'a> {
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
         self.github
             .iter(format!("/orgs/{}/teams", self.org), identity)
+    }
+
+    /// adds a repository permission to this team
+    pub fn add_repo_permission<N>(&self,
+                                  team_id: u64,
+                                  repo_name: N,
+                                  permission: Permission)
+                                  -> Result<()>
+        where N: Into<String>
+    {
+        self.github
+            .patch_nothing(&format!("/teams/{}/repos/{}/{}?permission={}",
+                                    team_id,
+                                    self.org,
+                                    repo_name.into(),
+                                    permission))
     }
 }
 

@@ -1,3 +1,7 @@
+# 0.3.10
+
+* add ability to add team to repository
+
 # 0.3.9
 
 * add support for fetching a single repo by name
