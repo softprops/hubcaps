@@ -478,6 +478,7 @@ pub struct RepoOptions {
     pub description: Option<String>,
     #[serde(skip_serializing_if="Option::is_none")]
     pub homepage: Option<String>,
+    /// false by default
     #[serde(skip_serializing_if="Option::is_none")]
     pub private: Option<bool>,
     #[serde(skip_serializing_if="Option::is_none")]
