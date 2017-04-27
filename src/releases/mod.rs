@@ -206,7 +206,7 @@ pub struct ReleaseOptionsBuilder {
 }
 
 impl ReleaseOptionsBuilder {
-    pub fn new<T>(tag: T) -> ReleaseOptionsBuilder
+    pub fn new<T>(tag: T) -> Self
         where T: Into<String>
     {
         ReleaseOptionsBuilder {
@@ -215,33 +215,33 @@ impl ReleaseOptionsBuilder {
         }
     }
 
-    pub fn commitish<C>(&mut self, commit: C) -> &mut ReleaseOptionsBuilder
+    pub fn commitish<C>(&mut self, commit: C) -> &mut Self
         where C: Into<String>
     {
         self.commitish = Some(commit.into());
         self
     }
 
-    pub fn name<N>(&mut self, name: N) -> &mut ReleaseOptionsBuilder
+    pub fn name<N>(&mut self, name: N) -> &mut Self
         where N: Into<String>
     {
         self.name = Some(name.into());
         self
     }
 
-    pub fn body<B>(&mut self, body: B) -> &mut ReleaseOptionsBuilder
+    pub fn body<B>(&mut self, body: B) -> &mut Self
         where B: Into<String>
     {
         self.body = Some(body.into());
         self
     }
 
-    pub fn draft(&mut self, draft: bool) -> &mut ReleaseOptionsBuilder {
+    pub fn draft(&mut self, draft: bool) -> &mut Self {
         self.draft = Some(draft);
         self
     }
 
-    pub fn prerelease(&mut self, pre: bool) -> &mut ReleaseOptionsBuilder {
+    pub fn prerelease(&mut self, pre: bool) -> &mut Self {
         self.prerelease = Some(pre);
         self
     }
@@ -263,7 +263,7 @@ impl ReleaseOptions {
                            body: Option<B>,
                            draft: Option<bool>,
                            prerelease: Option<bool>)
-                           -> ReleaseOptions
+                           -> Self
         where T: Into<String>,
               C: Into<String>,
               N: Into<String>,

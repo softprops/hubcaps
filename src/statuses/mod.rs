@@ -87,28 +87,28 @@ pub struct StatusBuilder {
 }
 
 impl StatusBuilder {
-    pub fn new(state: State) -> StatusBuilder {
+    pub fn new(state: State) -> Self {
         StatusBuilder {
             state: state,
             ..Default::default()
         }
     }
 
-    pub fn target_url<T>(&mut self, url: T) -> &mut StatusBuilder
+    pub fn target_url<T>(&mut self, url: T) -> &mut Self
         where T: Into<String>
     {
         self.target_url = Some(url.into());
         self
     }
 
-    pub fn description<D>(&mut self, desc: D) -> &mut StatusBuilder
+    pub fn description<D>(&mut self, desc: D) -> &mut Self
         where D: Into<String>
     {
         self.description = Some(desc.into());
         self
     }
 
-    pub fn context<C>(&mut self, ctx: C) -> &mut StatusBuilder
+    pub fn context<C>(&mut self, ctx: C) -> &mut Self
         where C: Into<String>
     {
         self.context = Some(ctx.into());
@@ -128,7 +128,7 @@ impl StatusOptions {
                         target_url: Option<T>,
                         descr: Option<D>,
                         context: Option<C>)
-                        -> StatusOptions
+                        -> Self
         where T: Into<String>,
               D: Into<String>,
               C: Into<String>

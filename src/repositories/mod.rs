@@ -520,7 +520,7 @@ pub struct RepoOptionsBuilder {
 }
 
 impl RepoOptionsBuilder {
-    pub fn new<N>(name: N) -> RepoOptionsBuilder
+    pub fn new<N>(name: N) -> Self
         where N: Into<String>
     {
         RepoOptionsBuilder {
@@ -529,58 +529,58 @@ impl RepoOptionsBuilder {
         }
     }
 
-    pub fn description<D>(&mut self, description: D) -> &mut RepoOptionsBuilder
+    pub fn description<D>(&mut self, description: D) -> &mut Self
         where D: Into<String>
     {
         self.description = Some(description.into());
         self
     }
 
-    pub fn homepage<H>(&mut self, homepage: H) -> &mut RepoOptionsBuilder
+    pub fn homepage<H>(&mut self, homepage: H) -> &mut Self
         where H: Into<String>
     {
         self.homepage = Some(homepage.into());
         self
     }
 
-    pub fn private(&mut self, private: bool) -> &mut RepoOptionsBuilder {
+    pub fn private(&mut self, private: bool) -> &mut Self {
         self.private = Some(private);
         self
     }
 
-    pub fn has_issues(&mut self, has_issues: bool) -> &mut RepoOptionsBuilder {
+    pub fn has_issues(&mut self, has_issues: bool) -> &mut Self {
         self.has_issues = Some(has_issues);
         self
     }
 
-    pub fn has_wiki(&mut self, has_wiki: bool) -> &mut RepoOptionsBuilder {
+    pub fn has_wiki(&mut self, has_wiki: bool) -> &mut Self {
         self.has_wiki = Some(has_wiki);
         self
     }
 
-    pub fn has_downloads(&mut self, has_downloads: bool) -> &mut RepoOptionsBuilder {
+    pub fn has_downloads(&mut self, has_downloads: bool) -> &mut Self {
         self.has_downloads = Some(has_downloads);
         self
     }
 
-    pub fn team_id(&mut self, team_id: i32) -> &mut RepoOptionsBuilder {
+    pub fn team_id(&mut self, team_id: i32) -> &mut Self {
         self.team_id = Some(team_id);
         self
     }
 
-    pub fn auto_init(&mut self, auto_init: bool) -> &mut RepoOptionsBuilder {
+    pub fn auto_init(&mut self, auto_init: bool) -> &mut Self {
         self.auto_init = Some(auto_init);
         self
     }
 
-    pub fn gitignore_template<GI>(&mut self, gitignore_template: GI) -> &mut RepoOptionsBuilder
+    pub fn gitignore_template<GI>(&mut self, gitignore_template: GI) -> &mut Self
         where GI: Into<String>
     {
         self.gitignore_template = Some(gitignore_template.into());
         self
     }
 
-    pub fn license_template<L>(&mut self, license_template: L) -> &mut RepoOptionsBuilder
+    pub fn license_template<L>(&mut self, license_template: L) -> &mut Self
         where L: Into<String>
     {
         self.license_template = Some(license_template.into());
@@ -614,7 +614,7 @@ impl RepoOptions {
                                auto_init: Option<bool>,
                                gitignore_template: Option<GI>,
                                license_template: Option<L>)
-                               -> RepoOptions
+                               -> Self
         where N: Into<String>,
               D: Into<String>,
               H: Into<String>,
@@ -670,7 +670,7 @@ pub struct RepoListOptionsBuilder {
 }
 
 impl RepoListOptionsBuilder {
-    pub fn new() -> RepoListOptionsBuilder {
+    pub fn new() -> Self {
         RepoListOptionsBuilder { ..Default::default() }
     }
 
@@ -679,12 +679,12 @@ impl RepoListOptionsBuilder {
         self
     }
 
-    pub fn visibility(&mut self, vis: Visibility) -> &mut RepoListOptionsBuilder {
+    pub fn visibility(&mut self, vis: Visibility) -> &mut Self {
         self.params.insert("visibility", vis.to_string());
         self
     }
 
-    pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut RepoListOptionsBuilder {
+    pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut Self {
         self.params
             .insert("affiliation",
                     affiliations
@@ -696,25 +696,25 @@ impl RepoListOptionsBuilder {
     }
 
 
-    pub fn repo_type(&mut self, tpe: Sort) -> &mut RepoListOptionsBuilder {
+    pub fn repo_type(&mut self, tpe: Sort) -> &mut Self {
         self.params.insert("type", tpe.to_string());
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut RepoListOptionsBuilder {
+    pub fn sort(&mut self, sort: Sort) -> &mut Self {
         self.params.insert("sort", sort.to_string());
         self
     }
 
-    pub fn asc(&mut self) -> &mut RepoListOptionsBuilder {
+    pub fn asc(&mut self) -> &mut Self {
         self.direction(SortDirection::Asc)
     }
 
-    pub fn desc(&mut self) -> &mut RepoListOptionsBuilder {
+    pub fn desc(&mut self) -> &mut Self {
         self.direction(SortDirection::Desc)
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut RepoListOptionsBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
         self.params.insert("direction", direction.to_string());
         self
     }
@@ -802,11 +802,11 @@ pub struct UserRepoListOptionsBuilder {
 }
 
 impl UserRepoListOptionsBuilder {
-    pub fn new() -> UserRepoListOptionsBuilder {
+    pub fn new() -> Self {
         UserRepoListOptionsBuilder { ..Default::default() }
     }
 
-    pub fn repo_type(&mut self, tpe: Type) -> &mut UserRepoListOptionsBuilder {
+    pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
         self.params.insert("type", tpe.to_string());
         self
     }
@@ -816,20 +816,20 @@ impl UserRepoListOptionsBuilder {
         self
     }
 
-    pub fn sort(&mut self, sort: Type) -> &mut UserRepoListOptionsBuilder {
+    pub fn sort(&mut self, sort: Type) -> &mut Self {
         self.params.insert("sort", sort.to_string());
         self
     }
 
-    pub fn asc(&mut self) -> &mut UserRepoListOptionsBuilder {
+    pub fn asc(&mut self) -> &mut Self {
         self.direction(SortDirection::Asc)
     }
 
-    pub fn desc(&mut self) -> &mut UserRepoListOptionsBuilder {
+    pub fn desc(&mut self) -> &mut Self {
         self.direction(SortDirection::Desc)
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut UserRepoListOptionsBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
         self.params.insert("direction", direction.to_string());
         self
     }
@@ -868,7 +868,7 @@ pub struct OrganizationRepoListOptionsBuilder {
 }
 
 impl OrganizationRepoListOptionsBuilder {
-    pub fn new() -> OrganizationRepoListOptionsBuilder {
+    pub fn new() -> Self {
         OrganizationRepoListOptionsBuilder { ..Default::default() }
     }
 
@@ -877,7 +877,7 @@ impl OrganizationRepoListOptionsBuilder {
         self
     }
 
-    pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut OrganizationRepoListOptionsBuilder {
+    pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut Self {
         self.params.insert("type", tpe.to_string());
         self
     }
