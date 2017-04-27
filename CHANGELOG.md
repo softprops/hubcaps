@@ -1,3 +1,7 @@
+# 0.3.7
+
+* add support for updating a repository branch's protection
+
 # 0.3.6
 
 * added `per_page` to various repo list builder interfaces
