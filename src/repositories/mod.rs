@@ -216,6 +216,13 @@ impl<'a> OrgRepositories<'a> {
         }
         self.github.iter(uri.join("?"), identity)
     }
+
+    /// Create a new org repository
+    /// https://developer.github.com/v3/repos/#create
+    pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
+        let data = try!(serde_json::to_string(&repo));
+        self.github.post::<Repo>(&self.path(""), data.as_bytes())
+    }
 }
 
 /// Provides access to the authenticated user's repositories
