@@ -1,3 +1,7 @@
+# 0.3.11
+
+* fixed PUT vs PATCH issue with repo team adds
+
 # 0.3.10
 
 * add ability to add team to repository

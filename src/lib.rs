@@ -410,8 +410,8 @@ impl Github {
                             MediaType::Json)
     }
 
-    fn patch_nothing(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(Method::Patch,
+    fn put_nothing(&self, uri: &str) -> Result<()> {
+        match self.request_entity::<()>(Method::Put,
                                         self.host.clone() + uri,
                                         None,
                                         MediaType::Json) {

@@ -95,11 +95,11 @@ impl<'a> OrgTeams<'a> {
         where N: Into<String>
     {
         self.github
-            .patch_nothing(&format!("/teams/{}/repos/{}/{}?permission={}",
-                                    team_id,
-                                    self.org,
-                                    repo_name.into(),
-                                    permission))
+            .put_nothing(&format!("/teams/{}/repos/{}/{}?permission={}",
+                                  team_id,
+                                  self.org,
+                                  repo_name.into(),
+                                  permission))
     }
 }
 
