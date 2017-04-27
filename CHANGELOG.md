@@ -1,3 +1,7 @@
+# 0.3.9
+
+* add support for fetching a single repo by name
+
 # 0.3.8
 
 * add support for org repo creation
