@@ -1,4 +1,7 @@
-//! Gists interface
+//! Repo branches interface
+//!
+//! For more information, visit the official
+//! [Github docs](https://developer.github.com/v3/repos/branches/)
 extern crate serde_json;
 
 use self::super::{Iter, MediaType, Github, Result};
