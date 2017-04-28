@@ -1,6 +1,8 @@
 //! Teams interface
 use self::super::{Iter, Github, Result};
 use std::fmt;
+use serde_json;
+use std::collections::BTreeMap;
 
 /// Team repository permissions
 pub enum Permission {
@@ -87,6 +89,7 @@ impl<'a> OrgTeams<'a> {
     }
 
     /// adds a repository permission to this team
+    /// learn more [here](https://developer.github.com/v3/orgs/teams/#add-or-update-team-repository)
     pub fn add_repo_permission<N>(&self,
                                   team_id: u64,
                                   repo_name: N,
@@ -94,12 +97,12 @@ impl<'a> OrgTeams<'a> {
                                   -> Result<()>
         where N: Into<String>
     {
+        let mut payload = BTreeMap::new();
+        payload.insert("permission", permission.to_string());
+        let data = serde_json::to_string(&payload)?;
         self.github
-            .put_nothing(&format!("/teams/{}/repos/{}/{}?permission={}",
-                                  team_id,
-                                  self.org,
-                                  repo_name.into(),
-                                  permission))
+            .put_no_response(&format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
+                             data.as_bytes())
     }
 }
 

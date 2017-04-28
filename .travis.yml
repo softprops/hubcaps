@@ -35,11 +35,11 @@ after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
-  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+  (wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
   tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build && cmake .. && make && make install DESTDIR=../tmp && cd ../.. &&
   ls target/debug &&
   for file in target/debug/hubcaps-*; do mkdir -p "target/cov/$(basename $file)"; ./kcov-master/tmp/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
-  echo "covered" &&
+  echo "covered") || true &&
   cargo doc --no-deps &&
   echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
   pip install --user ghp-import &&
