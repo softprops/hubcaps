@@ -10,6 +10,7 @@ pub struct Git<'a> {
 }
 
 impl<'a> Git<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
         where O: Into<String>,
               R: Into<String>

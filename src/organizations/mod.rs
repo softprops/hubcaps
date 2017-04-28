@@ -11,6 +11,7 @@ pub struct Organization<'a> {
 }
 
 impl<'a> Organization<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> Self
         where O: Into<String>
     {
@@ -37,6 +38,7 @@ pub struct Organizations<'a> {
 }
 
 impl<'a> Organizations<'a> {
+    #[doc(hidden)]
     pub fn new(github: &'a Github) -> Organizations<'a> {
         Organizations { github: github }
     }

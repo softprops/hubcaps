@@ -11,6 +11,7 @@ pub struct Labels<'a> {
 }
 
 impl<'a> Labels<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Labels<'a>
         where O: Into<String>,
               R: Into<String>

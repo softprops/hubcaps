@@ -16,6 +16,7 @@ pub struct Comments<'a> {
 }
 
 impl<'a> Comments<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> Comments<'a>
         where O: Into<String>,
               R: Into<String>

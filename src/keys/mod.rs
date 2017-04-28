@@ -12,6 +12,7 @@ pub struct Keys<'a> {
 }
 
 impl<'a> Keys<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Keys<'a>
         where O: Into<String>,
               R: Into<String>

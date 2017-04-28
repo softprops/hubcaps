@@ -44,7 +44,7 @@ pub struct Hooks<'a> {
 }
 
 impl<'a> Hooks<'a> {
-    /// Create a new deployments instance
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Hooks<'a>
         where O: Into<String>,
               R: Into<String>
@@ -127,6 +127,7 @@ pub struct HookCreateOptionsBuilder {
 }
 
 impl HookCreateOptionsBuilder {
+    #[doc(hidden)]
     pub fn new<N>(name: N) -> HookCreateOptionsBuilder
         where N: Into<String>
     {

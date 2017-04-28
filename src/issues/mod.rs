@@ -78,6 +78,7 @@ pub struct IssueLabels<'a> {
 }
 
 impl<'a> IssueLabels<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueLabels<'a>
         where O: Into<String>,
               R: Into<String>

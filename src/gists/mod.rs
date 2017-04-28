@@ -14,6 +14,7 @@ pub struct UserGists<'a> {
 }
 
 impl<'a> UserGists<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, owner: O) -> UserGists<'a>
         where O: Into<String>
     {
@@ -37,6 +38,7 @@ pub struct Gists<'a> {
 }
 
 impl<'a> Gists<'a> {
+    #[doc(hidden)]
     pub fn new(github: &'a Github) -> Gists<'a> {
         Gists { github: github }
     }

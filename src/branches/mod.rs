@@ -19,7 +19,7 @@ pub struct Branches<'a> {
 }
 
 impl<'a> Branches<'a> {
-    /// create a new instance of branches
+    #[doc(hidden)]
     pub fn new<U, R>(github: &'a Github, owner: U, repo: R) -> Self
         where U: Into<String>,
               R: Into<String>

@@ -25,7 +25,7 @@ pub struct DeploymentStatuses<'a> {
 }
 
 impl<'a> DeploymentStatuses<'a> {
-    /// creates a new deployment status
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
         where O: Into<String>,
               R: Into<String>

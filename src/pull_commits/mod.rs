@@ -16,8 +16,7 @@ pub struct PullCommits<'a> {
 }
 
 impl<'a> PullCommits<'a> {
-    /// creates a new instance
-    /// use `github.repo(...).pulls().get(number).commits()` instead
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullCommits<'a>
         where O: Into<String>,
               R: Into<String>
