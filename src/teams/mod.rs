@@ -35,6 +35,7 @@ pub struct RepoTeams<'a> {
 }
 
 impl<'a> RepoTeams<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
         where O: Into<String>,
               R: Into<String>
@@ -67,6 +68,7 @@ pub struct OrgTeams<'a> {
 }
 
 impl<'a> OrgTeams<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> Self
         where O: Into<String>
     {

@@ -58,8 +58,7 @@ pub struct PullRequest<'a> {
 }
 
 impl<'a> PullRequest<'a> {
-    /// Creates a new instance
-    /// Use `github.repo(...).pulls().get(num)` instead
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullRequest<'a>
         where O: Into<String>,
               R: Into<String>
@@ -140,8 +139,7 @@ pub struct PullRequests<'a> {
 }
 
 impl<'a> PullRequests<'a> {
-    /// Creates a new instance
-    /// Use `github.repo(..).pulls()` instead
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> PullRequests<'a>
         where O: Into<String>,
               R: Into<String>

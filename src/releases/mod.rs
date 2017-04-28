@@ -12,6 +12,7 @@ pub struct Assets<'a> {
 }
 
 impl<'a> Assets<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, releaseid: u64) -> Assets<'a>
         where O: Into<String>,
               R: Into<String>
@@ -59,6 +60,7 @@ pub struct ReleaseRef<'a> {
 }
 
 impl<'a> ReleaseRef<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> ReleaseRef<'a>
         where O: Into<String>,
               R: Into<String>
@@ -98,6 +100,7 @@ pub struct Releases<'a> {
 }
 
 impl<'a> Releases<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Releases<'a>
         where O: Into<String>,
               R: Into<String>

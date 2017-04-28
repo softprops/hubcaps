@@ -6,8 +6,6 @@ use hyper::Error as HttpError;
 use hyper::status::StatusCode;
 use serde_json::error::Error as SerdeError;
 
-// todo: look into error_chain crate to remove boiler plate
-
 /// enumerated types of client errors
 error_chain! {
     errors {

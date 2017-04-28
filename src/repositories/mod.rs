@@ -142,6 +142,7 @@ pub struct Repositories<'a> {
 }
 
 impl<'a> Repositories<'a> {
+    #[doc(hidden)]
     pub fn new(github: &'a Github) -> Repositories<'a> {
         Repositories { github: github }
     }
@@ -185,6 +186,7 @@ pub struct OrgRepositories<'a> {
 }
 
 impl<'a> OrgRepositories<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> Self
         where O: Into<String>
     {
@@ -232,6 +234,7 @@ pub struct UserRepositories<'a> {
 }
 
 impl<'a> UserRepositories<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, owner: O) -> UserRepositories<'a>
         where O: Into<String>
     {
@@ -272,6 +275,7 @@ pub struct OrganizationRepositories<'a> {
 }
 
 impl<'a> OrganizationRepositories<'a> {
+    #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> OrganizationRepositories<'a>
         where O: Into<String>
     {
@@ -313,6 +317,7 @@ pub struct Repository<'a> {
 }
 
 impl<'a> Repository<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Repository<'a>
         where O: Into<String>,
               R: Into<String>
@@ -390,7 +395,7 @@ impl<'a> Repository<'a> {
         Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
-    // get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)
+    /// get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)
     /// associated with this repository ref
     pub fn teams(&self) -> RepoTeams {
         RepoTeams::new(self.github, self.owner.as_str(), self.repo.as_str())

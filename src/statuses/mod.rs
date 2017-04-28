@@ -13,6 +13,7 @@ pub struct Statuses<'a> {
 }
 
 impl<'a> Statuses<'a> {
+    #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Statuses<'a>
         where O: Into<String>,
               R: Into<String>
@@ -87,6 +88,7 @@ pub struct StatusBuilder {
 }
 
 impl StatusBuilder {
+    #[doc(hidden)]
     pub fn new(state: State) -> Self {
         StatusBuilder {
             state: state,
@@ -124,6 +126,7 @@ impl StatusBuilder {
 }
 
 impl StatusOptions {
+    #[doc(hidden)]
     pub fn new<T, D, C>(state: State,
                         target_url: Option<T>,
                         descr: Option<D>,

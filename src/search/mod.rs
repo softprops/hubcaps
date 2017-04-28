@@ -44,6 +44,7 @@ fn items<D: Deserialize>(result: SearchResult<D>) -> Vec<D> {
 }
 
 impl<'a> Search<'a> {
+    #[doc(hidden)]
     pub fn new(github: &'a Github) -> Search<'a> {
         Search { github: github }
     }
@@ -69,6 +70,7 @@ pub struct SearchIssues<'a> {
 }
 
 impl<'a> SearchIssues<'a> {
+    #[doc(hidden)]
     pub fn new(search: &'a Search<'a>) -> SearchIssues<'a> {
         SearchIssues { search: search }
     }
