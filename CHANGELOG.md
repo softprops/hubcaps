@@ -1,3 +1,7 @@
+# 0.3.12
+
+* fixed issue with persistence of repo term permission
+
 # 0.3.11
 
 * fixed PUT vs PATCH issue with repo team adds
