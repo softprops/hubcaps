@@ -67,7 +67,7 @@ extern crate serde_json;
 extern crate url;
 
 // all the modules!
-use serde::de::Deserialize;
+use serde::de::DeserializeOwned;
 pub mod branches;
 pub mod git;
 pub mod users;
@@ -307,7 +307,7 @@ impl Github {
 
 
     fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.iter_media(uri, into_items, MediaType::Json)
     }
@@ -317,7 +317,7 @@ impl Github {
                             into_items: fn(D) -> Vec<I>,
                             media_type: MediaType)
                             -> Result<Iter<'a, D, I>>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         Iter::new(self, self.host.clone() + &uri, into_items, media_type)
     }
@@ -328,7 +328,7 @@ impl Github {
                   body: Option<&[u8]>,
                   media_type: MediaType)
                   -> Result<(Option<Links>, D)>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         let builder = self.authenticate(method, uri)
             .header(UserAgent(self.agent.to_owned()))
@@ -373,20 +373,20 @@ impl Github {
                          body: Option<&[u8]>,
                          media_type: MediaType)
                          -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.request(method, uri, body, media_type)
             .map(|(_, entity)| entity)
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.get_media(uri, MediaType::Json)
     }
 
     fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.request_entity(Method::Get, self.host.clone() + uri, None, media)
     }
@@ -402,7 +402,7 @@ impl Github {
     }
 
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.request_entity(Method::Post,
                             self.host.clone() + uri,
@@ -411,13 +411,13 @@ impl Github {
     }
 
     fn patch_media<D>(&self, uri: &str, message: &[u8], media: MediaType) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.patch_media(uri, message, MediaType::Json)
     }
@@ -431,7 +431,7 @@ impl Github {
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+        where D: DeserializeOwned
     {
         self.request_entity(Method::Put,
                             self.host.clone() + uri,
@@ -450,7 +450,7 @@ pub struct Iter<'a, D, I> {
 }
 
 impl<'a, D, I> Iter<'a, D, I>
-    where D: Deserialize
+    where D: DeserializeOwned
 {
     /// creates a new instance of an Iter
     pub fn new(github: &'a Github,
@@ -476,7 +476,7 @@ impl<'a, D, I> Iter<'a, D, I>
 }
 
 impl<'a, D, I> Iterator for Iter<'a, D, I>
-    where D: Deserialize
+    where D: DeserializeOwned
 {
     type Item = I;
     fn next(&mut self) -> Option<I> {
