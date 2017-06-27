@@ -18,8 +18,9 @@ pub struct PullCommits<'a> {
 impl<'a> PullCommits<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullCommits<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         PullCommits {
             github: github,
@@ -31,19 +32,23 @@ impl<'a> PullCommits<'a> {
 
     /// list pull commits
     pub fn list(&self) -> Result<Vec<PullCommit>> {
-        let uri = format!("/repos/{}/{}/pulls/{}/commits",
-                          self.owner,
-                          self.repo,
-                          self.number);
+        let uri = format!(
+            "/repos/{}/{}/pulls/{}/commits",
+            self.owner,
+            self.repo,
+            self.number
+        );
         self.github.get::<Vec<PullCommit>>(&uri)
     }
 
     /// provides an iterator over all pages of pull commits
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<PullCommit>, PullCommit>> {
-        let uri = format!("/repos/{}/{}/pulls/{}/commits",
-                          self.owner,
-                          self.repo,
-                          self.number);
+        let uri = format!(
+            "/repos/{}/{}/pulls/{}/commits",
+            self.owner,
+            self.repo,
+            self.number
+        );
         self.github.iter(uri, identity)
     }
 }

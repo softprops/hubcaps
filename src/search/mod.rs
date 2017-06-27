@@ -23,13 +23,15 @@ pub enum IssuesSort {
 
 impl fmt::Display for IssuesSort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   IssuesSort::Comments => "comments",
-                   IssuesSort::Created => "created",
-                   IssuesSort::Updated => "updated",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                IssuesSort::Comments => "comments",
+                IssuesSort::Created => "created",
+                IssuesSort::Updated => "updated",
+            }
+        )
     }
 }
 
@@ -76,7 +78,8 @@ impl<'a> SearchIssues<'a> {
     }
 
     fn search_uri<Q>(q: Q, options: &SearchIssuesOptions) -> String
-        where Q: Into<String>
+    where
+        Q: Into<String>,
     {
         let mut uri = vec!["/search/issues".to_string()];
         let query_options = options.serialize().unwrap_or(String::new());
@@ -90,22 +93,27 @@ impl<'a> SearchIssues<'a> {
     /// Returns an Iterator over pages of search results
     /// Use this interface if you wish to iterate over all items
     /// in a result set
-    pub fn iter<Q>(&'a self,
-                   q: Q,
-                   options: &SearchIssuesOptions)
-                   -> Result<Iter<'a, SearchResult<IssuesItem>, IssuesItem>>
-        where Q: Into<String>
+    pub fn iter<Q>(
+        &'a self,
+        q: Q,
+        options: &SearchIssuesOptions,
+    ) -> Result<Iter<'a, SearchResult<IssuesItem>, IssuesItem>>
+    where
+        Q: Into<String>,
     {
-        self.search
-            .iter::<IssuesItem>(&Self::search_uri(q, options))
+        self.search.iter::<IssuesItem>(
+            &Self::search_uri(q, options),
+        )
     }
 
     /// Returns a single page of search results
     pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Result<SearchResult<IssuesItem>>
-        where Q: Into<String>
+    where
+        Q: Into<String>,
     {
-        self.search
-            .search::<IssuesItem>(&Self::search_uri(q, options))
+        self.search.search::<IssuesItem>(
+            &Self::search_uri(q, options),
+        )
     }
 }
 
@@ -145,12 +153,12 @@ impl SearchIssuesOptionsBuilder {
         SearchIssuesOptionsBuilder { ..Default::default() }
     }
 
-    pub fn sort(&mut self, sort: IssuesSort) -> &mut SearchIssuesOptionsBuilder {
+    pub fn sort(&mut self, sort: IssuesSort) -> &mut Self {
         self.params.insert("sort", sort.to_string());
         self
     }
 
-    pub fn order(&mut self, direction: SortDirection) -> &mut SearchIssuesOptionsBuilder {
+    pub fn order(&mut self, direction: SortDirection) -> &mut Self {
         self.params.insert("order", direction.to_string());
         self
     }

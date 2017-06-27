@@ -21,8 +21,9 @@ pub struct Branches<'a> {
 impl<'a> Branches<'a> {
     #[doc(hidden)]
     pub fn new<U, R>(github: &'a Github, owner: U, repo: R) -> Self
-        where U: Into<String>,
-              R: Into<String>
+    where
+        U: Into<String>,
+        R: Into<String>,
     {
         Branches {
             github: github,
@@ -33,49 +34,63 @@ impl<'a> Branches<'a> {
 
     /// list of branches for this repo
     pub fn list(&self) -> Result<Vec<Branch>> {
-        self.github
-            .get_media::<Vec<Branch>>(&format!("/repos/{owner}/{repo}/branches",
-                                               owner = self.owner,
-                                               repo = self.repo),
-                                      MediaType::Preview("loki"))
+        self.github.get_media::<Vec<Branch>>(
+            &format!(
+                "/repos/{owner}/{repo}/branches",
+                owner = self.owner,
+                repo = self.repo
+            ),
+            MediaType::Preview("loki"),
+        )
     }
 
     /// provides an iterator over branches for this repo
     pub fn iter(&self) -> Result<Iter<Vec<Branch>, Branch>> {
-        self.github
-            .iter_media(format!("/repos/{owner}/{repo}/branches",
-                                owner = self.owner,
-                                repo = self.repo),
-                        identity,
-                        MediaType::Preview("loki"))
+        self.github.iter_media(
+            format!(
+                "/repos/{owner}/{repo}/branches",
+                owner = self.owner,
+                repo = self.repo
+            ),
+            identity,
+            MediaType::Preview("loki"),
+        )
     }
 
     /// gets a branch for this repo by name
     pub fn get<B>(&self, branch: B) -> Result<Branch>
-        where B: Into<String>
+    where
+        B: Into<String>,
     {
-        self.github
-            .get_media(&format!("/repos/{owner}/{repo}/branches/{branch}",
-                                owner = self.owner,
-                                repo = self.repo,
-                                branch = branch.into()),
-                       MediaType::Preview("loki"))
+        self.github.get_media(
+            &format!(
+                "/repos/{owner}/{repo}/branches/{branch}",
+                owner = self.owner,
+                repo = self.repo,
+                branch = branch.into()
+            ),
+            MediaType::Preview("loki"),
+        )
     }
 
     /// update branch production for a given branch
     pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<Branch>
-        where B: Into<String>
+    where
+        B: Into<String>,
     {
         let mut payload = BTreeMap::new();
         payload.insert("protection", pro);
         let data = serde_json::to_string(&payload)?;
-        self.github
-            .patch_media::<Branch>(&format!("/repos/{owner}/{repo}/branches/{branch}",
-                                            owner = self.owner,
-                                            repo = self.repo,
-                                            branch = branch.into()),
-                                   data.as_bytes(),
-                                   MediaType::Preview("loki"))
+        self.github.patch_media::<Branch>(
+            &format!(
+                "/repos/{owner}/{repo}/branches/{branch}",
+                owner = self.owner,
+                repo = self.repo,
+                branch = branch.into()
+            ),
+            data.as_bytes(),
+            MediaType::Preview("loki"),
+        )
     }
 }
 
@@ -94,7 +109,7 @@ pub struct Branch {
 pub struct Protection {
     pub enabled: bool,
     /// when set to None in branch updates, github will apply a set of defaults
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required_status_checks: Option<StatusChecks>,
 }
 

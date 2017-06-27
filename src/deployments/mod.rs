@@ -27,8 +27,9 @@ pub struct DeploymentStatuses<'a> {
 impl<'a> DeploymentStatuses<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         DeploymentStatuses {
             github: github,
@@ -39,11 +40,13 @@ impl<'a> DeploymentStatuses<'a> {
     }
 
     fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/deployments/{}/statuses{}",
-                self.owner,
-                self.repo,
-                self.id,
-                more)
+        format!(
+            "/repos/{}/{}/deployments/{}/statuses{}",
+            self.owner,
+            self.repo,
+            self.id,
+            more
+        )
     }
 
     /// lists all statuses associated with a deployment
@@ -55,16 +58,19 @@ impl<'a> DeploymentStatuses<'a> {
     /// interface is required for building up a request
     pub fn create(&self, status: &DeploymentStatusOptions) -> Result<DeploymentStatus> {
         let data = serde_json::to_string(&status)?;
-        self.github
-            .post::<DeploymentStatus>(&self.path(""), &data.as_bytes())
+        self.github.post::<DeploymentStatus>(
+            &self.path(""),
+            &data.as_bytes(),
+        )
     }
 }
 
 impl<'a> Deployments<'a> {
     /// Create a new deployments instance
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Deployments<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Deployments {
             github: github,
@@ -89,8 +95,10 @@ impl<'a> Deployments<'a> {
     /// creates a new deployment for this repository
     pub fn create(&self, dep: &DeploymentOptions) -> Result<Deployment> {
         let data = serde_json::to_string(&dep)?;
-        self.github
-            .post::<Deployment>(&self.path(""), data.as_bytes())
+        self.github.post::<Deployment>(
+            &self.path(""),
+            data.as_bytes(),
+        )
     }
 
     /// get a reference to the statuses api for a give deployment
@@ -106,12 +114,12 @@ pub struct Deployment {
     pub url: String,
     pub id: u64,
     pub sha: String,
-    #[serde(rename="ref")]
+    #[serde(rename = "ref")]
     pub commit_ref: String,
     pub task: String,
     pub payload: serde_json::Value,
     pub environment: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub creator: User,
     pub created_at: String,
@@ -122,26 +130,27 @@ pub struct Deployment {
 
 #[derive(Debug, Serialize)]
 pub struct DeploymentOptions {
-    #[serde(rename="ref")]
+    #[serde(rename = "ref")]
     pub commit_ref: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub task: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub auto_merge: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required_contexts: Option<Vec<String>>,
     /// contents of payload should be valid JSON
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub payload: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub environment: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 }
 
 impl DeploymentOptions {
     pub fn builder<C>(commit: C) -> DeploymentOptionsBuilder
-        where C: Into<String>
+    where
+        C: Into<String>,
     {
         DeploymentOptionsBuilder::new(commit)
     }
@@ -160,7 +169,8 @@ pub struct DeploymentOptionsBuilder {
 
 impl DeploymentOptionsBuilder {
     pub fn new<C>(commit: C) -> DeploymentOptionsBuilder
-        where C: Into<String>
+    where
+        C: Into<String>,
     {
         DeploymentOptionsBuilder {
             commit_ref: commit.into(),
@@ -169,7 +179,8 @@ impl DeploymentOptionsBuilder {
     }
 
     pub fn task<T>(&mut self, task: T) -> &mut DeploymentOptionsBuilder
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         self.task = Some(task.into());
         self
@@ -181,11 +192,10 @@ impl DeploymentOptionsBuilder {
     }
 
     pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentOptionsBuilder
-        where C: Into<String>
+    where
+        C: Into<String>,
     {
-        self.required_contexts = Some(ctxs.into_iter()
-                                          .map(|c| c.into())
-                                          .collect::<Vec<String>>());
+        self.required_contexts = Some(ctxs.into_iter().map(|c| c.into()).collect::<Vec<String>>());
         self
     }
 
@@ -195,14 +205,16 @@ impl DeploymentOptionsBuilder {
     }
 
     pub fn environment<E>(&mut self, env: E) -> &mut DeploymentOptionsBuilder
-        where E: Into<String>
+    where
+        E: Into<String>,
     {
         self.environment = Some(env.into());
         self
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut DeploymentOptionsBuilder
-        where D: Into<String>
+    where
+        D: Into<String>,
     {
         self.description = Some(desc.into());
         self
@@ -251,14 +263,16 @@ impl DeploymentStatusOptionsBuilder {
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusOptionsBuilder
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         self.target_url = Some(url.into());
         self
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut DeploymentStatusOptionsBuilder
-        where D: Into<String>
+    where
+        D: Into<String>,
     {
         self.description = Some(desc.into());
         self
@@ -276,9 +290,9 @@ impl DeploymentStatusOptionsBuilder {
 #[derive(Debug, Serialize)]
 pub struct DeploymentStatusOptions {
     state: State,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     target_url: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
 }
 
@@ -323,28 +337,32 @@ impl DeploymentListOptionsBuilder {
     }
 
     pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.params.insert("sha", s.into());
         self
     }
 
     pub fn commit_ref<G>(&mut self, r: G) -> &mut DeploymentListOptionsBuilder
-        where G: Into<String>
+    where
+        G: Into<String>,
     {
         self.params.insert("ref", r.into());
         self
     }
 
     pub fn task<T>(&mut self, t: T) -> &mut DeploymentListOptionsBuilder
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         self.params.insert("task", t.into());
         self
     }
 
     pub fn environment<E>(&mut self, e: E) -> &mut DeploymentListOptionsBuilder
-        where E: Into<String>
+    where
+        E: Into<String>,
     {
         self.params.insert("environment", e.into());
         self
@@ -398,21 +416,25 @@ mod tests {
 
     #[test]
     fn deployment_status_reqs() {
-        let tests = vec![(DeploymentStatusOptions::builder(State::Pending).build(),
-                  r#"{"state":"pending"}"#),
-                 (
+        let tests = vec![
+            (
+                DeploymentStatusOptions::builder(State::Pending).build(),
+                r#"{"state":"pending"}"#
+            ),
+            (
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .build(),
                 r#"{"state":"pending","target_url":"http://host.com"}"#
             ),
-                 (
+            (
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .description("desc")
                     .build(),
                 r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
-            )];
+            ),
+        ];
         test_encoding(tests)
     }
 }

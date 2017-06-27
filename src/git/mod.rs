@@ -12,8 +12,9 @@ pub struct Git<'a> {
 impl<'a> Git<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Git {
             github: github,
@@ -24,25 +25,29 @@ impl<'a> Git<'a> {
 
     /// list a git tree of files for this repo at a given sha
     pub fn tree<S>(&self, sha: S, recursive: bool) -> Result<TreeData>
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
-        self.github
-            .get::<TreeData>(&format!("/repos/{}/{}/git/trees/{}?recursive={}",
-                                      self.owner,
-                                      self.repo,
-                                      sha.into(),
-                                      if recursive { "1" } else { "0" }))
+        self.github.get::<TreeData>(&format!(
+            "/repos/{}/{}/git/trees/{}?recursive={}",
+            self.owner,
+            self.repo,
+            sha.into(),
+            if recursive { "1" } else { "0" }
+        ))
     }
 
     /// get the blob contents of a given sha
     pub fn blob<S>(&self, sha: S) -> Result<Blob>
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
-        self.github
-            .get::<Blob>(&format!("/repos/{}/{}/git/blobs/{}",
-                                  self.owner,
-                                  self.repo,
-                                  sha.into()))
+        self.github.get::<Blob>(&format!(
+            "/repos/{}/{}/git/blobs/{}",
+            self.owner,
+            self.repo,
+            sha.into()
+        ))
     }
 }
 
@@ -62,7 +67,7 @@ pub struct GitFile {
     pub path: String,
     pub mode: String,
     /// typically tree or blob
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub content_type: String,
     /// size will be None for directories
     pub size: Option<usize>,

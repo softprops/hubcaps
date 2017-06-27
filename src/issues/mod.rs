@@ -24,13 +24,15 @@ pub enum State {
 
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   State::Open => "open",
-                   State::Closed => "closed",
-                   State::All => "all",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                State::Open => "open",
+                State::Closed => "closed",
+                State::All => "all",
+            }
+        )
     }
 }
 
@@ -53,13 +55,15 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Sort::Created => "created",
-                   Sort::Updated => "updated",
-                   Sort::Comments => "comments",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Sort::Created => "created",
+                Sort::Updated => "updated",
+                Sort::Comments => "comments",
+            }
+        )
     }
 }
 
@@ -80,8 +84,9 @@ pub struct IssueLabels<'a> {
 impl<'a> IssueLabels<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueLabels<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         IssueLabels {
             github: github,
@@ -92,17 +97,21 @@ impl<'a> IssueLabels<'a> {
     }
 
     fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/issues/{}/labels{}",
-                self.owner,
-                self.repo,
-                self.number,
-                more)
+        format!(
+            "/repos/{}/{}/issues/{}/labels{}",
+            self.owner,
+            self.repo,
+            self.number,
+            more
+        )
     }
 
     /// add a set of labels to this issue ref
     pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github
-            .post::<Vec<Label>>(&self.path(""), serde_json::to_string(&labels)?.as_bytes())
+        self.github.post::<Vec<Label>>(
+            &self.path(""),
+            serde_json::to_string(&labels)?.as_bytes(),
+        )
     }
 
     /// remove a label from this issue
@@ -114,8 +123,10 @@ impl<'a> IssueLabels<'a> {
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github
-            .put::<Vec<Label>>(&self.path(""), serde_json::to_string(&labels)?.as_bytes())
+        self.github.put::<Vec<Label>>(
+            &self.path(""),
+            serde_json::to_string(&labels)?.as_bytes(),
+        )
     }
 
     /// remove all labels from an issue
@@ -136,8 +147,9 @@ pub struct IssueRef<'a> {
 impl<'a> IssueRef<'a> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueRef<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         IssueRef {
             github: github,
@@ -148,31 +160,36 @@ impl<'a> IssueRef<'a> {
     }
 
     fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/issues/{}{}",
-                self.owner,
-                self.repo,
-                self.number,
-                more)
+        format!(
+            "/repos/{}/{}/issues/{}{}",
+            self.owner,
+            self.repo,
+            self.number,
+            more
+        )
     }
 
     pub fn labels(&self) -> IssueLabels {
-        IssueLabels::new(self.github,
-                         self.owner.as_str(),
-                         self.repo.as_str(),
-                         self.number)
+        IssueLabels::new(
+            self.github,
+            self.owner.as_str(),
+            self.repo.as_str(),
+            self.number,
+        )
     }
 
     pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
         let data = serde_json::to_string(&is)?;
-        self.github
-            .patch::<Issue>(&self.path(""), data.as_bytes())
+        self.github.patch::<Issue>(&self.path(""), data.as_bytes())
     }
 
     pub fn comments(&self) -> Comments {
-        Comments::new(self.github,
-                      self.owner.clone(),
-                      self.repo.clone(),
-                      self.number)
+        Comments::new(
+            self.github,
+            self.owner.clone(),
+            self.repo.clone(),
+            self.number,
+        )
     }
 }
 
@@ -187,8 +204,9 @@ pub struct Issues<'a> {
 impl<'a> Issues<'a> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Issues<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Issues {
             github: github,
@@ -207,8 +225,7 @@ impl<'a> Issues<'a> {
 
     pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
         let data = serde_json::to_string(&is)?;
-        self.github
-            .post::<Issue>(&self.path(""), data.as_bytes())
+        self.github.post::<Issue>(&self.path(""), data.as_bytes())
     }
 
     pub fn list(&self, options: &IssueListOptions) -> Result<Vec<Issue>> {
@@ -280,41 +297,47 @@ impl IssueListOptionsBuilder {
     }
 
     pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListOptionsBuilder
-        where A: Into<String>
+    where
+        A: Into<String>,
     {
         self.params.insert("assignee", assignee.into());
         self
     }
 
     pub fn creator<C>(&mut self, creator: C) -> &mut IssueListOptionsBuilder
-        where C: Into<String>
+    where
+        C: Into<String>,
     {
         self.params.insert("creator", creator.into());
         self
     }
 
     pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListOptionsBuilder
-        where M: Into<String>
+    where
+        M: Into<String>,
     {
         self.params.insert("mentioned", mentioned.into());
         self
     }
 
     pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
-        where L: Into<String>
+    where
+        L: Into<String>,
     {
-        self.params
-            .insert("labels",
-                    labels
-                        .into_iter()
-                        .map(|l| l.into())
-                        .collect::<Vec<_>>()
-                        .join(","));
+        self.params.insert(
+            "labels",
+            labels
+                .into_iter()
+                .map(|l| l.into())
+                .collect::<Vec<_>>()
+                .join(","),
+        );
         self
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut IssueListOptionsBuilder
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.params.insert("since", since.into());
         self
@@ -328,26 +351,28 @@ impl IssueListOptionsBuilder {
 #[derive(Debug, Serialize)]
 pub struct IssueOptions {
     pub title: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub assignee: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub milestone: Option<u64>,
     pub labels: Vec<String>,
 }
 
 impl IssueOptions {
-    pub fn new<T, B, A, L>(title: T,
-                           body: Option<B>,
-                           assignee: Option<A>,
-                           milestone: Option<u64>,
-                           labels: Vec<L>)
-                           -> IssueOptions
-        where T: Into<String>,
-              B: Into<String>,
-              A: Into<String>,
-              L: Into<String>
+    pub fn new<T, B, A, L>(
+        title: T,
+        body: Option<B>,
+        assignee: Option<A>,
+        milestone: Option<u64>,
+        labels: Vec<L>,
+    ) -> IssueOptions
+    where
+        T: Into<String>,
+        B: Into<String>,
+        A: Into<String>,
+        L: Into<String>,
     {
         IssueOptions {
             title: title.into(),
@@ -403,13 +428,19 @@ mod tests {
                 }
             }
         }
-        let tests = vec![(IssueListOptions::builder().build(), None),
-                         (IssueListOptions::builder().state(State::Closed).build(),
-                          Some("state=closed".to_owned())),
-                         (IssueListOptions::builder()
-                              .labels(vec!["foo", "bar"])
-                              .build(),
-                          Some("labels=foo%2Cbar".to_owned()))];
+        let tests = vec![
+            (IssueListOptions::builder().build(), None),
+            (
+                IssueListOptions::builder().state(State::Closed).build(),
+                Some("state=closed".to_owned())
+            ),
+            (
+                IssueListOptions::builder()
+                    .labels(vec!["foo", "bar"])
+                    .build(),
+                Some("labels=foo%2Cbar".to_owned())
+            ),
+        ];
         test_serialize(tests)
     }
 
@@ -421,9 +452,12 @@ mod tests {
 
     #[test]
     fn sort_display() {
-        for (k, v) in vec![(Sort::Created, "created"),
-                           (Sort::Updated, "updated"),
-                           (Sort::Comments, "comments")] {
+        for (k, v) in vec![
+            (Sort::Created, "created"),
+            (Sort::Updated, "updated"),
+            (Sort::Comments, "comments"),
+        ]
+        {
             assert_eq!(k.to_string(), v)
         }
     }

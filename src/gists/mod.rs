@@ -16,7 +16,8 @@ pub struct UserGists<'a> {
 impl<'a> UserGists<'a> {
     #[doc(hidden)]
     pub fn new<O>(github: &'a Github, owner: O) -> UserGists<'a>
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         UserGists {
             github: github,
@@ -49,8 +50,8 @@ impl<'a> Gists<'a> {
 
     pub fn star(&self, id: &str) -> Result<()> {
         match self.github
-                  .put::<String>(&self.path(&format!("/{}/star", id)), &[])
-                  .map(|_| ()) {
+            .put::<String>(&self.path(&format!("/{}/star", id)), &[])
+            .map(|_| ()) {
             Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
             otherwise => otherwise,
         }
@@ -61,13 +62,16 @@ impl<'a> Gists<'a> {
     }
 
     pub fn fork(&self, id: &str) -> Result<Gist> {
-        self.github
-            .post::<Gist>(&self.path(&format!("/{}/forks", id)), &[])
+        self.github.post::<Gist>(
+            &self.path(&format!("/{}/forks", id)),
+            &[],
+        )
     }
 
     pub fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
-        self.github
-            .get::<Vec<GistFork>>(&self.path(&format!("/{}/forks", id)))
+        self.github.get::<Vec<GistFork>>(
+            &self.path(&format!("/{}/forks", id)),
+        )
     }
 
     pub fn delete(&self, id: &str) -> Result<()> {
@@ -79,8 +83,9 @@ impl<'a> Gists<'a> {
     }
 
     pub fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
-        self.github
-            .get::<Gist>(&self.path(&format!("/{}/{}", id, sha)))
+        self.github.get::<Gist>(
+            &self.path(&format!("/{}/{}", id, sha)),
+        )
     }
 
     pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
@@ -116,7 +121,8 @@ pub struct GistListOptions {
 
 impl GistListOptions {
     pub fn since<T>(timestamp: T) -> GistListOptions
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         let mut params = HashMap::new();
         params.insert("since", timestamp.into());
@@ -141,7 +147,7 @@ pub struct GistFile {
     pub size: u64,
     pub raw_url: String,
     pub content: Option<String>,
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub content_type: String,
     pub truncated: Option<bool>,
     pub language: Option<String>,
@@ -179,15 +185,16 @@ pub struct GistFork {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Content {
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub filename: Option<String>,
     pub content: String,
 }
 
 impl Content {
     pub fn new<F, C>(filename: Option<F>, content: C) -> Content
-        where F: Into<String>,
-              C: Into<String>
+    where
+        F: Into<String>,
+        C: Into<String>,
     {
         Content {
             filename: filename.map(|f| f.into()),
@@ -205,8 +212,9 @@ pub struct GistOptionsBuilder {
 
 impl GistOptionsBuilder {
     pub fn new<K, V>(files: HashMap<K, V>) -> GistOptionsBuilder
-        where K: Clone + Hash + Eq + Into<String>,
-              V: Into<String>
+    where
+        K: Clone + Hash + Eq + Into<String>,
+        V: Into<String>,
     {
         let mut contents = HashMap::new();
         for (k, v) in files.into_iter() {
@@ -219,7 +227,8 @@ impl GistOptionsBuilder {
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut GistOptionsBuilder
-        where D: Into<String>
+    where
+        D: Into<String>,
     {
         self.description = Some(desc.into());
         self
@@ -241,18 +250,19 @@ impl GistOptionsBuilder {
 
 #[derive(Debug, Serialize)]
 pub struct GistOptions {
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
     pub files: HashMap<String, Content>,
 }
 
 impl GistOptions {
     pub fn new<D, K, V>(desc: Option<D>, public: bool, files: HashMap<K, V>) -> GistOptions
-        where D: Into<String>,
-              K: Hash + Eq + Into<String>,
-              V: Into<String>
+    where
+        D: Into<String>,
+        K: Hash + Eq + Into<String>,
+        V: Into<String>,
     {
         let mut contents = HashMap::new();
         for (k, v) in files.into_iter() {
@@ -266,8 +276,9 @@ impl GistOptions {
     }
 
     pub fn builder<K, V>(files: HashMap<K, V>) -> GistOptionsBuilder
-        where K: Clone + Hash + Eq + Into<String>,
-              V: Into<String>
+    where
+        K: Clone + Hash + Eq + Into<String>,
+        V: Into<String>,
     {
         GistOptionsBuilder::new(files)
     }
@@ -291,11 +302,16 @@ mod tests {
     fn gist_reqs() {
         let mut files = HashMap::new();
         files.insert("foo", "bar");
-        let tests =
-            vec![(GistOptions::new(None as Option<String>, true, files.clone()),
-                  r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#),
-                 (GistOptions::new(Some("desc"), true, files.clone()),
-                  r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#)];
+        let tests = vec![
+            (
+                GistOptions::new(None as Option<String>, true, files.clone()),
+                r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
+            ),
+            (
+                GistOptions::new(Some("desc"), true, files.clone()),
+                r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#
+            ),
+        ];
         test_encoding(tests);
     }
 
@@ -304,18 +320,25 @@ mod tests {
     fn gist_req() {
         let mut files = HashMap::new();
         files.insert("test", "foo");
-        let tests =
-            vec![(GistOptions::builder(files.clone()).build(),
-                  r#"{"files":{"test":{"content":"foo"}}}"#),
-                 (GistOptions::builder(files.clone())
-                      .description("desc")
-                      .build(),
-                  r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#),
-                 (GistOptions::builder(files.clone())
-                      .description("desc")
-                      .public(false)
-                      .build(),
-                  r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#)];
+        let tests = vec![
+            (
+                GistOptions::builder(files.clone()).build(),
+                r#"{"files":{"test":{"content":"foo"}}}"#
+            ),
+            (
+                GistOptions::builder(files.clone())
+                    .description("desc")
+                    .build(),
+                r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#
+            ),
+            (
+                GistOptions::builder(files.clone())
+                    .description("desc")
+                    .public(false)
+                    .build(),
+                r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#
+            ),
+        ];
         test_encoding(tests)
     }
 }

@@ -14,8 +14,9 @@ pub struct ReviewComments<'a> {
 impl<'a> ReviewComments<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> ReviewComments<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         ReviewComments {
             github: github,
@@ -27,11 +28,12 @@ impl<'a> ReviewComments<'a> {
 
     /// list pull requests
     pub fn list(&self) -> Result<Vec<ReviewComment>> {
-        self.github
-            .get::<Vec<ReviewComment>>(&format!("/repos/{}/{}/pulls/{}/comments",
-                                                self.owner,
-                                                self.repo,
-                                                self.number))
+        self.github.get::<Vec<ReviewComment>>(&format!(
+            "/repos/{}/{}/pulls/{}/comments",
+            self.owner,
+            self.repo,
+            self.number
+        ))
     }
 }
 

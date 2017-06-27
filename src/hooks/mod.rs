@@ -27,12 +27,14 @@ impl Default for WebHookContentType {
 
 impl fmt::Display for WebHookContentType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   WebHookContentType::Form => "form",
-                   WebHookContentType::Json => "json",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                WebHookContentType::Form => "form",
+                WebHookContentType::Json => "json",
+            }
+        )
     }
 }
 
@@ -46,8 +48,9 @@ pub struct Hooks<'a> {
 impl<'a> Hooks<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Hooks<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Hooks {
             github: github,
@@ -58,8 +61,11 @@ impl<'a> Hooks<'a> {
 
     /// lists hook associated with a repoistory
     pub fn list(&self) -> Result<Vec<Hook>> {
-        self.github
-            .get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
+        self.github.get(&format!(
+            "/repos/{}/{}/hooks",
+            self.owner,
+            self.repo
+        ))
     }
 
     /// creates a new repository hook
@@ -69,23 +75,29 @@ impl<'a> Hooks<'a> {
     /// for more information
     pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
         let data = serde_json::to_string(&options)?;
-        self.github
-            .post::<Hook>(&format!("/repos/{}/{}/hooks", self.owner, self.repo),
-                          data.as_bytes())
+        self.github.post::<Hook>(
+            &format!("/repos/{}/{}/hooks", self.owner, self.repo),
+            data.as_bytes(),
+        )
     }
 
     /// edits an existing repository hook
     pub fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
         let data = serde_json::to_string(&options)?;
-        self.github
-            .patch::<Hook>(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-                           data.as_bytes())
+        self.github.patch::<Hook>(
+            &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
+            data.as_bytes(),
+        )
     }
 
     /// deletes a repoistory hook by id
     pub fn delete(&self, id: u64) -> Result<()> {
-        self.github
-            .delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
+        self.github.delete(&format!(
+            "/repos/{}/{}/hooks/{}",
+            self.owner,
+            self.repo,
+            id
+        ))
     }
 }
 
@@ -107,7 +119,8 @@ impl HookCreateOptions {
     /// are should be taken with respect to the hook name as you can only
     /// use "web" or the a valid service name listed [here](https://api.github.com/hooks)
     pub fn builder<N>(name: N) -> HookCreateOptionsBuilder
-        where N: Into<String>
+    where
+        N: Into<String>,
     {
         HookCreateOptionsBuilder::new(name)
     }
@@ -129,7 +142,8 @@ pub struct HookCreateOptionsBuilder {
 impl HookCreateOptionsBuilder {
     #[doc(hidden)]
     pub fn new<N>(name: N) -> HookCreateOptionsBuilder
-        where N: Into<String>
+    where
+        N: Into<String>,
     {
         HookCreateOptionsBuilder {
             name: name.into(),
@@ -148,7 +162,8 @@ impl HookCreateOptionsBuilder {
     /// the default is "push". for a full list, see
     /// the [Github api docs](https://developer.github.com/webhooks/#events)
     pub fn events<E>(&mut self, events: Vec<E>) -> &mut Self
-        where E: Into<String>
+    where
+        E: Into<String>,
     {
         self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
         self
@@ -156,7 +171,8 @@ impl HookCreateOptionsBuilder {
 
     /// web hooks must have an associated url
     pub fn url<U>(&mut self, url: U) -> &mut Self
-        where U: Into<String>
+    where
+        U: Into<String>,
     {
         self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
     }
@@ -171,22 +187,25 @@ impl HookCreateOptionsBuilder {
     /// web hooks can optionally provide a secret used to sign deliveries
     /// to identify that their source was indeed github
     pub fn secret<S>(&mut self, sec: S) -> &mut Self
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.config_str_entry("secret", sec);
         self
     }
 
     pub fn config_str_entry<K, V>(&mut self, k: K, v: V) -> &mut Self
-        where K: Into<String>,
-              V: Into<String>
+    where
+        K: Into<String>,
+        V: Into<String>,
     {
         self.config_entry(k.into(), ::serde_json::Value::String(v.into()));
         self
     }
 
     pub fn config_entry<N>(&mut self, name: N, value: ::serde_json::Value) -> &mut Self
-        where N: Into<String>
+    where
+        N: Into<String>,
     {
         self.config.insert(name.into(), value);
         self
@@ -246,7 +265,8 @@ impl HookEditOptionsBuilder {
     /// the default is "push". for a full list, see
     /// the [Github api docs](https://developer.github.com/webhooks/#events)
     pub fn events<E>(&mut self, events: Vec<E>) -> &mut Self
-        where E: Into<String>
+    where
+        E: Into<String>,
     {
         self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
         self
@@ -254,7 +274,8 @@ impl HookEditOptionsBuilder {
 
     /// web hooks must have an associated url
     pub fn url<U>(&mut self, url: U) -> &mut Self
-        where U: Into<String>
+    where
+        U: Into<String>,
     {
         self.config_entry("url".to_owned(), ::serde_json::Value::String(url.into()))
     }
@@ -269,22 +290,25 @@ impl HookEditOptionsBuilder {
     /// web hooks can optionally provide a secret used to sign deliveries
     /// to identify that their source was indeed github
     pub fn secret<S>(&mut self, sec: S) -> &mut Self
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.config_str_entry("secret", sec);
         self
     }
 
     pub fn config_str_entry<K, V>(&mut self, k: K, v: V) -> &mut Self
-        where K: Into<String>,
-              V: Into<String>
+    where
+        K: Into<String>,
+        V: Into<String>,
     {
         self.config_entry(k.into(), ::serde_json::Value::String(v.into()));
         self
     }
 
     pub fn config_entry<N>(&mut self, name: N, value: ::serde_json::Value) -> &mut Self
-        where N: Into<String>
+    where
+        N: Into<String>,
     {
         self.config.insert(name.into(), value);
         self
@@ -322,11 +346,10 @@ impl Hook {
     }
 
     pub fn config_string(&self, name: &str) -> Option<String> {
-        self.config_value(name)
-            .and_then(|value| match *value {
-                          ::serde_json::Value::String(ref val) => Some(val.clone()),
-                          _ => None,
-                      })
+        self.config_value(name).and_then(|value| match *value {
+            ::serde_json::Value::String(ref val) => Some(val.clone()),
+            _ => None,
+        })
     }
 
     pub fn url(&self) -> Option<String> {
@@ -344,8 +367,11 @@ mod tests {
 
     #[test]
     fn webhook_content_type_display() {
-        for (ct, expect) in vec![(WebHookContentType::Form, "form"),
-                                 (WebHookContentType::Json, "json")] {
+        for (ct, expect) in vec![
+            (WebHookContentType::Form, "form"),
+            (WebHookContentType::Json, "json"),
+        ]
+        {
             assert_eq!(ct.to_string(), expect)
         }
     }

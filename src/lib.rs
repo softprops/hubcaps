@@ -152,12 +152,14 @@ pub enum SortDirection {
 
 impl fmt::Display for SortDirection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   SortDirection::Asc => "asc",
-                   SortDirection::Desc => "desc",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                SortDirection::Asc => "asc",
+                SortDirection::Desc => "desc",
+            }
+        )
     }
 }
 
@@ -198,7 +200,8 @@ impl Github {
     /// Create a new Github instance. This will typically be how you interface with all
     /// other operations
     pub fn new<A>(agent: A, client: Client, credentials: Credentials) -> Github
-        where A: Into<String>
+    where
+        A: Into<String>,
     {
         Github::host(DEFAULT_HOST, agent, client, credentials)
     }
@@ -206,8 +209,9 @@ impl Github {
     /// Create a new Github instance hosted at a custom location.
     /// Useful for github enterprise installations ( yourdomain.com/api/v3/ )
     pub fn host<H, A>(host: H, agent: A, client: Client, credentials: Credentials) -> Github
-        where H: Into<String>,
-              A: Into<String>
+    where
+        H: Into<String>,
+        A: Into<String>,
     {
         Github {
             host: host.into(),
@@ -219,8 +223,9 @@ impl Github {
 
     /// Return a reference to a Github reposistory
     pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Repository::new(self, owner, repo)
     }
@@ -228,7 +233,8 @@ impl Github {
     /// Return a reference to the collection of repositories owned by and
     /// associated with an owner
     pub fn user_repos<S>(&self, owner: S) -> UserRepositories
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         UserRepositories::new(self, owner)
     }
@@ -240,7 +246,8 @@ impl Github {
     }
 
     pub fn org<O>(&self, org: O) -> Organization
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         Organization::new(self, org)
     }
@@ -254,14 +261,16 @@ impl Github {
     /// Return a reference to the collection of organizations a user
     /// is publicly associated with
     pub fn user_orgs<U>(&self, user: U) -> UserOrganizations
-        where U: Into<String>
+    where
+        U: Into<String>,
     {
         UserOrganizations::new(self, user)
     }
 
     /// Return a reference to an interface that provides access to a user's gists
     pub fn user_gists<O>(&self, owner: O) -> UserGists
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         UserGists::new(self, owner)
     }
@@ -280,7 +289,8 @@ impl Github {
     /// Return a reference to the collection of repositories owned by and
     /// associated with an organization
     pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         OrganizationRepositories::new(self, org)
     }
@@ -288,9 +298,9 @@ impl Github {
     fn authenticate(&self, method: Method, url: String) -> RequestBuilder {
         match self.credentials {
             Credentials::Token(ref token) => {
-                self.client
-                    .request(method, &url)
-                    .header(Authorization(format!("token {}", token)))
+                self.client.request(method, &url).header(Authorization(
+                    format!("token {}", token),
+                ))
             }
             Credentials::Client(ref id, ref secret) => {
 
@@ -307,28 +317,33 @@ impl Github {
 
 
     fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
         self.iter_media(uri, into_items, MediaType::Json)
     }
 
-    fn iter_media<'a, D, I>(&'a self,
-                            uri: String,
-                            into_items: fn(D) -> Vec<I>,
-                            media_type: MediaType)
-                            -> Result<Iter<'a, D, I>>
-        where D: Deserialize
+    fn iter_media<'a, D, I>(
+        &'a self,
+        uri: String,
+        into_items: fn(D) -> Vec<I>,
+        media_type: MediaType,
+    ) -> Result<Iter<'a, D, I>>
+    where
+        D: Deserialize,
     {
         Iter::new(self, self.host.clone() + &uri, into_items, media_type)
     }
 
-    fn request<D>(&self,
-                  method: Method,
-                  uri: String,
-                  body: Option<&[u8]>,
-                  media_type: MediaType)
-                  -> Result<(Option<Links>, D)>
-        where D: Deserialize
+    fn request<D>(
+        &self,
+        method: Method,
+        uri: String,
+        body: Option<&[u8]>,
+        media_type: MediaType,
+    ) -> Result<(Option<Links>, D)>
+    where
+        D: Deserialize,
     {
         let builder = self.authenticate(method, uri)
             .header(UserAgent(self.agent.to_owned()))
@@ -345,9 +360,9 @@ impl Github {
         };
         res.read_to_string(&mut body)?;
 
-        let links = res.headers
-            .get::<Link>()
-            .map(|&Link(ref value)| Links::new(value.to_owned()));
+        let links = res.headers.get::<Link>().map(|&Link(ref value)| {
+            Links::new(value.to_owned())
+        });
 
         debug!("rec response {:#?} {:#?} {}", res.status, res.headers, body);
         match res.status {
@@ -357,67 +372,82 @@ impl Github {
             StatusCode::Unauthorized |
             StatusCode::NotFound |
             StatusCode::Forbidden => {
-                Err(ErrorKind::Fault {
-                            code: res.status,
-                            error: serde_json::from_str::<errors::ClientError>(&body)?,
-                        }
-                        .into())
+                Err(
+                    ErrorKind::Fault {
+                        code: res.status,
+                        error: serde_json::from_str::<errors::ClientError>(&body)?,
+                    }.into(),
+                )
             }
             _ => Ok((links, serde_json::from_str::<D>(&body)?)),
         }
     }
 
-    fn request_entity<D>(&self,
-                         method: Method,
-                         uri: String,
-                         body: Option<&[u8]>,
-                         media_type: MediaType)
-                         -> Result<D>
-        where D: Deserialize
+    fn request_entity<D>(
+        &self,
+        method: Method,
+        uri: String,
+        body: Option<&[u8]>,
+        media_type: MediaType,
+    ) -> Result<D>
+    where
+        D: Deserialize,
     {
-        self.request(method, uri, body, media_type)
-            .map(|(_, entity)| entity)
+        self.request(method, uri, body, media_type).map(
+            |(_, entity)| {
+                entity
+            },
+        )
     }
 
     fn get<D>(&self, uri: &str) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
         self.get_media(uri, MediaType::Json)
     }
 
     fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
         self.request_entity(Method::Get, self.host.clone() + uri, None, media)
     }
 
     fn delete(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(Method::Delete,
-                                        self.host.clone() + uri,
-                                        None,
-                                        MediaType::Json) {
+        match self.request_entity::<()>(
+            Method::Delete,
+            self.host.clone() + uri,
+            None,
+            MediaType::Json,
+        ) {
             Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
             otherwise => otherwise,
         }
     }
 
     fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
-        self.request_entity(Method::Post,
-                            self.host.clone() + uri,
-                            Some(message),
-                            MediaType::Json)
+        self.request_entity(
+            Method::Post,
+            self.host.clone() + uri,
+            Some(message),
+            MediaType::Json,
+        )
     }
 
     fn patch_media<D>(&self, uri: &str, message: &[u8], media: MediaType) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
         self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
@@ -431,12 +461,15 @@ impl Github {
     }
 
     fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
-        where D: Deserialize
+    where
+        D: Deserialize,
     {
-        self.request_entity(Method::Put,
-                            self.host.clone() + uri,
-                            Some(message),
-                            MediaType::Json)
+        self.request_entity(
+            Method::Put,
+            self.host.clone() + uri,
+            Some(message),
+            MediaType::Json,
+        )
     }
 }
 
@@ -450,24 +483,26 @@ pub struct Iter<'a, D, I> {
 }
 
 impl<'a, D, I> Iter<'a, D, I>
-    where D: Deserialize
+where
+    D: Deserialize,
 {
     /// creates a new instance of an Iter
-    pub fn new(github: &'a Github,
-               uri: String,
-               into_items: fn(D) -> Vec<I>,
-               media_type: MediaType)
-               -> Result<Iter<'a, D, I>> {
+    pub fn new(
+        github: &'a Github,
+        uri: String,
+        into_items: fn(D) -> Vec<I>,
+        media_type: MediaType,
+    ) -> Result<Iter<'a, D, I>> {
         let (links, payload) = github.request::<D>(Method::Get, uri, None, media_type)?;
         let mut items = into_items(payload);
         items.reverse(); // we pop from the tail
         Ok(Iter {
-               github: github,
-               next_link: links.and_then(|l| l.next()),
-               into_items: into_items,
-               items: items,
-               media_type: media_type,
-           })
+            github: github,
+            next_link: links.and_then(|l| l.next()),
+            into_items: into_items,
+            items: items,
+            media_type: media_type,
+        })
     }
 
     fn set_next(&mut self, next: Option<String>) {
@@ -476,28 +511,25 @@ impl<'a, D, I> Iter<'a, D, I>
 }
 
 impl<'a, D, I> Iterator for Iter<'a, D, I>
-    where D: Deserialize
+where
+    D: Deserialize,
 {
     type Item = I;
     fn next(&mut self) -> Option<I> {
-        self.items
-            .pop()
-            .or_else(|| {
-                self.next_link
-                    .clone()
-                    .and_then(|ref next_link| {
-                        self.github
-                            .request::<D>(Method::Get, next_link.to_owned(), None, self.media_type)
-                            .ok()
-                            .and_then(|(links, payload)| {
-                                          let mut next_items = (self.into_items)(payload);
-                                          next_items.reverse(); // we pop() from the tail
-                                          self.set_next(links.and_then(|l| l.next()));
-                                          self.items = next_items;
-                                          self.next()
-                                      })
+        self.items.pop().or_else(|| {
+            self.next_link.clone().and_then(|ref next_link| {
+                self.github
+                    .request::<D>(Method::Get, next_link.to_owned(), None, self.media_type)
+                    .ok()
+                    .and_then(|(links, payload)| {
+                        let mut next_items = (self.into_items)(payload);
+                        next_items.reverse(); // we pop() from the tail
+                        self.set_next(links.and_then(|l| l.next()));
+                        self.items = next_items;
+                        self.next()
                     })
             })
+        })
     }
 }
 
@@ -512,22 +544,22 @@ pub struct Links {
 impl Links {
     /// Creates a new Links instance given a raw header string value
     pub fn new<V>(value: V) -> Links
-        where V: Into<String>
+    where
+        V: Into<String>,
     {
         let values = value
             .into()
             .split(",")
             .map(|link| {
                 let parts = link.split(";").collect::<Vec<_>>();
-                (parts[1]
-                     .to_owned()
-                     .replace(" rel=\"", "")
-                     .replace("\"", ""),
-                 parts[0]
-                     .to_owned()
-                     .replace("<", "")
-                     .replace(">", "")
-                     .replace(" ", ""))
+                (
+                    parts[1].to_owned().replace(" rel=\"", "").replace("\"", ""),
+                    parts[0]
+                        .to_owned()
+                        .replace("<", "")
+                        .replace(">", "")
+                        .replace(" ", ""),
+                )
             })
             .fold(HashMap::new(), |mut acc, (rel, link)| {
                 acc.insert(rel, link);

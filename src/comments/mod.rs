@@ -18,8 +18,9 @@ pub struct Comments<'a> {
 impl<'a> Comments<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> Comments<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Comments {
             github: github,
@@ -32,8 +33,7 @@ impl<'a> Comments<'a> {
     /// add a new comment
     pub fn create(&self, comment: &CommentOptions) -> Result<Comment> {
         let data = serde_json::to_string(&comment)?;
-        self.github
-            .post::<Comment>(&self.path(), data.as_bytes())
+        self.github.post::<Comment>(&self.path(), data.as_bytes())
     }
 
     /// list pull requests
@@ -46,10 +46,12 @@ impl<'a> Comments<'a> {
     }
 
     fn path(&self) -> String {
-        format!("/repos/{}/{}/issues/{}/comments",
-                self.owner,
-                self.repo,
-                self.number)
+        format!(
+            "/repos/{}/{}/issues/{}/comments",
+            self.owner,
+            self.repo,
+            self.number
+        )
     }
 }
 
@@ -105,7 +107,8 @@ impl CommentListOptionsBuilder {
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut CommentListOptionsBuilder
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.params.insert("since", since.into());
         self

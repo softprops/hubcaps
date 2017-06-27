@@ -13,8 +13,9 @@ pub struct Labels<'a> {
 impl<'a> Labels<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Labels<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Labels {
             github: github,
@@ -29,20 +30,21 @@ impl<'a> Labels<'a> {
 
     pub fn create(&self, lab: &LabelOptions) -> Result<Label> {
         let data = serde_json::to_string(&lab)?;
-        self.github
-            .post::<Label>(&self.path(""), data.as_bytes())
+        self.github.post::<Label>(&self.path(""), data.as_bytes())
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
         let data = serde_json::to_string(&lab)?;
-        self.github
-            .patch::<Label>(&self.path(&format!("/{}", prevname)), data.as_bytes())
+        self.github.patch::<Label>(
+            &self.path(&format!("/{}", prevname)),
+            data.as_bytes(),
+        )
     }
 
     pub fn delete(&self, name: &str) -> Result<()> {
-        self.github
-            .delete(&self.path(&format!("/{}", name)))
-            .map(|_| ())
+        self.github.delete(&self.path(&format!("/{}", name))).map(
+            |_| (),
+        )
     }
 
     pub fn list(&self) -> Result<Vec<Label>> {
@@ -60,8 +62,9 @@ pub struct LabelOptions {
 
 impl LabelOptions {
     pub fn new<N, C>(name: N, color: C) -> LabelOptions
-        where N: Into<String>,
-              C: Into<String>
+    where
+        N: Into<String>,
+        C: Into<String>,
     {
         LabelOptions {
             name: name.into(),

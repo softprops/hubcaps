@@ -15,8 +15,9 @@ pub struct Statuses<'a> {
 impl<'a> Statuses<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Statuses<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Statuses {
             github: github,
@@ -32,23 +33,30 @@ impl<'a> Statuses<'a> {
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
         let data = serde_json::to_string(&status)?;
-        self.github
-            .post::<Status>(&self.path(&format!("/{}", sha)), data.as_bytes())
+        self.github.post::<Status>(
+            &self.path(&format!("/{}", sha)),
+            data.as_bytes(),
+        )
     }
 
     /// lists all statuses associated with a given git sha
     pub fn list(&self, sha: &str) -> Result<Vec<Status>> {
-        self.github
-            .get::<Vec<Status>>(&format!("/repos/{}/{}/commits/{}/statuses",
-                                         self.owner,
-                                         self.repo,
-                                         sha))
+        self.github.get::<Vec<Status>>(&format!(
+            "/repos/{}/{}/commits/{}/statuses",
+            self.owner,
+            self.repo,
+            sha
+        ))
     }
 
     /// list the combined statuses for a given git sha
     pub fn combined(&self, sha: &str) -> Result<String> {
-        self.github
-            .get::<String>(&format!("/repos/{}/{}/commits/{}/status", self.owner, self.repo, sha))
+        self.github.get::<String>(&format!(
+            "/repos/{}/{}/commits/{}/status",
+            self.owner,
+            self.repo,
+            sha
+        ))
     }
 }
 
@@ -71,11 +79,11 @@ pub struct Status {
 #[derive(Debug, Serialize)]
 pub struct StatusOptions {
     state: State,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     target_url: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     context: Option<String>,
 }
 
@@ -97,44 +105,51 @@ impl StatusBuilder {
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut Self
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         self.target_url = Some(url.into());
         self
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut Self
-        where D: Into<String>
+    where
+        D: Into<String>,
     {
         self.description = Some(desc.into());
         self
     }
 
     pub fn context<C>(&mut self, ctx: C) -> &mut Self
-        where C: Into<String>
+    where
+        C: Into<String>,
     {
         self.context = Some(ctx.into());
         self
     }
 
     pub fn build(&self) -> StatusOptions {
-        StatusOptions::new(self.state.clone(),
-                           self.target_url.clone(),
-                           self.description.clone(),
-                           self.context.clone())
+        StatusOptions::new(
+            self.state.clone(),
+            self.target_url.clone(),
+            self.description.clone(),
+            self.context.clone(),
+        )
     }
 }
 
 impl StatusOptions {
     #[doc(hidden)]
-    pub fn new<T, D, C>(state: State,
-                        target_url: Option<T>,
-                        descr: Option<D>,
-                        context: Option<C>)
-                        -> Self
-        where T: Into<String>,
-              D: Into<String>,
-              C: Into<String>
+    pub fn new<T, D, C>(
+        state: State,
+        target_url: Option<T>,
+        descr: Option<D>,
+        context: Option<C>,
+    ) -> Self
+    where
+        T: Into<String>,
+        D: Into<String>,
+        C: Into<String>,
     {
         StatusOptions {
             state: state,
@@ -188,20 +203,26 @@ mod tests {
 
     #[test]
     fn deserialize_status_state() {
-        for (json, value) in vec![("\"pending\"", State::Pending),
-                                  ("\"success\"", State::Success),
-                                  ("\"error\"", State::Error),
-                                  ("\"failure\"", State::Failure)] {
+        for (json, value) in vec![
+            ("\"pending\"", State::Pending),
+            ("\"success\"", State::Success),
+            ("\"error\"", State::Error),
+            ("\"failure\"", State::Failure),
+        ]
+        {
             assert_eq!(serde_json::from_str::<State>(json).unwrap(), value)
         }
     }
 
     #[test]
     fn serialize_status_state() {
-        for (json, value) in vec![("\"pending\"", State::Pending),
-                                  ("\"success\"", State::Success),
-                                  ("\"error\"", State::Error),
-                                  ("\"failure\"", State::Failure)] {
+        for (json, value) in vec![
+            ("\"pending\"", State::Pending),
+            ("\"success\"", State::Success),
+            ("\"error\"", State::Error),
+            ("\"failure\"", State::Failure),
+        ]
+        {
             assert_eq!(serde_json::to_string(&value).unwrap(), json)
         }
     }

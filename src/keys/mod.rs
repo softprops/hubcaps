@@ -14,8 +14,9 @@ pub struct Keys<'a> {
 impl<'a> Keys<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Keys<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Keys {
             github: github,
@@ -42,9 +43,9 @@ impl<'a> Keys<'a> {
     }
 
     pub fn delete(&self, id: u64) -> Result<()> {
-        self.github
-            .delete(&self.path(&format!("/{}", id)))
-            .map(|_| ())
+        self.github.delete(&self.path(&format!("/{}", id))).map(
+            |_| (),
+        )
     }
 }
 

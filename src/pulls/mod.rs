@@ -32,14 +32,16 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Sort::Created => "created",
-                   Sort::Updated => "updated",
-                   Sort::Popularity => "popularity",
-                   Sort::LongRunning => "long-running",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Sort::Created => "created",
+                Sort::Updated => "updated",
+                Sort::Popularity => "popularity",
+                Sort::LongRunning => "long-running",
+            }
+        )
     }
 }
 
@@ -60,8 +62,9 @@ pub struct PullRequest<'a> {
 impl<'a> PullRequest<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullRequest<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         PullRequest {
             github: github,
@@ -72,11 +75,13 @@ impl<'a> PullRequest<'a> {
     }
 
     fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/pulls/{}{}",
-                self.owner,
-                self.repo,
-                self.number,
-                more)
+        format!(
+            "/repos/{}/{}/pulls/{}{}",
+            self.owner,
+            self.repo,
+            self.number,
+            more
+        )
     }
 
     /// Request a pull requests information
@@ -97,8 +102,7 @@ impl<'a> PullRequest<'a> {
     /// Edit a pull request
     pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
         let data = serde_json::to_string(&pr)?;
-        self.github
-            .patch::<Pull>(&self.path(""), data.as_bytes())
+        self.github.patch::<Pull>(&self.path(""), data.as_bytes())
     }
 
     /// Returns a vector of file diffs associated with this pull
@@ -108,26 +112,32 @@ impl<'a> PullRequest<'a> {
 
     /// returns issue comments interface
     pub fn comments(&self) -> Comments {
-        Comments::new(self.github,
-                      self.owner.clone(),
-                      self.repo.clone(),
-                      self.number)
+        Comments::new(
+            self.github,
+            self.owner.clone(),
+            self.repo.clone(),
+            self.number,
+        )
     }
 
     /// returns review comments interface
     pub fn review_comments(&self) -> ReviewComments {
-        ReviewComments::new(self.github,
-                            self.owner.clone(),
-                            self.repo.clone(),
-                            self.number)
+        ReviewComments::new(
+            self.github,
+            self.owner.clone(),
+            self.repo.clone(),
+            self.number,
+        )
     }
 
     /// returns pull commits interface
     pub fn commits(&self) -> PullCommits {
-        PullCommits::new(self.github,
-                         self.owner.clone(),
-                         self.repo.clone(),
-                         self.number)
+        PullCommits::new(
+            self.github,
+            self.owner.clone(),
+            self.repo.clone(),
+            self.number,
+        )
     }
 }
 
@@ -141,8 +151,9 @@ pub struct PullRequests<'a> {
 impl<'a> PullRequests<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> PullRequests<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         PullRequests {
             github: github,
@@ -228,7 +239,7 @@ pub struct Pull {
 #[derive(Debug, Deserialize)]
 pub struct Commit {
     pub label: String,
-    #[serde(rename="ref")]
+    #[serde(rename = "ref")]
     pub commit_ref: String,
     pub sha: String,
     pub user: User, //    pub repo: Option<Repo>,
@@ -248,7 +259,8 @@ impl PullEditOptionsBuilder {
 
     /// set the title of the pull
     pub fn title<T>(&mut self, title: T) -> &mut PullEditOptionsBuilder
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         self.title = Some(title.into());
         self
@@ -256,7 +268,8 @@ impl PullEditOptionsBuilder {
 
     /// set the body of the pull
     pub fn body<B>(&mut self, body: B) -> &mut PullEditOptionsBuilder
-        where B: Into<String>
+    where
+        B: Into<String>,
     {
         self.body = Some(body.into());
         self
@@ -264,7 +277,8 @@ impl PullEditOptionsBuilder {
 
     /// set the state of the pull
     pub fn state<S>(&mut self, state: S) -> &mut PullEditOptionsBuilder
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.state = Some(state.into());
         self
@@ -282,20 +296,21 @@ impl PullEditOptionsBuilder {
 
 #[derive(Debug, Serialize)]
 pub struct PullEditOptions {
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     body: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     state: Option<String>,
 }
 
 impl PullEditOptions {
     // todo represent state as enum
     pub fn new<T, B, S>(title: Option<T>, body: Option<B>, state: Option<S>) -> PullEditOptions
-        where T: Into<String>,
-              B: Into<String>,
-              S: Into<String>
+    where
+        T: Into<String>,
+        B: Into<String>,
+        S: Into<String>,
     {
         PullEditOptions {
             title: title.map(|t| t.into()),
@@ -313,16 +328,17 @@ pub struct PullOptions {
     pub title: String,
     pub head: String,
     pub base: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
 }
 
 impl PullOptions {
     pub fn new<T, H, BS, B>(title: T, head: H, base: BS, body: Option<B>) -> PullOptions
-        where T: Into<String>,
-              H: Into<String>,
-              BS: Into<String>,
-              B: Into<String>
+    where
+        T: Into<String>,
+        H: Into<String>,
+        BS: Into<String>,
+        B: Into<String>,
     {
         PullOptions {
             title: title.into(),
@@ -424,22 +440,35 @@ mod tests {
                 }
             }
         }
-        let tests = vec![(PullListOptions::builder().build(), None),
-                         (PullListOptions::builder().state(State::Closed).build(),
-                          Some("state=closed".to_owned()))];
+        let tests = vec![
+            (PullListOptions::builder().build(), None),
+            (
+                PullListOptions::builder().state(State::Closed).build(),
+                Some("state=closed".to_owned())
+            ),
+        ];
         test_serialize(tests)
     }
 
     #[test]
     fn pullreq_edits() {
-        let tests = vec![(PullEditOptions::builder().title("test").build(), r#"{"title":"test"}"#),
-                         (PullEditOptions::builder()
-                              .title("test")
-                              .body("desc")
-                              .build(),
-                          r#"{"title":"test","body":"desc"}"#),
-                         (PullEditOptions::builder().state("closed").build(),
-                          r#"{"state":"closed"}"#)];
+        let tests = vec![
+            (
+                PullEditOptions::builder().title("test").build(),
+                r#"{"title":"test"}"#
+            ),
+            (
+                PullEditOptions::builder()
+                    .title("test")
+                    .body("desc")
+                    .build(),
+                r#"{"title":"test","body":"desc"}"#
+            ),
+            (
+                PullEditOptions::builder().state("closed").build(),
+                r#"{"state":"closed"}"#
+            ),
+        ];
         test_encoding(tests)
     }
 

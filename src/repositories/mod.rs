@@ -35,13 +35,15 @@ pub enum Visibility {
 
 impl fmt::Display for Visibility {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Visibility::All => "all",
-                   Visibility::Public => "public",
-                   Visibility::Private => "private",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Visibility::All => "all",
+                Visibility::Public => "public",
+                Visibility::Private => "private",
+            }
+        )
     }
 }
 
@@ -56,14 +58,16 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Sort::Created => "created",
-                   Sort::Updated => "updated",
-                   Sort::Pushed => "pushed",
-                   Sort::FullName => "full_name",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Sort::Created => "created",
+                Sort::Updated => "updated",
+                Sort::Pushed => "pushed",
+                Sort::FullName => "full_name",
+            }
+        )
     }
 }
 
@@ -77,13 +81,15 @@ pub enum Affiliation {
 
 impl fmt::Display for Affiliation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Affiliation::Owner => "owner",
-                   Affiliation::Collaborator => "collaborator",
-                   Affiliation::OrganizationMember => "organization_member",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Affiliation::Owner => "owner",
+                Affiliation::Collaborator => "collaborator",
+                Affiliation::OrganizationMember => "organization_member",
+            }
+        )
     }
 }
 
@@ -99,15 +105,17 @@ pub enum Type {
 
 impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Type::All => "all",
-                   Type::Owner => "owner",
-                   Type::Public => "public",
-                   Type::Private => "private",
-                   Type::Member => "member",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Type::All => "all",
+                Type::Owner => "owner",
+                Type::Public => "public",
+                Type::Private => "private",
+                Type::Member => "member",
+            }
+        )
     }
 }
 
@@ -124,16 +132,18 @@ pub enum OrgRepoType {
 
 impl fmt::Display for OrgRepoType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   OrgRepoType::All => "all",
-                   OrgRepoType::Public => "public",
-                   OrgRepoType::Private => "private",
-                   OrgRepoType::Forks => "forks",
-                   OrgRepoType::Sources => "sources",
-                   OrgRepoType::Member => "member",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                OrgRepoType::All => "all",
+                OrgRepoType::Public => "public",
+                OrgRepoType::Private => "private",
+                OrgRepoType::Forks => "forks",
+                OrgRepoType::Sources => "sources",
+                OrgRepoType::Member => "member",
+            }
+        )
     }
 }
 
@@ -188,7 +198,8 @@ pub struct OrgRepositories<'a> {
 impl<'a> OrgRepositories<'a> {
     #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> Self
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         OrgRepositories {
             github: github,
@@ -236,7 +247,8 @@ pub struct UserRepositories<'a> {
 impl<'a> UserRepositories<'a> {
     #[doc(hidden)]
     pub fn new<O>(github: &'a Github, owner: O) -> UserRepositories<'a>
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         UserRepositories {
             github: github,
@@ -277,7 +289,8 @@ pub struct OrganizationRepositories<'a> {
 impl<'a> OrganizationRepositories<'a> {
     #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> OrganizationRepositories<'a>
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         OrganizationRepositories {
             github: github,
@@ -319,8 +332,9 @@ pub struct Repository<'a> {
 impl<'a> Repository<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Repository<'a>
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Repository {
             github: github,
@@ -492,26 +506,26 @@ impl Repo {
 #[derive(Debug, Serialize)]
 pub struct RepoOptions {
     pub name: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<String>,
     /// false by default
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub private: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_issues: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_wiki: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_downloads: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub team_id: Option<i32>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub auto_init: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gitignore_template: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub license_template: Option<String>,
 }
 
@@ -532,7 +546,8 @@ pub struct RepoOptionsBuilder {
 
 impl RepoOptionsBuilder {
     pub fn new<N>(name: N) -> Self
-        where N: Into<String>
+    where
+        N: Into<String>,
     {
         RepoOptionsBuilder {
             name: name.into(),
@@ -541,14 +556,16 @@ impl RepoOptionsBuilder {
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
-        where D: Into<String>
+    where
+        D: Into<String>,
     {
         self.description = Some(description.into());
         self
     }
 
     pub fn homepage<H>(&mut self, homepage: H) -> &mut Self
-        where H: Into<String>
+    where
+        H: Into<String>,
     {
         self.homepage = Some(homepage.into());
         self
@@ -585,52 +602,58 @@ impl RepoOptionsBuilder {
     }
 
     pub fn gitignore_template<GI>(&mut self, gitignore_template: GI) -> &mut Self
-        where GI: Into<String>
+    where
+        GI: Into<String>,
     {
         self.gitignore_template = Some(gitignore_template.into());
         self
     }
 
     pub fn license_template<L>(&mut self, license_template: L) -> &mut Self
-        where L: Into<String>
+    where
+        L: Into<String>,
     {
         self.license_template = Some(license_template.into());
         self
     }
 
     pub fn build(&self) -> RepoOptions {
-        RepoOptions::new(self.name.as_str(),
-                         self.description.clone(),
-                         self.homepage.clone(),
-                         self.private,
-                         self.has_issues,
-                         self.has_wiki,
-                         self.has_downloads,
-                         self.team_id,
-                         self.auto_init,
-                         self.gitignore_template.clone(),
-                         self.license_template.clone())
+        RepoOptions::new(
+            self.name.as_str(),
+            self.description.clone(),
+            self.homepage.clone(),
+            self.private,
+            self.has_issues,
+            self.has_wiki,
+            self.has_downloads,
+            self.team_id,
+            self.auto_init,
+            self.gitignore_template.clone(),
+            self.license_template.clone(),
+        )
     }
 }
 
 impl RepoOptions {
-    pub fn new<N, D, H, GI, L>(name: N,
-                               description: Option<D>,
-                               homepage: Option<H>,
-                               private: Option<bool>,
-                               has_issues: Option<bool>,
-                               has_wiki: Option<bool>,
-                               has_downloads: Option<bool>,
-                               team_id: Option<i32>,
-                               auto_init: Option<bool>,
-                               gitignore_template: Option<GI>,
-                               license_template: Option<L>)
-                               -> Self
-        where N: Into<String>,
-              D: Into<String>,
-              H: Into<String>,
-              GI: Into<String>,
-              L: Into<String>
+    pub fn new<N, D, H, GI, L>(
+        name: N,
+        description: Option<D>,
+        homepage: Option<H>,
+        private: Option<bool>,
+        has_issues: Option<bool>,
+        has_wiki: Option<bool>,
+        has_downloads: Option<bool>,
+        team_id: Option<i32>,
+        auto_init: Option<bool>,
+        gitignore_template: Option<GI>,
+        license_template: Option<L>,
+    ) -> Self
+    where
+        N: Into<String>,
+        D: Into<String>,
+        H: Into<String>,
+        GI: Into<String>,
+        L: Into<String>,
     {
         RepoOptions {
             name: name.into(),
@@ -696,13 +719,14 @@ impl RepoListOptionsBuilder {
     }
 
     pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut Self {
-        self.params
-            .insert("affiliation",
-                    affiliations
-                        .into_iter()
-                        .map(|a| a.to_string())
-                        .collect::<Vec<String>>()
-                        .join(","));
+        self.params.insert(
+            "affiliation",
+            affiliations
+                .into_iter()
+                .map(|a| a.to_string())
+                .collect::<Vec<String>>()
+                .join(","),
+        );
         self
     }
 

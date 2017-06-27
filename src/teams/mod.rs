@@ -13,13 +13,15 @@ pub enum Permission {
 
 impl fmt::Display for Permission {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Permission::Pull => "pull",
-                   Permission::Push => "push",
-                   Permission::Admin => "admin",
-               })
+        write!(
+            f,
+            "{}",
+            match *self {
+                Permission::Pull => "pull",
+                Permission::Push => "push",
+                Permission::Admin => "admin",
+            }
+        )
     }
 }
 
@@ -37,8 +39,9 @@ pub struct RepoTeams<'a> {
 impl<'a> RepoTeams<'a> {
     #[doc(hidden)]
     pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         RepoTeams {
             github: github,
@@ -49,15 +52,19 @@ impl<'a> RepoTeams<'a> {
 
     /// list of teams for this repo
     pub fn list(&self) -> Result<Vec<Team>> {
-        self.github
-            .get::<Vec<Team>>(&format!("/repos/{}/{}/teams", self.owner, self.repo))
+        self.github.get::<Vec<Team>>(&format!(
+            "/repos/{}/{}/teams",
+            self.owner,
+            self.repo
+        ))
     }
 
     /// provides an iterator over all pages of teams
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github
-            .iter(format!("/repos/{}/{}/teams", self.owner, self.repo),
-                  identity)
+        self.github.iter(
+            format!("/repos/{}/{}/teams", self.owner, self.repo),
+            identity,
+        )
     }
 }
 
@@ -70,7 +77,8 @@ pub struct OrgTeams<'a> {
 impl<'a> OrgTeams<'a> {
     #[doc(hidden)]
     pub fn new<O>(github: &'a Github, org: O) -> Self
-        where O: Into<String>
+    where
+        O: Into<String>,
     {
         OrgTeams {
             github: github,
@@ -80,31 +88,37 @@ impl<'a> OrgTeams<'a> {
 
     /// list of teams for this org
     pub fn list(&self) -> Result<Vec<Team>> {
-        self.github
-            .get::<Vec<Team>>(&format!("/orgs/{}/teams", self.org))
+        self.github.get::<Vec<Team>>(
+            &format!("/orgs/{}/teams", self.org),
+        )
     }
 
     /// provides an iterator over all pages of teams
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github
-            .iter(format!("/orgs/{}/teams", self.org), identity)
+        self.github.iter(
+            format!("/orgs/{}/teams", self.org),
+            identity,
+        )
     }
 
     /// adds a repository permission to this team
     /// learn more [here](https://developer.github.com/v3/orgs/teams/#add-or-update-team-repository)
-    pub fn add_repo_permission<N>(&self,
-                                  team_id: u64,
-                                  repo_name: N,
-                                  permission: Permission)
-                                  -> Result<()>
-        where N: Into<String>
+    pub fn add_repo_permission<N>(
+        &self,
+        team_id: u64,
+        repo_name: N,
+        permission: Permission,
+    ) -> Result<()>
+    where
+        N: Into<String>,
     {
         let mut payload = BTreeMap::new();
         payload.insert("permission", permission.to_string());
         let data = serde_json::to_string(&payload)?;
-        self.github
-            .put_no_response(&format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
-                             data.as_bytes())
+        self.github.put_no_response(
+            &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
+            data.as_bytes(),
+        )
     }
 }
 
