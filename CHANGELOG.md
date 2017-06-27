@@ -1,3 +1,7 @@
+# 0.3.next
+
+* added `SearchIssuesOptions.per_page(n)` interface for limiting search results
+
 # 0.3.12
 
 * fixed issue with persistence of repo term permission

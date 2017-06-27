@@ -153,6 +153,11 @@ impl SearchIssuesOptionsBuilder {
         SearchIssuesOptionsBuilder { ..Default::default() }
     }
 
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.params.insert("per_page", n.to_string());
+        self
+    }
+
     pub fn sort(&mut self, sort: IssuesSort) -> &mut Self {
         self.params.insert("sort", sort.to_string());
         self
