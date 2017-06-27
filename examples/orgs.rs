@@ -15,10 +15,11 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
 
             let options = OrganizationRepoListOptions::builder()
                 .repo_type(OrgRepoType::Forks)

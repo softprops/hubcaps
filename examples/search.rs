@@ -7,6 +7,7 @@ use hyper::Client;
 use hyper::net::HttpsConnector;
 use hyper_native_tls::NativeTlsClient;
 use hubcaps::{Credentials, Github};
+use hubcaps::search::SearchIssuesOptions;
 use std::env;
 
 fn main() {
@@ -19,16 +20,16 @@ fn main() {
                     Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
                     Credentials::Token(token),
                 );
-            for repo in github
-                .user_repos("softprops")
-                .iter(&Default::default())
+            for issue in github
+                .search()
+                .issues()
+                .iter(
+                    "user:softprops",
+                    &SearchIssuesOptions::builder().per_page(1).build(),
+                )
                 .unwrap()
             {
-                println!("{}", repo.name);
-                for (language, bytes_of_code) in &repo.languages(&github).unwrap() {
-                    println!("{}: {} bytes", language, bytes_of_code);
-                }
-                println!("");
+                println!("{}", issue.title);
             }
         }
         _ => println!("example missing GITHUB_TOKEN"),

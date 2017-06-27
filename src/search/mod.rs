@@ -1,7 +1,7 @@
 //! Search interface
 
 use self::super::{Github, Result, Iter};
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use std::fmt;
 use url::form_urlencoded;
 use std::collections::HashMap;
@@ -41,7 +41,7 @@ pub struct Search<'a> {
     github: &'a Github,
 }
 
-fn items<D: Deserialize>(result: SearchResult<D>) -> Vec<D> {
+fn items<'d, D: DeserializeOwned>(result: SearchResult<D>) -> Vec<D> {
     result.items
 }
 
@@ -56,11 +56,11 @@ impl<'a> Search<'a> {
         SearchIssues::new(&self)
     }
 
-    fn iter<D: Deserialize>(&'a self, url: &str) -> Result<Iter<'a, SearchResult<D>, D>> {
+    fn iter<D: DeserializeOwned>(&'a self, url: &str) -> Result<Iter<'a, SearchResult<D>, D>> {
         self.github.iter(url.to_owned(), items)
     }
 
-    fn search<D: Deserialize>(&self, url: &str) -> Result<SearchResult<D>> {
+    fn search<D: DeserializeOwned>(&self, url: &str) -> Result<SearchResult<D>> {
         self.github.get::<SearchResult<D>>(url)
     }
 }
@@ -169,7 +169,7 @@ impl SearchIssuesOptionsBuilder {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct SearchResult<D: ::serde::Deserialize> {
+pub struct SearchResult<D> {
     pub total_count: u64,
     pub incomplete_results: bool,
     pub items: Vec<D>,

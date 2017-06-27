@@ -12,10 +12,11 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
             let repo = github.repo("softprops", "hubcaps");
             let deployments = repo.deployments();
             // let deploy = deployments.create(&DeploymentOptions::builder("master")

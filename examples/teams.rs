@@ -14,20 +14,22 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
             println!("org teams");
             for team in github.org("meetup").teams().iter().unwrap() {
                 println!("{:#?}", team)
             }
             println!("repo teams");
             for team in github
-                    .repo("meetup", "k8s-nginx-dogstats")
-                    .teams()
-                    .iter()
-                    .unwrap() {
+                .repo("meetup", "k8s-nginx-dogstats")
+                .teams()
+                .iter()
+                .unwrap()
+            {
                 println!("{:#?}", team)
             }
         }

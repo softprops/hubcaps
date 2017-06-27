@@ -14,10 +14,11 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
             for pull in pulls.iter(&Default::default()).unwrap() {
@@ -26,23 +27,25 @@ fn main() {
 
             println!("comments");
             for c in github
-                    .repo("softprops", "hubcaps")
-                    .pulls()
-                    .get(28)
-                    .comments()
-                    .list(&Default::default())
-                    .unwrap() {
+                .repo("softprops", "hubcaps")
+                .pulls()
+                .get(28)
+                .comments()
+                .list(&Default::default())
+                .unwrap()
+            {
                 println!("{:#?}", c);
             }
 
             println!("commits");
             for c in github
-                    .repo("softprops", "hubcaps")
-                    .pulls()
-                    .get(28)
-                    .commits()
-                    .iter()
-                    .unwrap() {
+                .repo("softprops", "hubcaps")
+                .pulls()
+                .get(28)
+                .commits()
+                .iter()
+                .unwrap()
+            {
                 println!("{:#?}", c);
             }
         }

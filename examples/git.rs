@@ -14,18 +14,20 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
             for file in github
-                    .repo("softprops", "hubcaps")
-                    .git()
-                    .tree("master", true)
-                    .unwrap()
-                    .tree
-                    .iter()
-                    .find(|file| file.path == "README.md") {
+                .repo("softprops", "hubcaps")
+                .git()
+                .tree("master", true)
+                .unwrap()
+                .tree
+                .iter()
+                .find(|file| file.path == "README.md")
+            {
                 let blob = github
                     .repo("softprops", "hubcaps")
                     .git()

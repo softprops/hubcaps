@@ -14,22 +14,21 @@ fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github =
-                Github::new(format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                            Client::with_connector(HttpsConnector::new(NativeTlsClient::new()
-                                                                           .unwrap())),
-                            Credentials::Token(token));
+                Github::new(
+                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
+                    Credentials::Token(token),
+                );
             for branch in github
-                    .repo("softprops", "hubcaps")
-                    .branches()
-                    .iter()
-                    .unwrap() {
+                .repo("softprops", "hubcaps")
+                .branches()
+                .iter()
+                .unwrap()
+            {
                 println!("{:#?}", branch)
             }
 
-            match github
-                      .repo("softprops", "hubcaps")
-                      .branches()
-                      .get("master") {
+            match github.repo("softprops", "hubcaps").branches().get("master") {
                 Ok(branch) => println!("{:#?}", branch),
                 Err(err) => println!("err {:#?}", err),
             }
