@@ -343,6 +343,10 @@ impl<'a> Repository<'a> {
         }
     }
 
+    fn path(&self, more: &str) -> String {
+        format!("/repos/{}/{}{}", self.owner, self.repo, more)
+    }
+
     /// get a reference to branch operations
     pub fn branches(&self) -> Branches {
         Branches::new(self.github, self.owner.as_str(), self.repo.as_str())
@@ -360,8 +364,13 @@ impl<'a> Repository<'a> {
 
     /// get a reference to the GitHub repository object that this `Respository` refers to
     pub fn get(&self) -> Result<Repo> {
-        let uri = format!("/repos/{}/{}", self.owner, self.repo);
-        self.github.get(&uri)
+        self.github.get(&self.path(""))
+    }
+
+    /// https://developer.github.com/v3/repos/#edit
+    pub fn edit(&self, options: &RepoEditOptions) -> Result<Repo> {
+        let data = serde_json::to_string(&options)?;
+        self.github.post::<Repo>(&&self.path(""), data.as_bytes())
     }
 
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
@@ -756,6 +765,173 @@ impl RepoListOptionsBuilder {
 
     pub fn build(&self) -> RepoListOptions {
         RepoListOptions { params: self.params.clone() }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct RepoEditOptions {
+    pub name: String,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub homepage: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub private: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_issues: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_projects: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub has_wiki: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub default_branch: Option<String>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub allow_squash_merge: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub allow_merge_commit: Option<bool>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub allow_rebase_merge: Option<bool>,
+}
+
+impl RepoEditOptions {
+    pub fn new<N, D, H, DB>(
+        name: N,
+        description: Option<D>,
+        homepage: Option<H>,
+        private: Option<bool>,
+        has_issues: Option<bool>,
+        has_projects: Option<bool>,
+        has_wiki: Option<bool>,
+        default_branch: Option<DB>,
+        allow_squash_merge: Option<bool>,
+        allow_merge_commit: Option<bool>,
+        allow_rebase_merge: Option<bool>,
+    ) -> Self
+    where
+        N: Into<String>,
+        D: Into<String>,
+        H: Into<String>,
+        DB: Into<String>,
+    {
+        RepoEditOptions {
+            name: name.into(),
+            description: description.map(|h| h.into()),
+            homepage: homepage.map(|h| h.into()),
+            private: private,
+            has_issues: has_issues,
+            has_projects: has_projects,
+            has_wiki: has_wiki,
+            default_branch: default_branch.map(|d| d.into()),
+            allow_squash_merge: allow_squash_merge,
+            allow_merge_commit: allow_merge_commit,
+            allow_rebase_merge: allow_rebase_merge,
+        }
+    }
+
+    pub fn builder<N: Into<String>>(name: N) -> RepoEditOptionsBuilder {
+        RepoEditOptionsBuilder::new(name)
+    }
+}
+
+#[derive(Default)]
+pub struct RepoEditOptionsBuilder {
+    pub name: String,
+    pub description: Option<String>,
+    pub homepage: Option<String>,
+    pub private: Option<bool>,
+    pub has_issues: Option<bool>,
+    pub has_projects: Option<bool>,
+    pub has_wiki: Option<bool>,
+    pub default_branch: Option<String>,
+    pub allow_squash_merge: Option<bool>,
+    pub allow_merge_commit: Option<bool>,
+    pub allow_rebase_merge: Option<bool>,
+}
+
+impl RepoEditOptionsBuilder {
+    pub fn new<N>(name: N) -> Self
+    where
+        N: Into<String>,
+    {
+        RepoEditOptionsBuilder {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    pub fn description<D>(&mut self, description: D) -> &mut Self
+    where
+        D: Into<String>,
+    {
+        self.description = Some(description.into());
+        self
+    }
+
+    pub fn homepage<H>(&mut self, homepage: H) -> &mut Self
+    where
+        H: Into<String>,
+    {
+        self.homepage = Some(homepage.into());
+        self
+    }
+
+    pub fn private(&mut self, private: bool) -> &mut Self {
+        self.private = Some(private);
+        self
+    }
+
+    pub fn has_issues(&mut self, has_issues: bool) -> &mut Self {
+        self.has_issues = Some(has_issues);
+        self
+    }
+
+    pub fn has_projects(&mut self, has_projects: bool) -> &mut Self {
+        self.has_projects = Some(has_projects);
+        self
+    }
+
+    pub fn has_wiki(&mut self, has_wiki: bool) -> &mut Self {
+        self.has_wiki = Some(has_wiki);
+        self
+    }
+
+    pub fn default_branch<DB>(&mut self, default_branch: DB) -> &mut Self
+    where
+        DB: Into<String>,
+    {
+        self.default_branch = Some(default_branch.into());
+        self
+    }
+
+    pub fn allow_squash_merge(&mut self, allow_squash_merge: bool) -> &mut Self {
+        self.allow_squash_merge = Some(allow_squash_merge);
+        self
+    }
+
+    pub fn allow_merge_commit(&mut self, allow_merge_commit: bool) -> &mut Self {
+        self.allow_merge_commit = Some(allow_merge_commit);
+        self
+    }
+
+    pub fn allow_rebase_merge(&mut self, allow_rebase_merge: bool) -> &mut Self {
+        self.allow_rebase_merge = Some(allow_rebase_merge);
+        self
+    }
+
+    pub fn build(&self) -> RepoEditOptions {
+        RepoEditOptions::new(
+            self.name.as_str(),
+            self.description.clone(),
+            self.homepage.clone(),
+            self.private,
+            self.has_issues,
+            self.has_projects,
+            self.has_wiki,
+            self.default_branch.clone(),
+            self.allow_squash_merge,
+            self.allow_merge_commit,
+            self.allow_rebase_merge,
+        )
     }
 }
 
