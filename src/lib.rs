@@ -52,7 +52,7 @@
 //! built-in Result with the Err Type fixed to the
 //! [hubcaps::Error](errors/enum.Error.html) enum type.
 //!
-#![warn(missing_docs)] // todo: make this a deny eventually
+#![allow(missing_docs)] // todo: make this a deny eventually
 
 #[macro_use]
 extern crate error_chain;
