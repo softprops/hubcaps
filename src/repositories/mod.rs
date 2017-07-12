@@ -370,6 +370,9 @@ impl<'a> Repository<'a> {
     /// https://developer.github.com/v3/repos/#edit
     pub fn edit(&self, options: &RepoEditOptions) -> Result<Repo> {
         let data = serde_json::to_string(&options)?;
+        // Note that this intentionally calls POST rather than PATCH,
+        // even though the docs say PATCH.
+        // In my tests (changing the default branch) POST works while PATCH doesn't.
         self.github.post::<Repo>(&&self.path(""), data.as_bytes())
     }
 
