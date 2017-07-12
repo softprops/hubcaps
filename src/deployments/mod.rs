@@ -415,7 +415,7 @@ mod tests {
                     r#""description":"description""#,
                     "}"
                 )
-            )
+            ),
         ];
         test_encoding(tests)
     }

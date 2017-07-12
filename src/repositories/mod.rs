@@ -774,25 +774,25 @@ impl RepoListOptionsBuilder {
 #[derive(Debug, Default, Serialize)]
 pub struct RepoEditOptions {
     pub name: String,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub private: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_issues: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_projects: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub has_wiki: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_branch: Option<String>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_squash_merge: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_merge_commit: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_rebase_merge: Option<bool>,
 }
 
@@ -843,12 +843,10 @@ impl RepoEditOptionsBuilder {
     where
         N: Into<String>,
     {
-        RepoEditOptionsBuilder(
-            RepoEditOptions {
-                name: name.into(),
-                ..Default::default()
-            }
-        )
+        RepoEditOptionsBuilder(RepoEditOptions {
+            name: name.into(),
+            ..Default::default()
+        })
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
