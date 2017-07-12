@@ -23,15 +23,11 @@ pub enum IssuesSort {
 
 impl fmt::Display for IssuesSort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                IssuesSort::Comments => "comments",
-                IssuesSort::Created => "created",
-                IssuesSort::Updated => "updated",
-            }
-        )
+        match *self {
+            IssuesSort::Comments => "comments",
+            IssuesSort::Created => "created",
+            IssuesSort::Updated => "updated",
+        }.fmt(f)
     }
 }
 

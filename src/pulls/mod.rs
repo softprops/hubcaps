@@ -32,16 +32,12 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Sort::Created => "created",
-                Sort::Updated => "updated",
-                Sort::Popularity => "popularity",
-                Sort::LongRunning => "long-running",
-            }
-        )
+        match *self {
+            Sort::Created => "created",
+            Sort::Updated => "updated",
+            Sort::Popularity => "popularity",
+            Sort::LongRunning => "long-running",
+        }.fmt(f)
     }
 }
 

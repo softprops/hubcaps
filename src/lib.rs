@@ -152,14 +152,10 @@ pub enum SortDirection {
 
 impl fmt::Display for SortDirection {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                SortDirection::Asc => "asc",
-                SortDirection::Desc => "desc",
-            }
-        )
+        match *self {
+            SortDirection::Asc => "asc",
+            SortDirection::Desc => "desc",
+        }.fmt(f)
     }
 }
 

@@ -35,15 +35,11 @@ pub enum Visibility {
 
 impl fmt::Display for Visibility {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Visibility::All => "all",
-                Visibility::Public => "public",
-                Visibility::Private => "private",
-            }
-        )
+        match *self {
+            Visibility::All => "all",
+            Visibility::Public => "public",
+            Visibility::Private => "private",
+        }.fmt(f)
     }
 }
 
@@ -58,16 +54,12 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Sort::Created => "created",
-                Sort::Updated => "updated",
-                Sort::Pushed => "pushed",
-                Sort::FullName => "full_name",
-            }
-        )
+        match *self {
+            Sort::Created => "created",
+            Sort::Updated => "updated",
+            Sort::Pushed => "pushed",
+            Sort::FullName => "full_name",
+        }.fmt(f)
     }
 }
 
@@ -81,15 +73,11 @@ pub enum Affiliation {
 
 impl fmt::Display for Affiliation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Affiliation::Owner => "owner",
-                Affiliation::Collaborator => "collaborator",
-                Affiliation::OrganizationMember => "organization_member",
-            }
-        )
+        match *self {
+            Affiliation::Owner => "owner",
+            Affiliation::Collaborator => "collaborator",
+            Affiliation::OrganizationMember => "organization_member",
+        }.fmt(f)
     }
 }
 
@@ -105,17 +93,13 @@ pub enum Type {
 
 impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Type::All => "all",
-                Type::Owner => "owner",
-                Type::Public => "public",
-                Type::Private => "private",
-                Type::Member => "member",
-            }
-        )
+        match *self {
+            Type::All => "all",
+            Type::Owner => "owner",
+            Type::Public => "public",
+            Type::Private => "private",
+            Type::Member => "member",
+        }.fmt(f)
     }
 }
 
@@ -132,18 +116,14 @@ pub enum OrgRepoType {
 
 impl fmt::Display for OrgRepoType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                OrgRepoType::All => "all",
-                OrgRepoType::Public => "public",
-                OrgRepoType::Private => "private",
-                OrgRepoType::Forks => "forks",
-                OrgRepoType::Sources => "sources",
-                OrgRepoType::Member => "member",
-            }
-        )
+        match *self {
+            OrgRepoType::All => "all",
+            OrgRepoType::Public => "public",
+            OrgRepoType::Private => "private",
+            OrgRepoType::Forks => "forks",
+            OrgRepoType::Sources => "sources",
+            OrgRepoType::Member => "member",
+        }.fmt(f)
     }
 }
 
