@@ -768,7 +768,7 @@ impl RepoListOptionsBuilder {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct RepoEditOptions {
     pub name: String,
     #[serde(skip_serializing_if="Option::is_none")]
@@ -833,37 +833,26 @@ impl RepoEditOptions {
     }
 }
 
-#[derive(Default)]
-pub struct RepoEditOptionsBuilder {
-    pub name: String,
-    pub description: Option<String>,
-    pub homepage: Option<String>,
-    pub private: Option<bool>,
-    pub has_issues: Option<bool>,
-    pub has_projects: Option<bool>,
-    pub has_wiki: Option<bool>,
-    pub default_branch: Option<String>,
-    pub allow_squash_merge: Option<bool>,
-    pub allow_merge_commit: Option<bool>,
-    pub allow_rebase_merge: Option<bool>,
-}
+pub struct RepoEditOptionsBuilder(RepoEditOptions);
 
 impl RepoEditOptionsBuilder {
     pub fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
-        RepoEditOptionsBuilder {
-            name: name.into(),
-            ..Default::default()
-        }
+        RepoEditOptionsBuilder(
+            RepoEditOptions {
+                name: name.into(),
+                ..Default::default()
+            }
+        )
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
     where
         D: Into<String>,
     {
-        self.description = Some(description.into());
+        self.0.description = Some(description.into());
         self
     }
 
@@ -871,27 +860,27 @@ impl RepoEditOptionsBuilder {
     where
         H: Into<String>,
     {
-        self.homepage = Some(homepage.into());
+        self.0.homepage = Some(homepage.into());
         self
     }
 
     pub fn private(&mut self, private: bool) -> &mut Self {
-        self.private = Some(private);
+        self.0.private = Some(private);
         self
     }
 
     pub fn has_issues(&mut self, has_issues: bool) -> &mut Self {
-        self.has_issues = Some(has_issues);
+        self.0.has_issues = Some(has_issues);
         self
     }
 
     pub fn has_projects(&mut self, has_projects: bool) -> &mut Self {
-        self.has_projects = Some(has_projects);
+        self.0.has_projects = Some(has_projects);
         self
     }
 
     pub fn has_wiki(&mut self, has_wiki: bool) -> &mut Self {
-        self.has_wiki = Some(has_wiki);
+        self.0.has_wiki = Some(has_wiki);
         self
     }
 
@@ -899,38 +888,38 @@ impl RepoEditOptionsBuilder {
     where
         DB: Into<String>,
     {
-        self.default_branch = Some(default_branch.into());
+        self.0.default_branch = Some(default_branch.into());
         self
     }
 
     pub fn allow_squash_merge(&mut self, allow_squash_merge: bool) -> &mut Self {
-        self.allow_squash_merge = Some(allow_squash_merge);
+        self.0.allow_squash_merge = Some(allow_squash_merge);
         self
     }
 
     pub fn allow_merge_commit(&mut self, allow_merge_commit: bool) -> &mut Self {
-        self.allow_merge_commit = Some(allow_merge_commit);
+        self.0.allow_merge_commit = Some(allow_merge_commit);
         self
     }
 
     pub fn allow_rebase_merge(&mut self, allow_rebase_merge: bool) -> &mut Self {
-        self.allow_rebase_merge = Some(allow_rebase_merge);
+        self.0.allow_rebase_merge = Some(allow_rebase_merge);
         self
     }
 
     pub fn build(&self) -> RepoEditOptions {
         RepoEditOptions::new(
-            self.name.as_str(),
-            self.description.clone(),
-            self.homepage.clone(),
-            self.private,
-            self.has_issues,
-            self.has_projects,
-            self.has_wiki,
-            self.default_branch.clone(),
-            self.allow_squash_merge,
-            self.allow_merge_commit,
-            self.allow_rebase_merge,
+            self.0.name.as_str(),
+            self.0.description.clone(),
+            self.0.homepage.clone(),
+            self.0.private,
+            self.0.has_issues,
+            self.0.has_projects,
+            self.0.has_wiki,
+            self.0.default_branch.clone(),
+            self.0.allow_squash_merge,
+            self.0.allow_merge_commit,
+            self.0.allow_rebase_merge,
         )
     }
 }
