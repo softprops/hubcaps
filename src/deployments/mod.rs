@@ -408,7 +408,13 @@ mod tests {
                     .description("description")
                     .payload(payload)
                     .build(),
-                r#"{"ref":"topic-branch","payload":"{\"room_id\":\"123456\",\"user\":\"atmos\"}","description":"description"}"#
+                concat!(
+                    "{",
+                    r#""ref":"topic-branch","#,
+                    r#""payload":"{\"room_id\":\"123456\",\"user\":\"atmos\"}","#,
+                    r#""description":"description""#,
+                    "}"
+                )
             )
         ];
         test_encoding(tests)
