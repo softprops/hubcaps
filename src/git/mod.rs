@@ -23,18 +23,20 @@ impl<'a> Git<'a> {
         }
     }
 
+    fn path(&self, more: String) -> String {
+        format!("/repos/{}/{}/git{}", self.owner, self.repo, more)
+    }
+
     /// list a git tree of files for this repo at a given sha
     pub fn tree<S>(&self, sha: S, recursive: bool) -> Result<TreeData>
     where
         S: Into<String>,
     {
-        self.github.get::<TreeData>(&format!(
-            "/repos/{}/{}/git/trees/{}?recursive={}",
-            self.owner,
-            self.repo,
+        self.github.get::<TreeData>(&self.path(format!(
+            "/trees/{}?recursive={}",
             sha.into(),
             if recursive { "1" } else { "0" }
-        ))
+        )))
     }
 
     /// get the blob contents of a given sha
@@ -42,12 +44,9 @@ impl<'a> Git<'a> {
     where
         S: Into<String>,
     {
-        self.github.get::<Blob>(&format!(
-            "/repos/{}/{}/git/blobs/{}",
-            self.owner,
-            self.repo,
-            sha.into()
-        ))
+        self.github.get::<Blob>(
+            &self.path(format!("/blobs/{}", sha.into())),
+        )
     }
 }
 
