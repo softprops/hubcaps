@@ -28,6 +28,8 @@ impl<'a> Git<'a> {
     }
 
     /// list a git tree of files for this repo at a given sha
+    /// https://developer.github.com/v3/git/trees/#get-a-tree
+    /// https://developer.github.com/v3/git/trees/#get-a-tree-recursively
     pub fn tree<S>(&self, sha: S, recursive: bool) -> Result<TreeData>
     where
         S: Into<String>,
@@ -40,6 +42,7 @@ impl<'a> Git<'a> {
     }
 
     /// get the blob contents of a given sha
+    /// https://developer.github.com/v3/git/blobs/#get-a-blob
     pub fn blob<S>(&self, sha: S) -> Result<Blob>
     where
         S: Into<String>,
