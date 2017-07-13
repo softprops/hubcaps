@@ -495,7 +495,7 @@ impl Repo {
 }
 
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct RepoOptions {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -521,37 +521,24 @@ pub struct RepoOptions {
     pub license_template: Option<String>,
 }
 
-#[derive(Default)]
-pub struct RepoOptionsBuilder {
-    name: String,
-    description: Option<String>,
-    homepage: Option<String>,
-    private: Option<bool>,
-    has_issues: Option<bool>,
-    has_wiki: Option<bool>,
-    has_downloads: Option<bool>,
-    team_id: Option<i32>,
-    auto_init: Option<bool>,
-    gitignore_template: Option<String>,
-    license_template: Option<String>,
-}
+pub struct RepoOptionsBuilder(RepoOptions);
 
 impl RepoOptionsBuilder {
     pub fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
-        RepoOptionsBuilder {
+        RepoOptionsBuilder(RepoOptions {
             name: name.into(),
             ..Default::default()
-        }
+        })
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
     where
         D: Into<String>,
     {
-        self.description = Some(description.into());
+        self.0.description = Some(description.into());
         self
     }
 
@@ -559,37 +546,37 @@ impl RepoOptionsBuilder {
     where
         H: Into<String>,
     {
-        self.homepage = Some(homepage.into());
+        self.0.homepage = Some(homepage.into());
         self
     }
 
     pub fn private(&mut self, private: bool) -> &mut Self {
-        self.private = Some(private);
+        self.0.private = Some(private);
         self
     }
 
     pub fn has_issues(&mut self, has_issues: bool) -> &mut Self {
-        self.has_issues = Some(has_issues);
+        self.0.has_issues = Some(has_issues);
         self
     }
 
     pub fn has_wiki(&mut self, has_wiki: bool) -> &mut Self {
-        self.has_wiki = Some(has_wiki);
+        self.0.has_wiki = Some(has_wiki);
         self
     }
 
     pub fn has_downloads(&mut self, has_downloads: bool) -> &mut Self {
-        self.has_downloads = Some(has_downloads);
+        self.0.has_downloads = Some(has_downloads);
         self
     }
 
     pub fn team_id(&mut self, team_id: i32) -> &mut Self {
-        self.team_id = Some(team_id);
+        self.0.team_id = Some(team_id);
         self
     }
 
     pub fn auto_init(&mut self, auto_init: bool) -> &mut Self {
-        self.auto_init = Some(auto_init);
+        self.0.auto_init = Some(auto_init);
         self
     }
 
@@ -597,7 +584,7 @@ impl RepoOptionsBuilder {
     where
         GI: Into<String>,
     {
-        self.gitignore_template = Some(gitignore_template.into());
+        self.0.gitignore_template = Some(gitignore_template.into());
         self
     }
 
@@ -605,23 +592,23 @@ impl RepoOptionsBuilder {
     where
         L: Into<String>,
     {
-        self.license_template = Some(license_template.into());
+        self.0.license_template = Some(license_template.into());
         self
     }
 
     pub fn build(&self) -> RepoOptions {
         RepoOptions::new(
-            self.name.as_str(),
-            self.description.clone(),
-            self.homepage.clone(),
-            self.private,
-            self.has_issues,
-            self.has_wiki,
-            self.has_downloads,
-            self.team_id,
-            self.auto_init,
-            self.gitignore_template.clone(),
-            self.license_template.clone(),
+            self.0.name.as_str(),
+            self.0.description.clone(),
+            self.0.homepage.clone(),
+            self.0.private,
+            self.0.has_issues,
+            self.0.has_wiki,
+            self.0.has_downloads,
+            self.0.team_id,
+            self.0.auto_init,
+            self.0.gitignore_template.clone(),
+            self.0.license_template.clone(),
         )
     }
 }
@@ -690,28 +677,25 @@ impl RepoListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct RepoListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct RepoListOptionsBuilder(RepoListOptions);
 
 impl RepoListOptionsBuilder {
     pub fn new() -> Self {
-        RepoListOptionsBuilder { ..Default::default() }
+        RepoListOptionsBuilder(RepoListOptions { ..Default::default() })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
-        self.params.insert("per_page", n.to_string());
+        self.0.params.insert("per_page", n.to_string());
         self
     }
 
     pub fn visibility(&mut self, vis: Visibility) -> &mut Self {
-        self.params.insert("visibility", vis.to_string());
+        self.0.params.insert("visibility", vis.to_string());
         self
     }
 
     pub fn affiliation(&mut self, affiliations: Vec<Affiliation>) -> &mut Self {
-        self.params.insert(
+        self.0.params.insert(
             "affiliation",
             affiliations
                 .into_iter()
@@ -724,12 +708,12 @@ impl RepoListOptionsBuilder {
 
 
     pub fn repo_type(&mut self, tpe: Sort) -> &mut Self {
-        self.params.insert("type", tpe.to_string());
+        self.0.params.insert("type", tpe.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: Sort) -> &mut Self {
-        self.params.insert("sort", sort.to_string());
+        self.0.params.insert("sort", sort.to_string());
         self
     }
 
@@ -742,12 +726,12 @@ impl RepoListOptionsBuilder {
     }
 
     pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
-        self.params.insert("direction", direction.to_string());
+        self.0.params.insert("direction", direction.to_string());
         self
     }
 
     pub fn build(&self) -> RepoListOptions {
-        RepoListOptions { params: self.params.clone() }
+        RepoListOptions { params: self.0.params.clone() }
     }
 }
 
@@ -929,28 +913,25 @@ impl OrgRepoListOptions {
 }
 
 
-#[derive(Default)]
-pub struct OrgRepoListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct OrgRepoListOptionsBuilder(OrgRepoListOptions);
 
 impl OrgRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrgRepoListOptionsBuilder { ..Default::default() }
+        OrgRepoListOptionsBuilder(OrgRepoListOptions { ..Default::default() })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
-        self.params.insert("per_page", n.to_string());
+        self.0.params.insert("per_page", n.to_string());
         self
     }
 
     pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut Self {
-        self.params.insert("type", tpe.to_string());
+        self.0.params.insert("type", tpe.to_string());
         self
     }
 
     pub fn build(&self) -> OrgRepoListOptions {
-        OrgRepoListOptions { params: self.params.clone() }
+        OrgRepoListOptions { params: self.0.params.clone() }
     }
 }
 
@@ -977,28 +958,25 @@ impl UserRepoListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct UserRepoListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct UserRepoListOptionsBuilder(UserRepoListOptions);
 
 impl UserRepoListOptionsBuilder {
     pub fn new() -> Self {
-        UserRepoListOptionsBuilder { ..Default::default() }
+        UserRepoListOptionsBuilder(UserRepoListOptions { ..Default::default() })
     }
 
     pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
-        self.params.insert("type", tpe.to_string());
+        self.0.params.insert("type", tpe.to_string());
         self
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
-        self.params.insert("per_page", n.to_string());
+        self.0.params.insert("per_page", n.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: Type) -> &mut Self {
-        self.params.insert("sort", sort.to_string());
+        self.0.params.insert("sort", sort.to_string());
         self
     }
 
@@ -1011,12 +989,12 @@ impl UserRepoListOptionsBuilder {
     }
 
     pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
-        self.params.insert("direction", direction.to_string());
+        self.0.params.insert("direction", direction.to_string());
         self
     }
 
     pub fn build(&self) -> UserRepoListOptions {
-        UserRepoListOptions { params: self.params.clone() }
+        UserRepoListOptions { params: self.0.params.clone() }
     }
 }
 
@@ -1043,27 +1021,24 @@ impl OrganizationRepoListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct OrganizationRepoListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions);
 
 impl OrganizationRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrganizationRepoListOptionsBuilder { ..Default::default() }
+        OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions { ..Default::default() })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
-        self.params.insert("per_page", n.to_string());
+        self.0.params.insert("per_page", n.to_string());
         self
     }
 
     pub fn repo_type(&mut self, tpe: OrgRepoType) -> &mut Self {
-        self.params.insert("type", tpe.to_string());
+        self.0.params.insert("type", tpe.to_string());
         self
     }
 
     pub fn build(&self) -> OrganizationRepoListOptions {
-        OrganizationRepoListOptions { params: self.params.clone() }
+        OrganizationRepoListOptions { params: self.0.params.clone() }
     }
 }

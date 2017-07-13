@@ -192,7 +192,7 @@ pub struct Release {
     pub assets: Vec<Asset>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct ReleaseOptions {
     pub tag_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -208,32 +208,24 @@ pub struct ReleaseOptions {
 }
 
 /// builder interface for ReleaseOptions
-#[derive(Default)]
-pub struct ReleaseOptionsBuilder {
-    tag: String,
-    commitish: Option<String>,
-    name: Option<String>,
-    body: Option<String>,
-    draft: Option<bool>,
-    prerelease: Option<bool>,
-}
+pub struct ReleaseOptionsBuilder(ReleaseOptions);
 
 impl ReleaseOptionsBuilder {
     pub fn new<T>(tag: T) -> Self
     where
         T: Into<String>,
     {
-        ReleaseOptionsBuilder {
-            tag: tag.into(),
+        ReleaseOptionsBuilder(ReleaseOptions {
+            tag_name: tag.into(),
             ..Default::default()
-        }
+        })
     }
 
     pub fn commitish<C>(&mut self, commit: C) -> &mut Self
     where
         C: Into<String>,
     {
-        self.commitish = Some(commit.into());
+        self.0.target_commitish = Some(commit.into());
         self
     }
 
@@ -241,7 +233,7 @@ impl ReleaseOptionsBuilder {
     where
         N: Into<String>,
     {
-        self.name = Some(name.into());
+        self.0.name = Some(name.into());
         self
     }
 
@@ -249,28 +241,28 @@ impl ReleaseOptionsBuilder {
     where
         B: Into<String>,
     {
-        self.body = Some(body.into());
+        self.0.body = Some(body.into());
         self
     }
 
     pub fn draft(&mut self, draft: bool) -> &mut Self {
-        self.draft = Some(draft);
+        self.0.draft = Some(draft);
         self
     }
 
     pub fn prerelease(&mut self, pre: bool) -> &mut Self {
-        self.prerelease = Some(pre);
+        self.0.prerelease = Some(pre);
         self
     }
 
     pub fn build(&self) -> ReleaseOptions {
         ReleaseOptions::new(
-            self.tag.as_str(),
-            self.commitish.clone(),
-            self.name.clone(),
-            self.body.clone(),
-            self.draft,
-            self.prerelease,
+            self.0.tag_name.as_str(),
+            self.0.target_commitish.clone(),
+            self.0.name.clone(),
+            self.0.body.clone(),
+            self.0.draft,
+            self.0.prerelease,
         )
     }
 }

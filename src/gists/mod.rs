@@ -203,12 +203,7 @@ impl Content {
     }
 }
 
-#[derive(Default)]
-pub struct GistOptionsBuilder {
-    pub description: Option<String>,
-    pub public: Option<bool>,
-    pub files: HashMap<String, Content>,
-}
+pub struct GistOptionsBuilder(GistOptions);
 
 impl GistOptionsBuilder {
     pub fn new<K, V>(files: HashMap<K, V>) -> GistOptionsBuilder
@@ -220,35 +215,35 @@ impl GistOptionsBuilder {
         for (k, v) in files.into_iter() {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
-        GistOptionsBuilder {
+        GistOptionsBuilder(GistOptions {
             files: contents,
             ..Default::default()
-        }
+        })
     }
 
     pub fn description<D>(&mut self, desc: D) -> &mut GistOptionsBuilder
     where
         D: Into<String>,
     {
-        self.description = Some(desc.into());
+        self.0.description = Some(desc.into());
         self
     }
 
     pub fn public(&mut self, p: bool) -> &mut GistOptionsBuilder {
-        self.public = Some(p);
+        self.0.public = Some(p);
         self
     }
 
     pub fn build(&self) -> GistOptions {
         GistOptions {
-            files: self.files.clone(),
-            description: self.description.clone(),
-            public: self.public,
+            files: self.0.files.clone(),
+            description: self.0.description.clone(),
+            public: self.0.public,
         }
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct GistOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,

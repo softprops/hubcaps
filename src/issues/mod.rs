@@ -255,23 +255,20 @@ impl IssueListOptions {
 }
 
 /// a mutable issue list builder
-#[derive(Default)]
-pub struct IssueListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
     pub fn new() -> IssueListOptionsBuilder {
-        IssueListOptionsBuilder { ..Default::default() }
+        IssueListOptionsBuilder(IssueListOptions { ..Default::default() })
     }
 
     pub fn state(&mut self, state: State) -> &mut IssueListOptionsBuilder {
-        self.params.insert("state", state.to_string());
+        self.0.params.insert("state", state.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
-        self.params.insert("sort", sort.to_string());
+        self.0.params.insert("sort", sort.to_string());
         self
     }
 
@@ -284,7 +281,7 @@ impl IssueListOptionsBuilder {
     }
 
     pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListOptionsBuilder {
-        self.params.insert("direction", direction.to_string());
+        self.0.params.insert("direction", direction.to_string());
         self
     }
 
@@ -292,7 +289,7 @@ impl IssueListOptionsBuilder {
     where
         A: Into<String>,
     {
-        self.params.insert("assignee", assignee.into());
+        self.0.params.insert("assignee", assignee.into());
         self
     }
 
@@ -300,7 +297,7 @@ impl IssueListOptionsBuilder {
     where
         C: Into<String>,
     {
-        self.params.insert("creator", creator.into());
+        self.0.params.insert("creator", creator.into());
         self
     }
 
@@ -308,7 +305,7 @@ impl IssueListOptionsBuilder {
     where
         M: Into<String>,
     {
-        self.params.insert("mentioned", mentioned.into());
+        self.0.params.insert("mentioned", mentioned.into());
         self
     }
 
@@ -316,7 +313,7 @@ impl IssueListOptionsBuilder {
     where
         L: Into<String>,
     {
-        self.params.insert(
+        self.0.params.insert(
             "labels",
             labels
                 .into_iter()
@@ -331,12 +328,12 @@ impl IssueListOptionsBuilder {
     where
         S: Into<String>,
     {
-        self.params.insert("since", since.into());
+        self.0.params.insert("since", since.into());
         self
     }
 
     pub fn build(&self) -> IssueListOptions {
-        IssueListOptions { params: self.params.clone() }
+        IssueListOptions { params: self.0.params.clone() }
     }
 }
 

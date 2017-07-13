@@ -96,25 +96,22 @@ impl CommentListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct CommentListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct CommentListOptionsBuilder(CommentListOptions);
 
 impl CommentListOptionsBuilder {
     pub fn new() -> CommentListOptionsBuilder {
-        CommentListOptionsBuilder { ..Default::default() }
+        CommentListOptionsBuilder(CommentListOptions { ..Default::default() })
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut CommentListOptionsBuilder
     where
         S: Into<String>,
     {
-        self.params.insert("since", since.into());
+        self.0.params.insert("since", since.into());
         self
     }
 
     pub fn build(&self) -> CommentListOptions {
-        CommentListOptions { params: self.params.clone() }
+        CommentListOptions { params: self.0.params.clone() }
     }
 }

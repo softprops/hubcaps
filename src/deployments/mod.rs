@@ -128,7 +128,7 @@ pub struct Deployment {
     pub repository_url: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct DeploymentOptions {
     #[serde(rename = "ref")]
     pub commit_ref: String,
@@ -156,38 +156,29 @@ impl DeploymentOptions {
     }
 }
 
-#[derive(Default)]
-pub struct DeploymentOptionsBuilder {
-    pub commit_ref: String,
-    pub task: Option<String>,
-    pub auto_merge: Option<bool>,
-    pub required_contexts: Option<Vec<String>>,
-    pub payload: Option<String>,
-    pub environment: Option<String>,
-    pub description: Option<String>,
-}
+pub struct DeploymentOptionsBuilder(DeploymentOptions);
 
 impl DeploymentOptionsBuilder {
     pub fn new<C>(commit: C) -> DeploymentOptionsBuilder
     where
         C: Into<String>,
     {
-        DeploymentOptionsBuilder {
+        DeploymentOptionsBuilder(DeploymentOptions {
             commit_ref: commit.into(),
             ..Default::default()
-        }
+        })
     }
 
     pub fn task<T>(&mut self, task: T) -> &mut DeploymentOptionsBuilder
     where
         T: Into<String>,
     {
-        self.task = Some(task.into());
+        self.0.task = Some(task.into());
         self
     }
 
     pub fn auto_merge(&mut self, auto_merge: bool) -> &mut DeploymentOptionsBuilder {
-        self.auto_merge = Some(auto_merge);
+        self.0.auto_merge = Some(auto_merge);
         self
     }
 
@@ -195,12 +186,13 @@ impl DeploymentOptionsBuilder {
     where
         C: Into<String>,
     {
-        self.required_contexts = Some(ctxs.into_iter().map(|c| c.into()).collect::<Vec<String>>());
+        self.0.required_contexts =
+            Some(ctxs.into_iter().map(|c| c.into()).collect::<Vec<String>>());
         self
     }
 
     pub fn payload<T: serde::ser::Serialize>(&mut self, pl: T) -> &mut DeploymentOptionsBuilder {
-        self.payload = serde_json::ser::to_string(&pl).ok();
+        self.0.payload = serde_json::ser::to_string(&pl).ok();
         self
     }
 
@@ -208,7 +200,7 @@ impl DeploymentOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.environment = Some(env.into());
+        self.0.environment = Some(env.into());
         self
     }
 
@@ -216,19 +208,19 @@ impl DeploymentOptionsBuilder {
     where
         D: Into<String>,
     {
-        self.description = Some(desc.into());
+        self.0.description = Some(desc.into());
         self
     }
 
     pub fn build(&self) -> DeploymentOptions {
         DeploymentOptions {
-            commit_ref: self.commit_ref.clone(),
-            task: self.task.clone(),
-            auto_merge: self.auto_merge,
-            required_contexts: self.required_contexts.clone(),
-            payload: self.payload.clone(),
-            environment: self.environment.clone(),
-            description: self.description.clone(),
+            commit_ref: self.0.commit_ref.clone(),
+            task: self.0.task.clone(),
+            auto_merge: self.0.auto_merge,
+            required_contexts: self.0.required_contexts.clone(),
+            payload: self.0.payload.clone(),
+            environment: self.0.environment.clone(),
+            description: self.0.description.clone(),
         }
     }
 }
@@ -247,26 +239,21 @@ pub struct DeploymentStatus {
     pub creator: User,
 }
 
-#[derive(Default)]
-pub struct DeploymentStatusOptionsBuilder {
-    state: State,
-    target_url: Option<String>,
-    description: Option<String>,
-}
+pub struct DeploymentStatusOptionsBuilder(DeploymentStatusOptions);
 
 impl DeploymentStatusOptionsBuilder {
     pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
-        DeploymentStatusOptionsBuilder {
+        DeploymentStatusOptionsBuilder(DeploymentStatusOptions {
             state: state,
             ..Default::default()
-        }
+        })
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut DeploymentStatusOptionsBuilder
     where
         T: Into<String>,
     {
-        self.target_url = Some(url.into());
+        self.0.target_url = Some(url.into());
         self
     }
 
@@ -274,20 +261,20 @@ impl DeploymentStatusOptionsBuilder {
     where
         D: Into<String>,
     {
-        self.description = Some(desc.into());
+        self.0.description = Some(desc.into());
         self
     }
 
     pub fn build(&self) -> DeploymentStatusOptions {
         DeploymentStatusOptions {
-            state: self.state.clone(),
-            target_url: self.target_url.clone(),
-            description: self.description.clone(),
+            state: self.0.state.clone(),
+            target_url: self.0.target_url.clone(),
+            description: self.0.description.clone(),
         }
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct DeploymentStatusOptions {
     state: State,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -326,21 +313,18 @@ impl DeploymentListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct DeploymentListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct DeploymentListOptionsBuilder(DeploymentListOptions);
 
 impl DeploymentListOptionsBuilder {
     pub fn new() -> DeploymentListOptionsBuilder {
-        DeploymentListOptionsBuilder { ..Default::default() }
+        DeploymentListOptionsBuilder(DeploymentListOptions { ..Default::default() })
     }
 
     pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder
     where
         S: Into<String>,
     {
-        self.params.insert("sha", s.into());
+        self.0.params.insert("sha", s.into());
         self
     }
 
@@ -348,7 +332,7 @@ impl DeploymentListOptionsBuilder {
     where
         G: Into<String>,
     {
-        self.params.insert("ref", r.into());
+        self.0.params.insert("ref", r.into());
         self
     }
 
@@ -356,7 +340,7 @@ impl DeploymentListOptionsBuilder {
     where
         T: Into<String>,
     {
-        self.params.insert("task", t.into());
+        self.0.params.insert("task", t.into());
         self
     }
 
@@ -364,12 +348,12 @@ impl DeploymentListOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.params.insert("environment", e.into());
+        self.0.params.insert("environment", e.into());
         self
     }
 
     pub fn build(&self) -> DeploymentListOptions {
-        DeploymentListOptions { params: self.params.clone() }
+        DeploymentListOptions { params: self.0.params.clone() }
     }
 }
 
