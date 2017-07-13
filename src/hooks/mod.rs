@@ -7,7 +7,7 @@ use self::super::{Github, Result};
 use std::fmt;
 use std::collections::BTreeMap;
 
-/// Content-Type web hooks will recieve
+/// Content-Type web hooks will receive
 /// deliveries in
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum WebHookContentType {
@@ -34,7 +34,7 @@ impl fmt::Display for WebHookContentType {
     }
 }
 
-/// Interface for mangaing repository hooks
+/// Interface for managing repository hooks
 pub struct Hooks<'a> {
     github: &'a Github,
     owner: String,
@@ -55,7 +55,7 @@ impl<'a> Hooks<'a> {
         }
     }
 
-    /// lists hook associated with a repoistory
+    /// lists hook associated with a repository
     pub fn list(&self) -> Result<Vec<Hook>> {
         self.github.get(&format!(
             "/repos/{}/{}/hooks",
@@ -86,7 +86,7 @@ impl<'a> Hooks<'a> {
         )
     }
 
-    /// deletes a repoistory hook by id
+    /// deletes a repository hook by id
     pub fn delete(&self, id: u64) -> Result<()> {
         self.github.delete(&format!(
             "/repos/{}/{}/hooks/{}",
@@ -112,8 +112,8 @@ pub struct HookCreateOptions {
 
 impl HookCreateOptions {
     /// creates a new builder instance with a hook name
-    /// are should be taken with respect to the hook name as you can only
-    /// use "web" or the a valid service name listed [here](https://api.github.com/hooks)
+    /// care should be taken with respect to the hook name as you can only
+    /// use "web" or a valid service name listed [here](https://api.github.com/hooks)
     pub fn builder<N>(name: N) -> HookCreateOptionsBuilder
     where
         N: Into<String>,

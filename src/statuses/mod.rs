@@ -5,7 +5,7 @@ extern crate serde;
 use self::super::{Github, Result};
 use users::User;
 
-/// interface for statuses assocaited with a repository
+/// interface for statuses associated with a repository
 pub struct Statuses<'a> {
     github: &'a Github,
     owner: String,

@@ -20,7 +20,7 @@ error_chain! {
     }
 }
 
-// preresentations
+// representations
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct FieldErr {

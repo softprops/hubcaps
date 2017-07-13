@@ -39,11 +39,11 @@
 //!
 //! The convention for executing operations typically looks like
 //! `github.repo(.., ..).service().operation(OperationOptions)` where operation may be `create`,
-//! `delete`, ect.
+//! `delete`, etc.
 
 //! Services and their types are packaged under their own module namespace.
 //! A service interface will provide access to operations and operations may access options types
-//! this define the various parameter options available for the operation. Most operation option
+//! that define the various parameter options available for the operation. Most operation option
 //! types expose `builder()` methods for a builder oriented style of constructing options.
 //!
 //! # Errors
@@ -217,7 +217,7 @@ impl Github {
         }
     }
 
-    /// Return a reference to a Github reposistory
+    /// Return a reference to a Github repository
     pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository
     where
         O: Into<String>,
@@ -564,17 +564,17 @@ impl Links {
         Links { values: values }
     }
 
-    /// Returns next link url, when vailable
+    /// Returns next link url, when available
     pub fn next(&self) -> Option<String> {
         self.values.get("next").map(|s| s.to_owned())
     }
 
-    /// Returns prev link url, when vailable
+    /// Returns prev link url, when available
     pub fn prev(&self) -> Option<String> {
         self.values.get("prev").map(|s| s.to_owned())
     }
 
-    /// Returns last link url, when vailable
+    /// Returns last link url, when available
     pub fn last(&self) -> Option<String> {
         self.values.get("last").map(|s| s.to_owned())
     }

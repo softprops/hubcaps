@@ -1,4 +1,4 @@
-//! Releases inteface
+//! Releases interface
 extern crate serde_json;
 
 use self::super::{Github, Result};

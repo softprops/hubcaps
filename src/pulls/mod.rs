@@ -162,7 +162,7 @@ impl<'a> PullRequests<'a> {
         format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
     }
 
-    /// Get a reference to a strucuture for interfacing with a specific pull request
+    /// Get a reference to a structure for interfacing with a specific pull request
     pub fn get(&self, number: u64) -> PullRequest {
         PullRequest::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }

@@ -9,14 +9,14 @@ use self::super::{Github, Result};
 use statuses::State;
 use users::User;
 
-/// Interface for repository deployements
+/// Interface for repository deployments
 pub struct Deployments<'a> {
     github: &'a Github,
     owner: String,
     repo: String,
 }
 
-/// INterface for deployment statuses
+/// Interface for deployment statuses
 pub struct DeploymentStatuses<'a> {
     github: &'a Github,
     owner: String,

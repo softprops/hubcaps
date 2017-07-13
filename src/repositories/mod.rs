@@ -342,7 +342,7 @@ impl<'a> Repository<'a> {
         Hooks::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
-    /// get a reference to the GitHub repository object that this `Respository` refers to
+    /// get a reference to the GitHub repository object that this `Repository` refers to
     pub fn get(&self) -> Result<Repo> {
         self.github.get(&self.path(""))
     }
@@ -362,12 +362,12 @@ impl<'a> Repository<'a> {
         Deployments::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
 
-    /// get a reference to a specific github issue associated with this repoistory ref
+    /// get a reference to a specific github issue associated with this repository ref
     pub fn issue(&self, number: u64) -> IssueRef {
         IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }
 
-    /// get a reference to github issues associated with this repoistory ref
+    /// get a reference to github issues associated with this repository ref
     pub fn issues(&self) -> Issues {
         Issues::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
@@ -396,7 +396,7 @@ impl<'a> Repository<'a> {
     }
 
     /// get a reference to [statuses](https://developer.github.com/v3/repos/statuses/)
-    /// associated with this reposoitory ref
+    /// associated with this repository ref
     pub fn statuses(&self) -> Statuses {
         Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
     }
