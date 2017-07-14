@@ -51,6 +51,18 @@ impl<'a> Git<'a> {
             &self.path(format!("/blobs/{}", sha.into())),
         )
     }
+
+    /// get the git reference data of a given ref
+    /// the specified reference must be formatted as as "heads/branch", not just "branch"
+    /// https://developer.github.com/v3/git/refs/#get-a-reference
+    pub fn reference<S>(&self, reference: S) -> Result<GetReferenceResponse>
+    where
+        S: Into<String>,
+    {
+        self.github.get::<GetReferenceResponse>(
+            &self.path(format!("/refs/{}", reference.into())),
+        )
+    }
 }
 
 
@@ -86,4 +98,117 @@ pub struct Blob {
     pub sha: String,
     /// sizes will be None for directories
     pub size: Option<usize>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(untagged)]
+/// The response for getting a git reference
+pub enum GetReferenceResponse {
+    /// The reference data matching the specified reference
+    Exact(Reference),
+    /// If the reference doesn't exist in the repository
+    /// but existing refs start with ref they will be returned as an array.
+    /// For example, a call to get the data for a branch named feature,
+    /// which doesn't exist, would return head refs including featureA and featureB which do.
+    StartWith(Vec<Reference>),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct Reference {
+    #[serde(rename = "ref")]
+    pub reference: String,
+    pub url: String,
+    pub object: Object,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct Object {
+    #[serde(rename = "type")]
+    pub object_type: String,
+    pub sha: String,
+    pub url: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fmt::Debug;
+    use serde::Deserialize;
+    use serde_json;
+    use super::*;
+
+    fn test_deserializing<'de, T>(payload: &'static str, expected: T)
+    where
+        T:  Debug + PartialEq + Deserialize<'de>,
+    {
+        let incoming: T = serde_json::from_str(payload).unwrap();
+        assert_eq!(incoming, expected)
+    }
+
+    #[test]
+    fn deserialize_get_ref_exact() {
+        let payload = r#"{
+  "ref": "refs/heads/featureA",
+  "url": "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/featureA",
+  "object": {
+    "type": "commit",
+    "sha": "aa218f56b14c9653891f9e74264a383fa43fefbd",
+    "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/aa218f56b14c9653891f9e74264a383fa43fefbd"
+  }
+}"#;
+        let expected = GetReferenceResponse::Exact(Reference {
+            reference: "refs/heads/featureA".to_string(),
+            url: "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/featureA".to_string(),
+            object: Object {
+                object_type: "commit".to_string(),
+                sha: "aa218f56b14c9653891f9e74264a383fa43fefbd".to_string(),
+                url: "https://api.github.com/repos/octocat/Hello-World/git/commits/aa218f56b14c9653891f9e74264a383fa43fefbd".to_string(),
+            },
+        });
+        test_deserializing(payload, expected)
+    }
+
+    #[test]
+    fn deserialize_get_ref_starts_with() {
+        let payload = r#"[
+  {
+    "ref": "refs/heads/feature-a",
+    "url": "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/feature-a",
+    "object": {
+      "type": "commit",
+      "sha": "aa218f56b14c9653891f9e74264a383fa43fefbd",
+      "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/aa218f56b14c9653891f9e74264a383fa43fefbd"
+    }
+  },
+  {
+    "ref": "refs/heads/feature-b",
+    "url": "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/feature-b",
+    "object": {
+      "type": "commit",
+      "sha": "612077ae6dffb4d2fbd8ce0cccaa58893b07b5ac",
+      "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/612077ae6dffb4d2fbd8ce0cccaa58893b07b5ac"
+    }
+  }
+]"#;
+        let expected = GetReferenceResponse::StartWith(vec![
+            Reference {
+                reference: "refs/heads/feature-a".to_string(),
+                url: "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/feature-a".to_string(),
+                object: Object {
+                    object_type: "commit".to_string(),
+                    sha: "aa218f56b14c9653891f9e74264a383fa43fefbd".to_string(),
+                    url: "https://api.github.com/repos/octocat/Hello-World/git/commits/aa218f56b14c9653891f9e74264a383fa43fefbd".to_string(),
+                },
+            },
+            Reference {
+                reference: "refs/heads/feature-b".to_string(),
+                url: "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/feature-b".to_string(),
+                object: Object {
+                    object_type: "commit".to_string(),
+                    sha: "612077ae6dffb4d2fbd8ce0cccaa58893b07b5ac".to_string(),
+                    url: "https://api.github.com/repos/octocat/Hello-World/git/commits/612077ae6dffb4d2fbd8ce0cccaa58893b07b5ac".to_string(),
+                },
+            },
+        ]);
+        test_deserializing(payload, expected)
+    }
 }
