@@ -5,7 +5,7 @@ extern crate serde;
 use self::super::{Github, Result};
 use users::User;
 
-/// interface for statuses assocaited with a repository
+/// interface for statuses associated with a repository
 pub struct Statuses<'a> {
     github: &'a Github,
     owner: String,
@@ -76,7 +76,7 @@ pub struct Status {
     pub creator: User,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct StatusOptions {
     state: State,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,28 +87,22 @@ pub struct StatusOptions {
     context: Option<String>,
 }
 
-#[derive(Default)]
-pub struct StatusBuilder {
-    state: State,
-    target_url: Option<String>,
-    description: Option<String>,
-    context: Option<String>,
-}
+pub struct StatusOptionsBuilder(StatusOptions);
 
-impl StatusBuilder {
+impl StatusOptionsBuilder {
     #[doc(hidden)]
     pub fn new(state: State) -> Self {
-        StatusBuilder {
+        StatusOptionsBuilder(StatusOptions {
             state: state,
             ..Default::default()
-        }
+        })
     }
 
     pub fn target_url<T>(&mut self, url: T) -> &mut Self
     where
         T: Into<String>,
     {
-        self.target_url = Some(url.into());
+        self.0.target_url = Some(url.into());
         self
     }
 
@@ -116,7 +110,7 @@ impl StatusBuilder {
     where
         D: Into<String>,
     {
-        self.description = Some(desc.into());
+        self.0.description = Some(desc.into());
         self
     }
 
@@ -124,16 +118,16 @@ impl StatusBuilder {
     where
         C: Into<String>,
     {
-        self.context = Some(ctx.into());
+        self.0.context = Some(ctx.into());
         self
     }
 
     pub fn build(&self) -> StatusOptions {
         StatusOptions::new(
-            self.state.clone(),
-            self.target_url.clone(),
-            self.description.clone(),
-            self.context.clone(),
+            self.0.state.clone(),
+            self.0.target_url.clone(),
+            self.0.description.clone(),
+            self.0.context.clone(),
         )
     }
 }
@@ -159,8 +153,8 @@ impl StatusOptions {
         }
     }
 
-    pub fn builder(state: State) -> StatusBuilder {
-        StatusBuilder::new(state)
+    pub fn builder(state: State) -> StatusOptionsBuilder {
+        StatusOptionsBuilder::new(state)
     }
 }
 

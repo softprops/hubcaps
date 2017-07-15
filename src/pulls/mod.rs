@@ -32,16 +32,12 @@ pub enum Sort {
 
 impl fmt::Display for Sort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Sort::Created => "created",
-                Sort::Updated => "updated",
-                Sort::Popularity => "popularity",
-                Sort::LongRunning => "long-running",
-            }
-        )
+        match *self {
+            Sort::Created => "created",
+            Sort::Updated => "updated",
+            Sort::Popularity => "popularity",
+            Sort::LongRunning => "long-running",
+        }.fmt(f)
     }
 }
 
@@ -166,7 +162,7 @@ impl<'a> PullRequests<'a> {
         format!("/repos/{}/{}/pulls{}", self.owner, self.repo, more)
     }
 
-    /// Get a reference to a strucuture for interfacing with a specific pull request
+    /// Get a reference to a structure for interfacing with a specific pull request
     pub fn get(&self, number: u64) -> PullRequest {
         PullRequest::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
     }
@@ -245,16 +241,11 @@ pub struct Commit {
     pub user: User, //    pub repo: Option<Repo>,
 }
 
-#[derive(Default)]
-pub struct PullEditOptionsBuilder {
-    pub title: Option<String>,
-    pub body: Option<String>,
-    pub state: Option<String>,
-}
+pub struct PullEditOptionsBuilder(PullEditOptions);
 
 impl PullEditOptionsBuilder {
     pub fn new() -> PullEditOptionsBuilder {
-        PullEditOptionsBuilder { ..Default::default() }
+        PullEditOptionsBuilder(PullEditOptions { ..Default::default() })
     }
 
     /// set the title of the pull
@@ -262,7 +253,7 @@ impl PullEditOptionsBuilder {
     where
         T: Into<String>,
     {
-        self.title = Some(title.into());
+        self.0.title = Some(title.into());
         self
     }
 
@@ -271,7 +262,7 @@ impl PullEditOptionsBuilder {
     where
         B: Into<String>,
     {
-        self.body = Some(body.into());
+        self.0.body = Some(body.into());
         self
     }
 
@@ -280,21 +271,21 @@ impl PullEditOptionsBuilder {
     where
         S: Into<String>,
     {
-        self.state = Some(state.into());
+        self.0.state = Some(state.into());
         self
     }
 
     /// create a new set of pull edit options
     pub fn build(&self) -> PullEditOptions {
         PullEditOptions {
-            title: self.title.clone(),
-            body: self.body.clone(),
-            state: self.state.clone(),
+            title: self.0.title.clone(),
+            body: self.0.body.clone(),
+            state: self.0.state.clone(),
         }
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct PullEditOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
@@ -388,33 +379,30 @@ impl PullListOptions {
     }
 }
 
-#[derive(Default)]
-pub struct PullListOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct PullListOptionsBuilder(PullListOptions);
 
 impl PullListOptionsBuilder {
     pub fn new() -> PullListOptionsBuilder {
-        PullListOptionsBuilder { ..Default::default() }
+        PullListOptionsBuilder(PullListOptions { ..Default::default() })
     }
 
     pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {
-        self.params.insert("state", state.to_string());
+        self.0.params.insert("state", state.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: IssueSort) -> &mut PullListOptionsBuilder {
-        self.params.insert("sort", sort.to_string());
+        self.0.params.insert("sort", sort.to_string());
         self
     }
 
     pub fn direction(&mut self, direction: SortDirection) -> &mut PullListOptionsBuilder {
-        self.params.insert("direction", direction.to_string());
+        self.0.params.insert("direction", direction.to_string());
         self
     }
 
     pub fn build(&self) -> PullListOptions {
-        PullListOptions { params: self.params.clone() }
+        PullListOptions { params: self.0.params.clone() }
     }
 }
 

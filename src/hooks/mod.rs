@@ -7,7 +7,7 @@ use self::super::{Github, Result};
 use std::fmt;
 use std::collections::BTreeMap;
 
-/// Content-Type web hooks will recieve
+/// Content-Type web hooks will receive
 /// deliveries in
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum WebHookContentType {
@@ -27,18 +27,14 @@ impl Default for WebHookContentType {
 
 impl fmt::Display for WebHookContentType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                WebHookContentType::Form => "form",
-                WebHookContentType::Json => "json",
-            }
-        )
+        match *self {
+            WebHookContentType::Form => "form",
+            WebHookContentType::Json => "json",
+        }.fmt(f)
     }
 }
 
-/// Interface for mangaing repository hooks
+/// Interface for managing repository hooks
 pub struct Hooks<'a> {
     github: &'a Github,
     owner: String,
@@ -59,7 +55,7 @@ impl<'a> Hooks<'a> {
         }
     }
 
-    /// lists hook associated with a repoistory
+    /// lists hook associated with a repository
     pub fn list(&self) -> Result<Vec<Hook>> {
         self.github.get(&format!(
             "/repos/{}/{}/hooks",
@@ -90,7 +86,7 @@ impl<'a> Hooks<'a> {
         )
     }
 
-    /// deletes a repoistory hook by id
+    /// deletes a repository hook by id
     pub fn delete(&self, id: u64) -> Result<()> {
         self.github.delete(&format!(
             "/repos/{}/{}/hooks/{}",
@@ -106,7 +102,7 @@ impl<'a> Hooks<'a> {
 /// options for creating a repository hook
 /// see [this](https://developer.github.com/v3/repos/hooks/#create-a-hook)
 /// for githubs official documentation
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct HookCreateOptions {
     name: String,
     config: BTreeMap<String, ::serde_json::Value>,
@@ -116,8 +112,8 @@ pub struct HookCreateOptions {
 
 impl HookCreateOptions {
     /// creates a new builder instance with a hook name
-    /// are should be taken with respect to the hook name as you can only
-    /// use "web" or the a valid service name listed [here](https://api.github.com/hooks)
+    /// care should be taken with respect to the hook name as you can only
+    /// use "web" or a valid service name listed [here](https://api.github.com/hooks)
     pub fn builder<N>(name: N) -> HookCreateOptionsBuilder
     where
         N: Into<String>,
@@ -131,13 +127,7 @@ impl HookCreateOptions {
     }
 }
 
-#[derive(Default)]
-pub struct HookCreateOptionsBuilder {
-    name: String,
-    config: BTreeMap<String, ::serde_json::Value>,
-    events: Vec<String>,
-    active: bool,
-}
+pub struct HookCreateOptionsBuilder(HookCreateOptions);
 
 impl HookCreateOptionsBuilder {
     #[doc(hidden)]
@@ -145,16 +135,16 @@ impl HookCreateOptionsBuilder {
     where
         N: Into<String>,
     {
-        HookCreateOptionsBuilder {
+        HookCreateOptionsBuilder(HookCreateOptions {
             name: name.into(),
             active: true,
             ..Default::default()
-        }
+        })
     }
 
 
     pub fn active(&mut self, active: bool) -> &mut Self {
-        self.active = active;
+        self.0.active = active;
         self
     }
 
@@ -165,7 +155,7 @@ impl HookCreateOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+        self.0.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
         self
     }
 
@@ -207,16 +197,16 @@ impl HookCreateOptionsBuilder {
     where
         N: Into<String>,
     {
-        self.config.insert(name.into(), value);
+        self.0.config.insert(name.into(), value);
         self
     }
 
     pub fn build(&self) -> HookCreateOptions {
         HookCreateOptions {
-            name: self.name.clone(),
-            config: self.config.clone(),
-            events: self.events.clone(),
-            active: self.active,
+            name: self.0.name.clone(),
+            config: self.0.config.clone(),
+            events: self.0.events.clone(),
+            active: self.0.active,
         }
     }
 }
@@ -225,7 +215,7 @@ impl HookCreateOptionsBuilder {
 /// options for editing a repository hook
 /// see [this](https://developer.github.com/v3/repos/hooks/#edit-a-hook)
 /// for githubs official documentation
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct HookEditOptions {
     config: BTreeMap<String, ::serde_json::Value>,
     events: Vec<String>,
@@ -241,23 +231,16 @@ impl HookEditOptions {
     }
 }
 
-#[derive(Default)]
-pub struct HookEditOptionsBuilder {
-    config: BTreeMap<String, ::serde_json::Value>,
-    events: Vec<String>,
-    add_events: Vec<String>,
-    remove_events: Vec<String>,
-    active: bool,
-}
+pub struct HookEditOptionsBuilder(HookEditOptions);
 
 impl HookEditOptionsBuilder {
     pub fn new() -> HookEditOptionsBuilder {
-        HookEditOptionsBuilder { ..Default::default() }
+        HookEditOptionsBuilder(HookEditOptions { ..Default::default() })
     }
 
 
     pub fn active(&mut self, active: bool) -> &mut Self {
-        self.active = active;
+        self.0.active = active;
         self
     }
 
@@ -268,7 +251,7 @@ impl HookEditOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+        self.0.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
         self
     }
 
@@ -310,17 +293,17 @@ impl HookEditOptionsBuilder {
     where
         N: Into<String>,
     {
-        self.config.insert(name.into(), value);
+        self.0.config.insert(name.into(), value);
         self
     }
 
     pub fn build(&self) -> HookEditOptions {
         HookEditOptions {
-            config: self.config.clone(),
-            events: self.events.clone(),
-            add_events: self.add_events.clone(),
-            remove_events: self.remove_events.clone(),
-            active: self.active,
+            config: self.0.config.clone(),
+            events: self.0.events.clone(),
+            add_events: self.0.add_events.clone(),
+            remove_events: self.0.remove_events.clone(),
+            active: self.0.active,
         }
     }
 }

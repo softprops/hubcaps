@@ -13,15 +13,11 @@ pub enum Permission {
 
 impl fmt::Display for Permission {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                Permission::Pull => "pull",
-                Permission::Push => "push",
-                Permission::Admin => "admin",
-            }
-        )
+        match *self {
+            Permission::Pull => "pull",
+            Permission::Push => "push",
+            Permission::Admin => "admin",
+        }.fmt(f)
     }
 }
 

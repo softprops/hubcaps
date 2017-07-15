@@ -23,15 +23,11 @@ pub enum IssuesSort {
 
 impl fmt::Display for IssuesSort {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                IssuesSort::Comments => "comments",
-                IssuesSort::Created => "created",
-                IssuesSort::Updated => "updated",
-            }
-        )
+        match *self {
+            IssuesSort::Comments => "comments",
+            IssuesSort::Created => "created",
+            IssuesSort::Updated => "updated",
+        }.fmt(f)
     }
 }
 
@@ -143,33 +139,30 @@ impl SearchIssuesOptions {
 }
 
 /// https://developer.github.com/v3/search/#search-issues
-#[derive(Default)]
-pub struct SearchIssuesOptionsBuilder {
-    params: HashMap<&'static str, String>,
-}
+pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
     pub fn new() -> SearchIssuesOptionsBuilder {
-        SearchIssuesOptionsBuilder { ..Default::default() }
+        SearchIssuesOptionsBuilder(SearchIssuesOptions { ..Default::default() })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
-        self.params.insert("per_page", n.to_string());
+        self.0.params.insert("per_page", n.to_string());
         self
     }
 
     pub fn sort(&mut self, sort: IssuesSort) -> &mut Self {
-        self.params.insert("sort", sort.to_string());
+        self.0.params.insert("sort", sort.to_string());
         self
     }
 
     pub fn order(&mut self, direction: SortDirection) -> &mut Self {
-        self.params.insert("order", direction.to_string());
+        self.0.params.insert("order", direction.to_string());
         self
     }
 
     pub fn build(&self) -> SearchIssuesOptions {
-        SearchIssuesOptions { params: self.params.clone() }
+        SearchIssuesOptions { params: self.0.params.clone() }
     }
 }
 

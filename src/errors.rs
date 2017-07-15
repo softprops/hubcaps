@@ -1,6 +1,5 @@
 //! Client errors
 
-use std::error::Error as StdError;
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
 use hyper::status::StatusCode;
@@ -21,7 +20,7 @@ error_chain! {
     }
 }
 
-// preresentations
+// representations
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct FieldErr {
