@@ -95,13 +95,12 @@ use search::Search;
 use hyper::Client;
 use hyper::client::RequestBuilder;
 use hyper::method::Method;
-use hyper::header::{qitem, Accept, Authorization, ContentLength, UserAgent};
+use hyper::header::{qitem, Accept, Authorization, UserAgent};
 use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use organizations::{Organization, Organizations, UserOrganizations};
 use std::fmt;
-use std::io::Read;
 use url::Url;
 use std::collections::HashMap;
 
@@ -345,22 +344,16 @@ impl Github {
             .header(UserAgent(self.agent.to_owned()))
             .header(Accept(vec![qitem(From::from(media_type))]));
 
-        let mut res = (match body {
-                           Some(ref bod) => builder.body(*bod).send(),
-                           _ => builder.send(),
-                       })?;
-
-        let mut body = match res.headers.clone().get::<ContentLength>() {
-            Some(&ContentLength(len)) => String::with_capacity(len as usize),
-            _ => String::new(),
-        };
-        res.read_to_string(&mut body)?;
+        let res = (match body {
+                       Some(ref bod) => builder.body(*bod).send(),
+                       _ => builder.send(),
+                   })?;
 
         let links = res.headers.get::<Link>().map(|&Link(ref value)| {
             Links::new(value.to_owned())
         });
 
-        debug!("rec response {:#?} {:#?} {}", res.status, res.headers, body);
+        debug!("rec response {:?}", res);
         match res.status {
             StatusCode::Conflict |
             StatusCode::BadRequest |
@@ -371,11 +364,11 @@ impl Github {
                 Err(
                     ErrorKind::Fault {
                         code: res.status,
-                        error: serde_json::from_str::<errors::ClientError>(&body)?,
+                        error: serde_json::from_reader(res)?,
                     }.into(),
                 )
             }
-            _ => Ok((links, serde_json::from_str::<D>(&body)?)),
+            _ => Ok((links, serde_json::from_reader(res)?)),
         }
     }
 
