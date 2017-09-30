@@ -138,7 +138,7 @@ mod tests {
 
     fn test_deserializing<'de, T>(payload: &'static str, expected: T)
     where
-        T:  Debug + PartialEq + Deserialize<'de>,
+        T: Debug + PartialEq + Deserialize<'de>,
     {
         let incoming: T = serde_json::from_str(payload).unwrap();
         assert_eq!(incoming, expected)
