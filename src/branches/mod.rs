@@ -68,7 +68,7 @@ impl<'a> Branches<'a> {
     /// update branch production for a given branch
     ///
     /// https://developer.github.com/v3/repos/branches/#update-branch-protection
-    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<Protection>
+    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<ProtectionState>
     where
         B: Into<String>,
     {
@@ -92,6 +92,20 @@ pub struct Branch {
     pub protected: Option<bool>,
     pub protection_url: Option<String>,
     // todo: commit ref
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ProtectionState {
+    pub required_status_checks: Option<StatusChecks>,
+    pub enforce_admins: Option<EnforceAdmins>,
+    //pub required_pull_request_reviews: Option<RequiredPullRequestReviews>,
+    //pub restrictions: Option<Restrictions>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EnforceAdmins {
+    pub url: String,
+    pub enabled: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

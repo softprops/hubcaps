@@ -7,6 +7,7 @@ use hyper::net::HttpsConnector;
 use hyper::Client;
 use hyper_native_tls::NativeTlsClient;
 use hubcaps::{Credentials, Github};
+use hubcaps::branches::Protection;
 use std::env;
 
 fn main() {
@@ -30,6 +31,20 @@ fn main() {
 
             match github.repo("softprops", "hubcaps").branches().get("master") {
                 Ok(branch) => println!("{:#?}", branch),
+                Err(err) => println!("err {:#?}", err),
+            }
+
+            // protect master branch
+            match github.repo("softprops", "hubcaps").branches().protection(
+                "master",
+                &Protection {
+                    required_status_checks: None,
+                    enforce_admins: false,
+                    required_pull_request_reviews: None,
+                    restrictions: None,
+                },
+            ) {
+                Ok(pro) => println!("{:#?}", pro),
                 Err(err) => println!("err {:#?}", err),
             }
         }

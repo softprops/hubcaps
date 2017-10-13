@@ -1,10 +1,11 @@
-# 0.3.next
+# 0.3.14
 
-* added `SearchIssuesOptions.per_page(n)` interface for limiting search results
+* fixed response parsing for adding branch protection
 
 # 0.3.13
 
 * updated branches interface to reflect [branch API changes](https://developer.github.com/changes/2017-09-06-protected-branches-preview-end/)
+* added `SearchIssuesOptions.per_page(n)` interface for limiting search results
 
 # 0.3.12
 
