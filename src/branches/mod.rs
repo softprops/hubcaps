@@ -4,8 +4,7 @@
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
 extern crate serde_json;
 
-use self::super::{Iter, MediaType, Github, Result};
-use std::collections::BTreeMap;
+use self::super::{Iter, Github, Result};
 
 fn identity<T>(x: T) -> T {
     x
@@ -34,26 +33,22 @@ impl<'a> Branches<'a> {
 
     /// list of branches for this repo
     pub fn list(&self) -> Result<Vec<Branch>> {
-        self.github.get_media::<Vec<Branch>>(
-            &format!(
-                "/repos/{owner}/{repo}/branches",
-                owner = self.owner,
-                repo = self.repo
-            ),
-            MediaType::Preview("loki"),
-        )
+        self.github.get(&format!(
+            "/repos/{owner}/{repo}/branches",
+            owner = self.owner,
+            repo = self.repo
+        ))
     }
 
     /// provides an iterator over branches for this repo
     pub fn iter(&self) -> Result<Iter<Vec<Branch>, Branch>> {
-        self.github.iter_media(
+        self.github.iter(
             format!(
                 "/repos/{owner}/{repo}/branches",
                 owner = self.owner,
                 repo = self.repo
             ),
             identity,
-            MediaType::Preview("loki"),
         )
     }
 
@@ -62,59 +57,66 @@ impl<'a> Branches<'a> {
     where
         B: Into<String>,
     {
-        self.github.get_media(
-            &format!(
-                "/repos/{owner}/{repo}/branches/{branch}",
-                owner = self.owner,
-                repo = self.repo,
-                branch = branch.into()
-            ),
-            MediaType::Preview("loki"),
-        )
+        self.github.get(&format!(
+            "/repos/{owner}/{repo}/branches/{branch}",
+            owner = self.owner,
+            repo = self.repo,
+            branch = branch.into()
+        ))
     }
 
     /// update branch production for a given branch
-    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<Branch>
+    ///
+    /// https://developer.github.com/v3/repos/branches/#update-branch-protection
+    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<Protection>
     where
         B: Into<String>,
     {
-        let mut payload = BTreeMap::new();
-        payload.insert("protection", pro);
-        let data = serde_json::to_string(&payload)?;
-        self.github.patch_media::<Branch>(
+        self.github.put(
             &format!(
-                "/repos/{owner}/{repo}/branches/{branch}",
+                "/repos/{owner}/{repo}/branches/{branch}/protection",
                 owner = self.owner,
                 repo = self.repo,
                 branch = branch.into()
             ),
-            data.as_bytes(),
-            MediaType::Preview("loki"),
+            &serde_json::to_vec(&pro)?,
         )
     }
 }
-
 
 // representations
 
 #[derive(Debug, Deserialize)]
 pub struct Branch {
     pub name: String,
-    pub protected: bool,
-    pub protection_url: String,
-    pub protection: Protection, // todo: pub commit: CommitRef
+    pub protected: Option<bool>,
+    pub protection_url: Option<String>,
+    // todo: commit ref
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Protection {
-    pub enabled: bool,
-    /// when set to None in branch updates, github will apply a set of defaults
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub required_status_checks: Option<StatusChecks>,
+    pub enforce_admins: bool,
+    pub required_pull_request_reviews: Option<RequiredPullRequestReviews>,
+    pub restrictions: Option<Restrictions>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Restrictions {
+    pub users: Vec<String>,
+    pub teams: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct RequiredPullRequestReviews {
+    pub dismissal_restrictions: Restrictions,
+    pub dismiss_stale_reviews: bool,
+    pub require_code_owner_reviews: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct StatusChecks {
-    pub enforcement_level: String,
+    pub strict: bool,
     pub contexts: Vec<String>,
 }
