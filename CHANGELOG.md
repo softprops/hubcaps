@@ -1,3 +1,6 @@
+# 0.3.15
+
+* org team description is now an Option type
 # 0.3.14
 
 * fixed response parsing for adding branch protection

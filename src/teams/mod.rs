@@ -48,7 +48,7 @@ impl<'a> RepoTeams<'a> {
 
     /// list of teams for this repo
     pub fn list(&self) -> Result<Vec<Team>> {
-        self.github.get::<Vec<Team>>(&format!(
+        self.github.get(&format!(
             "/repos/{}/{}/teams",
             self.owner,
             self.repo
@@ -84,9 +84,7 @@ impl<'a> OrgTeams<'a> {
 
     /// list of teams for this org
     pub fn list(&self) -> Result<Vec<Team>> {
-        self.github.get::<Vec<Team>>(
-            &format!("/orgs/{}/teams", self.org),
-        )
+        self.github.get(&format!("/orgs/{}/teams", self.org))
     }
 
     /// provides an iterator over all pages of teams
@@ -126,7 +124,7 @@ pub struct Team {
     pub url: String,
     pub name: String,
     pub slug: String,
-    pub description: String,
+    pub description: Option<String>,
     pub privacy: String,
     pub members_url: String,
     pub repositories_url: String,
