@@ -51,7 +51,7 @@ pub struct AuthenticatedUser {
     pub blog: String,
     pub location: String,
     pub email: String,
-    pub hireable: String,
+    pub hireable: Option<bool>,
     pub bio: String,
     pub public_repos: u64,
     pub public_gists: u64,
