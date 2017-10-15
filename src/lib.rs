@@ -100,6 +100,7 @@ use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
 use organizations::{Organization, Organizations, UserOrganizations};
+use users::Users;
 use std::fmt;
 use url::Url;
 use std::collections::HashMap;
@@ -251,6 +252,13 @@ impl Github {
     /// associated with the current authentication credentials is in
     pub fn orgs(&self) -> Organizations {
         Organizations::new(self)
+    }
+
+    /// Return a reference to an interface that provides access
+    /// to user information.
+    pub fn users(&self) -> Users
+    {
+        Users::new(self)
     }
 
     /// Return a reference to the collection of organizations a user
