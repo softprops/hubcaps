@@ -256,8 +256,7 @@ impl Github {
 
     /// Return a reference to an interface that provides access
     /// to user information.
-    pub fn users(&self) -> Users
-    {
+    pub fn users(&self) -> Users {
         Users::new(self)
     }
 

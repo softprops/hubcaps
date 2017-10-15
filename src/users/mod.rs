@@ -68,13 +68,21 @@ pub struct Users<'a> {
 
 impl<'a> Users<'a> {
     pub fn new(github: &'a Github) -> Users<'a> {
-        Users {
-            github: github,
-        }
+        Users { github: github }
     }
 
     /// Information about current authenticated user
     pub fn authenticated(&self) -> Result<AuthenticatedUser> {
-        self.github.get::<AuthenticatedUser>(&"/user")
+        self.github.get::<AuthenticatedUser>("/user")
+    }
+
+    pub fn get<U>(&self, username: U) -> Result<User>
+    where
+        U: Into<String>,
+    {
+        self.github.get(&format!(
+            "/users/{username}",
+            username = username.into()
+        ))
     }
 }
