@@ -1,3 +1,7 @@
+# 0.3.16
+
+* added users api interfaces [@dpc](https://github.com/softprops/hubcaps/pull/90)
+
 # 0.3.15
 
 * org team description is now an Option type
