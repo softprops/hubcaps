@@ -47,7 +47,7 @@ pub struct AuthenticatedUser {
 
     // extend over `User`:
     pub name: String,
-    pub company: String,
+    pub company: Option<String>,
     pub blog: String,
     pub location: String,
     pub email: String,
