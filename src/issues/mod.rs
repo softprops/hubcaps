@@ -151,6 +151,11 @@ impl<'a> IssueRef<'a> {
         }
     }
 
+    /// Request an issue's information
+    pub fn get(&self) -> Result<Issue> {
+        self.github.get::<Issue>(&self.path(""))
+    }
+
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/issues/{}{}",
