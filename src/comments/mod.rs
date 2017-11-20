@@ -1,23 +1,29 @@
 //! Comments interface
 
 extern crate serde_json;
+extern crate futures;
 
-use super::{Github, Result};
+use {Github, Future};
+use futures::future;
+use hyper::client::Connect;
 use std::collections::HashMap;
 use url::form_urlencoded;
 use users::User;
 
 /// A structure for interfacing with a issue comments
-pub struct Comments<'a> {
-    github: &'a Github,
+pub struct Comments<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> Comments<'a> {
+impl<C: Clone + Connect> Comments<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> Comments<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -31,18 +37,21 @@ impl<'a> Comments<'a> {
     }
 
     /// add a new comment
-    pub fn create(&self, comment: &CommentOptions) -> Result<Comment> {
-        let data = serde_json::to_string(&comment)?;
-        self.github.post::<Comment>(&self.path(), data.as_bytes())
+    pub fn create(&self, comment: &CommentOptions) -> Future<Comment> {
+        let data = match serde_json::to_vec(&comment) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
+        self.github.post(&self.path(), data)
     }
 
     /// list pull requests
-    pub fn list(&self, options: &CommentListOptions) -> Result<Vec<Comment>> {
+    pub fn list(&self, options: &CommentListOptions) -> Future<Vec<Comment>> {
         let mut uri = vec![self.path()];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Comment>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 
     fn path(&self) -> String {

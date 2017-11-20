@@ -1,6 +1,8 @@
 //! Pull Commits interface
 
-use super::{Github, Result, Iter};
+use hyper::client::Connect;
+
+use {Github, /*Iter,*/ Future};
 use users::User;
 
 fn identity<T>(x: T) -> T {
@@ -8,16 +10,19 @@ fn identity<T>(x: T) -> T {
 }
 
 /// A structure for interfacing with a pull commits
-pub struct PullCommits<'a> {
-    github: &'a Github,
+pub struct PullCommits<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> PullCommits<'a> {
+impl<C: Clone + Connect> PullCommits<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullCommits<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -31,7 +36,7 @@ impl<'a> PullCommits<'a> {
     }
 
     /// list pull commits
-    pub fn list(&self) -> Result<Vec<PullCommit>> {
+    pub fn list(&self) -> Future<Vec<PullCommit>> {
         let uri = format!(
             "/repos/{}/{}/pulls/{}/commits",
             self.owner,
@@ -41,7 +46,7 @@ impl<'a> PullCommits<'a> {
         self.github.get::<Vec<PullCommit>>(&uri)
     }
 
-    /// provides an iterator over all pages of pull commits
+    /*/// provides an iterator over all pages of pull commits
     pub fn iter(&'a self) -> Result<Iter<'a, Vec<PullCommit>, PullCommit>> {
         let uri = format!(
             "/repos/{}/{}/pulls/{}/commits",
@@ -50,7 +55,7 @@ impl<'a> PullCommits<'a> {
             self.number
         );
         self.github.iter(uri, identity)
-    }
+    }*/
 }
 
 // representations

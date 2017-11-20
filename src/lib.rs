@@ -54,20 +54,31 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
+extern crate futures;
 #[macro_use]
 extern crate error_chain;
 #[macro_use]
 extern crate log;
-#[macro_use]
 extern crate hyper;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 extern crate url;
+extern crate tokio_core;
+#[cfg(feature = "tls")]
+extern crate hyper_tls;
 
-// all the modules!
+#[cfg(feature = "tls")]
+use hyper_tls::HttpsConnector;
+
+use std::fmt;
+
+use futures::{Stream as StdStream, Future as StdFuture, IntoFuture};
 use serde::de::DeserializeOwned;
+use tokio_core::reactor::Handle;
+use url::Url;
+
 pub mod branches;
 pub mod git;
 pub mod users;
@@ -85,30 +96,34 @@ pub mod releases;
 pub mod repositories;
 pub mod statuses;
 pub mod pulls;
-pub mod search;
+//pub mod search;
 pub mod teams;
 pub mod organizations;
 
 pub use errors::{Error, ErrorKind, Result};
+
 use gists::{Gists, UserGists};
-use search::Search;
+//use search::Search;
+use hyper::client::{Connect, HttpConnector};
 use hyper::Client;
-use hyper::client::RequestBuilder;
-use hyper::method::Method;
-use hyper::header::{qitem, Accept, Authorization, UserAgent};
+use hyper::client::Request;
+use hyper::Method;
+use hyper::header::{qitem, Accept, Authorization, UserAgent, Link};
 use hyper::mime::Mime;
-use hyper::status::StatusCode;
-use repositories::{Repository, Repositories, UserRepositories, OrganizationRepositories};
+use repositories::{Repositories, OrganizationRepositories, UserRepositories, Repository};
 use organizations::{Organization, Organizations, UserOrganizations};
 use users::Users;
-use std::fmt;
-use url::Url;
-use std::collections::HashMap;
 
 /// Link header type
-header! { (Link, "Link") => [String] }
+//header! { (Link, "Link") => [String] }
 
 const DEFAULT_HOST: &'static str = "https://api.github.com";
+
+/// A type alias for `Futures` that may return `travis::Errors`
+pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
+
+/// A type alias for `Streams` that may result in `travis::Errors`
+pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
 
 /// alias for Result that infers hubcaps::Error as Err
 // pub type Result<T> = std::result::Result<T, Error>;
@@ -166,7 +181,7 @@ impl Default for SortDirection {
 }
 
 /// Various forms of authentication credentials supported by Github
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Credentials {
     /// No authentication (the default)
     None,
@@ -185,140 +200,139 @@ impl Default for Credentials {
 }
 
 /// Entry point interface for interacting with Github API
-pub struct Github {
+#[derive(Clone, Debug)]
+pub struct Github<C>
+where
+    C: Clone + Connect,
+{
     host: String,
     agent: String,
-    client: Client,
+    client: Client<C>,
     credentials: Credentials,
 }
 
-impl Github {
-    /// Create a new Github instance. This will typically be how you interface with all
-    /// other operations
-    pub fn new<A>(agent: A, client: Client, credentials: Credentials) -> Github
+#[cfg(feature = "tls")]
+impl Github<HttpsConnector<HttpConnector>> {
+    pub fn new<A>(agent: A, credentials: Credentials, handle: &Handle) -> Self
     where
         A: Into<String>,
     {
-        Github::host(DEFAULT_HOST, agent, client, credentials)
+        Self::host(DEFAULT_HOST, agent, credentials, handle)
     }
 
-    /// Create a new Github instance hosted at a custom location.
-    /// Useful for github enterprise installations ( yourdomain.com/api/v3/ )
-    pub fn host<H, A>(host: H, agent: A, client: Client, credentials: Credentials) -> Github
+    pub fn host<H, A>(host: H, agent: A, credentials: Credentials, handle: &Handle) -> Self
     where
         H: Into<String>,
         A: Into<String>,
     {
-        Github {
+        let connector = HttpsConnector::new(4, handle).unwrap();
+        let http = Client::configure()
+            .connector(connector)
+            .keep_alive(true)
+            .build(handle);
+        Self::custom(host, agent, credentials, http)
+    }
+}
+
+impl<C> Github<C>
+where
+    C: Clone + Connect,
+{
+    pub fn custom<H, A>(host: H, agent: A, credentials: Credentials, http: Client<C>) -> Self
+    where
+        H: Into<String>,
+        A: Into<String>,
+    {
+        Self {
             host: host.into(),
             agent: agent.into(),
-            client: client,
+            client: http,
             credentials: credentials,
         }
     }
 
     /// Return a reference to a Github repository
-    pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository
+    pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository<C>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        Repository::new(self, owner, repo)
+        Repository::new(self.clone(), owner, repo)
     }
 
     /// Return a reference to the collection of repositories owned by and
     /// associated with an owner
-    pub fn user_repos<S>(&self, owner: S) -> UserRepositories
+    pub fn user_repos<S>(&self, owner: S) -> UserRepositories<C>
     where
         S: Into<String>,
     {
-        UserRepositories::new(self, owner)
+        UserRepositories::new(self.clone(), owner)
     }
 
     /// Return a reference to the collection of repositories owned by the user
     /// associated with the current authentication credentials
-    pub fn repos(&self) -> Repositories {
-        Repositories::new(self)
+    pub fn repos(&self) -> Repositories<C> {
+        Repositories::new(self.clone())
     }
 
-    pub fn org<O>(&self, org: O) -> Organization
+    pub fn org<O>(&self, org: O) -> Organization<C>
     where
         O: Into<String>,
     {
-        Organization::new(self, org)
+        Organization::new(self.clone(), org)
     }
 
     /// Return a reference to the collection of organizations that the user
     /// associated with the current authentication credentials is in
-    pub fn orgs(&self) -> Organizations {
-        Organizations::new(self)
+    pub fn orgs(&self) -> Organizations<C> {
+        Organizations::new(self.clone())
     }
 
     /// Return a reference to an interface that provides access
     /// to user information.
-    pub fn users(&self) -> Users {
-        Users::new(self)
+    pub fn users(&self) -> Users<C> {
+        Users::new(self.clone())
     }
 
     /// Return a reference to the collection of organizations a user
     /// is publicly associated with
-    pub fn user_orgs<U>(&self, user: U) -> UserOrganizations
+    pub fn user_orgs<U>(&self, user: U) -> UserOrganizations<C>
     where
         U: Into<String>,
     {
-        UserOrganizations::new(self, user)
+        UserOrganizations::new(self.clone(), user)
     }
 
     /// Return a reference to an interface that provides access to a user's gists
-    pub fn user_gists<O>(&self, owner: O) -> UserGists
+    pub fn user_gists<O>(&self, owner: O) -> UserGists<C>
     where
         O: Into<String>,
     {
-        UserGists::new(self, owner)
+        UserGists::new(self.clone(), owner)
     }
 
     /// Return a reference to an interface that provides access to the
     /// gists belonging to the owner of the token used to configure this client
-    pub fn gists(&self) -> Gists {
-        Gists::new(self)
+    pub fn gists(&self) -> Gists<C> {
+        Gists::new(self.clone())
     }
 
-    /// Return a reference to an interface that provides access to search operations
+    /*/// Return a reference to an interface that provides access to search operations
     pub fn search(&self) -> Search {
         Search::new(self)
-    }
+    }*/
 
     /// Return a reference to the collection of repositories owned by and
     /// associated with an organization
-    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
+    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories<C>
     where
         O: Into<String>,
     {
-        OrganizationRepositories::new(self, org)
-    }
-
-    fn authenticate(&self, method: Method, url: String) -> RequestBuilder {
-        match self.credentials {
-            Credentials::Token(ref token) => {
-                self.client.request(method, &url).header(Authorization(
-                    format!("token {}", token),
-                ))
-            }
-            Credentials::Client(ref id, ref secret) => {
-
-                let mut parsed = Url::parse(&url).unwrap();
-                parsed
-                    .query_pairs_mut()
-                    .append_pair("client_id", id)
-                    .append_pair("client_secret", secret);
-                self.client.request(method, parsed)
-            }
-            Credentials::None => self.client.request(method, &url),
-        }
+        OrganizationRepositories::new(self.clone(), org)
     }
 
 
-    fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
+    /*fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
     where
         D: DeserializeOwned,
     {
@@ -335,96 +349,115 @@ impl Github {
         D: DeserializeOwned,
     {
         Iter::new(self, self.host.clone() + &uri, into_items, media_type)
-    }
+    }*/
 
-    fn request<D>(
+    fn request<Out>(
         &self,
         method: Method,
         uri: String,
-        body: Option<&[u8]>,
+        body: Option<Vec<u8>>,
         media_type: MediaType,
-    ) -> Result<(Option<Links>, D)>
+    ) -> Future<(Option<Link>, Out)>
     where
-        D: DeserializeOwned,
+        Out: DeserializeOwned + 'static,
     {
-        let builder = self.authenticate(method, uri)
-            .header(UserAgent(self.agent.to_owned()))
-            .header(Accept(vec![qitem(From::from(media_type))]));
-
-        let res = (match body {
-                       Some(ref bod) => builder.body(*bod).send(),
-                       _ => builder.send(),
-                   })?;
-
-        let links = res.headers.get::<Link>().map(|&Link(ref value)| {
-            Links::new(value.to_owned())
-        });
-
-        debug!("rec response {:?}", res);
-        match res.status {
-            StatusCode::Conflict |
-            StatusCode::BadRequest |
-            StatusCode::UnprocessableEntity |
-            StatusCode::Unauthorized |
-            StatusCode::NotFound |
-            StatusCode::Forbidden => {
-                Err(
-                    ErrorKind::Fault {
-                        code: res.status,
-                        error: serde_json::from_reader(res)?,
-                    }.into(),
-                )
+        let url = if let Credentials::Client(ref id, ref secret) = self.credentials {
+            let mut parsed = Url::parse(&uri).unwrap();
+            parsed
+                .query_pairs_mut()
+                .append_pair("client_id", id)
+                .append_pair("client_secret", secret);
+            parsed.to_string().parse().into_future()
+        } else {
+            uri.parse().into_future()
+        };
+        let instance = self.clone();
+        let response = url.map_err(Error::from).and_then(move |url| {
+            let mut req = Request::new(method, url);
+            {
+                let headers = req.headers_mut();
+                headers.set(UserAgent::new(instance.agent.clone()));
+                headers.set(Accept(vec![qitem(From::from(media_type))]));
+                if let Credentials::Token(ref token) = instance.credentials {
+                    headers.set(Authorization(format!("token {}", token)))
+                }
             }
-            _ => Ok((links, serde_json::from_reader(res)?)),
-        }
+
+            if let Some(body) = body {
+                req.set_body(body)
+            }
+            instance.client.request(req).map_err(Error::from)
+        });
+        Box::new(response.and_then(move |response| {
+            let link = response.headers().get::<Link>().map(|l| l.clone());
+            let status = response.status();
+            response.body().concat2().map_err(Error::from).and_then(
+                move |body| {
+                    if status.is_success() {
+                        serde_json::from_slice::<Out>(&body)
+                            .map(|out| (link, out))
+                            .map_err(|error| ErrorKind::Codec(error).into())
+                    } else {
+                        Err(
+                            ErrorKind::Fault {
+                                code: status,
+                                error: serde_json::from_slice(&body)?,
+                            }.into(),
+                        )
+                    }
+                },
+            )
+        }))
     }
 
     fn request_entity<D>(
         &self,
         method: Method,
         uri: String,
-        body: Option<&[u8]>,
+        body: Option<Vec<u8>>,
         media_type: MediaType,
-    ) -> Result<D>
+    ) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
-        self.request(method, uri, body, media_type).map(
+        Box::new(self.request(method, uri, body, media_type).map(
             |(_, entity)| {
                 entity
             },
-        )
+        ))
     }
 
-    fn get<D>(&self, uri: &str) -> Result<D>
+    fn get<D>(&self, uri: &str) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.get_media(uri, MediaType::Json)
     }
 
-    fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
+    fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.request_entity(Method::Get, self.host.clone() + uri, None, media)
     }
 
-    fn delete(&self, uri: &str) -> Result<()> {
-        match self.request_entity::<()>(
-            Method::Delete,
-            self.host.clone() + uri,
-            None,
-            MediaType::Json,
-        ) {
-            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
-            otherwise => otherwise,
-        }
+    fn delete(&self, uri: &str) -> Future<()> {
+        Box::new(
+            self.request_entity::<()>(
+                Method::Delete,
+                self.host.clone() + uri,
+                None,
+                MediaType::Json,
+            ).or_else(|err| match err {
+                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    otherwise => Err(otherwise.into()),
+                }),
+        )
     }
 
-    fn post<D>(&self, uri: &str, message: &[u8]) -> Result<D>
+    fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.request_entity(
             Method::Post,
@@ -434,31 +467,30 @@ impl Github {
         )
     }
 
-    fn patch_media<D>(&self, uri: &str, message: &[u8], media: MediaType) -> Result<D>
+    fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
     }
 
-    fn patch<D>(&self, uri: &str, message: &[u8]) -> Result<D>
+    fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
 
-
-    fn put_no_response(&self, uri: &str, message: &[u8]) -> Result<()> {
-        match self.put(uri, message) {
-            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
-            otherwise => otherwise,
-        }
+    fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+        Box::new(self.put(uri, message).or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            err => Err(err.into()),
+        }))
     }
 
-    fn put<D>(&self, uri: &str, message: &[u8]) -> Result<D>
+    fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned,
+        D: DeserializeOwned + 'static,
     {
         self.request_entity(
             Method::Put,
@@ -470,7 +502,7 @@ impl Github {
 }
 
 /// An abstract type used for iterating over result sets
-pub struct Iter<'a, D, I> {
+/*pub struct Iter<'a, D, I> {
     github: &'a Github,
     next_link: Option<String>,
     into_items: fn(D) -> Vec<I>,
@@ -527,12 +559,11 @@ where
             })
         })
     }
-}
-
+}*/
 /// An abstract collection of Link header urls
 /// Exposes interfaces to access link relations github typically
 /// sends as headers
-#[derive(Debug)]
+/*#[derive(Debug)]
 pub struct Links {
     values: HashMap<String, String>,
 }
@@ -578,11 +609,10 @@ impl Links {
     pub fn last(&self) -> Option<String> {
         self.values.get("last").map(|s| s.to_owned())
     }
-}
-
+}*/
 #[cfg(test)]
 mod tests {
-    use super::*;
+    /*use super::*;
 
     #[test]
     fn test_parse_links() {
@@ -601,5 +631,5 @@ mod tests {
     fn default_credentials() {
         let default: Credentials = Default::default();
         assert_eq!(default, Credentials::None)
-    }
+    }*/
 }

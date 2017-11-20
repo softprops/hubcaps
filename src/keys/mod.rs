@@ -1,19 +1,25 @@
 //! Deploy keys interface
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
 //! for motivation and use
-extern crate serde_json;
 
-use self::super::{Github, Result};
+use futures::future;
+use hyper::client::Connect;
+use serde_json;
 
-pub struct Keys<'a> {
-    github: &'a Github,
+use {Github, Future};
+
+pub struct Keys<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Keys<'a> {
+impl<C: Clone + Connect> Keys<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Keys<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -29,23 +35,24 @@ impl<'a> Keys<'a> {
         format!("/repos/{}/{}/keys{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, key: &KeyOptions) -> Result<Key> {
-        let data = serde_json::to_string::<KeyOptions>(key)?;
-        self.github.post::<Key>(&self.path(""), data.as_bytes())
+    pub fn create(&self, key: &KeyOptions) -> Future<Key> {
+        let data = match serde_json::to_vec(key) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
+        self.github.post(&self.path(""), data)
     }
 
-    pub fn list(&self) -> Result<Vec<Key>> {
-        self.github.get::<Vec<Key>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<Key>> {
+        self.github.get(&self.path(""))
     }
 
-    pub fn get(&self, id: u64) -> Result<Key> {
-        self.github.get::<Key>(&self.path(&format!("/{}", id)))
+    pub fn get(&self, id: u64) -> Future<Key> {
+        self.github.get(&self.path(&format!("/{}", id)))
     }
 
-    pub fn delete(&self, id: u64) -> Result<()> {
-        self.github.delete(&self.path(&format!("/{}", id))).map(
-            |_| (),
-        )
+    pub fn delete(&self, id: u64) -> Future<()> {
+        self.github.delete(&self.path(&format!("/{}", id)))
     }
 }
 

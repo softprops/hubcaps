@@ -2,24 +2,31 @@
 //!
 //! For more information, visit the official
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
+extern crate futures;
 extern crate serde_json;
 
-use self::super::{Iter, Github, Result};
+use hyper::client::Connect;
+use futures::future;
+
+use {/*Iter,*/ Github, Future};
 
 fn identity<T>(x: T) -> T {
     x
 }
 
 /// reference to gists associated with a github user
-pub struct Branches<'a> {
-    github: &'a Github,
+pub struct Branches<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Branches<'a> {
+impl<C: Clone + Connect> Branches<C> {
     #[doc(hidden)]
-    pub fn new<U, R>(github: &'a Github, owner: U, repo: R) -> Self
+    pub fn new<U, R>(github: Github<C>, owner: U, repo: R) -> Self
     where
         U: Into<String>,
         R: Into<String>,
@@ -32,7 +39,7 @@ impl<'a> Branches<'a> {
     }
 
     /// list of branches for this repo
-    pub fn list(&self) -> Result<Vec<Branch>> {
+    pub fn list(&self) -> Future<Vec<Branch>> {
         self.github.get(&format!(
             "/repos/{owner}/{repo}/branches",
             owner = self.owner,
@@ -41,7 +48,7 @@ impl<'a> Branches<'a> {
     }
 
     /// provides an iterator over branches for this repo
-    pub fn iter(&self) -> Result<Iter<Vec<Branch>, Branch>> {
+    /*pub fn iter(&self) -> Result<Iter<Vec<Branch>, Branch>> {
         self.github.iter(
             format!(
                 "/repos/{owner}/{repo}/branches",
@@ -50,10 +57,9 @@ impl<'a> Branches<'a> {
             ),
             identity,
         )
-    }
-
+    }*/
     /// gets a branch for this repo by name
-    pub fn get<B>(&self, branch: B) -> Result<Branch>
+    pub fn get<B>(&self, branch: B) -> Future<Branch>
     where
         B: Into<String>,
     {
@@ -68,10 +74,14 @@ impl<'a> Branches<'a> {
     /// update branch production for a given branch
     ///
     /// https://developer.github.com/v3/repos/branches/#update-branch-protection
-    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Result<ProtectionState>
+    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Future<ProtectionState>
     where
         B: Into<String>,
     {
+        let bytes = match serde_json::to_vec(&pro) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
         self.github.put(
             &format!(
                 "/repos/{owner}/{repo}/branches/{branch}/protection",
@@ -79,7 +89,7 @@ impl<'a> Branches<'a> {
                 repo = self.repo,
                 branch = branch.into()
             ),
-            &serde_json::to_vec(&pro)?,
+            bytes,
         )
     }
 }

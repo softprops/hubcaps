@@ -1,19 +1,24 @@
 //! Review comments interface
 
-use super::{Github, Result};
+use hyper::client::Connect;
+
+use {Github, Future};
 use users::User;
 
 /// A structure for interfacing with a issue comments
-pub struct ReviewComments<'a> {
-    github: &'a Github,
+pub struct ReviewComments<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> ReviewComments<'a> {
+impl<C: Clone + Connect> ReviewComments<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> ReviewComments<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -27,7 +32,7 @@ impl<'a> ReviewComments<'a> {
     }
 
     /// list pull requests
-    pub fn list(&self) -> Result<Vec<ReviewComment>> {
+    pub fn list(&self) -> Future<Vec<ReviewComment>> {
         self.github.get::<Vec<ReviewComment>>(&format!(
             "/repos/{}/{}/pulls/{}/comments",
             self.owner,

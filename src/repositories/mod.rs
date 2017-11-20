@@ -1,25 +1,27 @@
 //! Repository interface
 extern crate serde_json;
+extern crate futures;
 
-use self::super::{Iter, Github, Result};
+use std::collections::HashMap;
+use std::fmt;
+
+use futures::future;
+use hyper::client::Connect;
+use url::form_urlencoded;
+
+use {/*Iter,*/ Github, Future, SortDirection};
 use branches::Branches;
 use git::Git;
 use hooks::Hooks;
 use deployments::Deployments;
 use keys::Keys;
-use issues::{IssueRef, Issues};
+/*use issues::{IssueRef, Issues};*/
 use labels::Labels;
-use pulls::PullRequests;
+/*use pulls::PullRequests;*/
 use releases::Releases;
 use teams::RepoTeams;
 use statuses::Statuses;
 use users::User;
-
-use std::fmt;
-use super::SortDirection;
-use url::form_urlencoded;
-use std::collections::HashMap;
-use url::Url;
 
 fn identity<T>(x: T) -> T {
     x
@@ -127,14 +129,18 @@ impl fmt::Display for OrgRepoType {
     }
 }
 
-pub struct Repositories<'a> {
-    github: &'a Github,
+#[derive(Clone)]
+pub struct Repositories<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
 }
 
-impl<'a> Repositories<'a> {
+impl<C: Clone + Connect> Repositories<C> {
     #[doc(hidden)]
-    pub fn new(github: &'a Github) -> Repositories<'a> {
-        Repositories { github: github }
+    pub fn new(github: Github<C>) -> Self {
+        Self { github }
     }
 
     fn path(&self, more: &str) -> String {
@@ -143,21 +149,24 @@ impl<'a> Repositories<'a> {
 
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
-        let data = serde_json::to_string(&repo)?;
-        self.github.post::<Repo>(&self.path(""), data.as_bytes())
+    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
+        let data = match serde_json::to_vec(&repo) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
+        self.github.post::<Repo>(&self.path(""), data)
     }
 
     /// list the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn list(&self, options: &RepoListOptions) -> Result<Vec<Repo>> {
+    pub fn list(&self, options: &RepoListOptions) -> Future<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
-
+    /*
     /// provides an iterator over all pages of the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
     pub fn iter(&self, options: &RepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
@@ -166,18 +175,21 @@ impl<'a> Repositories<'a> {
             uri.push(query);
         }
         self.github.iter(uri.join("?"), identity)
-    }
+    }*/
 }
 
 /// Provides access to the authenticated user's repositories
-pub struct OrgRepositories<'a> {
-    github: &'a Github,
+pub struct OrgRepositories<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     org: String,
 }
 
-impl<'a> OrgRepositories<'a> {
+impl<C: Clone + Connect> OrgRepositories<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, org: O) -> Self
+    pub fn new<O>(github: Github<C>, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -192,7 +204,7 @@ impl<'a> OrgRepositories<'a> {
     }
 
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrgRepoListOptions) -> Result<Vec<Repo>> {
+    pub fn list(&self, options: &OrgRepoListOptions) -> Future<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -200,7 +212,7 @@ impl<'a> OrgRepositories<'a> {
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
 
-    /// provides an iterator over all pages of an orgs's repositories
+    /*/// provides an iterator over all pages of an orgs's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
     pub fn iter(&self, options: &OrgRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
         let mut uri = vec![self.path("")];
@@ -208,25 +220,31 @@ impl<'a> OrgRepositories<'a> {
             uri.push(query);
         }
         self.github.iter(uri.join("?"), identity)
-    }
+    }*/
 
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Result<Repo> {
-        let data = serde_json::to_string(&repo)?;
-        self.github.post::<Repo>(&self.path(""), data.as_bytes())
+    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
+        let data = match serde_json::to_vec(&repo) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
+        self.github.post::<Repo>(&self.path(""), data)
     }
 }
 
 /// Provides access to the authenticated user's repositories
-pub struct UserRepositories<'a> {
-    github: &'a Github,
+pub struct UserRepositories<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
 }
 
-impl<'a> UserRepositories<'a> {
+impl<C: Connect + Clone> UserRepositories<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, owner: O) -> UserRepositories<'a>
+    pub fn new<O>(github: Github<C>, owner: O) -> Self
     where
         O: Into<String>,
     {
@@ -241,7 +259,7 @@ impl<'a> UserRepositories<'a> {
     }
 
     /// https://developer.github.com/v3/repos/#list-user-repositories
-    pub fn list(&self, options: &UserRepoListOptions) -> Result<Vec<Repo>> {
+    pub fn list(&self, options: &UserRepoListOptions) -> Future<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -249,7 +267,7 @@ impl<'a> UserRepositories<'a> {
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
 
-    /// provides an iterator over all pages of a user's repositories
+    /*/// provides an iterator over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
     pub fn iter(&self, options: &UserRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
         let mut uri = vec![self.path("")];
@@ -257,18 +275,21 @@ impl<'a> UserRepositories<'a> {
             uri.push(query);
         }
         self.github.iter(uri.join("?"), identity)
-    }
+    }*/
 }
 
 /// Provides access to an organization's repositories
-pub struct OrganizationRepositories<'a> {
-    github: &'a Github,
+pub struct OrganizationRepositories<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     org: String,
 }
 
-impl<'a> OrganizationRepositories<'a> {
+impl<C: Clone + Connect> OrganizationRepositories<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, org: O) -> OrganizationRepositories<'a>
+    pub fn new<O>(github: Github<C>, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -284,7 +305,7 @@ impl<'a> OrganizationRepositories<'a> {
 
     /// list an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrganizationRepoListOptions) -> Result<Vec<Repo>> {
+    pub fn list(&self, options: &OrganizationRepoListOptions) -> Future<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -292,7 +313,7 @@ impl<'a> OrganizationRepositories<'a> {
         self.github.get::<Vec<Repo>>(&uri.join("?"))
     }
 
-    /// Provides an iterator over all pages of an organization's repositories
+    /*/// Provides an iterator over all pages of an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
     pub fn iter(&self, options: &OrganizationRepoListOptions) -> Result<Iter<Vec<Repo>, Repo>> {
         let mut uri = vec![self.path("")];
@@ -300,18 +321,21 @@ impl<'a> OrganizationRepositories<'a> {
             uri.push(query);
         }
         self.github.iter(uri.join("?"), identity)
-    }
+    }*/
 }
 
-pub struct Repository<'a> {
-    github: &'a Github,
+pub struct Repository<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Repository<'a> {
+impl<C: Clone + Connect> Repository<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Repository<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -327,41 +351,45 @@ impl<'a> Repository<'a> {
         format!("/repos/{}/{}{}", self.owner, self.repo, more)
     }
 
-    /// get a reference to branch operations
-    pub fn branches(&self) -> Branches {
-        Branches::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }
-
-    /// get a reference to git operations
-    pub fn git(&self) -> Git {
-        Git::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }
-
-    /// get a reference to repo hook operations
-    pub fn hooks(&self) -> Hooks {
-        Hooks::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }
-
     /// get a reference to the GitHub repository object that this `Repository` refers to
-    pub fn get(&self) -> Result<Repo> {
+    pub fn get(&self) -> Future<Repo> {
         self.github.get(&self.path(""))
     }
 
     /// https://developer.github.com/v3/repos/#edit
-    pub fn edit(&self, options: &RepoEditOptions) -> Result<Repo> {
-        let data = serde_json::to_string(&options)?;
+    pub fn edit(&self, options: &RepoEditOptions) -> Future<Repo> {
+        let data = match serde_json::to_vec(&options) {
+            Ok(data) => data,
+            Err(err) => return Box::new(future::err(err.into())),
+        };
         // Note that this intentionally calls POST rather than PATCH,
         // even though the docs say PATCH.
         // In my tests (changing the default branch) POST works while PATCH doesn't.
-        self.github.post::<Repo>(&&self.path(""), data.as_bytes())
+        self.github.post::<Repo>(&self.path(""), data)
     }
+
+    /// get a reference to branch operations
+    pub fn branches(&self) -> Branches<C> {
+        Branches::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to git operations
+    pub fn git(&self) -> Git<C> {
+        Git::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to repo hook operations
+    pub fn hooks(&self) -> Hooks<C> {
+        Hooks::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
 
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
     /// associated with this repository ref
-    pub fn deployments(&self) -> Deployments {
-        Deployments::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn deployments(&self) -> Deployments<C> {
+        Deployments::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
-
+    /*
     /// get a reference to a specific github issue associated with this repository ref
     pub fn issue(&self, number: u64) -> IssueRef {
         IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
@@ -370,44 +398,43 @@ impl<'a> Repository<'a> {
     /// get a reference to github issues associated with this repository ref
     pub fn issues(&self) -> Issues {
         Issues::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }
+    }*/
 
     /// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)
     /// associated with this repository ref
-    pub fn keys(&self) -> Keys {
-        Keys::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn keys(&self) -> Keys<C> {
+        Keys::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a list of labels associated with this repository ref
-    pub fn labels(&self) -> Labels {
-        Labels::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn labels(&self) -> Labels<C> {
+        Labels::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
-
+    /*
     /// get a list of [pulls](https://developer.github.com/v3/pulls/)
     /// associated with this repository ref
     pub fn pulls(&self) -> PullRequests {
         PullRequests::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }
+    }*/
 
     /// get a reference to [releases](https://developer.github.com/v3/repos/releases/)
     /// associated with this repository ref
-    pub fn releases(&self) -> Releases {
-        Releases::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn releases(&self) -> Releases<C> {
+        Releases::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [statuses](https://developer.github.com/v3/repos/statuses/)
     /// associated with this repository ref
-    pub fn statuses(&self) -> Statuses {
-        Statuses::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn statuses(&self) -> Statuses<C> {
+        Statuses::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)
     /// associated with this repository ref
-    pub fn teams(&self) -> RepoTeams {
-        RepoTeams::new(self.github, self.owner.as_str(), self.repo.as_str())
+    pub fn teams(&self) -> RepoTeams<C> {
+        RepoTeams::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 }
-
 
 // representations
 
@@ -481,6 +508,7 @@ pub struct Repo {
 }
 
 impl Repo {
+    /*
     /// Returns a map containing the
     /// [languages](https://developer.github.com/v3/repos/#list-languages) that the repository is
     /// implemented in.
@@ -491,7 +519,7 @@ impl Repo {
         let url = Url::parse(&self.languages_url).unwrap();
         let uri: String = url.path().into();
         github.get(&uri)
-    }
+    }*/
 }
 
 

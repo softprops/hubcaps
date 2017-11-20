@@ -1,18 +1,23 @@
 //! Organizations interface
 
-use self::super::{Github, Result};
-use teams::OrgTeams;
+use hyper::client::Connect;
+
+use {Github, Future};
 use repositories::OrgRepositories;
+use teams::OrgTeams;
 
 /// Provides access to label operations available for an individual organization
-pub struct Organization<'a> {
-    github: &'a Github,
+pub struct Organization<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     org: String,
 }
 
-impl<'a> Organization<'a> {
+impl<C: Clone + Connect> Organization<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, org: O) -> Self
+    pub fn new<O>(github: Github<C>, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -23,25 +28,28 @@ impl<'a> Organization<'a> {
     }
 
     /// returns a reference to an interface for team operations
-    pub fn teams(&self) -> OrgTeams {
-        OrgTeams::new(self.github, self.org.clone())
+    pub fn teams(&self) -> OrgTeams<C> {
+        OrgTeams::new(self.github.clone(), self.org.clone())
     }
 
     /// returns a reference to an interface for repo operations
-    pub fn repos(&self) -> OrgRepositories {
-        OrgRepositories::new(self.github, self.org.clone())
+    pub fn repos(&self) -> OrgRepositories<C> {
+        OrgRepositories::new(self.github.clone(), self.org.clone())
     }
 }
 
 
-pub struct Organizations<'a> {
-    github: &'a Github,
+pub struct Organizations<C>
+where
+    C: Connect + Clone,
+{
+    github: Github<C>,
 }
 
-impl<'a> Organizations<'a> {
+impl<C: Connect + Clone> Organizations<C> {
     #[doc(hidden)]
-    pub fn new(github: &'a Github) -> Organizations<'a> {
-        Organizations { github: github }
+    pub fn new(github: Github<C>) -> Self {
+        Self { github }
     }
 
     fn path(&self, more: &str) -> String {
@@ -50,18 +58,21 @@ impl<'a> Organizations<'a> {
 
     /// list the authenticated user's organizations
     /// https://developer.github.com/v3/orgs/#list-your-organizations
-    pub fn list(&self) -> Result<Vec<Org>> {
-        self.github.get::<Vec<Org>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<Org>> {
+        self.github.get(&self.path(""))
     }
 }
 
-pub struct UserOrganizations<'a> {
-    github: &'a Github,
+pub struct UserOrganizations<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     user: String,
 }
 
-impl<'a> UserOrganizations<'a> {
-    pub fn new<U>(github: &'a Github, user: U) -> UserOrganizations<'a>
+impl<C: Clone + Connect> UserOrganizations<C> {
+    pub fn new<U>(github: Github<C>, user: U) -> Self
     where
         U: Into<String>,
     {
@@ -77,8 +88,8 @@ impl<'a> UserOrganizations<'a> {
 
     /// list the organizations this user is publicly associated with
     /// https://developer.github.com/v3/orgs/#list-user-organizations
-    pub fn list(&self) -> Result<Vec<Org>> {
-        self.github.get::<Vec<Org>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<Org>> {
+        self.github.get(&self.path(""))
     }
 }
 
