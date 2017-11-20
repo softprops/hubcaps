@@ -38,11 +38,7 @@ impl<C: Clone + Connect> Comments<C> {
 
     /// add a new comment
     pub fn create(&self, comment: &CommentOptions) -> Future<Comment> {
-        let data = match serde_json::to_vec(&comment) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(), data)
+        self.github.post(&self.path(), json!(comment))
     }
 
     /// list pull requests

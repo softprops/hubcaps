@@ -102,11 +102,7 @@ impl<C: Clone + Connect> PullRequest<C> {
 
     /// Edit a pull request
     pub fn edit(&self, pr: &PullEditOptions) -> Future<Pull> {
-        let data = match serde_json::to_vec(&pr) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.patch::<Pull>(&self.path(""), data)
+        self.github.patch::<Pull>(&self.path(""), json!(pr))
     }
 
     /// Returns a vector of file diffs associated with this pull
@@ -185,11 +181,7 @@ impl<C: Clone + Connect> PullRequests<C> {
 
     /// Create a new pull request
     pub fn create(&self, pr: &PullOptions) -> Future<Pull> {
-        let data = match serde_json::to_vec(&pr) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(pr))
     }
 
     /// list pull requests

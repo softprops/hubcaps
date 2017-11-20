@@ -68,11 +68,7 @@ impl<C: Clone + Connect> DeploymentStatuses<C> {
     /// creates a new deployment status. For convenience, a DeploymentStatusOptions.builder
     /// interface is required for building up a request
     pub fn create(&self, status: &DeploymentStatusOptions) -> Future<DeploymentStatus> {
-        let data = match serde_json::to_vec(&status) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(status))
     }
 }
 
@@ -105,11 +101,7 @@ impl<C: Clone + Connect> Deployments<C> {
 
     /// creates a new deployment for this repository
     pub fn create(&self, dep: &DeploymentOptions) -> Future<Deployment> {
-        let data = match serde_json::to_vec(&dep) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(dep))
     }
 
     /// get a reference to the statuses api for a give deployment

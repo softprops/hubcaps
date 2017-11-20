@@ -108,11 +108,7 @@ impl<C: Clone + Connect> Gists<C> {
     }
 
     pub fn create(&self, gist: &GistOptions) -> Future<Gist> {
-        let data = match serde_json::to_vec(&gist) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(gist))
     }
 
     // todo: edit

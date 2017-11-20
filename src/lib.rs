@@ -78,6 +78,8 @@ use futures::{Stream as StdStream, Future as StdFuture, IntoFuture};
 use serde::de::DeserializeOwned;
 use tokio_core::reactor::Handle;
 use url::Url;
+#[macro_use]
+mod macros;
 
 pub mod branches;
 pub mod git;

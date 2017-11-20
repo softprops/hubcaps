@@ -35,21 +35,13 @@ impl<C: Connect + Clone> Labels<C> {
     }
 
     pub fn create(&self, lab: &LabelOptions) -> Future<Label> {
-        let data = match serde_json::to_vec(&lab) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(lab))
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Future<Label> {
-        let data = match serde_json::to_vec(&lab) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         self.github.patch(
             &self.path(&format!("/{}", prevname)),
-            data,
+            json!(lab),
         )
     }
 

@@ -119,14 +119,9 @@ impl<C: Clone + Connect> OrgTeams<C> {
     {
         let mut payload = BTreeMap::new();
         payload.insert("permission", permission.to_string());
-        //let data = serde_json::to_string(&payload)?;
-        let data = match serde_json::to_vec(&payload) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         self.github.put_no_response(
             &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
-            data,
+            json!(payload),
         )
     }
 }

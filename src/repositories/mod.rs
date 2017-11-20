@@ -150,11 +150,7 @@ impl<C: Clone + Connect> Repositories<C> {
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
     pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
-        let data = match serde_json::to_vec(&repo) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post::<Repo>(&self.path(""), data)
+        self.github.post::<Repo>(&self.path(""), json!(repo))
     }
 
     /// list the authenticated users repositories
@@ -225,11 +221,7 @@ impl<C: Clone + Connect> OrgRepositories<C> {
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
     pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
-        let data = match serde_json::to_vec(&repo) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post::<Repo>(&self.path(""), data)
+        self.github.post(&self.path(""), json!(repo))
     }
 }
 
@@ -358,14 +350,10 @@ impl<C: Clone + Connect> Repository<C> {
 
     /// https://developer.github.com/v3/repos/#edit
     pub fn edit(&self, options: &RepoEditOptions) -> Future<Repo> {
-        let data = match serde_json::to_vec(&options) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         // Note that this intentionally calls POST rather than PATCH,
         // even though the docs say PATCH.
         // In my tests (changing the default branch) POST works while PATCH doesn't.
-        self.github.post::<Repo>(&self.path(""), data)
+        self.github.post(&self.path(""), json!(options))
     }
 
     /// get a reference to branch operations

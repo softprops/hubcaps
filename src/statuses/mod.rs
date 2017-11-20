@@ -38,11 +38,10 @@ impl<C: Clone + Connect> Statuses<C> {
 
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusOptions) -> Future<Status> {
-        let data = match serde_json::to_vec(&status) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(&format!("/{}", sha)), data)
+        self.github.post(
+            &self.path(&format!("/{}", sha)),
+            json!(status),
+        )
     }
 
     /// lists all statuses associated with a given git sha

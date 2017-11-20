@@ -101,11 +101,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
 
     /// add a set of labels to this issue ref
     pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
-        let data = match serde_json::to_vec(&labels) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(labels))
     }
 
     /// remove a label from this issue
@@ -117,11 +113,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
-        let data = match serde_json::to_vec(&labels) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.put(&self.path(""), data)
+        self.github.put(&self.path(""), json!(labels))
     }
 
     /// remove all labels from an issue
@@ -177,11 +169,7 @@ impl<C: Clone + Connect> IssueRef<C> {
     }
 
     pub fn edit(&self, is: &IssueOptions) -> Future<Issue> {
-        let data = match serde_json::to_vec(&is) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.patch(&self.path(""), data)
+        self.github.patch(&self.path(""), json!(is))
     }
 
     pub fn comments(&self) -> Comments<C> {
@@ -233,11 +221,7 @@ impl<C: Clone + Connect> Issues<C> {
     }
 
     pub fn create(&self, is: &IssueOptions) -> Future<Issue> {
-        let data = match serde_json::to_vec(&is) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(is))
     }
 
     pub fn list(&self, options: &IssueListOptions) -> Future<Vec<Issue>> {

@@ -36,11 +36,7 @@ impl<C: Clone + Connect> Keys<C> {
     }
 
     pub fn create(&self, key: &KeyOptions) -> Future<Key> {
-        let data = match serde_json::to_vec(key) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(key))
     }
 
     pub fn list(&self) -> Future<Vec<Key>> {

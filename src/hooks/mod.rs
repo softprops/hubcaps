@@ -76,29 +76,17 @@ impl<C: Clone + Connect> Hooks<C> {
     /// see [github docs](https://developer.github.com/v3/repos/hooks/)
     /// for more information
     pub fn create(&self, options: &HookCreateOptions) -> Future<Hook> {
-        let data = match serde_json::to_vec(&options) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         self.github.post(
-            &format!(
-                "/repos/{}/{}/hooks",
-                self.owner,
-                self.repo
-            ),
-            data,
+            &format!("/repos/{}/{}/hooks", self.owner, self.repo),
+            json!(options),
         )
     }
 
     /// edits an existing repository hook
     pub fn edit(&self, id: u64, options: &HookEditOptions) -> Future<Hook> {
-        let data = match serde_json::to_vec(&options) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         self.github.patch(
             &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-            data,
+            json!(options),
         )
     }
 

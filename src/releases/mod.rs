@@ -136,19 +136,14 @@ impl<C: Clone + Connect> Releases<C> {
     }
 
     pub fn create(&self, rel: &ReleaseOptions) -> Future<Release> {
-        let data = match serde_json::to_vec(&rel) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.post(&self.path(""), data)
+        self.github.post(&self.path(""), json!(rel))
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
-        let data = match serde_json::to_vec(&rel) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
-        self.github.patch(&self.path(&format!("/{}", id)), data)
+        self.github.patch(
+            &self.path(&format!("/{}", id)),
+            json!(rel),
+        )
     }
 
     pub fn delete(&self, id: u64) -> Future<()> {
