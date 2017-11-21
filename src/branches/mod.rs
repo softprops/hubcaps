@@ -5,10 +5,11 @@
 extern crate futures;
 extern crate serde_json;
 
+use hyper::Method;
 use hyper::client::Connect;
 use futures::future;
 
-use {/*Iter,*/ Github, Future};
+use {/*Iter,*/ Github, Future, Stream, streamed};
 
 fn identity<T>(x: T) -> T {
     x
@@ -47,17 +48,25 @@ impl<C: Clone + Connect> Branches<C> {
         ))
     }
 
-    /// provides an iterator over branches for this repo
-    /*pub fn iter(&self) -> Result<Iter<Vec<Branch>, Branch>> {
-        self.github.iter(
-            format!(
-                "/repos/{owner}/{repo}/branches",
-                owner = self.owner,
-                repo = self.repo
+    /// provides an stream over branches for this repo
+    pub fn iter(&self) -> Stream<Branch> {
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                format!(
+                    "{host}/repos/{owner}/{repo}/branches",
+                    host = self.github.host.clone(),
+                    owner = self.owner,
+                    repo = self.repo
+                ),
+                Default::default(),
+                Default::default(),
             ),
             identity,
         )
-    }*/
+    }
+
     /// gets a branch for this repo by name
     pub fn get<B>(&self, branch: B) -> Future<Branch>
     where

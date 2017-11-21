@@ -69,18 +69,23 @@ extern crate tokio_core;
 #[cfg(feature = "tls")]
 extern crate hyper_tls;
 
-#[cfg(feature = "tls")]
-use hyper_tls::HttpsConnector;
-
 use std::fmt;
 
-use futures::{Stream as StdStream, Future as StdFuture, IntoFuture};
+use futures::{future, stream, Stream as StdStream, Future as StdFuture, IntoFuture};
+#[cfg(feature = "tls")]
+use hyper_tls::HttpsConnector;
+use hyper::client::{Connect, HttpConnector};
+use hyper::Client;
+use hyper::client::Request;
+use hyper::Method;
+use hyper::header::{qitem, Accept, Authorization, UserAgent, Link, RelationType};
+use hyper::mime::Mime;
 use serde::de::DeserializeOwned;
 use tokio_core::reactor::Handle;
 use url::Url;
+
 #[macro_use]
 mod macros;
-
 pub mod branches;
 pub mod git;
 pub mod users;
@@ -106,12 +111,6 @@ pub use errors::{Error, ErrorKind, Result};
 
 use gists::{Gists, UserGists};
 //use search::Search;
-use hyper::client::{Connect, HttpConnector};
-use hyper::Client;
-use hyper::client::Request;
-use hyper::Method;
-use hyper::header::{qitem, Accept, Authorization, UserAgent, Link};
-use hyper::mime::Mime;
 use repositories::{Repositories, OrganizationRepositories, UserRepositories, Repository};
 use organizations::{Organization, Organizations, UserOrganizations};
 use users::Users;
@@ -503,125 +502,64 @@ where
     }
 }
 
-/// An abstract type used for iterating over result sets
-/*pub struct Iter<'a, D, I> {
-    github: &'a Github,
-    next_link: Option<String>,
+fn next_link(l: Link) -> Option<String> {
+    l.values()
+        .into_iter()
+        .find(|v| {
+            v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next)
+        })
+        .map(|v| v.link().to_owned())
+}
+
+fn streamed<C, D, I>(
+    github: Github<C>,
+    first: Future<(Option<Link>, D)>,
     into_items: fn(D) -> Vec<I>,
-    items: Vec<I>,
-    media_type: MediaType,
-}
-
-impl<'a, D, I> Iter<'a, D, I>
+) -> Stream<I>
 where
-    D: DeserializeOwned,
+    D: DeserializeOwned + 'static,
+    I: 'static,
+    C: Clone + Connect,
 {
-    /// creates a new instance of an Iter
-    pub fn new(
-        github: &'a Github,
-        uri: String,
-        into_items: fn(D) -> Vec<I>,
-        media_type: MediaType,
-    ) -> Result<Iter<'a, D, I>> {
-        let (links, payload) = github.request::<D>(Method::Get, uri, None, media_type)?;
-        let mut items = into_items(payload);
-        items.reverse(); // we pop from the tail
-        Ok(Iter {
-            github: github,
-            next_link: links.and_then(|l| l.next()),
-            into_items: into_items,
-            items: items,
-            media_type: media_type,
-        })
-    }
-
-    fn set_next(&mut self, next: Option<String>) {
-        self.next_link = next;
-    }
-}
-
-impl<'a, D, I> Iterator for Iter<'a, D, I>
-where
-    D: DeserializeOwned,
-{
-    type Item = I;
-    fn next(&mut self) -> Option<I> {
-        self.items.pop().or_else(|| {
-            self.next_link.clone().and_then(|ref next_link| {
-                self.github
-                    .request::<D>(Method::Get, next_link.to_owned(), None, self.media_type)
-                    .ok()
-                    .and_then(|(links, payload)| {
-                        let mut next_items = (self.into_items)(payload);
-                        next_items.reverse(); // we pop() from the tail
-                        self.set_next(links.and_then(|l| l.next()));
-                        self.items = next_items;
-                        self.next()
-                    })
-            })
-        })
-    }
-}*/
-/// An abstract collection of Link header urls
-/// Exposes interfaces to access link relations github typically
-/// sends as headers
-/*#[derive(Debug)]
-pub struct Links {
-    values: HashMap<String, String>,
-}
-
-impl Links {
-    /// Creates a new Links instance given a raw header string value
-    pub fn new<V>(value: V) -> Links
-    where
-        V: Into<String>,
-    {
-        let values = value
-            .into()
-            .split(",")
-            .map(|link| {
-                let parts = link.split(";").collect::<Vec<_>>();
-                (
-                    parts[1].to_owned().replace(" rel=\"", "").replace("\"", ""),
-                    parts[0]
-                        .to_owned()
-                        .replace("<", "")
-                        .replace(">", "")
-                        .replace(" ", ""),
+    Box::new(
+        first
+            .map(move |(link, payload)| {
+                let mut items = into_items(payload);
+                items.reverse();
+                stream::unfold::<_, _, Future<(I, (Option<Link>, Vec<I>))>, _>(
+                    (link, items),
+                    move |(link, mut items)| match items.pop() {
+                        Some(item) => Some(Box::new(future::ok((item, (link, items))))),
+                        _ => {
+                            link.and_then(next_link).map(|url| {
+                                Box::new(
+                                    github
+                                        .request::<D>(
+                                            Method::Get,
+                                            url.to_owned(),
+                                            Default::default(),
+                                            Default::default(),
+                                        )
+                                        .map(move |(link, payload)| {
+                                            let mut items = into_items(payload);
+                                            items.reverse();
+                                            (items.pop().unwrap(), (link, items))
+                                        }),
+                                ) as
+                                    Future<(I, (Option<Link>, Vec<I>))>
+                            })
+                        }
+                    },
                 )
             })
-            .fold(HashMap::new(), |mut acc, (rel, link)| {
-                acc.insert(rel, link);
-                acc
-            });
-        Links { values: values }
-    }
+            .into_stream()
+            .flatten(),
+    )
+}
 
-    /// Returns next link url, when available
-    pub fn next(&self) -> Option<String> {
-        self.values.get("next").map(|s| s.to_owned())
-    }
-
-    /// Returns prev link url, when available
-    pub fn prev(&self) -> Option<String> {
-        self.values.get("prev").map(|s| s.to_owned())
-    }
-
-    /// Returns last link url, when available
-    pub fn last(&self) -> Option<String> {
-        self.values.get("last").map(|s| s.to_owned())
-    }
-}*/
 #[cfg(test)]
 mod tests {
-    /*use super::*;
-
-    #[test]
-    fn test_parse_links() {
-        let links = Links::new(r#"<linknext>; rel="next", <linklast>; rel="last""#);
-        assert_eq!(links.next(), Some("linknext".to_owned()));
-        assert_eq!(links.last(), Some("linklast".to_owned()));
-    }
+    use super::*;
 
     #[test]
     fn default_sort_direction() {
@@ -633,5 +571,5 @@ mod tests {
     fn default_credentials() {
         let default: Credentials = Default::default();
         assert_eq!(default, Credentials::None)
-    }*/
+    }
 }

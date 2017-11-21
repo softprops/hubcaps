@@ -1,41 +1,48 @@
 extern crate env_logger;
 extern crate hyper;
-extern crate hyper_native_tls;
 extern crate hubcaps;
+extern crate tokio_core;
+extern crate futures;
 
-use hyper::net::HttpsConnector;
-use hyper::Client;
-use hyper_native_tls::NativeTlsClient;
+use std::env;
+
+use futures::Stream;
+
 use hubcaps::{Credentials, Github};
 use hubcaps::branches::Protection;
-use std::env;
+
+
+use tokio_core::reactor::Core;
 
 fn main() {
     env_logger::init().unwrap();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
-            for branch in github
-                .repo("softprops", "hubcaps")
-                .branches()
-                .iter()
-                .unwrap()
+            let mut core = Core::new().unwrap();
+            let github = Github::new(
+                format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
+
+            if let Err(err) = core.run(
+                github
+                    .repo("softprops", "hubcaps")
+                    .branches()
+                    .iter()
+                    .for_each(|branch| Ok(println!("{:#?}", branch))),
+            )
             {
-                println!("{:#?}", branch)
+                println!("err {:#?}", err)
             }
 
-            match github.repo("softprops", "hubcaps").branches().get("master") {
+            match core.run(github.repo("softprops", "hubcaps").branches().get("master")) {
                 Ok(branch) => println!("{:#?}", branch),
                 Err(err) => println!("err {:#?}", err),
             }
 
             // protect master branch
-            match github.repo("softprops", "hubcaps").branches().protection(
+            match core.run(github.repo("softprops", "hubcaps").branches().protection(
                 "master",
                 &Protection {
                     required_status_checks: None,
@@ -43,7 +50,7 @@ fn main() {
                     required_pull_request_reviews: None,
                     restrictions: None,
                 },
-            ) {
+            )) {
                 Ok(pro) => println!("{:#?}", pro),
                 Err(err) => println!("err {:#?}", err),
             }
