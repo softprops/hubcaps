@@ -87,10 +87,6 @@ impl<C: Clone + Connect> Branches<C> {
     where
         B: Into<String>,
     {
-        let bytes = match serde_json::to_vec(&pro) {
-            Ok(data) => data,
-            Err(err) => return Box::new(future::err(err.into())),
-        };
         self.github.put(
             &format!(
                 "/repos/{owner}/{repo}/branches/{branch}/protection",
@@ -98,7 +94,7 @@ impl<C: Clone + Connect> Branches<C> {
                 repo = self.repo,
                 branch = branch.into()
             ),
-            bytes,
+            json!(pro),
         )
     }
 }
