@@ -1,25 +1,25 @@
 extern crate env_logger;
 extern crate hyper;
-extern crate hyper_native_tls;
 extern crate hubcaps;
+extern crate tokio_core;
 
-use hyper::net::HttpsConnector;
-use hyper::Client;
-use hyper_native_tls::NativeTlsClient;
-use hubcaps::{Credentials, Github};
 use std::env;
 
+use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github};
+
 fn main() {
-    env_logger::init().unwrap();
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
-            for gist in github.gists().list(&Default::default()).unwrap() {
+            let mut core = Core::new().unwrap();
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
+            for gist in core.run(github.gists().list(&Default::default())).unwrap() {
                 println!("{:#?}", gist)
             }
         }

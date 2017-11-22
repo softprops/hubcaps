@@ -6,18 +6,19 @@ use std::collections::HashMap;
 use std::fmt;
 
 use futures::future;
+use hyper::Method;
 use hyper::client::Connect;
 use url::form_urlencoded;
 
-use {/*Iter,*/ Github, Future, SortDirection};
+use {streamed, Stream, Github, Future, SortDirection};
 use branches::Branches;
+use deployments::Deployments;
 use git::Git;
 use hooks::Hooks;
-use deployments::Deployments;
 use keys::Keys;
-/*use issues::{IssueRef, Issues};*/
+use issues::{IssueRef, Issues};
 use labels::Labels;
-/*use pulls::PullRequests;*/
+use pulls::PullRequests;
 use releases::Releases;
 use teams::RepoTeams;
 use statuses::Statuses;
@@ -150,7 +151,7 @@ impl<C: Clone + Connect> Repositories<C> {
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
     pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
-        self.github.post::<Repo>(&self.path(""), json!(repo))
+        self.github.post(&self.path(""), json!(repo))
     }
 
     /// list the authenticated users repositories
@@ -160,18 +161,27 @@ impl<C: Clone + Connect> Repositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Repo>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
-    /*
-    /// provides an iterator over all pages of the authenticated users repositories
+
+    /// provides a stream over all pages of the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &RepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+    pub fn iter(&self, options: &RepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
-    }*/
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                uri.join("?"),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 }
 
 /// Provides access to the authenticated user's repositories
@@ -205,18 +215,27 @@ impl<C: Clone + Connect> OrgRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Repo>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 
-    /*/// provides an iterator over all pages of an orgs's repositories
+    /// provides a stream over all pages of an orgs's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrgRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+    pub fn iter(&self, options: &OrgRepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
-    }*/
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                uri.join("?"),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
@@ -256,18 +275,27 @@ impl<C: Connect + Clone> UserRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Repo>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 
-    /*/// provides an iterator over all pages of a user's repositories
+    /// provides a stream over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &UserRepoListOptions) -> Result<Iter<'a, Vec<Repo>, Repo>> {
+    pub fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
-    }*/
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                uri.join("?"),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 }
 
 /// Provides access to an organization's repositories
@@ -302,18 +330,27 @@ impl<C: Clone + Connect> OrganizationRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Repo>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 
-    /*/// Provides an iterator over all pages of an organization's repositories
+    /// Provides a stream over all pages of an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrganizationRepoListOptions) -> Result<Iter<Vec<Repo>, Repo>> {
+    pub fn iter(&self, options: &OrganizationRepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
-    }*/
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                uri.join("?"),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 }
 
 pub struct Repository<C>
@@ -377,16 +414,21 @@ impl<C: Clone + Connect> Repository<C> {
     pub fn deployments(&self) -> Deployments<C> {
         Deployments::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
-    /*
+
     /// get a reference to a specific github issue associated with this repository ref
-    pub fn issue(&self, number: u64) -> IssueRef {
-        IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
+    pub fn issue(&self, number: u64) -> IssueRef<C> {
+        IssueRef::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            number,
+        )
     }
 
     /// get a reference to github issues associated with this repository ref
-    pub fn issues(&self) -> Issues {
-        Issues::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }*/
+    pub fn issues(&self) -> Issues<C> {
+        Issues::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
 
     /// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)
     /// associated with this repository ref
@@ -398,12 +440,12 @@ impl<C: Clone + Connect> Repository<C> {
     pub fn labels(&self) -> Labels<C> {
         Labels::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
-    /*
+
     /// get a list of [pulls](https://developer.github.com/v3/pulls/)
     /// associated with this repository ref
-    pub fn pulls(&self) -> PullRequests {
-        PullRequests::new(self.github, self.owner.as_str(), self.repo.as_str())
-    }*/
+    pub fn pulls(&self) -> PullRequests<C> {
+        PullRequests::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
 
     /// get a reference to [releases](https://developer.github.com/v3/repos/releases/)
     /// associated with this repository ref
@@ -496,18 +538,18 @@ pub struct Repo {
 }
 
 impl Repo {
-    /*
     /// Returns a map containing the
     /// [languages](https://developer.github.com/v3/repos/#list-languages) that the repository is
     /// implemented in.
     ///
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
-    pub fn languages(&self, github: &Github) -> Result<HashMap<String, i64>> {
-        let url = Url::parse(&self.languages_url).unwrap();
-        let uri: String = url.path().into();
-        github.get(&uri)
-    }*/
+    pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
+    where
+        C: Clone + Connect,
+    {
+        github.get(&self.languages_url.clone())
+    }
 }
 
 

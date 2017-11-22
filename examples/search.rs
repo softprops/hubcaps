@@ -1,36 +1,38 @@
 extern crate env_logger;
 extern crate hyper;
 extern crate hubcaps;
-extern crate hyper_native_tls;
+extern crate tokio_core;
+extern crate futures;
 
-use hyper::Client;
-use hyper::net::HttpsConnector;
-use hyper_native_tls::NativeTlsClient;
-use hubcaps::{Credentials, Github};
-use hubcaps::search::SearchIssuesOptions;
 use std::env;
 
+use futures::Stream;
+use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github};
+use hubcaps::search::SearchIssuesOptions;
+
 fn main() {
-    env_logger::init().unwrap();
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
-            for issue in github
-                .search()
-                .issues()
-                .iter(
-                    "user:softprops",
-                    &SearchIssuesOptions::builder().per_page(1).build(),
-                )
-                .unwrap()
-            {
-                println!("{}", issue.title);
-            }
+            let mut core = Core::new().unwrap();
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
+            core.run(
+                github
+                    .search()
+                    .issues()
+                    .iter(
+                        "user:softprops",
+                        &SearchIssuesOptions::builder().per_page(1).build(),
+                    )
+                    .for_each(|issue| Ok(println!("{}", issue.title))),
+            ).unwrap()
+
         }
         _ => println!("example missing GITHUB_TOKEN"),
     }

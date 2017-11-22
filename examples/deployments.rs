@@ -1,28 +1,28 @@
 extern crate hyper;
 extern crate hubcaps;
-extern crate hyper_native_tls;
+extern crate tokio_core;
 
-use hyper::Client;
-use hyper::net::HttpsConnector;
-use hyper_native_tls::NativeTlsClient;
-use hubcaps::{Credentials, Github};
 use std::env;
+
+use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github};
 
 fn main() {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
+            let mut core = Core::new().unwrap();
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
             let repo = github.repo("softprops", "hubcaps");
             let deployments = repo.deployments();
             // let deploy = deployments.create(&DeploymentOptions::builder("master")
             // .payload("this is the payload".to_owned()).build());
             // println!("{:?}", deploy);
-            for d in deployments.list(&Default::default()).unwrap() {
+            for d in core.run(deployments.list(&Default::default())).unwrap() {
                 println!("{:#?}", d)
             }
         }

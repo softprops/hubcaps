@@ -1,26 +1,25 @@
 extern crate env_logger;
 extern crate hyper;
 extern crate hubcaps;
-extern crate tokio_core;
 extern crate futures;
+extern crate tokio_core;
+
 
 use std::env;
 
 use futures::Stream;
+use tokio_core::reactor::Core;
 
 use hubcaps::{Credentials, Github};
 use hubcaps::branches::Protection;
 
-
-use tokio_core::reactor::Core;
-
 fn main() {
-    env_logger::init().unwrap();
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut core = Core::new().unwrap();
             let github = Github::new(
-                format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
                 &core.handle(),
             );

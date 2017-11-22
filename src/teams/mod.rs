@@ -4,10 +4,11 @@ use std::collections::BTreeMap;
 use std::fmt;
 
 use futures::future;
+use hyper::Method;
 use hyper::client::Connect;
 use serde_json;
 
-use {/*Iter,*/ Github, Future};
+use {Github, Future, Stream, streamed};
 
 /// Team repository permissions
 pub enum Permission {
@@ -63,13 +64,19 @@ impl<C: Connect + Clone> RepoTeams<C> {
         ))
     }
 
-    /*/// provides an iterator over all pages of teams
-    pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github.iter(
-            format!("/repos/{}/{}/teams", self.owner, self.repo),
+    /// provides a stream over all pages of teams
+    pub fn iter(&self) -> Stream<Team> {
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                format!("/repos/{}/{}/teams", self.owner, self.repo),
+                Default::default(),
+                Default::default(),
+            ),
             identity,
         )
-    }*/
+    }
 }
 
 /// reference to teams associated with a github org
@@ -98,13 +105,19 @@ impl<C: Clone + Connect> OrgTeams<C> {
         self.github.get(&format!("/orgs/{}/teams", self.org))
     }
 
-    /*/// provides an iterator over all pages of teams
-    pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github.iter(
-            format!("/orgs/{}/teams", self.org),
+    /// provides an iterator over all pages of teams
+    pub fn iter(&self) -> Stream<Team> {
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                format!("/orgs/{}/teams", self.org),
+                Default::default(),
+                Default::default(),
+            ),
             identity,
         )
-    }*/
+    }
 
     /// adds a repository permission to this team
     /// learn more [here](https://developer.github.com/v3/orgs/teams/#add-or-update-team-repository)

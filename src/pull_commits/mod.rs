@@ -1,8 +1,9 @@
 //! Pull Commits interface
 
+use hyper::Method;
 use hyper::client::Connect;
 
-use {Github, /*Iter,*/ Future};
+use {streamed, Github, Stream, Future};
 use users::User;
 
 fn identity<T>(x: T) -> T {
@@ -46,16 +47,24 @@ impl<C: Clone + Connect> PullCommits<C> {
         self.github.get::<Vec<PullCommit>>(&uri)
     }
 
-    /*/// provides an iterator over all pages of pull commits
-    pub fn iter(&'a self) -> Result<Iter<'a, Vec<PullCommit>, PullCommit>> {
-        let uri = format!(
-            "/repos/{}/{}/pulls/{}/commits",
-            self.owner,
-            self.repo,
-            self.number
-        );
-        self.github.iter(uri, identity)
-    }*/
+    /// provides a stream over all pages of pull commits
+    pub fn iter(&self) -> Stream<PullCommit> {
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                format!(
+                    "/repos/{}/{}/pulls/{}/commits",
+                    self.owner,
+                    self.repo,
+                    self.number
+                ),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 }
 
 // representations

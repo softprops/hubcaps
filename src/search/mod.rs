@@ -1,14 +1,16 @@
 //! Search interface
 
-use self::super::{Github, Result, Iter};
-use serde::de::DeserializeOwned;
-use std::fmt;
-use url::form_urlencoded;
 use std::collections::HashMap;
-use super::SortDirection;
-use users::User;
-use url;
+use std::fmt;
+
+use hyper::Method;
+use hyper::client::Connect;
+use serde::de::DeserializeOwned;
+use url::{self, form_urlencoded};
+
+use {Github, Stream, Future, SortDirection, streamed};
 use labels::Label;
+use users::User;
 
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
@@ -33,44 +35,69 @@ impl fmt::Display for IssuesSort {
 
 /// Provides access to search operations
 /// https://developer.github.com/v3/search/#search-issues
-pub struct Search<'a> {
-    github: &'a Github,
+#[derive(Clone)]
+pub struct Search<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
 }
 
-fn items<'d, D: DeserializeOwned>(result: SearchResult<D>) -> Vec<D> {
+fn items<D>(result: SearchResult<D>) -> Vec<D>
+where
+    D: DeserializeOwned + 'static,
+{
     result.items
 }
 
-impl<'a> Search<'a> {
+impl<C: Clone + Connect> Search<C> {
     #[doc(hidden)]
-    pub fn new(github: &'a Github) -> Search<'a> {
-        Search { github: github }
+    pub fn new(github: Github<C>) -> Self {
+        Self { github }
     }
 
     /// return a reference to a search interface for issues
-    pub fn issues(&self) -> SearchIssues {
-        SearchIssues::new(&self)
+    pub fn issues(&self) -> SearchIssues<C> {
+        SearchIssues::new(self.clone())
     }
 
-    fn iter<D: DeserializeOwned>(&'a self, url: &str) -> Result<Iter<'a, SearchResult<D>, D>> {
-        self.github.iter(url.to_owned(), items)
+    fn iter<D>(&self, url: &str) -> Stream<D>
+    where
+        D: DeserializeOwned + 'static,
+    {
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                url.to_owned(),
+                Default::default(),
+                Default::default(),
+            ),
+            items,
+        )
     }
 
-    fn search<D: DeserializeOwned>(&self, url: &str) -> Result<SearchResult<D>> {
-        self.github.get::<SearchResult<D>>(url)
+    fn search<D>(&self, url: &str) -> Future<SearchResult<D>>
+    where
+        D: DeserializeOwned + 'static,
+    {
+        self.github.get(url)
     }
 }
 
 /// Provides access to issue search operations
 /// https://developer.github.com/v3/search/#search-issues
-pub struct SearchIssues<'a> {
-    search: &'a Search<'a>,
+pub struct SearchIssues<C>
+where
+    C: Clone + Connect,
+{
+    search: Search<C>,
 }
 
-impl<'a> SearchIssues<'a> {
+impl<C: Clone + Connect> SearchIssues<C> {
     #[doc(hidden)]
-    pub fn new(search: &'a Search<'a>) -> SearchIssues<'a> {
-        SearchIssues { search: search }
+    pub fn new(search: Search<C>) -> Self {
+        Self { search }
     }
 
     fn search_uri<Q>(q: Q, options: &SearchIssuesOptions) -> String
@@ -89,11 +116,7 @@ impl<'a> SearchIssues<'a> {
     /// Returns an Iterator over pages of search results
     /// Use this interface if you wish to iterate over all items
     /// in a result set
-    pub fn iter<Q>(
-        &'a self,
-        q: Q,
-        options: &SearchIssuesOptions,
-    ) -> Result<Iter<'a, SearchResult<IssuesItem>, IssuesItem>>
+    pub fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Stream<IssuesItem>
     where
         Q: Into<String>,
     {
@@ -103,7 +126,7 @@ impl<'a> SearchIssues<'a> {
     }
 
     /// Returns a single page of search results
-    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Result<SearchResult<IssuesItem>>
+    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Future<SearchResult<IssuesItem>>
     where
         Q: Into<String>,
     {

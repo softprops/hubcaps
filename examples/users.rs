@@ -2,9 +2,11 @@ extern crate env_logger;
 extern crate hubcaps;
 extern crate tokio_core;
 
-use hubcaps::{Credentials, Github};
 use std::env;
+
 use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github};
 
 fn main() {
     env_logger::init().unwrap();
@@ -12,7 +14,7 @@ fn main() {
         Some(token) => {
             let mut core = Core::new().unwrap();
             let github = Github::new(
-                format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
                 &core.handle(),
             );

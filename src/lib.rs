@@ -10,24 +10,19 @@
 //! ```no_run
 //! extern crate hubcaps;
 //! extern crate hyper;
-//! extern crate hyper_native_tls;
+//! extern crate tokio_core;
 //!
+//! use tokio_core::reactor::Core;
 //! use hubcaps::{Credentials, Github};
-//! use hyper::Client;
-//! use hyper::net::HttpsConnector;
-//! use hyper_native_tls::NativeTlsClient;
 //!
 //! fn main() {
+//!   let mut core = Core::new().unwrap();
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
-//!     Client::with_connector(
-//!       HttpsConnector::new(
-//!         NativeTlsClient::new().unwrap()
-//!       )
-//!     ),
 //!     Credentials::Token(
 //!       String::from("personal-access-token")
-//!     )
+//!     ),
+//!     &core.handle()
 //!   );
 //! }
 //! ```
@@ -103,27 +98,24 @@ pub mod releases;
 pub mod repositories;
 pub mod statuses;
 pub mod pulls;
-//pub mod search;
+pub mod search;
 pub mod teams;
 pub mod organizations;
 
 pub use errors::{Error, ErrorKind, Result};
 
 use gists::{Gists, UserGists};
-//use search::Search;
+use search::Search;
 use repositories::{Repositories, OrganizationRepositories, UserRepositories, Repository};
 use organizations::{Organization, Organizations, UserOrganizations};
 use users::Users;
 
-/// Link header type
-//header! { (Link, "Link") => [String] }
-
 const DEFAULT_HOST: &'static str = "https://api.github.com";
 
-/// A type alias for `Futures` that may return `travis::Errors`
+/// A type alias for `Futures` that may return `github::Errors`
 pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
 
-/// A type alias for `Streams` that may result in `travis::Errors`
+/// A type alias for `Streams` that may result in `github::Errors`
 pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
 
 /// alias for Result that infers hubcaps::Error as Err
@@ -318,10 +310,10 @@ where
         Gists::new(self.clone())
     }
 
-    /*/// Return a reference to an interface that provides access to search operations
-    pub fn search(&self) -> Search {
-        Search::new(self)
-    }*/
+    /// Return a reference to an interface that provides access to search operations
+    pub fn search(&self) -> Search<C> {
+        Search::new(self.clone())
+    }
 
     /// Return a reference to the collection of repositories owned by and
     /// associated with an organization

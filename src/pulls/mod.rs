@@ -4,11 +4,12 @@ use std::collections::HashMap;
 use std::fmt;
 
 use hyper::client::Connect;
+use hyper::Method;
 use serde_json;
 use url::form_urlencoded;
 use futures::future;
 
-use {/*Iter,*/ Github, Future, SortDirection};
+use {streamed, Stream, Github, Future, SortDirection};
 use comments::Comments;
 use pull_commits::PullCommits;
 use issues::{Sort as IssueSort, State};
@@ -193,14 +194,23 @@ impl<C: Clone + Connect> PullRequests<C> {
         self.github.get::<Vec<Pull>>(&uri.join("?"))
     }
 
-    /*/// provides an iterator over all pages of pull requests
-    pub fn iter(&self, options: &PullListOptions) -> Result<Iter<Vec<Pull>, Pull>> {
+    /// provides a stream over all pages of pull requests
+    pub fn iter(&self, options: &PullListOptions) -> Stream<Pull> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
-    }*/
+        streamed(
+            self.github.clone(),
+            self.github.request(
+                Method::Get,
+                uri.join("?"),
+                Default::default(),
+                Default::default(),
+            ),
+            identity,
+        )
+    }
 }
 
 // representations
