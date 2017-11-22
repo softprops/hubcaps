@@ -543,7 +543,7 @@ where
                                         .map(move |(link, payload)| {
                                             let mut items = into_items(payload);
                                             items.reverse();
-                                            (items.pop().unwrap(), (link, items))
+                                            (items.remove(0), (link, items))
                                         }),
                                 ) as
                                     Future<(I, (Option<Link>, Vec<I>))>
