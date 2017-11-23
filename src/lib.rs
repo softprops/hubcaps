@@ -514,18 +514,11 @@ where
                         _ => {
                             link.and_then(next_link).map(|url| {
                                 Box::new(
-                                    github
-                                        .request::<D>(
-                                            Method::Get,
-                                            url.to_owned(),
-                                            Default::default(),
-                                            Default::default(),
-                                        )
-                                        .map(move |(link, payload)| {
-                                            let mut items = into_items(payload);
-                                            items.reverse();
-                                            (items.remove(0), (link, items))
-                                        }),
+                                    github.get_pages(url.as_ref()).map(move |(link, payload)| {
+                                        let mut items = into_items(payload);
+                                        items.reverse();
+                                        (items.remove(0), (link, items))
+                                    }),
                                 ) as
                                     Future<(I, (Option<Link>, Vec<I>))>
                             })
