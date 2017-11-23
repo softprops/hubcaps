@@ -6,7 +6,6 @@ use hyper::StatusCode;
 use hyper::error::UriError;
 use serde_json::error::Error as SerdeError;
 
-/// enumerated types of client errors
 error_chain! {
     errors {
         Fault {

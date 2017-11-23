@@ -3,9 +3,7 @@
 //! # Examples
 //!
 //!  Typical use will require instantiation of a Github client. Which requires
-//! a user agent string, a `hyper::Client`, and set of `hubcaps::Credentials`.
-//!
-//! The hyper client should be configured with tls.
+//! a user agent string, set of `hubcaps::Credentials` and a tokio_core `Handle`.
 //!
 //! ```no_run
 //! extern crate hubcaps;
@@ -80,7 +78,7 @@ use tokio_core::reactor::Handle;
 use url::Url;
 
 #[macro_use]
-mod macros;
+mod macros; // expose json! macro to child modules
 pub mod branches;
 pub mod git;
 pub mod users;
@@ -177,7 +175,7 @@ impl Default for SortDirection {
 #[derive(Debug, PartialEq, Clone)]
 pub enum Credentials {
     /// No authentication (the default)
-    None,
+    None, // todo: Just represent with Option<Credentials>
     /// Oauth token string
     /// https://developer.github.com/v3/#oauth2-token-sent-in-a-header
     Token(String),

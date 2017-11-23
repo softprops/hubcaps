@@ -1,6 +1,5 @@
 //! Pull Commits interface
 
-use hyper::Method;
 use hyper::client::Connect;
 
 use {unfold, Github, Stream, Future};
