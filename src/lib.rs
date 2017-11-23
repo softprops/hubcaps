@@ -14,7 +14,7 @@
 //! use hubcaps::{Credentials, Github};
 //!
 //! fn main() {
-//!   let mut core = Core::new().unwrap();
+//!   let mut core = Core::new().expect("reactor fail");
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
 //!     Credentials::Token(
@@ -141,7 +141,9 @@ impl From<MediaType> for Mime {
             MediaType::Preview(codename) => {
                 format!("application/vnd.github.{}-preview+json", codename)
                     .parse()
-                    .unwrap()
+                    .expect(
+                        format!("could not parse media type for preview {}", codename).as_str(),
+                    )
             }
         }
     }

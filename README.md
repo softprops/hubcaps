@@ -34,23 +34,17 @@ For user authenticated requests you'll typically want to use `hubcaps::Credentia
 ```rust
 extern crate hyper;
 extern crate hubcaps;
-extern crate hyper_native_tls;
+extern crate tokio_core;
 
-use hyper::Client;
-use hyper::net::HttpsConnector;
-use hyper_native_tls::NativeTlsClient;
+use tokio_core::reactor::Core;
 use hubcaps::{Credentials, Github};
 
 fn main() {
+  let mut core = Core::new().expect("reactor fail");
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    // tls configured hyper client
-    Client::with_connector(
-      HttpsConnector::new(
-        NativeTlsClient::new().unwrap()
-      )
-    ),
-    Credentials::Token("personal-access-token")
+    Credentials::Token("personal-access-token"),
+    &core.handle()
   );
 }
 ```

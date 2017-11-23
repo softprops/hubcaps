@@ -1,17 +1,21 @@
 extern crate hyper;
 extern crate hubcaps;
 extern crate tokio_core;
+#[macro_use(quick_main)]
+extern crate error_chain;
 
 use std::env;
 
 use tokio_core::reactor::Core;
 
-use hubcaps::{Credentials, Github};
+use hubcaps::{Credentials, Github, Result};
 
-fn main() {
+quick_main!(run);
+
+fn run() -> Result<()> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut core = Core::new().unwrap();
+            let mut core = Core::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -22,10 +26,11 @@ fn main() {
             // let deploy = deployments.create(&DeploymentOptions::builder("master")
             // .payload("this is the payload".to_owned()).build());
             // println!("{:?}", deploy);
-            for d in core.run(deployments.list(&Default::default())).unwrap() {
+            for d in core.run(deployments.list(&Default::default()))? {
                 println!("{:#?}", d)
             }
+            Ok(())
         }
-        _ => println!("example missing GITHUB_TOKEN"),
+        _ => Err("example missing GITHUB_TOKEN".into()),
     }
 }

@@ -2,18 +2,22 @@ extern crate env_logger;
 extern crate hyper;
 extern crate hubcaps;
 extern crate tokio_core;
+#[macro_use(quick_main)]
+extern crate error_chain;
 
 use std::env;
 
 use tokio_core::reactor::Core;
 
-use hubcaps::{Credentials, Github};
+use hubcaps::{Credentials, Github, Result};
 
-fn main() {
-    env_logger::init().unwrap();
+quick_main!(run);
+
+fn run() -> Result<()> {
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut core = Core::new().unwrap();
+            let mut core = Core::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -22,17 +26,18 @@ fn main() {
             for file in core.run(github.repo("softprops", "hubcaps").git().tree(
                 "master",
                 true,
-            )).unwrap()
+            ))?
                 .tree
                 .iter()
                 .find(|file| file.path == "README.md")
             {
                 let blob = core.run(github.repo("softprops", "hubcaps").git().blob(
                     file.sha.clone(),
-                )).unwrap();
+                ))?;
                 println!("readme {:#?}", blob);
             }
+            Ok(())
         }
-        _ => println!("example missing GITHUB_TOKEN"),
+        _ => Err("example missing GITHUB_TOKEN".into()),
     }
 }
