@@ -43,7 +43,7 @@
 //!
 //! Operations typically result in a `hubcaps::Result` Type which is an alias for Rust's
 //! built-in Result with the Err Type fixed to the
-//! [hubcaps::Error](errors/enum.Error.html) enum type.
+//! [hubcaps::Error](errors/struct.Error.html) type.
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
