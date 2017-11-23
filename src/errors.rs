@@ -11,7 +11,10 @@ error_chain! {
         Fault {
             code: StatusCode,
             error: ClientError,
-        }
+        } {
+            display("{}: '{}'", code, error.message)
+            description(error.message.as_str())
+          }
     }
     foreign_links {
         Codec(SerdeError);
