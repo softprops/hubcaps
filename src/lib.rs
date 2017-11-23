@@ -67,10 +67,8 @@ use std::fmt;
 use futures::{future, stream, Stream as StdStream, Future as StdFuture, IntoFuture};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
-use hyper::client::{Connect, HttpConnector};
-use hyper::Client;
-use hyper::client::Request;
-use hyper::Method;
+use hyper::{Client, Method};
+use hyper::client::{Connect, HttpConnector, Request};
 use hyper::header::{qitem, Accept, Authorization, UserAgent, Link, RelationType};
 use hyper::mime::Mime;
 use serde::de::DeserializeOwned;
