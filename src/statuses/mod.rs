@@ -66,7 +66,7 @@ impl<C: Clone + Connect> Statuses<C> {
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Status {

@@ -164,7 +164,7 @@ impl<C: Clone + Connect> Releases<C> {
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Asset {

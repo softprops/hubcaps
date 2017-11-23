@@ -4,11 +4,10 @@ use std::collections::BTreeMap;
 use std::fmt;
 
 use futures::future;
-use hyper::Method;
 use hyper::client::Connect;
 use serde_json;
 
-use {Github, Future, Stream, streamed};
+use {Github, Future, Stream, unfold};
 
 /// Team repository permissions
 pub enum Permission {
@@ -66,14 +65,13 @@ impl<C: Connect + Clone> RepoTeams<C> {
 
     /// provides a stream over all pages of teams
     pub fn iter(&self) -> Stream<Team> {
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                format!("/repos/{}/{}/teams", self.owner, self.repo),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&format!(
+                "/repos/{}/{}/teams",
+                self.owner,
+                self.repo
+            )),
             identity,
         )
     }
@@ -107,14 +105,9 @@ impl<C: Clone + Connect> OrgTeams<C> {
 
     /// provides an iterator over all pages of teams
     pub fn iter(&self) -> Stream<Team> {
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                format!("/orgs/{}/teams", self.org),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&format!("/orgs/{}/teams", self.org)),
             identity,
         )
     }
@@ -139,7 +132,7 @@ impl<C: Clone + Connect> OrgTeams<C> {
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Team {

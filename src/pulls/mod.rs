@@ -4,12 +4,11 @@ use std::collections::HashMap;
 use std::fmt;
 
 use hyper::client::Connect;
-use hyper::Method;
 use serde_json;
 use url::form_urlencoded;
 use futures::future;
 
-use {streamed, Stream, Github, Future, SortDirection};
+use {unfold, Stream, Github, Future, SortDirection};
 use comments::Comments;
 use pull_commits::PullCommits;
 use issues::{Sort as IssueSort, State};
@@ -200,20 +199,15 @@ impl<C: Clone + Connect> PullRequests<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                uri.join("?"),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&uri.join("?")),
             identity,
         )
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 /// representation of a github pull request
 #[derive(Debug, Deserialize)]

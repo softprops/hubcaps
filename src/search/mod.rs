@@ -3,12 +3,11 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::Method;
 use hyper::client::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
-use {Github, Stream, Future, SortDirection, streamed};
+use {Github, Stream, Future, SortDirection, unfold};
 use labels::Label;
 use users::User;
 
@@ -65,16 +64,7 @@ impl<C: Clone + Connect> Search<C> {
     where
         D: DeserializeOwned + 'static,
     {
-        streamed(
-            self.github.clone(),
-            self.github.request(
-                Method::Get,
-                url.to_owned(),
-                Default::default(),
-                Default::default(),
-            ),
-            items,
-        )
+        unfold(self.github.clone(), self.github.get_pages(url), items)
     }
 
     fn search<D>(&self, url: &str) -> Future<SearchResult<D>>
@@ -100,7 +90,7 @@ impl<C: Clone + Connect> SearchIssues<C> {
         Self { search }
     }
 
-    fn search_uri<Q>(q: Q, options: &SearchIssuesOptions) -> String
+    fn search_uri<Q>(&self, q: Q, options: &SearchIssuesOptions) -> String
     where
         Q: Into<String>,
     {
@@ -120,9 +110,7 @@ impl<C: Clone + Connect> SearchIssues<C> {
     where
         Q: Into<String>,
     {
-        self.search.iter::<IssuesItem>(
-            &Self::search_uri(q, options),
-        )
+        self.search.iter::<IssuesItem>(&self.search_uri(q, options))
     }
 
     /// Returns a single page of search results
@@ -131,12 +119,12 @@ impl<C: Clone + Connect> SearchIssues<C> {
         Q: Into<String>,
     {
         self.search.search::<IssuesItem>(
-            &Self::search_uri(q, options),
+            &self.search_uri(q, options),
         )
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Default)]
 pub struct SearchIssuesOptions {

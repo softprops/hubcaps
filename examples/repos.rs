@@ -34,7 +34,7 @@ fn main() {
                             }
                         });
                         handle.spawn(f.map_err(|_| ()));
-                        Ok(println!(""))
+                        Ok(())
                     }),
             ).unwrap();
         }

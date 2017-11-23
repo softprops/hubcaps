@@ -324,26 +324,6 @@ where
         OrganizationRepositories::new(self.clone(), org)
     }
 
-
-    /*fn iter<'a, D, I>(&'a self, uri: String, into_items: fn(D) -> Vec<I>) -> Result<Iter<'a, D, I>>
-    where
-        D: DeserializeOwned,
-    {
-        self.iter_media(uri, into_items, MediaType::Json)
-    }
-
-    fn iter_media<'a, D, I>(
-        &'a self,
-        uri: String,
-        into_items: fn(D) -> Vec<I>,
-        media_type: MediaType,
-    ) -> Result<Iter<'a, D, I>>
-    where
-        D: DeserializeOwned,
-    {
-        Iter::new(self, self.host.clone() + &uri, into_items, media_type)
-    }*/
-
     fn request<Out>(
         &self,
         method: Method,
@@ -387,6 +367,7 @@ where
             response.body().concat2().map_err(Error::from).and_then(
                 move |body| {
                     if status.is_success() {
+                        debug!("{}", String::from_utf8_lossy(&body));
                         serde_json::from_slice::<Out>(&body)
                             .map(|out| (link, out))
                             .map_err(|error| ErrorKind::Codec(error).into())
@@ -432,6 +413,13 @@ where
         D: DeserializeOwned + 'static,
     {
         self.request_entity(Method::Get, self.host.clone() + uri, None, media)
+    }
+
+    fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
+    where
+        D: DeserializeOwned + 'static,
+    {
+        self.request(Method::Get, self.host.clone() + uri, None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
@@ -503,7 +491,8 @@ fn next_link(l: Link) -> Option<String> {
         .map(|v| v.link().to_owned())
 }
 
-fn streamed<C, D, I>(
+/// "unfold" paginated results of a list of github entities
+fn unfold<C, D, I>(
     github: Github<C>,
     first: Future<(Option<Link>, D)>,
     into_items: fn(D) -> Vec<I>,

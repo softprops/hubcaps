@@ -9,7 +9,7 @@ use hyper::Method;
 use hyper::client::Connect;
 use futures::future;
 
-use {/*Iter,*/ Github, Future, Stream, streamed};
+use {Github, Future, Stream, unfold};
 
 fn identity<T>(x: T) -> T {
     x
@@ -50,19 +50,13 @@ impl<C: Clone + Connect> Branches<C> {
 
     /// provides an stream over branches for this repo
     pub fn iter(&self) -> Stream<Branch> {
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                format!(
-                    "{host}/repos/{owner}/{repo}/branches",
-                    host = self.github.host.clone(),
-                    owner = self.owner,
-                    repo = self.repo
-                ),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&format!(
+                "/repos/{owner}/{repo}/branches",
+                owner = self.owner,
+                repo = self.repo
+            )),
             identity,
         )
     }

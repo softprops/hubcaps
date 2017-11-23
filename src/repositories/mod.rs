@@ -6,11 +6,10 @@ use std::collections::HashMap;
 use std::fmt;
 
 use futures::future;
-use hyper::Method;
 use hyper::client::Connect;
 use url::form_urlencoded;
 
-use {streamed, Stream, Github, Future, SortDirection};
+use {unfold, Stream, Github, Future, SortDirection};
 use branches::Branches;
 use deployments::Deployments;
 use git::Git;
@@ -171,14 +170,9 @@ impl<C: Clone + Connect> Repositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                uri.join("?"),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&uri.join("?")),
             identity,
         )
     }
@@ -225,14 +219,9 @@ impl<C: Clone + Connect> OrgRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                uri.join("?"),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&uri.join("?")),
             identity,
         )
     }
@@ -285,14 +274,9 @@ impl<C: Connect + Clone> UserRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                uri.join("?"),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&uri.join("?")),
             identity,
         )
     }
@@ -340,14 +324,9 @@ impl<C: Clone + Connect> OrganizationRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                uri.join("?"),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&uri.join("?")),
             identity,
         )
     }
@@ -466,7 +445,7 @@ impl<C: Clone + Connect> Repository<C> {
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Repo {

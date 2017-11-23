@@ -3,7 +3,7 @@
 use hyper::Method;
 use hyper::client::Connect;
 
-use {streamed, Github, Stream, Future};
+use {unfold, Github, Stream, Future};
 use users::User;
 
 fn identity<T>(x: T) -> T {
@@ -49,19 +49,14 @@ impl<C: Clone + Connect> PullCommits<C> {
 
     /// provides a stream over all pages of pull commits
     pub fn iter(&self) -> Stream<PullCommit> {
-        streamed(
+        unfold(
             self.github.clone(),
-            self.github.request(
-                Method::Get,
-                format!(
-                    "/repos/{}/{}/pulls/{}/commits",
-                    self.owner,
-                    self.repo,
-                    self.number
-                ),
-                Default::default(),
-                Default::default(),
-            ),
+            self.github.get_pages(&format!(
+                "/repos/{}/{}/pulls/{}/commits",
+                self.owner,
+                self.repo,
+                self.number
+            )),
             identity,
         )
     }

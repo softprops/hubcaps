@@ -42,7 +42,7 @@ impl<C: Clone + Connect> ReviewComments<C> {
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct ReviewComment {
