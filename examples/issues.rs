@@ -29,6 +29,7 @@ fn run() -> Result<()> {
             {
                 println!("{:#?}", issue)
             }
+            Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),
     }
