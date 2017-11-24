@@ -13,6 +13,10 @@ these map to async computed values
 connector. A `tokio_core::reactor::Handle` reference is required in order to
 construct this client. The motivation is that its the application responsibility
 to manage `Core` resources.
+* `iter` methods previously returned `Iter` types which provided a way to iterate
+over elements of paginated collections. The analog to iterators in the async world `hubcaps::Stream` types which are akin to an iterator in which values are
+computed asynchronously. To learn more about Streams and Stream combinators see
+[this documentation](http://alexcrichton.com/futures-rs/futures/stream/index.html)
 
 # 0.3.16
 
