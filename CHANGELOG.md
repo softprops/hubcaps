@@ -5,7 +5,7 @@
 ## breaking changes
 
 Hyper 0.11's switch to async API's had a major impact to the API design choices
-in this release. The follow is the major changes
+in this release. The following are the major notable changes
 
 * interfaces that previously returned `hubcaps::Result` types now return `hubcaps::Future` types. The semantics are the same, the difference is that
 these map to async computed values
