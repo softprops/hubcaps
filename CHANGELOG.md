@@ -1,3 +1,19 @@
+# 0.4.0
+
+* upgrade to async hyper (0.11)
+
+## breaking changes
+
+Hyper 0.11's switch to async API's had a major impact to the API design choices
+in this release. The follow is the major changes
+
+* interfaces that previously returned `hubcaps::Result` types now return `hubcaps::Future` types. The semantics are the same, the difference is that
+these map to async computed values
+* `hubcaps::Client`'s associated methods for creating new interfaces got a facelift. The `hyper::Client` previously required for constructor methods is provided by default ( customization is still supported ) with a default tls
+connector. A `tokio_core::reactor::Handle` reference is required in order to
+construct this client. The motivation is that its the application responsibility
+to manage `Core` resources.
+
 # 0.3.16
 
 * added users api interfaces [@dpc](https://github.com/softprops/hubcaps/pull/90)
