@@ -8,7 +8,8 @@ Hyper 0.11's switch to async API's had a major impact to the API design choices
 in this release. The following are the major notable changes
 
 * interfaces that previously returned `hubcaps::Result` types now return `hubcaps::Future` types. The semantics are the same, the difference is that
-these map to async computed values
+these map to async computed values. To learn more about Futures and
+Future combinators see [this documentation](http://alexcrichton.com/futures-rs/futures/future/index.html)
 * `hubcaps::Client`'s associated methods for creating new interfaces got a facelift. The `hyper::Client` previously required for constructor methods is provided by default ( customization is still supported ) with a default tls
 connector. A `tokio_core::reactor::Handle` reference is required in order to
 construct this client. The motivation is that its the application responsibility
