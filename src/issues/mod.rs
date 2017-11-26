@@ -135,7 +135,7 @@ where
 }
 
 impl<C: Clone + Connect> IssueRef<C> {
-    /// create a new instance of a github repo issue ref
+    #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
@@ -150,8 +150,8 @@ impl<C: Clone + Connect> IssueRef<C> {
     }
 
     /// Request an issue's information
-    pub fn get(&self) -> Result<Issue> {
-        self.github.get::<Issue>(&self.path(""))
+    pub fn get(&self) -> Future<Issue> {
+        self.github.get(&self.path(""))
     }
 
     fn path(&self, more: &str) -> String {
@@ -164,6 +164,7 @@ impl<C: Clone + Connect> IssueRef<C> {
         )
     }
 
+    /// Return a reference to labels operations available for this issue
     pub fn labels(&self) -> IssueLabels<C> {
         IssueLabels::new(
             self.github.clone(),
@@ -173,10 +174,12 @@ impl<C: Clone + Connect> IssueRef<C> {
         )
     }
 
+    /// Edit the issues options
     pub fn edit(&self, is: &IssueOptions) -> Future<Issue> {
         self.github.patch(&self.path(""), json!(is))
     }
 
+    /// Return a reference to comment operations available for this issue
     pub fn comments(&self) -> Comments<C> {
         Comments::new(
             self.github.clone(),
