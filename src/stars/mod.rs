@@ -1,3 +1,5 @@
+//! Stars interface
+
 use hyper::client::Connect;
 use hyper::StatusCode;
 use futures::Future as StdFuture;

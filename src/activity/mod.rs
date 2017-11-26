@@ -1,3 +1,5 @@
+//! Activity interface
+
 use hyper::client::Connect;
 
 use Github;
