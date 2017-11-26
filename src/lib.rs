@@ -77,6 +77,7 @@ use url::Url;
 
 #[macro_use]
 mod macros; // expose json! macro to child modules
+pub mod activity;
 pub mod branches;
 pub mod git;
 pub mod users;
@@ -92,6 +93,7 @@ pub mod issues;
 pub mod labels;
 pub mod releases;
 pub mod repositories;
+pub mod stars;
 pub mod statuses;
 pub mod pulls;
 pub mod search;
@@ -100,13 +102,14 @@ pub mod organizations;
 
 pub use errors::{Error, ErrorKind, Result};
 
+use activity::Activity;
 use gists::{Gists, UserGists};
 use search::Search;
 use repositories::{Repositories, OrganizationRepositories, UserRepositories, Repository};
 use organizations::{Organization, Organizations, UserOrganizations};
 use users::Users;
 
-const DEFAULT_HOST: &'static str = "https://api.github.com";
+const DEFAULT_HOST: &str = "https://api.github.com";
 
 /// A type alias for `Futures` that may return `github::Errors`
 pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
@@ -237,6 +240,11 @@ where
             client: http,
             credentials: credentials,
         }
+    }
+
+    /// Return a reference to user activity
+    pub fn activity(&self) -> Activity<C> {
+        Activity::new(self.clone())
     }
 
     /// Return a reference to a Github repository
