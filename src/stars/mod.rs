@@ -19,6 +19,7 @@ impl<C: Clone + Connect> Stars<C> {
         Self { github }
     }
 
+    /// returns whether or not authenticated user has started a repo
     pub fn starred<O, R>(&self, owner: O, repo: R) -> Future<bool>
     where
         O: Into<String>,
@@ -36,6 +37,7 @@ impl<C: Clone + Connect> Stars<C> {
         )
     }
 
+    /// star a repo
     pub fn star<O, R>(&self, owner: O, repo: R) -> Future<()>
     where
         O: Into<String>,
@@ -47,6 +49,7 @@ impl<C: Clone + Connect> Stars<C> {
         )
     }
 
+    /// unstar a repo
     pub fn unstar<O, R>(&self, owner: O, repo: R) -> Future<()>
     where
         O: Into<String>,

@@ -17,6 +17,7 @@ impl<C: Clone + Connect> Activity<C> {
     pub fn new(github: Github<C>) -> Self {
         Self { github }
     }
+    /// return a reference to starring operations
     pub fn stars(&self) -> Stars<C> {
         Stars::new(self.github.clone())
     }
