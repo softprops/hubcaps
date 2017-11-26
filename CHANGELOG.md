@@ -18,6 +18,7 @@ to manage `Core` resources.
 over elements of paginated collections. The analog to iterators in the async world `hubcaps::Stream` types which are akin to an iterator in which values are
 computed asynchronously. To learn more about Streams and Stream combinators see
 [this documentation](http://alexcrichton.com/futures-rs/futures/stream/index.html)
+* Credentials are now provided as an Option type removing the need for Credential::None
 
 # 0.3.16
 

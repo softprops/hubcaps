@@ -24,9 +24,9 @@ hubcaps = "0.3"
 
 ## usage
 
-Basic usage requires a user-defined user agent string (because github requires this),
-a `hyper::Client` instance, and a flavor of `hubcaps::Credentials` for authorization.
-For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens). For requests that permit anonymous access, you can substitute `hubcaps::Credentials::Token` with `hubcaps::Credentials::None`
+Basic usage requires a user-defined user agent string (because github requires this), optionally a flavor of `hubcaps::Credentials` for authorization, and a tokio_core Handle.
+
+For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens).
 
 > Note: hyper 0.10 no longer includes a tls implementation by default. you will need
 >       to provide one to your choosing
@@ -43,7 +43,7 @@ fn main() {
   let mut core = Core::new().expect("reactor fail");
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    Credentials::Token("personal-access-token"),
+    Some(Credentials::Token("personal-access-token")),
     &core.handle()
   );
 }
