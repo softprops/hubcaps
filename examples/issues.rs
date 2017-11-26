@@ -20,7 +20,7 @@ fn run() -> Result<()> {
             let mut core = Core::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-                Credentials::Token(token),
+                Some(Credentials::Token(token)),
                 &core.handle(),
             );
             for issue in core.run(github.repo("softprops", "hubcat").issues().list(

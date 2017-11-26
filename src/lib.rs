@@ -17,9 +17,9 @@
 //!   let mut core = Core::new().expect("reactor fail");
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
-//!     Credentials::Token(
+//!     Some(Credentials::Token(
 //!       String::from("personal-access-token")
-//!     ),
+//!     )),
 //!     &core.handle()
 //!   );
 //! }
@@ -174,20 +174,12 @@ impl Default for SortDirection {
 /// Various forms of authentication credentials supported by Github
 #[derive(Debug, PartialEq, Clone)]
 pub enum Credentials {
-    /// No authentication (the default)
-    None, // todo: Just represent with Option<Credentials>
     /// Oauth token string
     /// https://developer.github.com/v3/#oauth2-token-sent-in-a-header
     Token(String),
     /// Oauth client id and secret
     /// https://developer.github.com/v3/#oauth2-keysecret
     Client(String, String),
-}
-
-impl Default for Credentials {
-    fn default() -> Credentials {
-        Credentials::None
-    }
 }
 
 /// Entry point interface for interacting with Github API
@@ -199,19 +191,19 @@ where
     host: String,
     agent: String,
     client: Client<C>,
-    credentials: Credentials,
+    credentials: Option<Credentials>,
 }
 
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A>(agent: A, credentials: Credentials, handle: &Handle) -> Self
+    pub fn new<A>(agent: A, credentials: Option<Credentials>, handle: &Handle) -> Self
     where
         A: Into<String>,
     {
         Self::host(DEFAULT_HOST, agent, credentials, handle)
     }
 
-    pub fn host<H, A>(host: H, agent: A, credentials: Credentials, handle: &Handle) -> Self
+    pub fn host<H, A>(host: H, agent: A, credentials: Option<Credentials>, handle: &Handle) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -229,7 +221,12 @@ impl<C> Github<C>
 where
     C: Clone + Connect,
 {
-    pub fn custom<H, A>(host: H, agent: A, credentials: Credentials, http: Client<C>) -> Self
+    pub fn custom<H, A>(
+        host: H,
+        agent: A,
+        credentials: Option<Credentials>,
+        http: Client<C>,
+    ) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -332,7 +329,7 @@ where
     where
         Out: DeserializeOwned + 'static,
     {
-        let url = if let Credentials::Client(ref id, ref secret) = self.credentials {
+        let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
             let mut parsed = Url::parse(&uri).unwrap();
             parsed
                 .query_pairs_mut()
@@ -349,7 +346,7 @@ where
                 let headers = req.headers_mut();
                 headers.set(UserAgent::new(instance.agent.clone()));
                 headers.set(Accept(vec![qitem(From::from(media_type))]));
-                if let Credentials::Token(ref token) = instance.credentials {
+                if let Some(Credentials::Token(ref token)) = instance.credentials {
                     headers.set(Authorization(format!("token {}", token)))
                 }
             }
@@ -537,11 +534,5 @@ mod tests {
     fn default_sort_direction() {
         let default: SortDirection = Default::default();
         assert_eq!(default, SortDirection::Asc)
-    }
-
-    #[test]
-    fn default_credentials() {
-        let default: Credentials = Default::default();
-        assert_eq!(default, Credentials::None)
     }
 }
