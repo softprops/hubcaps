@@ -1,17 +1,19 @@
 //! Pull requests interface
-extern crate serde_json;
 
-use super::{Iter, Github, Result};
+use std::collections::HashMap;
+use std::fmt;
+
+use hyper::client::Connect;
+use serde_json;
+use url::form_urlencoded;
+use futures::future;
+
+use {unfold, Stream, Github, Future, SortDirection};
 use comments::Comments;
 use pull_commits::PullCommits;
+use issues::{Sort as IssueSort, State};
 use review_comments::ReviewComments;
 use users::User;
-use std::default::Default;
-use std::fmt;
-use url::form_urlencoded;
-use std::collections::HashMap;
-use issues::{Sort as IssueSort, State};
-use super::SortDirection;
 
 fn identity<T>(x: T) -> T {
     x
@@ -48,16 +50,19 @@ impl Default for Sort {
 }
 
 /// A structure for accessing interfacing with a specific pull request
-pub struct PullRequest<'a> {
-    github: &'a Github,
+pub struct PullRequest<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> PullRequest<'a> {
+impl<C: Clone + Connect> PullRequest<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> PullRequest<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -81,35 +86,34 @@ impl<'a> PullRequest<'a> {
     }
 
     /// Request a pull requests information
-    pub fn get(&self) -> Result<Pull> {
-        self.github.get::<Pull>(&self.path(""))
+    pub fn get(&self) -> Future<Pull> {
+        self.github.get(&self.path(""))
     }
 
     /// short hand for editing state = open
-    pub fn open(&self) -> Result<Pull> {
+    pub fn open(&self) -> Future<Pull> {
         self.edit(&PullEditOptions::builder().state("open").build())
     }
 
     /// shorthand for editing state = closed
-    pub fn close(&self) -> Result<Pull> {
+    pub fn close(&self) -> Future<Pull> {
         self.edit(&PullEditOptions::builder().state("closed").build())
     }
 
     /// Edit a pull request
-    pub fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
-        let data = serde_json::to_string(&pr)?;
-        self.github.patch::<Pull>(&self.path(""), data.as_bytes())
+    pub fn edit(&self, pr: &PullEditOptions) -> Future<Pull> {
+        self.github.patch::<Pull>(&self.path(""), json!(pr))
     }
 
     /// Returns a vector of file diffs associated with this pull
-    pub fn files(&self) -> Result<Vec<FileDiff>> {
-        self.github.get::<Vec<FileDiff>>(&self.path("/files"))
+    pub fn files(&self) -> Future<Vec<FileDiff>> {
+        self.github.get(&self.path("/files"))
     }
 
     /// returns issue comments interface
-    pub fn comments(&self) -> Comments {
+    pub fn comments(&self) -> Comments<C> {
         Comments::new(
-            self.github,
+            self.github.clone(),
             self.owner.clone(),
             self.repo.clone(),
             self.number,
@@ -117,9 +121,9 @@ impl<'a> PullRequest<'a> {
     }
 
     /// returns review comments interface
-    pub fn review_comments(&self) -> ReviewComments {
+    pub fn review_comments(&self) -> ReviewComments<C> {
         ReviewComments::new(
-            self.github,
+            self.github.clone(),
             self.owner.clone(),
             self.repo.clone(),
             self.number,
@@ -127,9 +131,9 @@ impl<'a> PullRequest<'a> {
     }
 
     /// returns pull commits interface
-    pub fn commits(&self) -> PullCommits {
+    pub fn commits(&self) -> PullCommits<C> {
         PullCommits::new(
-            self.github,
+            self.github.clone(),
             self.owner.clone(),
             self.repo.clone(),
             self.number,
@@ -138,15 +142,18 @@ impl<'a> PullRequest<'a> {
 }
 
 /// A structure for interfacing with a repositories list of pull requests
-pub struct PullRequests<'a> {
-    github: &'a Github,
+pub struct PullRequests<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> PullRequests<'a> {
+impl<C: Clone + Connect> PullRequests<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> PullRequests<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -163,18 +170,22 @@ impl<'a> PullRequests<'a> {
     }
 
     /// Get a reference to a structure for interfacing with a specific pull request
-    pub fn get(&self, number: u64) -> PullRequest {
-        PullRequest::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
+    pub fn get(&self, number: u64) -> PullRequest<C> {
+        PullRequest::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            number,
+        )
     }
 
     /// Create a new pull request
-    pub fn create(&self, pr: &PullOptions) -> Result<Pull> {
-        let data = serde_json::to_string(&pr)?;
-        self.github.post::<Pull>(&self.path(""), data.as_bytes())
+    pub fn create(&self, pr: &PullOptions) -> Future<Pull> {
+        self.github.post(&self.path(""), json!(pr))
     }
 
     /// list pull requests
-    pub fn list(&self, options: &PullListOptions) -> Result<Vec<Pull>> {
+    pub fn list(&self, options: &PullListOptions) -> Future<Vec<Pull>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -182,17 +193,21 @@ impl<'a> PullRequests<'a> {
         self.github.get::<Vec<Pull>>(&uri.join("?"))
     }
 
-    /// provides an iterator over all pages of pull requests
-    pub fn iter(&self, options: &PullListOptions) -> Result<Iter<Vec<Pull>, Pull>> {
+    /// provides a stream over all pages of pull requests
+    pub fn iter(&self, options: &PullListOptions) -> Stream<Pull> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.iter(uri.join("?"), identity)
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&uri.join("?")),
+            identity,
+        )
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 /// representation of a github pull request
 #[derive(Debug, Deserialize)]

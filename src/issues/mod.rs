@@ -1,15 +1,16 @@
 //! Issues interface
 
-extern crate serde_json;
+use std::fmt;
+use std::collections::HashMap;
 
-use super::{Github, Result};
+use futures::future;
+use hyper::client::Connect;
+use url::form_urlencoded;
+
+use {Github, Future, SortDirection, serde_json};
 use comments::Comments;
 use users::User;
 use labels::Label;
-use super::SortDirection;
-use std::fmt;
-use std::collections::HashMap;
-use url::form_urlencoded;
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Debug, PartialEq)]
@@ -66,16 +67,16 @@ impl Default for Sort {
 }
 
 /// Provides access to label operations available for an individual issues
-pub struct IssueLabels<'a> {
-    github: &'a Github,
+pub struct IssueLabels<C: Clone + Connect> {
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> IssueLabels<'a> {
+impl<C: Clone + Connect> IssueLabels<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueLabels<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -99,46 +100,43 @@ impl<'a> IssueLabels<'a> {
     }
 
     /// add a set of labels to this issue ref
-    pub fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github.post::<Vec<Label>>(
-            &self.path(""),
-            serde_json::to_string(&labels)?.as_bytes(),
-        )
+    pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
+        self.github.post(&self.path(""), json!(labels))
     }
 
     /// remove a label from this issue
-    pub fn remove(&self, label: &str) -> Result<()> {
+    pub fn remove(&self, label: &str) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}", label)))
     }
 
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
-    pub fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
-        self.github.put::<Vec<Label>>(
-            &self.path(""),
-            serde_json::to_string(&labels)?.as_bytes(),
-        )
+    pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
+        self.github.put(&self.path(""), json!(labels))
     }
 
     /// remove all labels from an issue
-    pub fn clear(&self) -> Result<()> {
+    pub fn clear(&self) -> Future<()> {
         self.github.delete(&self.path(""))
     }
 }
 
 /// Provides access to operations available for a single issue
 /// Typically accessed from `github.repo(.., ..).issues().get(number)`
-pub struct IssueRef<'a> {
-    github: &'a Github,
+pub struct IssueRef<C>
+where
+    C: Connect + Clone,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<'a> IssueRef<'a> {
-    /// create a new instance of a github repo issue ref
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, number: u64) -> IssueRef<'a>
+impl<C: Clone + Connect> IssueRef<C> {
+    #[doc(hidden)]
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -152,8 +150,8 @@ impl<'a> IssueRef<'a> {
     }
 
     /// Request an issue's information
-    pub fn get(&self) -> Result<Issue> {
-        self.github.get::<Issue>(&self.path(""))
+    pub fn get(&self) -> Future<Issue> {
+        self.github.get(&self.path(""))
     }
 
     fn path(&self, more: &str) -> String {
@@ -166,23 +164,25 @@ impl<'a> IssueRef<'a> {
         )
     }
 
-    pub fn labels(&self) -> IssueLabels {
+    /// Return a reference to labels operations available for this issue
+    pub fn labels(&self) -> IssueLabels<C> {
         IssueLabels::new(
-            self.github,
+            self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),
             self.number,
         )
     }
 
-    pub fn edit(&self, is: &IssueOptions) -> Result<Issue> {
-        let data = serde_json::to_string(&is)?;
-        self.github.patch::<Issue>(&self.path(""), data.as_bytes())
+    /// Edit the issues options
+    pub fn edit(&self, is: &IssueOptions) -> Future<Issue> {
+        self.github.patch(&self.path(""), json!(is))
     }
 
-    pub fn comments(&self) -> Comments {
+    /// Return a reference to comment operations available for this issue
+    pub fn comments(&self) -> Comments<C> {
         Comments::new(
-            self.github,
+            self.github.clone(),
             self.owner.clone(),
             self.repo.clone(),
             self.number,
@@ -192,15 +192,18 @@ impl<'a> IssueRef<'a> {
 
 /// Provides access to operations available for a repository issues
 /// Typically accessed via `github.repo(..., ...).issues()`
-pub struct Issues<'a> {
-    github: &'a Github,
+pub struct Issues<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Issues<'a> {
+impl<C: Clone + Connect> Issues<C> {
     /// create a new instance of a github repo issue ref
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Issues<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -216,21 +219,25 @@ impl<'a> Issues<'a> {
         format!("/repos/{}/{}/issues{}", self.owner, self.repo, more)
     }
 
-    pub fn get(&self, number: u64) -> IssueRef {
-        IssueRef::new(self.github, self.owner.as_str(), self.repo.as_str(), number)
+    pub fn get(&self, number: u64) -> IssueRef<C> {
+        IssueRef::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            number,
+        )
     }
 
-    pub fn create(&self, is: &IssueOptions) -> Result<Issue> {
-        let data = serde_json::to_string(&is)?;
-        self.github.post::<Issue>(&self.path(""), data.as_bytes())
+    pub fn create(&self, is: &IssueOptions) -> Future<Issue> {
+        self.github.post(&self.path(""), json!(is))
     }
 
-    pub fn list(&self, options: &IssueListOptions) -> Result<Vec<Issue>> {
+    pub fn list(&self, options: &IssueListOptions) -> Future<Vec<Issue>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Issue>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 }
 

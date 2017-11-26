@@ -2,17 +2,23 @@
 
 extern crate serde_json;
 
-use self::super::{Github, Result};
+use futures::future;
+use hyper::client::Connect;
 
-pub struct Labels<'a> {
-    github: &'a Github,
+use {Github, Future};
+
+pub struct Labels<C>
+where
+    C: Connect + Clone,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Labels<'a> {
+impl<C: Connect + Clone> Labels<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Labels<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -28,27 +34,23 @@ impl<'a> Labels<'a> {
         format!("/repos/{}/{}/labels{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, lab: &LabelOptions) -> Result<Label> {
-        let data = serde_json::to_string(&lab)?;
-        self.github.post::<Label>(&self.path(""), data.as_bytes())
+    pub fn create(&self, lab: &LabelOptions) -> Future<Label> {
+        self.github.post(&self.path(""), json!(lab))
     }
 
-    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
-        let data = serde_json::to_string(&lab)?;
-        self.github.patch::<Label>(
+    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Future<Label> {
+        self.github.patch(
             &self.path(&format!("/{}", prevname)),
-            data.as_bytes(),
+            json!(lab),
         )
     }
 
-    pub fn delete(&self, name: &str) -> Result<()> {
-        self.github.delete(&self.path(&format!("/{}", name))).map(
-            |_| (),
-        )
+    pub fn delete(&self, name: &str) -> Future<()> {
+        self.github.delete(&self.path(&format!("/{}", name)))
     }
 
-    pub fn list(&self) -> Result<Vec<Label>> {
-        self.github.get::<Vec<Label>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<Label>> {
+        self.github.get(&self.path(""))
     }
 }
 

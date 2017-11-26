@@ -1,21 +1,27 @@
 //! Gists interface
-extern crate serde_json;
 
-use self::super::{Error, ErrorKind, Github, Result};
-use url::form_urlencoded;
-use users::User;
 use std::collections::HashMap;
 use std::hash::Hash;
 
+use futures::future;
+use hyper::client::Connect;
+use url::form_urlencoded;
+
+use {Github, Future, serde_json};
+use users::User;
+
 /// reference to gists associated with a github user
-pub struct UserGists<'a> {
-    github: &'a Github,
+pub struct UserGists<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
 }
 
-impl<'a> UserGists<'a> {
+impl<C: Clone + Connect> UserGists<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, owner: O) -> UserGists<'a>
+    pub fn new<O>(github: Github<C>, owner: O) -> Self
     where
         O: Into<String>,
     {
@@ -25,70 +31,67 @@ impl<'a> UserGists<'a> {
         }
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
+    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
         let mut uri = vec![format!("/users/{}/gists", self.owner)];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Gist>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 }
 
-pub struct Gists<'a> {
-    github: &'a Github,
+pub struct Gists<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
 }
 
-impl<'a> Gists<'a> {
+impl<C: Clone + Connect> Gists<C> {
     #[doc(hidden)]
-    pub fn new(github: &'a Github) -> Gists<'a> {
-        Gists { github: github }
+    pub fn new(github: Github<C>) -> Self {
+        Self { github }
     }
 
     fn path(&self, more: &str) -> String {
         format!("/gists{}", more)
     }
 
-    pub fn star(&self, id: &str) -> Result<()> {
-        match self.github
-            .put::<String>(&self.path(&format!("/{}/star", id)), &[])
-            .map(|_| ()) {
-            Err(Error(ErrorKind::Codec(_), _)) => Ok(()),
-            otherwise => otherwise,
-        }
+    pub fn star(&self, id: &str) -> Future<()> {
+        self.github.put_no_response(
+            &self.path(&format!("/{}/star", id)),
+            Vec::new(),
+        )
     }
 
-    pub fn unstar(&self, id: &str) -> Result<()> {
+    pub fn unstar(&self, id: &str) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}/star", id)))
     }
 
-    pub fn fork(&self, id: &str) -> Result<Gist> {
-        self.github.post::<Gist>(
+    pub fn fork(&self, id: &str) -> Future<Gist> {
+        self.github.post(
             &self.path(&format!("/{}/forks", id)),
-            &[],
+            Vec::new(),
         )
     }
 
-    pub fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
-        self.github.get::<Vec<GistFork>>(
-            &self.path(&format!("/{}/forks", id)),
-        )
+    pub fn forks(&self, id: &str) -> Future<Vec<GistFork>> {
+        self.github.get(&self.path(&format!("/{}/forks", id)))
     }
 
-    pub fn delete(&self, id: &str) -> Result<()> {
+    pub fn delete(&self, id: &str) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
-    pub fn get(&self, id: &str) -> Result<Gist> {
-        self.github.get::<Gist>(&self.path(&format!("/{}", id)))
+    pub fn get(&self, id: &str) -> Future<Gist> {
+        self.github.get(&self.path(&format!("/{}", id)))
     }
 
-    pub fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
-        self.github.get::<Gist>(
-            &self.path(&format!("/{}/{}", id, sha)),
-        )
+    pub fn getrev(&self, id: &str, sha: &str) -> Future<Gist> {
+        self.github.get(&self.path(&format!("/{}/{}", id, sha)))
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
+    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -96,17 +99,16 @@ impl<'a> Gists<'a> {
         self.github.get::<Vec<Gist>>(&uri.join("?"))
     }
 
-    pub fn public(&self) -> Result<Vec<Gist>> {
-        self.github.get::<Vec<Gist>>(&self.path("/public"))
+    pub fn public(&self) -> Future<Vec<Gist>> {
+        self.github.get(&self.path("/public"))
     }
 
-    pub fn starred(&self) -> Result<Vec<Gist>> {
-        self.github.get::<Vec<Gist>>(&self.path("/starred"))
+    pub fn starred(&self) -> Future<Vec<Gist>> {
+        self.github.get(&self.path("/starred"))
     }
 
-    pub fn create(&self, gist: &GistOptions) -> Result<Gist> {
-        let data = serde_json::to_string(&gist)?;
-        self.github.post::<Gist>(&self.path(""), data.as_bytes())
+    pub fn create(&self, gist: &GistOptions) -> Future<Gist> {
+        self.github.post(&self.path(""), json!(gist))
     }
 
     // todo: edit

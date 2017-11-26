@@ -1,8 +1,13 @@
 //! Teams interface
-use self::super::{Iter, Github, Result};
-use std::fmt;
-use serde_json;
+
 use std::collections::BTreeMap;
+use std::fmt;
+
+use futures::future;
+use hyper::client::Connect;
+use serde_json;
+
+use {Github, Future, Stream, unfold};
 
 /// Team repository permissions
 pub enum Permission {
@@ -26,15 +31,18 @@ fn identity<T>(x: T) -> T {
 }
 
 /// reference to teams associated with a github repo
-pub struct RepoTeams<'a> {
-    github: &'a Github,
+pub struct RepoTeams<C>
+where
+    C: Connect + Clone,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> RepoTeams<'a> {
+impl<C: Connect + Clone> RepoTeams<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -47,7 +55,7 @@ impl<'a> RepoTeams<'a> {
     }
 
     /// list of teams for this repo
-    pub fn list(&self) -> Result<Vec<Team>> {
+    pub fn list(&self) -> Future<Vec<Team>> {
         self.github.get(&format!(
             "/repos/{}/{}/teams",
             self.owner,
@@ -55,24 +63,32 @@ impl<'a> RepoTeams<'a> {
         ))
     }
 
-    /// provides an iterator over all pages of teams
-    pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github.iter(
-            format!("/repos/{}/{}/teams", self.owner, self.repo),
+    /// provides a stream over all pages of teams
+    pub fn iter(&self) -> Stream<Team> {
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&format!(
+                "/repos/{}/{}/teams",
+                self.owner,
+                self.repo
+            )),
             identity,
         )
     }
 }
 
 /// reference to teams associated with a github org
-pub struct OrgTeams<'a> {
-    github: &'a Github,
+pub struct OrgTeams<C>
+where
+    C: Connect + Clone,
+{
+    github: Github<C>,
     org: String,
 }
 
-impl<'a> OrgTeams<'a> {
+impl<C: Clone + Connect> OrgTeams<C> {
     #[doc(hidden)]
-    pub fn new<O>(github: &'a Github, org: O) -> Self
+    pub fn new<O>(github: Github<C>, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -83,14 +99,15 @@ impl<'a> OrgTeams<'a> {
     }
 
     /// list of teams for this org
-    pub fn list(&self) -> Result<Vec<Team>> {
+    pub fn list(&self) -> Future<Vec<Team>> {
         self.github.get(&format!("/orgs/{}/teams", self.org))
     }
 
     /// provides an iterator over all pages of teams
-    pub fn iter(&'a self) -> Result<Iter<'a, Vec<Team>, Team>> {
-        self.github.iter(
-            format!("/orgs/{}/teams", self.org),
+    pub fn iter(&self) -> Stream<Team> {
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&format!("/orgs/{}/teams", self.org)),
             identity,
         )
     }
@@ -102,21 +119,20 @@ impl<'a> OrgTeams<'a> {
         team_id: u64,
         repo_name: N,
         permission: Permission,
-    ) -> Result<()>
+    ) -> Future<()>
     where
         N: Into<String>,
     {
         let mut payload = BTreeMap::new();
         payload.insert("permission", permission.to_string());
-        let data = serde_json::to_string(&payload)?;
         self.github.put_no_response(
             &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
-            data.as_bytes(),
+            json!(payload),
         )
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Team {

@@ -1,41 +1,50 @@
 extern crate env_logger;
 extern crate hyper;
-extern crate hyper_native_tls;
 extern crate hubcaps;
+extern crate futures;
+extern crate tokio_core;
+#[macro_use(quick_main)]
+extern crate error_chain;
 
-use hyper::net::HttpsConnector;
-use hyper::Client;
-use hyper_native_tls::NativeTlsClient;
-use hubcaps::{Credentials, Github};
-use hubcaps::branches::Protection;
 use std::env;
 
-fn main() {
-    env_logger::init().unwrap();
+use futures::Stream;
+use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github, Result};
+use hubcaps::branches::Protection;
+
+quick_main!(run);
+
+fn run() -> Result<()> {
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
-            for branch in github
-                .repo("softprops", "hubcaps")
-                .branches()
-                .iter()
-                .unwrap()
+            let mut core = Core::new()?;
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
+
+            if let Err(err) = core.run(
+                github
+                    .repo("softprops", "hubcaps")
+                    .branches()
+                    .iter()
+                    .for_each(|branch| Ok(println!("{:#?}", branch))),
+            )
             {
-                println!("{:#?}", branch)
+                println!("err {:#?}", err)
             }
 
-            match github.repo("softprops", "hubcaps").branches().get("master") {
+            match core.run(github.repo("softprops", "hubcaps").branches().get("master")) {
                 Ok(branch) => println!("{:#?}", branch),
                 Err(err) => println!("err {:#?}", err),
             }
 
             // protect master branch
-            match github.repo("softprops", "hubcaps").branches().protection(
+            match core.run(github.repo("softprops", "hubcaps").branches().protection(
                 "master",
                 &Protection {
                     required_status_checks: None,
@@ -43,11 +52,12 @@ fn main() {
                     required_pull_request_reviews: None,
                     restrictions: None,
                 },
-            ) {
+            )) {
                 Ok(pro) => println!("{:#?}", pro),
                 Err(err) => println!("err {:#?}", err),
             }
+            Ok(())
         }
-        _ => println!("example missing GITHUB_TOKEN"),
+        _ => Err("example missing GITHUB_TOKEN".into()),
     }
 }

@@ -1,17 +1,22 @@
 //! Git interface
 
-use self::super::{Github, Result};
+use hyper::client::Connect;
+
+use {Github, Future};
 
 /// reference to git operations associated with a github repo
-pub struct Git<'a> {
-    github: &'a Github,
+pub struct Git<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Git<'a> {
+impl<C: Clone + Connect> Git<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -30,11 +35,11 @@ impl<'a> Git<'a> {
     /// list a git tree of files for this repo at a given sha
     /// https://developer.github.com/v3/git/trees/#get-a-tree
     /// https://developer.github.com/v3/git/trees/#get-a-tree-recursively
-    pub fn tree<S>(&self, sha: S, recursive: bool) -> Result<TreeData>
+    pub fn tree<S>(&self, sha: S, recursive: bool) -> Future<TreeData>
     where
         S: Into<String>,
     {
-        self.github.get::<TreeData>(&self.path(format!(
+        self.github.get(&self.path(format!(
             "/trees/{}?recursive={}",
             sha.into(),
             if recursive { "1" } else { "0" }
@@ -43,11 +48,11 @@ impl<'a> Git<'a> {
 
     /// get the blob contents of a given sha
     /// https://developer.github.com/v3/git/blobs/#get-a-blob
-    pub fn blob<S>(&self, sha: S) -> Result<Blob>
+    pub fn blob<S>(&self, sha: S) -> Future<Blob>
     where
         S: Into<String>,
     {
-        self.github.get::<Blob>(
+        self.github.get(
             &self.path(format!("/blobs/{}", sha.into())),
         )
     }
@@ -55,11 +60,11 @@ impl<'a> Git<'a> {
     /// get the git reference data of a given ref
     /// the specified reference must be formatted as as "heads/branch", not just "branch"
     /// https://developer.github.com/v3/git/refs/#get-a-reference
-    pub fn reference<S>(&self, reference: S) -> Result<GetReferenceResponse>
+    pub fn reference<S>(&self, reference: S) -> Future<GetReferenceResponse>
     where
         S: Into<String>,
     {
-        self.github.get::<GetReferenceResponse>(
+        self.github.get(
             &self.path(format!("/refs/{}", reference.into())),
         )
     }

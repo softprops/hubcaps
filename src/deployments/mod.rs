@@ -1,32 +1,43 @@
 //! Deployments interface
+
+extern crate futures;
 extern crate serde_json;
 
 use std::collections::HashMap;
+
+use futures::future;
 use url::form_urlencoded;
 use serde;
-
-use self::super::{Github, Result};
+use hyper::client::Connect;
 use statuses::State;
 use users::User;
 
+use {Github, Future};
+
 /// Interface for repository deployments
-pub struct Deployments<'a> {
-    github: &'a Github,
+pub struct Deployments<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
 /// Interface for deployment statuses
-pub struct DeploymentStatuses<'a> {
-    github: &'a Github,
+pub struct DeploymentStatuses<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     id: u64,
 }
 
-impl<'a> DeploymentStatuses<'a> {
+impl<C: Clone + Connect> DeploymentStatuses<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> DeploymentStatuses<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -50,24 +61,20 @@ impl<'a> DeploymentStatuses<'a> {
     }
 
     /// lists all statuses associated with a deployment
-    pub fn list(&self) -> Result<Vec<DeploymentStatus>> {
-        self.github.get::<Vec<DeploymentStatus>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<DeploymentStatus>> {
+        self.github.get(&self.path(""))
     }
 
     /// creates a new deployment status. For convenience, a DeploymentStatusOptions.builder
     /// interface is required for building up a request
-    pub fn create(&self, status: &DeploymentStatusOptions) -> Result<DeploymentStatus> {
-        let data = serde_json::to_string(&status)?;
-        self.github.post::<DeploymentStatus>(
-            &self.path(""),
-            &data.as_bytes(),
-        )
+    pub fn create(&self, status: &DeploymentStatusOptions) -> Future<DeploymentStatus> {
+        self.github.post(&self.path(""), json!(status))
     }
 }
 
-impl<'a> Deployments<'a> {
+impl<C: Clone + Connect> Deployments<C> {
     /// Create a new deployments instance
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Deployments<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Deployments<C>
     where
         O: Into<String>,
         R: Into<String>,
@@ -84,26 +91,27 @@ impl<'a> Deployments<'a> {
     }
 
     /// lists all deployments for a repository
-    pub fn list(&self, opts: &DeploymentListOptions) -> Result<Vec<Deployment>> {
+    pub fn list(&self, opts: &DeploymentListOptions) -> Future<Vec<Deployment>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = opts.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Deployment>>(&uri.join("?"))
+        self.github.get(&uri.join("?"))
     }
 
     /// creates a new deployment for this repository
-    pub fn create(&self, dep: &DeploymentOptions) -> Result<Deployment> {
-        let data = serde_json::to_string(&dep)?;
-        self.github.post::<Deployment>(
-            &self.path(""),
-            data.as_bytes(),
-        )
+    pub fn create(&self, dep: &DeploymentOptions) -> Future<Deployment> {
+        self.github.post(&self.path(""), json!(dep))
     }
 
     /// get a reference to the statuses api for a give deployment
-    pub fn statuses(&self, id: u64) -> DeploymentStatuses {
-        DeploymentStatuses::new(self.github, self.owner.as_str(), self.repo.as_str(), id)
+    pub fn statuses(&self, id: u64) -> DeploymentStatuses<C> {
+        DeploymentStatuses::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            id,
+        )
     }
 }
 

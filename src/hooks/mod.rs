@@ -1,9 +1,13 @@
 //! Hooks interface
+//!
 //! See the [github docs](https://developer.github.com/v3/repos/hooks/) for more information
 
-extern crate serde_json;
+use futures::future;
+use serde_json;
 
-use self::super::{Github, Result};
+use {Github, Future};
+
+use hyper::client::Connect;
 use std::fmt;
 use std::collections::BTreeMap;
 
@@ -35,15 +39,18 @@ impl fmt::Display for WebHookContentType {
 }
 
 /// Interface for managing repository hooks
-pub struct Hooks<'a> {
-    github: &'a Github,
+pub struct Hooks<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Hooks<'a> {
+impl<C: Clone + Connect> Hooks<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Hooks<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -56,7 +63,7 @@ impl<'a> Hooks<'a> {
     }
 
     /// lists hook associated with a repository
-    pub fn list(&self) -> Result<Vec<Hook>> {
+    pub fn list(&self) -> Future<Vec<Hook>> {
         self.github.get(&format!(
             "/repos/{}/{}/hooks",
             self.owner,
@@ -69,25 +76,23 @@ impl<'a> Hooks<'a> {
     /// Creating hooks for a service that already has one configured will update the existing hook.
     /// see [github docs](https://developer.github.com/v3/repos/hooks/)
     /// for more information
-    pub fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
-        let data = serde_json::to_string(&options)?;
-        self.github.post::<Hook>(
+    pub fn create(&self, options: &HookCreateOptions) -> Future<Hook> {
+        self.github.post(
             &format!("/repos/{}/{}/hooks", self.owner, self.repo),
-            data.as_bytes(),
+            json!(options),
         )
     }
 
     /// edits an existing repository hook
-    pub fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
-        let data = serde_json::to_string(&options)?;
-        self.github.patch::<Hook>(
+    pub fn edit(&self, id: u64, options: &HookEditOptions) -> Future<Hook> {
+        self.github.patch(
             &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-            data.as_bytes(),
+            json!(options),
         )
     }
 
     /// deletes a repository hook by id
-    pub fn delete(&self, id: u64) -> Result<()> {
+    pub fn delete(&self, id: u64) -> Future<()> {
         self.github.delete(&format!(
             "/repos/{}/{}/hooks/{}",
             self.owner,

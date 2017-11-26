@@ -1,20 +1,26 @@
 //! Statuses interface
 extern crate serde_json;
 extern crate serde;
+extern crate futures;
 
-use self::super::{Github, Result};
+use futures::future;
+use {Github, Future};
+use hyper::client::Connect;
 use users::User;
 
 /// interface for statuses associated with a repository
-pub struct Statuses<'a> {
-    github: &'a Github,
+pub struct Statuses<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Statuses<'a> {
+impl<C: Clone + Connect> Statuses<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Statuses<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -31,17 +37,16 @@ impl<'a> Statuses<'a> {
     }
 
     /// creates a new status for a target sha
-    pub fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
-        let data = serde_json::to_string(&status)?;
-        self.github.post::<Status>(
+    pub fn create(&self, sha: &str, status: &StatusOptions) -> Future<Status> {
+        self.github.post(
             &self.path(&format!("/{}", sha)),
-            data.as_bytes(),
+            json!(status),
         )
     }
 
     /// lists all statuses associated with a given git sha
-    pub fn list(&self, sha: &str) -> Result<Vec<Status>> {
-        self.github.get::<Vec<Status>>(&format!(
+    pub fn list(&self, sha: &str) -> Future<Vec<Status>> {
+        self.github.get(&format!(
             "/repos/{}/{}/commits/{}/statuses",
             self.owner,
             self.repo,
@@ -50,8 +55,9 @@ impl<'a> Statuses<'a> {
     }
 
     /// list the combined statuses for a given git sha
-    pub fn combined(&self, sha: &str) -> Result<String> {
-        self.github.get::<String>(&format!(
+    /// fixme: give this a type
+    pub fn combined(&self, sha: &str) -> Future<String> {
+        self.github.get(&format!(
             "/repos/{}/{}/commits/{}/status",
             self.owner,
             self.repo,
@@ -60,8 +66,7 @@ impl<'a> Statuses<'a> {
     }
 }
 
-// representations
-
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Status {

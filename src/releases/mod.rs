@@ -1,19 +1,25 @@
 //! Releases interface
 extern crate serde_json;
 
-use self::super::{Github, Result};
+use futures::future;
+use hyper::client::Connect;
+
+use {Github, Future};
 use users::User;
 
-pub struct Assets<'a> {
-    github: &'a Github,
+pub struct Assets<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     releaseid: u64,
 }
 
-impl<'a> Assets<'a> {
+impl<C: Connect + Clone> Assets<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, releaseid: u64) -> Assets<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, releaseid: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -40,31 +46,32 @@ impl<'a> Assets<'a> {
     }
 
     // todo: stream interface to download
-    pub fn get(&self, id: u64) -> Result<Asset> {
-        self.github.get::<Asset>(&self.path(&format!("/{}", id)))
+    pub fn get(&self, id: u64) -> Future<Asset> {
+        self.github.get(&self.path(&format!("/{}", id)))
     }
 
-    pub fn delete(&self, id: u64) -> Result<()> {
-        self.github.delete(&self.path(&format!("/{}", id))).map(
-            |_| (),
-        )
+    pub fn delete(&self, id: u64) -> Future<()> {
+        self.github.delete(&self.path(&format!("/{}", id)))
     }
 
-    pub fn list(&self) -> Result<Vec<Asset>> {
-        self.github.get::<Vec<Asset>>(&self.path(""))
+    pub fn list(&self) -> Future<Vec<Asset>> {
+        self.github.get(&self.path(""))
     }
 }
 
-pub struct ReleaseRef<'a> {
-    github: &'a Github,
+pub struct ReleaseRef<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
     id: u64,
 }
 
-impl<'a> ReleaseRef<'a> {
+impl<C: Clone + Connect> ReleaseRef<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R, id: u64) -> ReleaseRef<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -87,13 +94,13 @@ impl<'a> ReleaseRef<'a> {
         )
     }
 
-    pub fn get(&self) -> Result<Release> {
+    pub fn get(&self) -> Future<Release> {
         self.github.get::<Release>(&self.path(""))
     }
 
-    pub fn assets(&self) -> Assets {
+    pub fn assets(&self) -> Assets<C> {
         Assets::new(
-            self.github,
+            self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),
             self.id,
@@ -101,15 +108,18 @@ impl<'a> ReleaseRef<'a> {
     }
 }
 
-pub struct Releases<'a> {
-    github: &'a Github,
+pub struct Releases<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<'a> Releases<'a> {
+impl<C: Clone + Connect> Releases<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: &'a Github, owner: O, repo: R) -> Releases<'a>
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -125,35 +135,36 @@ impl<'a> Releases<'a> {
         format!("/repos/{}/{}/releases{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, rel: &ReleaseOptions) -> Result<Release> {
-        let data = serde_json::to_string(&rel)?;
-        self.github.post::<Release>(&self.path(""), data.as_bytes())
+    pub fn create(&self, rel: &ReleaseOptions) -> Future<Release> {
+        self.github.post(&self.path(""), json!(rel))
     }
 
-    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Result<Release> {
-        let data = serde_json::to_string(&rel)?;
-        self.github.patch::<Release>(
+    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
+        self.github.patch(
             &self.path(&format!("/{}", id)),
-            data.as_bytes(),
+            json!(rel),
         )
     }
 
-    pub fn delete(&self, id: u64) -> Result<()> {
-        self.github.delete(&self.path(&format!("/{}", id))).map(
-            |_| (),
+    pub fn delete(&self, id: u64) -> Future<()> {
+        self.github.delete(&self.path(&format!("/{}", id)))
+    }
+
+    pub fn list(&self) -> Future<Vec<Release>> {
+        self.github.get(&self.path(""))
+    }
+
+    pub fn get(&self, id: u64) -> ReleaseRef<C> {
+        ReleaseRef::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            id,
         )
-    }
-
-    pub fn list(&self) -> Result<Vec<Release>> {
-        self.github.get::<Vec<Release>>(&self.path(""))
-    }
-
-    pub fn get(&self, id: u64) -> ReleaseRef {
-        ReleaseRef::new(self.github, self.owner.as_str(), self.repo.as_str(), id)
     }
 }
 
-// representations
+// representations (todo: replace with derive_builder)
 
 #[derive(Debug, Deserialize)]
 pub struct Asset {

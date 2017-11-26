@@ -2,21 +2,25 @@
 
 use std::io::Error as IoError;
 use hyper::Error as HttpError;
-use hyper::status::StatusCode;
+use hyper::StatusCode;
+use hyper::error::UriError;
 use serde_json::error::Error as SerdeError;
 
-/// enumerated types of client errors
 error_chain! {
     errors {
         Fault {
             code: StatusCode,
             error: ClientError,
-        }
+        } {
+            display("{}: '{}'", code, error.message)
+            description(error.message.as_str())
+          }
     }
     foreign_links {
         Codec(SerdeError);
         Http(HttpError);
         IO(IoError);
+        URI(UriError);
     }
 }
 

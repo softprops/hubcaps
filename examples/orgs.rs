@@ -1,25 +1,29 @@
 extern crate env_logger;
 extern crate hyper;
 extern crate hubcaps;
-extern crate hyper_native_tls;
+extern crate tokio_core;
+#[macro_use(quick_main)]
+extern crate error_chain;
 
-use hyper::Client;
-use hyper::net::HttpsConnector;
-use hyper_native_tls::NativeTlsClient;
-use hubcaps::{Credentials, Github};
-use hubcaps::repositories::{OrgRepoType, OrganizationRepoListOptions};
 use std::env;
 
-fn main() {
-    env_logger::init().unwrap();
+use tokio_core::reactor::Core;
+
+use hubcaps::{Credentials, Github, Result};
+use hubcaps::repositories::{OrgRepoType, OrganizationRepoListOptions};
+
+quick_main!(run);
+
+fn run() -> Result<()> {
+    drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let github =
-                Github::new(
-                    format!("hubcaps/{}", env!("CARGO_PKG_VERSION")),
-                    Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap())),
-                    Credentials::Token(token),
-                );
+            let mut core = Core::new()?;
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+                &core.handle(),
+            );
 
             let options = OrganizationRepoListOptions::builder()
                 .repo_type(OrgRepoType::Forks)
@@ -27,24 +31,25 @@ fn main() {
 
             println!("Forks in the rust-lang organization:");
 
-            for repo in github.org_repos("rust-lang").list(&options).unwrap() {
+            for repo in core.run(github.org_repos("rust-lang").list(&options))? {
                 println!("{}", repo.name)
             }
 
             println!("");
 
             println!("My organizations:");
-            for org in github.orgs().list().unwrap() {
+            for org in core.run(github.orgs().list())? {
                 println!("{}", org.login)
             }
 
             println!("");
 
             println!("softprops' organizations:");
-            for org in github.user_orgs("softprops").list().unwrap() {
+            for org in core.run(github.user_orgs("softprops").list())? {
                 println!("{}", org.login)
             }
+            Ok(())
         }
-        _ => println!("example missing GITHUB_TOKEN"),
+        _ => Err("example missing GITHUB_TOKEN".into()),
     }
 }

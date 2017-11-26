@@ -1,6 +1,8 @@
 //! Users interface
 
-use {Github, Result};
+use {Github, Future};
+
+use hyper::client::Connect;
 
 /// User information
 #[derive(Debug, Deserialize)]
@@ -62,21 +64,24 @@ pub struct AuthenticatedUser {
 }
 
 /// Query user information
-pub struct Users<'a> {
-    github: &'a Github,
+pub struct Users<C>
+where
+    C: Clone + Connect,
+{
+    github: Github<C>,
 }
 
-impl<'a> Users<'a> {
-    pub fn new(github: &'a Github) -> Users<'a> {
+impl<C: Clone + Connect> Users<C> {
+    pub fn new(github: Github<C>) -> Self {
         Users { github: github }
     }
 
     /// Information about current authenticated user
-    pub fn authenticated(&self) -> Result<AuthenticatedUser> {
-        self.github.get::<AuthenticatedUser>("/user")
+    pub fn authenticated(&self) -> Future<AuthenticatedUser> {
+        self.github.get("/user")
     }
 
-    pub fn get<U>(&self, username: U) -> Result<User>
+    pub fn get<U>(&self, username: U) -> Future<User>
     where
         U: Into<String>,
     {
