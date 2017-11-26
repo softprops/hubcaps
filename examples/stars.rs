@@ -26,7 +26,7 @@ fn run() -> Result<()> {
                 &core.handle(),
             );
             let stars = github.activity().stars();
-            let f = stars.star("softprops", "hubcaps").join(stars.starred(
+            let f = stars.star("softprops", "hubcaps").join(stars.is_starred(
                 "softprops",
                 "hubcaps",
             ));

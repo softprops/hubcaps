@@ -19,8 +19,8 @@ impl<C: Clone + Connect> Stars<C> {
         Self { github }
     }
 
-    /// returns whether or not authenticated user has started a repo
-    pub fn starred<O, R>(&self, owner: O, repo: R) -> Future<bool>
+    /// Returns whether or not authenticated user has started a repo
+    pub fn is_starred<O, R>(&self, owner: O, repo: R) -> Future<bool>
     where
         O: Into<String>,
         R: Into<String>,
