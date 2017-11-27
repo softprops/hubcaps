@@ -67,9 +67,9 @@ use std::fmt;
 use futures::{future, stream, Stream as StdStream, Future as StdFuture, IntoFuture};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
-use hyper::{Client, Method};
+use hyper::{StatusCode, Client, Method};
 use hyper::client::{Connect, HttpConnector, Request};
-use hyper::header::{qitem, Accept, Authorization, UserAgent, Link, RelationType};
+use hyper::header::{qitem, Accept, Authorization, UserAgent, Link, RelationType, Location};
 use hyper::mime::Mime;
 use serde::de::DeserializeOwned;
 use tokio_core::reactor::Handle;
@@ -348,8 +348,10 @@ where
             uri.parse().into_future()
         };
         let instance = self.clone();
+        let body2 = body.clone();
+        let method2 = method.clone();
         let response = url.map_err(Error::from).and_then(move |url| {
-            let mut req = Request::new(method, url);
+            let mut req = Request::new(method2, url);
             {
                 let headers = req.headers_mut();
                 headers.set(UserAgent::new(instance.agent.clone()));
@@ -359,31 +361,41 @@ where
                 }
             }
 
-            if let Some(body) = body {
+            if let Some(body) = body2 {
                 req.set_body(body)
             }
             instance.client.request(req).map_err(Error::from)
         });
+        let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
-            let link = response.headers().get::<Link>().map(|l| l.clone());
+            debug!("response headers {:?}", response.headers());
             let status = response.status();
-            response.body().concat2().map_err(Error::from).and_then(
-                move |body| {
-                    if status.is_success() {
-                        debug!("{}", String::from_utf8_lossy(&body));
-                        serde_json::from_slice::<Out>(&body)
-                            .map(|out| (link, out))
-                            .map_err(|error| ErrorKind::Codec(error).into())
-                    } else {
-                        Err(
-                            ErrorKind::Fault {
-                                code: status,
-                                error: serde_json::from_slice(&body)?,
-                            }.into(),
-                        )
-                    }
+            // handle redirect common with renamed repos
+            if StatusCode::MovedPermanently == status {
+                if let Some(location) = response.headers().get::<Location>() {
+                    debug!("redirect location {:?}", location);
+                    return instance2.request(method, location.to_string(), body, media_type);
+                }
+            }
+            let link = response.headers().get::<Link>().map(|l| l.clone());
+            Box::new(response.body().concat2().map_err(Error::from).and_then(
+                move |response_body| if status.is_success() {
+                    debug!(
+                        "response payload {}",
+                        String::from_utf8_lossy(&response_body)
+                    );
+                    serde_json::from_slice::<Out>(&response_body)
+                        .map(|out| (link, out))
+                        .map_err(|error| ErrorKind::Codec(error).into())
+                } else {
+                    Err(
+                        ErrorKind::Fault {
+                            code: status,
+                            error: serde_json::from_slice(&response_body)?,
+                        }.into(),
+                    )
                 },
-            )
+            ))
         }))
     }
 

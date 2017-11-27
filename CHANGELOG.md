@@ -1,3 +1,7 @@
+# 0.4.1
+
+* add tranparent handling of 301 permanent moves for repo renames
+
 # 0.4.0
 
 * upgrade to async hyper (0.11)
