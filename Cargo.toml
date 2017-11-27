@@ -13,6 +13,7 @@ readme = "README.md"
 
 [badges]
 travis-ci = { repository = "softprops/hubcaps" }
+coveralls = { repository = "softprops/hubcaps" }
 
 [dev-dependencies]
 env_logger = "0.3"
