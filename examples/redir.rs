@@ -24,7 +24,7 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
-            core.run(github.repo("rust-lang", "log").get())?;
+            core.run(github.activity().stars().star("rust-lang", "log"))?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

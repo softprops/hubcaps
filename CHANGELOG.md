@@ -1,6 +1,10 @@
+# 0.4.2
+
+* add transparent handling of 307 temporary redirect
+
 # 0.4.1
 
-* add tranparent handling of 301 permanent moves for repo renames
+* add transparent handling of 301 permanent moves for repo renames
 
 # 0.4.0
 

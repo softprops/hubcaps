@@ -371,7 +371,7 @@ where
             debug!("response headers {:?}", response.headers());
             let status = response.status();
             // handle redirect common with renamed repos
-            if StatusCode::MovedPermanently == status {
+            if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
                 if let Some(location) = response.headers().get::<Location>() {
                     debug!("redirect location {:?}", location);
                     return instance2.request(method, location.to_string(), body, media_type);
