@@ -1,6 +1,7 @@
 # 0.4.0
 
 * upgrade to async hyper (0.11)
+* begin [stars](https://developer.github.com/v3/activity/starring) interface
 
 ## breaking changes
 
