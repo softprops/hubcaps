@@ -8,10 +8,9 @@
 
 ## /!\ planned API changes
 
-* implement async interface when hyper adopts it
+The goal and motivation behind these are not to intentionally make breaking changes, but rather to adopt evolving community standards
 
-The goal and motivation behind these are not to intentionally make breaking changes,
-but rather to adopt evolving community standards
+* replace builder implementations with [derive_builder](https://crates.io/crates/derive_builder) crate type derivation
 
 ## installation
 
@@ -19,17 +18,18 @@ Add the following to your `Cargo.toml` filter
 
 ```toml
 [dependencies]
-hubcaps = "0.3"
+hubcaps = "0.4"
 ```
 
 ## usage
 
-Basic usage requires a user-defined user agent string (because github requires this), optionally a flavor of `hubcaps::Credentials` for authorization, and a tokio_core Handle.
+Basic usage requires a user agent string (because github requires this),
+optionally a flavor of `hubcaps::Credentials` for making requests as a particular
+github user, and a tokio_core `Handle`.
 
-For user authenticated requests you'll typically want to use `hubcaps::Credentials::Token` with a  [personal access token](https://github.com/settings/tokens).
-
-> Note: hyper 0.10 no longer includes a tls implementation by default. you will need
->       to provide one to your choosing
+For user authenticated requests you'll typically want to use
+`hubcaps::Credentials::Token` with a
+[personal access token](https://github.com/settings/tokens).
 
 ```rust
 extern crate hyper;
@@ -49,10 +49,12 @@ fn main() {
 }
 ```
 
-Github instances define functions for accessing api services that map closely to their url structure.
+Github instances define methods for accessing api services that map closely to
+their url structure.
 
-As a convention, api methods that expect arguments are represented as functions that accept a struct representing those arguments with an optional builder interface for convenience of construction.
-
+As a convention, api methods that expect arguments are represented as functions
+that accept a struct representing those arguments with an optional builder
+interface for convenience of construction.
 
 See [examples directory](examples/) for some getting started examples
 
@@ -64,7 +66,9 @@ Typically the reference point of most github services is a repository
 let repo = github.repo("user", "repo");
 ```
 
-With a repo instance on hand, you can access a number of sub services, like `labels`, `deployments`, `pulls`, `issues`, and `releases`. Each of this are named functions exported from the repo interface.
+With a repo instance on hand, you can access a number of sub services,
+like `labels`, `deployments`, `pulls`, `issues`, `releases`, and many more.
+Each of this are named functions exported from the repo interface.
 
 See [examples directory](examples/repos.rs) for examples
 
@@ -86,21 +90,11 @@ use hubcaps::labels::LabelOptions;
 let labels = repo.labels();
 
 // create new labels
-println!(
-  "{:?}", labels.create(
+labels.create(
     &LabelOptions::new(
       "rustic", "ccc"
     )
-  ).unwrap()
-);
-
-// list labels
-for l in labels.list().unwrap() {
-  println!("{:?}", l)
-}
-
-// delete labels
-labels.delete("rustic").unwrap();
+  )
 ```
 
 ### deployments
