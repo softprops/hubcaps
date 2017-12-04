@@ -14,7 +14,7 @@ The goal and motivation behind these are not to intentionally make breaking chan
 
 ## installation
 
-Add the following to your `Cargo.toml` filter
+Add the following to your `Cargo.toml` file
 
 ```toml
 [dependencies]
