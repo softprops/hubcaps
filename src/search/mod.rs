@@ -214,8 +214,7 @@ impl IssuesItem {
     /// returns a tuple of (repo owner name, repo name) associated with this issue
     pub fn repo_tuple(&self) -> (String, String) {
         let parsed = url::Url::parse(&self.repository_url).unwrap();
-        let mut path = parsed.path().split("/").collect::<Vec<_>>();
-        path.reverse();
+        let path = parsed.path().split("/").collect::<Vec<_>>();
         (path[0].to_owned(), path[1].to_owned())
     }
 }
