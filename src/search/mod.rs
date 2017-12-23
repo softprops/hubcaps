@@ -14,6 +14,8 @@ use users::User;
 mod repos;
 use self::repos::SearchRepos;
 
+pub use self::repos::*;
+
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
 pub enum IssuesSort {
