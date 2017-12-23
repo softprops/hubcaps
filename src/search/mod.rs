@@ -11,6 +11,11 @@ use {Github, Stream, Future, SortDirection, unfold};
 use labels::Label;
 use users::User;
 
+mod repos;
+use self::repos::SearchRepos;
+
+pub use self::repos::*;
+
 /// Sort directions for pull requests
 #[derive(Debug, PartialEq)]
 pub enum IssuesSort {
@@ -58,6 +63,11 @@ impl<C: Clone + Connect> Search<C> {
     /// return a reference to a search interface for issues
     pub fn issues(&self) -> SearchIssues<C> {
         SearchIssues::new(self.clone())
+    }
+
+    /// Return a reference to a search interface for repositories
+    pub fn repos(&self) -> SearchRepos<C> {
+        SearchRepos::new(self.clone())
     }
 
     fn iter<D>(&self, url: &str) -> Stream<D>
