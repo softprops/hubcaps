@@ -118,7 +118,7 @@ impl SearchReposOptionsBuilder {
     }
 
     pub fn build(&self) -> SearchReposOptions {
-        self.0
+        SearchIssuesOptions { params: self.0.params.clone() }
     }
 }
 
