@@ -117,7 +117,7 @@ impl SearchReposOptionsBuilder {
         self
     }
 
-    pub fn build(self) -> SearchReposOptions {
+    pub fn build(&self) -> SearchReposOptions {
         self.0
     }
 }
