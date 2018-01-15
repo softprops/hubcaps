@@ -144,7 +144,6 @@ header! {
   (XRateLimitLimit, "X-RateLimit-Limit") => [u16]
 }
 
-
 header! {
   #[doc(hidden)]
   (XRateLimitRemaining, "X-RateLimit-Remaining") => [u32]
