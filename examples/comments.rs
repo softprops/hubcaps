@@ -23,17 +23,12 @@ fn run() -> Result<()> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut core = Core::new()?;
-            let github = Github::new(
-                USER_AGENT,
-                Some(Credentials::Token(token)),
-                &core.handle(),
-            );
+            let github = Github::new(USER_AGENT, Some(Credentials::Token(token)), &core.handle());
 
             let issue = github.repo("softprops", "hubcat").issues().get(1);
-            let f = issue.comments()
-                .create(&CommentOptions {
-                    body: format!("Hello, world!\n---\nSent by {}", USER_AGENT),
-                });
+            let f = issue.comments().create(&CommentOptions {
+                body: format!("Hello, world!\n---\nSent by {}", USER_AGENT),
+            });
 
             match core.run(f) {
                 Ok(comment) => println!("{:?}", comment),
