@@ -528,8 +528,10 @@ where
                         Some(item) => Some(Box::new(future::ok((item, (link, items))))),
                         _ => {
                             link.and_then(next_link).map(|url| {
+                                let url = Url::parse(&url).unwrap();
+                                let uri: String = url.path().into();
                                 Box::new(
-                                    github.get_pages(url.as_ref()).map(move |(link, payload)| {
+                                    github.get_pages(uri.as_ref()).map(move |(link, payload)| {
                                         let mut items = into_items(payload);
                                         items.reverse();
                                         (items.remove(0), (link, items))
