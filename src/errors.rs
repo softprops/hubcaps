@@ -18,7 +18,7 @@ error_chain! {
             display("{}: '{}'", code, error.message)
             description(error.message.as_str())
           }
-        #[doc = "Error kind returned when a credentials rate limit has been exhausted. Wait for the reset duration before issuing more requests"]
+        #[doc = "Error kind returned when a credential's rate limit has been exhausted. Wait for the reset duration before issuing more requests"]
         RateLimit {
             reset: Duration
         } {

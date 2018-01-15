@@ -1,3 +1,9 @@
+# 0.4.3
+
+* fixed url bug with language looking for repositories
+* fixed url bug with iter based pagination
+* intoduce new ErrorKind::RateLimit error for better rate limit detection
+
 # 0.4.2
 
 * add transparent handling of 307 temporary redirect

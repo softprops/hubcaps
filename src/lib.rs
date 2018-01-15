@@ -41,9 +41,24 @@
 //!
 //! # Errors
 //!
-//! Operations typically result in a `hubcaps::Result` Type which is an alias for Rust's
-//! built-in Result with the Err Type fixed to the
-//! [hubcaps::Error](errors/struct.Error.html) type.
+//! Operations typically result in a `hubcaps::Future` with an error type pinned to
+//! [hubcaps::Error](errors/struct.Error.html).
+//!
+//! ## Rate Limiting
+//!
+//! A special note should be taken when accounting for Github's
+//! [API Rate Limiting](https://developer.github.com/v3/rate_limit/)
+//! A special case
+//! [hubcaps::ErrorKind::RateLimit](errors/enum.ErrorKind.html#variant.RateLimit)
+//! will be returned from api operations when the rate limit
+//! associated with credentials has been exhaused. This type will include a reset
+//! Duration to wait before making future requests.
+//!
+//! This crate uses the `log` crate's debug log interface to log x-rate-limit
+//! headers recieved from Github.
+//! If you are attempting to test your access patterns against
+//! Github's rate limits, enable debug looking and look for "x-rate-limit"
+//! log patterns sourced from this crate
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
@@ -113,10 +128,10 @@ use users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
 
-/// A type alias for `Futures` that may return `github::Errors`
+/// A type alias for `Futures` that may return `hubcaps::Errors`
 pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
 
-/// A type alias for `Streams` that may result in `github::Errors`
+/// A type alias for `Streams` that may result in `hubcaps::Errors`
 pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
 
 header! {
