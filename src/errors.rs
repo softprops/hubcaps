@@ -1,6 +1,8 @@
 //! Client errors
 
 use std::io::Error as IoError;
+use std::time::Duration;
+
 use hyper::Error as HttpError;
 use hyper::StatusCode;
 use hyper::error::UriError;
@@ -8,6 +10,7 @@ use serde_json::error::Error as SerdeError;
 
 error_chain! {
     errors {
+        #[doc = "Client side error returned for faulty requests"]
         Fault {
             code: StatusCode,
             error: ClientError,
@@ -15,6 +18,12 @@ error_chain! {
             display("{}: '{}'", code, error.message)
             description(error.message.as_str())
           }
+        #[doc = "Error kind returned when a credentials rate limit has been exhausted. Wait for the reset duration before issuing more requests"]
+        RateLimit {
+            reset: Duration
+        } {
+            display("Rate limit exhausted. Will reset in {} seconds", reset.as_secs())
+        }
     }
     foreign_links {
         Codec(SerdeError);

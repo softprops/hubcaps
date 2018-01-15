@@ -52,6 +52,7 @@ extern crate futures;
 extern crate error_chain;
 #[macro_use]
 extern crate log;
+#[macro_use]
 extern crate hyper;
 #[macro_use]
 extern crate serde_derive;
@@ -63,6 +64,7 @@ extern crate tokio_core;
 extern crate hyper_tls;
 
 use std::fmt;
+use std::time::{SystemTime, UNIX_EPOCH, Duration};
 
 use futures::{future, stream, Stream as StdStream, Future as StdFuture, IntoFuture};
 #[cfg(feature = "tls")]
@@ -116,6 +118,23 @@ pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
 
 /// A type alias for `Streams` that may result in `github::Errors`
 pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
+
+header! {
+    (XGithubRequestId, "X-GitHub-Request-Id") => [String]
+}
+
+header! {
+  (XRateLimitLimit, "X-RateLimit-Limit") => [u16]
+}
+
+header! {
+  (XRateLimitRemaining, "X-RateLimit-Remaining") => [u32]
+
+}
+
+header! {
+  (XRateLimitReset, "X-RateLimit-Reset") => [u32]
+}
 
 /// alias for Result that infers hubcaps::Error as Err
 // pub type Result<T> = std::result::Result<T, Error>;
@@ -368,7 +387,22 @@ where
         });
         let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
-            debug!("response headers {:?}", response.headers());
+            for value in response.headers().get::<XGithubRequestId>() {
+                debug!("x-github-request-id: {}", value)
+            }
+            for value in response.headers().get::<XRateLimitLimit>() {
+                debug!("x-rate-limit-limit: {}", value.0)
+            }
+            let remaining = response.headers().get::<XRateLimitRemaining>().map(
+                |val| val.0,
+            );
+            let reset = response.headers().get::<XRateLimitReset>().map(|val| val.0);
+            for value in remaining {
+                debug!("x-rate-limit-remaining: {}", value)
+            }
+            for value in reset {
+                debug!("x-rate-limit-reset: {}", value)
+            }
             let status = response.status();
             // handle redirect common with renamed repos
             if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
@@ -388,12 +422,22 @@ where
                         .map(|out| (link, out))
                         .map_err(|error| ErrorKind::Codec(error).into())
                 } else {
-                    Err(
-                        ErrorKind::Fault {
-                            code: status,
-                            error: serde_json::from_slice(&response_body)?,
-                        }.into(),
-                    )
+                    let error = match (remaining, reset) {
+                        (Some(remaining), Some(reset)) if remaining == 0 => {
+                            let now = SystemTime::now()
+                                .duration_since(UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs();
+                            ErrorKind::RateLimit { reset: Duration::from_secs(reset as u64 - now) }
+                        }
+                        _ => {
+                            ErrorKind::Fault {
+                                code: status,
+                                error: serde_json::from_slice(&response_body)?,
+                            }
+                        }
+                    };
+                    Err(error.into())
                 },
             ))
         }))
