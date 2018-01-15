@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use url::{self, form_urlencoded};
+use url::form_urlencoded;
 
-use {Github, Stream, Future, SortDirection};
+use {Stream, Future, SortDirection};
 use std::fmt;
 
 use hyper::client::Connect;
@@ -15,7 +15,7 @@ pub enum ReposSort {
     ///Sort by the number of forks
     Forks,
     /// Sort by when the repo was last updated
-    Updated
+    Updated,
 }
 
 impl fmt::Display for ReposSort {
@@ -31,22 +31,21 @@ impl fmt::Display for ReposSort {
 /// Provides access to search operations for repositories
 /// https://developer.github.com/v3/search/#search-repositories
 pub struct SearchRepos<C>
-    where C: Clone + Connect
+where
+    C: Clone + Connect,
 {
-    search: Search<C>
+    search: Search<C>,
 }
 
 impl<C: Clone + Connect> SearchRepos<C> {
     #[doc(hidden)]
     pub fn new(search: Search<C>) -> Self {
-        Self {
-            search
-        }
+        Self { search }
     }
 
     fn search_uri<Q>(&self, q: Q, options: &SearchReposOptions) -> String
     where
-        Q: Into<String>
+        Q: Into<String>,
     {
         let mut uri = vec!["/search/repositories".to_string()];
         let query_options = options.serialize().unwrap_or(String::new());
@@ -60,16 +59,18 @@ impl<C: Clone + Connect> SearchRepos<C> {
 
     pub fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> Stream<ReposItem>
     where
-        Q: Into<String>
+        Q: Into<String>,
     {
-        self.search.iter::<ReposItem> (&self.search_uri(q, options))
+        self.search.iter::<ReposItem>(&self.search_uri(q, options))
     }
 
     pub fn list<Q>(&self, q: Q, options: &SearchReposOptions) -> Future<SearchResult<ReposItem>>
     where
-        Q: Into<String>
+        Q: Into<String>,
     {
-        self.search.search::<ReposItem>(&self.search_uri(q, options))
+        self.search.search::<ReposItem>(
+            &self.search_uri(q, options),
+        )
     }
 }
 
@@ -86,7 +87,7 @@ impl SearchReposOptions {
     pub fn serialize(&self) -> Option<String> {
         if self.params.is_empty() {
             None
-        }else {
+        } else {
             let encoded: String = form_urlencoded::Serializer::new(String::new())
                 .extend_pairs(&self.params)
                 .finish();
@@ -195,7 +196,7 @@ pub struct ReposItem {
     pub open_issues: u32,
     pub watchers: u32,
     pub default_branch: String,
-    pub score: f64
+    pub score: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -203,6 +204,5 @@ pub struct License {
     key: String,
     name: String,
     spdx_id: String,
-    url: String
+    url: String,
 }
-

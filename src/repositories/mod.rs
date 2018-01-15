@@ -7,7 +7,7 @@ use std::fmt;
 
 use futures::future;
 use hyper::client::Connect;
-use url::form_urlencoded;
+use url::{Url, form_urlencoded};
 
 use {unfold, Stream, Github, Future, SortDirection};
 use branches::Branches;
@@ -527,7 +527,9 @@ impl Repo {
     where
         C: Clone + Connect,
     {
-        github.get(&self.languages_url.clone())
+        let url = Url::parse(&self.languages_url).unwrap();
+        let uri: String = url.path().into();
+        github.get(&uri)
     }
 }
 
