@@ -135,19 +135,23 @@ pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
 pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
 
 header! {
+    #[doc(hidden)]
     (XGithubRequestId, "X-GitHub-Request-Id") => [String]
 }
 
 header! {
+  #[doc(hidden)]
   (XRateLimitLimit, "X-RateLimit-Limit") => [u16]
 }
 
-header! {
-  (XRateLimitRemaining, "X-RateLimit-Remaining") => [u32]
 
+header! {
+  #[doc(hidden)]
+  (XRateLimitRemaining, "X-RateLimit-Remaining") => [u32]
 }
 
 header! {
+  #[doc(hidden)]
   (XRateLimitReset, "X-RateLimit-Reset") => [u32]
 }
 
