@@ -1,3 +1,8 @@
+# 0.4.4
+
+* issue body is now an `Option<String>` type [#107](https://github.com/softprops/hubcaps/pull/107)
+* upgrade log dependency `0.3` => `0.4`
+
 # 0.4.3
 
 * fixed url bug with language looking for repositories
