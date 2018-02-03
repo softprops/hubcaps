@@ -399,7 +399,7 @@ pub struct Issue {
     pub number: u64,
     pub state: String,
     pub title: String,
-    pub body: String,
+    pub body: Option<String>,
     pub user: User,
     pub labels: Vec<Label>,
     pub assignee: Option<User>,
