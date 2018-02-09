@@ -591,7 +591,7 @@ where
                         _ => {
                             link.and_then(next_link).map(|url| {
                                 let url = Url::parse(&url).unwrap();
-                                let uri: String = url.path().into();
+                                let uri = [url.path(), url.query().unwrap_or_default()].join("?");
                                 Box::new(
                                     github.get_pages(uri.as_ref()).map(move |(link, payload)| {
                                         let mut items = into_items(payload);
