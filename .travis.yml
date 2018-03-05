@@ -13,7 +13,9 @@ matrix:
   - rust: beta
 
 script:
-- RUSTFLAGS="$RUSTFLAGS -C link-dead-code" cargo test
+# https://github.com/rust-lang/rust/issues/47309#issuecomment-359166547
+#- RUSTFLAGS="$RUSTFLAGS -C link-dead-code" cargo test
+- cargo test
 
 
 before_cache:
@@ -53,7 +55,7 @@ after_success:
     [ $TRAVIS_BRANCH = master ] &&
     [ $TRAVIS_PULL_REQUEST = false ] &&
     (ls target/debug &&
-    RUSTFLAGS="-C link-dead-code" cargo test --no-run &&
+    cargo test --no-run &&
     for file in target/debug/hubcaps-*; do
        if [[ "${file: -2}" != ".d" ]]; then
          mkdir -p "target/cov/$(basename $file)";
