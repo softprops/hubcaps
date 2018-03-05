@@ -15,7 +15,7 @@ matrix:
 script:
 # https://github.com/rust-lang/rust/issues/47309#issuecomment-359166547
 #- RUSTFLAGS="$RUSTFLAGS -C link-dead-code" cargo test
-- cargo test
+- travis_wait cargo test
 
 
 before_cache:
