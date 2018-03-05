@@ -1,11 +1,14 @@
 //! Labels interface
 
-extern crate serde_json;
-
+use serde_json;
 use futures::future;
 use hyper::client::Connect;
 
-use {Github, Future};
+use {unfold, Future, Github, Stream};
+
+fn identity<T>(x: T) -> T {
+    x
+}
 
 pub struct Labels<C>
 where
@@ -39,10 +42,8 @@ impl<C: Connect + Clone> Labels<C> {
     }
 
     pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Future<Label> {
-        self.github.patch(
-            &self.path(&format!("/{}", prevname)),
-            json!(lab),
-        )
+        self.github
+            .patch(&self.path(&format!("/{}", prevname)), json!(lab))
     }
 
     pub fn delete(&self, name: &str) -> Future<()> {
@@ -51,6 +52,15 @@ impl<C: Connect + Clone> Labels<C> {
 
     pub fn list(&self) -> Future<Vec<Label>> {
         self.github.get(&self.path(""))
+    }
+
+    /// provides a stream over all pages of this repo's labels
+    pub fn iter(&self) -> Stream<Label> {
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&self.path("")),
+            identity,
+        )
     }
 }
 
