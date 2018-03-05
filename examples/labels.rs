@@ -25,7 +25,6 @@ fn run() -> Result<()> {
         Some(Credentials::Token(token)),
         &core.handle(),
       );
-      let handle = core.handle();
       core.run(
         github
           .repo("rust-lang", "cargo")
