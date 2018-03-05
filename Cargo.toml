@@ -1,6 +1,6 @@
 [package]
 name = "hubcaps"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["softprops <d.tangren@gmail.com>"]
 description = "Rust interface for Github"
 documentation = "https://softprops.github.io/hubcaps"
@@ -14,6 +14,7 @@ readme = "README.md"
 [badges]
 travis-ci = { repository = "softprops/hubcaps" }
 coveralls = { repository = "softprops/hubcaps" }
+maintenance = { status = "actively-developed" }
 
 [dev-dependencies]
 env_logger = "0.3"

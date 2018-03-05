@@ -1,10 +1,7 @@
-# 0.4.5
+# 0.4.4
 
 * fix issue with stream pagination [#108](https://github.com/softprops/hubcaps/pull/108)
 * implement stream iter for repo labels [#110](https://github.com/softprops/hubcaps/pull/110)
-
-# 0.4.4
-
 * issue body is now an `Option<String>` type [#107](https://github.com/softprops/hubcaps/pull/107)
 * upgrade log dependency `0.3` => `0.4`
 
