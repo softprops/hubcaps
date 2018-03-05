@@ -1,5 +1,4 @@
 extern crate env_logger;
-extern crate hyper;
 extern crate hubcaps;
 extern crate futures;
 extern crate tokio_core;

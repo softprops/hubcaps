@@ -1,10 +1,9 @@
 extern crate env_logger;
-extern crate hyper;
-extern crate hubcaps;
-extern crate futures;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate futures;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 
@@ -27,9 +26,11 @@ fn run() -> Result<()> {
             );
             println!("org teams");
             core.run(
-                github.org("meetup").teams().iter().for_each(|team| {
-                    Ok(println!("{:#?}", team))
-                }),
+                github
+                    .org("meetup")
+                    .teams()
+                    .iter()
+                    .for_each(|team| Ok(println!("{:#?}", team))),
             )?;
             println!("repo teams");
             core.run(

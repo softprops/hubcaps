@@ -3,7 +3,6 @@ extern crate env_logger;
 extern crate error_chain;
 extern crate futures;
 extern crate hubcaps;
-extern crate hyper;
 extern crate tokio_core;
 
 use std::env;

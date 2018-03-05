@@ -1,5 +1,4 @@
 extern crate env_logger;
-extern crate hyper;
 extern crate hubcaps;
 extern crate tokio_core;
 #[macro_use(quick_main)]

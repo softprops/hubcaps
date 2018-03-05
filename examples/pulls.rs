@@ -1,10 +1,9 @@
 extern crate env_logger;
-extern crate futures;
-extern crate hyper;
-extern crate hubcaps;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate futures;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 
@@ -27,9 +26,11 @@ fn run() -> Result<()> {
             );
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
-            core.run(pulls.iter(&Default::default()).for_each(|pull| {
-                Ok(println!("{:#?}", pull))
-            }))?;
+            core.run(
+                pulls
+                    .iter(&Default::default())
+                    .for_each(|pull| Ok(println!("{:#?}", pull))),
+            )?;
 
             println!("comments");
             for c in core.run(
@@ -39,8 +40,7 @@ fn run() -> Result<()> {
                     .get(28)
                     .comments()
                     .list(&Default::default()),
-            )?
-            {
+            )? {
                 println!("{:#?}", c);
             }
 

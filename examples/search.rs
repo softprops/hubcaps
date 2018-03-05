@@ -1,10 +1,9 @@
 extern crate env_logger;
-extern crate hyper;
-extern crate hubcaps;
-extern crate tokio_core;
-extern crate futures;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate futures;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 

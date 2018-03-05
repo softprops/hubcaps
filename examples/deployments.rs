@@ -1,8 +1,7 @@
-extern crate hyper;
-extern crate hubcaps;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 

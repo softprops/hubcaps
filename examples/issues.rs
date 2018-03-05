@@ -1,9 +1,8 @@
 extern crate env_logger;
-extern crate hyper;
-extern crate hubcaps;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 
@@ -23,10 +22,12 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
-            for issue in core.run(github.repo("softprops", "hubcat").issues().list(
-                &Default::default(),
-            ))?
-            {
+            for issue in core.run(
+                github
+                    .repo("softprops", "hubcat")
+                    .issues()
+                    .list(&Default::default()),
+            )? {
                 println!("{:#?}", issue)
             }
             Ok(())

@@ -1,10 +1,9 @@
 extern crate env_logger;
-extern crate hyper;
-extern crate hubcaps;
-extern crate futures;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate futures;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 
@@ -33,8 +32,7 @@ fn run() -> Result<()> {
                     .branches()
                     .iter()
                     .for_each(|branch| Ok(println!("{:#?}", branch))),
-            )
-            {
+            ) {
                 println!("err {:#?}", err)
             }
 
