@@ -163,7 +163,7 @@ pub struct Gist {
     pub id: String,
     pub description: Option<String>,
     pub public: bool,
-    pub owner: User,
+    pub owner: Option<User>,
     pub user: Option<User>,
     pub files: HashMap<String, GistFile>,
     pub truncated: bool,
