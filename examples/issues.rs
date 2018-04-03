@@ -1,14 +1,17 @@
 extern crate env_logger;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate futures;
 extern crate hubcaps;
 extern crate tokio_core;
 
 use std::env;
 
+use futures::Stream;
 use tokio_core::reactor::Core;
 
 use hubcaps::{Credentials, Github, Result};
+use hubcaps::issues::{IssueListOptions, State};
 
 quick_main!(run);
 
@@ -22,14 +25,16 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
-            for issue in core.run(
+            core.run(
                 github
-                    .repo("softprops", "hubcat")
+                    .repo("matthiasbeyer", "imag")
                     .issues()
-                    .list(&Default::default()),
-            )? {
-                println!("{:#?}", issue)
-            }
+                    .iter(&IssueListOptions::builder()
+                        .per_page(100)
+                        .state(State::All)
+                        .build())
+                    .for_each(move |issue| Ok(println!("{} ({})", issue.title, issue.state))),
+            )?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),
