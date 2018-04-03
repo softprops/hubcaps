@@ -242,8 +242,12 @@ impl<C: Clone + Connect> Issues<C> {
     }
 
     /// Return a stream of all issues for this repository
+    ///
     /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
     /// for more information
+    ///
+    /// Note: You'll typically want to use a `IssueListOptions` with a `per_page`
+    /// of 100 for maximum api credential rate limit efficency
     pub fn iter(&self, options: &IssueListOptions) -> Stream<Issue> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
