@@ -270,6 +270,7 @@ impl<C: Clone + Connect> Issues<C> {
 ///
 /// By default this returns up to `30` items. You can
 /// request up to `100` using the [per_page](https://developer.github.com/v3/#pagination)
+/// parameter
 #[derive(Default)]
 pub struct IssueListOptions {
     params: HashMap<&'static str, String>,
