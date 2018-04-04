@@ -1,6 +1,7 @@
 # 0.4.5
 
 * add support for iterating over a stream of repo issues `gitub.repo(.., ..).issues().iter(opts)`
+* support anonymous gist owners [#111](https://github.com/softprops/hubcaps/pull/111)
 
 # 0.4.4
 
