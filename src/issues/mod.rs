@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::Connect;
 use url::form_urlencoded;
 
-use {Github, Future, SortDirection, serde_json};
+use {serde_json, unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
 use users::User;
 use labels::Label;
@@ -92,10 +92,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/issues/{}/labels{}",
-            self.owner,
-            self.repo,
-            self.number,
-            more
+            self.owner, self.repo, self.number, more
         )
     }
 
@@ -157,10 +154,7 @@ impl<C: Clone + Connect> IssueRef<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/issues/{}{}",
-            self.owner,
-            self.repo,
-            self.number,
-            more
+            self.owner, self.repo, self.number, more
         )
     }
 
@@ -201,6 +195,10 @@ where
     repo: String,
 }
 
+fn identity<T>(x: T) -> T {
+    x
+}
+
 impl<C: Clone + Connect> Issues<C> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
@@ -232,6 +230,9 @@ impl<C: Clone + Connect> Issues<C> {
         self.github.post(&self.path(""), json!(is))
     }
 
+    /// Return the first page of issues for this repisotiry
+    /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
+    /// for more information
     pub fn list(&self, options: &IssueListOptions) -> Future<Vec<Issue>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
@@ -239,11 +240,37 @@ impl<C: Clone + Connect> Issues<C> {
         }
         self.github.get(&uri.join("?"))
     }
+
+    /// Return a stream of all issues for this repository
+    ///
+    /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
+    /// for more information
+    ///
+    /// Note: You'll typically want to use a `IssueListOptions` with a `per_page`
+    /// of 100 for maximum api credential rate limit efficency
+    pub fn iter(&self, options: &IssueListOptions) -> Stream<Issue> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&uri.join("?")),
+            identity,
+        )
+    }
 }
 
 // representations
 
-// todo: simplify with param
+/// Options used to filter repository issue listings
+///
+/// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
+/// for more information
+///
+/// By default this returns up to `30` items. You can
+/// request up to `100` using the [per_page](https://developer.github.com/v3/#pagination)
+/// parameter
 #[derive(Default)]
 pub struct IssueListOptions {
     params: HashMap<&'static str, String>,
@@ -270,34 +297,36 @@ impl IssueListOptions {
 pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
-    pub fn new() -> IssueListOptionsBuilder {
-        IssueListOptionsBuilder(IssueListOptions { ..Default::default() })
+    pub fn new() -> Self {
+        IssueListOptionsBuilder(IssueListOptions {
+            ..Default::default()
+        })
     }
 
-    pub fn state(&mut self, state: State) -> &mut IssueListOptionsBuilder {
+    pub fn state(&mut self, state: State) -> &mut Self {
         self.0.params.insert("state", state.to_string());
         self
     }
 
-    pub fn sort(&mut self, sort: Sort) -> &mut IssueListOptionsBuilder {
+    pub fn sort(&mut self, sort: Sort) -> &mut Self {
         self.0.params.insert("sort", sort.to_string());
         self
     }
 
-    pub fn asc(&mut self) -> &mut IssueListOptionsBuilder {
+    pub fn asc(&mut self) -> &mut Self {
         self.direction(SortDirection::Asc)
     }
 
-    pub fn desc(&mut self) -> &mut IssueListOptionsBuilder {
+    pub fn desc(&mut self) -> &mut Self {
         self.direction(SortDirection::Desc)
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut IssueListOptionsBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
         self.0.params.insert("direction", direction.to_string());
         self
     }
 
-    pub fn assignee<A>(&mut self, assignee: A) -> &mut IssueListOptionsBuilder
+    pub fn assignee<A>(&mut self, assignee: A) -> &mut Self
     where
         A: Into<String>,
     {
@@ -305,7 +334,7 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn creator<C>(&mut self, creator: C) -> &mut IssueListOptionsBuilder
+    pub fn creator<C>(&mut self, creator: C) -> &mut Self
     where
         C: Into<String>,
     {
@@ -313,7 +342,7 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut IssueListOptionsBuilder
+    pub fn mentioned<M>(&mut self, mentioned: M) -> &mut Self
     where
         M: Into<String>,
     {
@@ -321,7 +350,7 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut IssueListOptionsBuilder
+    pub fn labels<L>(&mut self, labels: Vec<L>) -> &mut Self
     where
         L: Into<String>,
     {
@@ -336,7 +365,7 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn since<S>(&mut self, since: S) -> &mut IssueListOptionsBuilder
+    pub fn since<S>(&mut self, since: S) -> &mut Self
     where
         S: Into<String>,
     {
@@ -344,8 +373,15 @@ impl IssueListOptionsBuilder {
         self
     }
 
+    pub fn per_page(&mut self, n: u32) -> &mut Self {
+        self.0.params.insert("per_page", n.to_string());
+        self
+    }
+
     pub fn build(&self) -> IssueListOptions {
-        IssueListOptions { params: self.0.params.clone() }
+        IssueListOptions {
+            params: self.0.params.clone(),
+        }
     }
 }
 
@@ -433,13 +469,13 @@ mod tests {
             (IssueListOptions::builder().build(), None),
             (
                 IssueListOptions::builder().state(State::Closed).build(),
-                Some("state=closed".to_owned())
+                Some("state=closed".to_owned()),
             ),
             (
                 IssueListOptions::builder()
                     .labels(vec!["foo", "bar"])
                     .build(),
-                Some("labels=foo%2Cbar".to_owned())
+                Some("labels=foo%2Cbar".to_owned()),
             ),
         ];
         test_serialize(tests)
@@ -457,8 +493,7 @@ mod tests {
             (Sort::Created, "created"),
             (Sort::Updated, "updated"),
             (Sort::Comments, "comments"),
-        ]
-        {
+        ] {
             assert_eq!(k.to_string(), v)
         }
     }
