@@ -1,10 +1,10 @@
 //! Statuses interface
-extern crate serde_json;
-extern crate serde;
 extern crate futures;
+extern crate serde;
+extern crate serde_json;
 
 use futures::future;
-use {Github, Future};
+use {Future, Github};
 use hyper::client::Connect;
 use users::User;
 
@@ -38,19 +38,15 @@ impl<C: Clone + Connect> Statuses<C> {
 
     /// creates a new status for a target sha
     pub fn create(&self, sha: &str, status: &StatusOptions) -> Future<Status> {
-        self.github.post(
-            &self.path(&format!("/{}", sha)),
-            json!(status),
-        )
+        self.github
+            .post(&self.path(&format!("/{}", sha)), json!(status))
     }
 
     /// lists all statuses associated with a given git sha
     pub fn list(&self, sha: &str) -> Future<Vec<Status>> {
         self.github.get(&format!(
             "/repos/{}/{}/commits/{}/statuses",
-            self.owner,
-            self.repo,
-            sha
+            self.owner, self.repo, sha
         ))
     }
 
@@ -59,9 +55,7 @@ impl<C: Clone + Connect> Statuses<C> {
     pub fn combined(&self, sha: &str) -> Future<String> {
         self.github.get(&format!(
             "/repos/{}/{}/commits/{}/status",
-            self.owner,
-            self.repo,
-            sha
+            self.owner, self.repo, sha
         ))
     }
 }
@@ -191,7 +185,6 @@ mod tests {
     use super::*;
     use serde_json;
 
-
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
         for test in tests {
             match test {
@@ -207,8 +200,7 @@ mod tests {
             ("\"success\"", State::Success),
             ("\"error\"", State::Error),
             ("\"failure\"", State::Failure),
-        ]
-        {
+        ] {
             assert_eq!(serde_json::from_str::<State>(json).unwrap(), value)
         }
     }
@@ -220,17 +212,14 @@ mod tests {
             ("\"success\"", State::Success),
             ("\"error\"", State::Error),
             ("\"failure\"", State::Failure),
-        ]
-        {
+        ] {
             assert_eq!(serde_json::to_string(&value).unwrap(), json)
         }
     }
 
-
     #[test]
     fn status_reqs() {
-        let tests =
-            vec![(StatusOptions::builder(State::Pending).build(), r#"{"state":"pending"}"#),
+        let tests = vec![(StatusOptions::builder(State::Pending).build(), r#"{"state":"pending"}"#),
                  (StatusOptions::builder(State::Success)
                       .target_url("http://acme.com")
                       .build(),
@@ -246,6 +235,5 @@ mod tests {
                   r#"{"state":"failure","target_url":"http://acme.com","description":"desc"}"#)];
         test_encoding(tests)
     }
-
 
 }

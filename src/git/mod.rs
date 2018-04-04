@@ -2,7 +2,7 @@
 
 use hyper::client::Connect;
 
-use {Github, Future};
+use {Future, Github};
 
 /// reference to git operations associated with a github repo
 pub struct Git<C>
@@ -52,9 +52,8 @@ impl<C: Clone + Connect> Git<C> {
     where
         S: Into<String>,
     {
-        self.github.get(
-            &self.path(format!("/blobs/{}", sha.into())),
-        )
+        self.github
+            .get(&self.path(format!("/blobs/{}", sha.into())))
     }
 
     /// get the git reference data of a given ref
@@ -64,12 +63,10 @@ impl<C: Clone + Connect> Git<C> {
     where
         S: Into<String>,
     {
-        self.github.get(
-            &self.path(format!("/refs/{}", reference.into())),
-        )
+        self.github
+            .get(&self.path(format!("/refs/{}", reference.into())))
     }
 }
-
 
 // representations
 

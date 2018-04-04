@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::Connect;
 use serde_json;
 
-use {Github, Future, Stream, unfold};
+use {unfold, Future, Github, Stream};
 
 /// Team repository permissions
 pub enum Permission {
@@ -56,22 +56,16 @@ impl<C: Connect + Clone> RepoTeams<C> {
 
     /// list of teams for this repo
     pub fn list(&self) -> Future<Vec<Team>> {
-        self.github.get(&format!(
-            "/repos/{}/{}/teams",
-            self.owner,
-            self.repo
-        ))
+        self.github
+            .get(&format!("/repos/{}/{}/teams", self.owner, self.repo))
     }
 
     /// provides a stream over all pages of teams
     pub fn iter(&self) -> Stream<Team> {
         unfold(
             self.github.clone(),
-            self.github.get_pages(&format!(
-                "/repos/{}/{}/teams",
-                self.owner,
-                self.repo
-            )),
+            self.github
+                .get_pages(&format!("/repos/{}/{}/teams", self.owner, self.repo)),
             identity,
         )
     }

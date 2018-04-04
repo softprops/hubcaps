@@ -1,15 +1,15 @@
 //! Repository interface
-extern crate serde_json;
 extern crate futures;
+extern crate serde_json;
 
 use std::collections::HashMap;
 use std::fmt;
 
 use futures::future;
 use hyper::client::Connect;
-use url::{Url, form_urlencoded};
+use url::{form_urlencoded, Url};
 
-use {unfold, Stream, Github, Future, SortDirection};
+use {unfold, Future, Github, SortDirection, Stream};
 use branches::Branches;
 use deployments::Deployments;
 use git::Git;
@@ -387,7 +387,6 @@ impl<C: Clone + Connect> Repository<C> {
         Hooks::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
-
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
     /// associated with this repository ref
     pub fn deployments(&self) -> Deployments<C> {
@@ -532,7 +531,6 @@ impl Repo {
         github.get(&uri)
     }
 }
-
 
 #[derive(Debug, Default, Serialize)]
 pub struct RepoOptions {
@@ -720,7 +718,9 @@ pub struct RepoListOptionsBuilder(RepoListOptions);
 
 impl RepoListOptionsBuilder {
     pub fn new() -> Self {
-        RepoListOptionsBuilder(RepoListOptions { ..Default::default() })
+        RepoListOptionsBuilder(RepoListOptions {
+            ..Default::default()
+        })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -744,7 +744,6 @@ impl RepoListOptionsBuilder {
         );
         self
     }
-
 
     pub fn repo_type(&mut self, tpe: Sort) -> &mut Self {
         self.0.params.insert("type", tpe.to_string());
@@ -770,7 +769,9 @@ impl RepoListOptionsBuilder {
     }
 
     pub fn build(&self) -> RepoListOptions {
-        RepoListOptions { params: self.0.params.clone() }
+        RepoListOptions {
+            params: self.0.params.clone(),
+        }
     }
 }
 
@@ -951,12 +952,13 @@ impl OrgRepoListOptions {
     }
 }
 
-
 pub struct OrgRepoListOptionsBuilder(OrgRepoListOptions);
 
 impl OrgRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrgRepoListOptionsBuilder(OrgRepoListOptions { ..Default::default() })
+        OrgRepoListOptionsBuilder(OrgRepoListOptions {
+            ..Default::default()
+        })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -970,7 +972,9 @@ impl OrgRepoListOptionsBuilder {
     }
 
     pub fn build(&self) -> OrgRepoListOptions {
-        OrgRepoListOptions { params: self.0.params.clone() }
+        OrgRepoListOptions {
+            params: self.0.params.clone(),
+        }
     }
 }
 
@@ -1001,7 +1005,9 @@ pub struct UserRepoListOptionsBuilder(UserRepoListOptions);
 
 impl UserRepoListOptionsBuilder {
     pub fn new() -> Self {
-        UserRepoListOptionsBuilder(UserRepoListOptions { ..Default::default() })
+        UserRepoListOptionsBuilder(UserRepoListOptions {
+            ..Default::default()
+        })
     }
 
     pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
@@ -1033,7 +1039,9 @@ impl UserRepoListOptionsBuilder {
     }
 
     pub fn build(&self) -> UserRepoListOptions {
-        UserRepoListOptions { params: self.0.params.clone() }
+        UserRepoListOptions {
+            params: self.0.params.clone(),
+        }
     }
 }
 
@@ -1064,7 +1072,9 @@ pub struct OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions);
 
 impl OrganizationRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions { ..Default::default() })
+        OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions {
+            ..Default::default()
+        })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -1078,6 +1088,8 @@ impl OrganizationRepoListOptionsBuilder {
     }
 
     pub fn build(&self) -> OrganizationRepoListOptions {
-        OrganizationRepoListOptions { params: self.0.params.clone() }
+        OrganizationRepoListOptions {
+            params: self.0.params.clone(),
+        }
     }
 }

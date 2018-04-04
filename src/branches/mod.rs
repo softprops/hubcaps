@@ -8,7 +8,7 @@ extern crate serde_json;
 use hyper::client::Connect;
 use futures::future;
 
-use {Github, Future, Stream, unfold};
+use {unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

@@ -2,7 +2,7 @@
 
 use hyper::client::Connect;
 
-use {unfold, Github, Stream, Future};
+use {unfold, Future, Github, Stream};
 use users::User;
 
 fn identity<T>(x: T) -> T {
@@ -39,9 +39,7 @@ impl<C: Clone + Connect> PullCommits<C> {
     pub fn list(&self) -> Future<Vec<PullCommit>> {
         let uri = format!(
             "/repos/{}/{}/pulls/{}/commits",
-            self.owner,
-            self.repo,
-            self.number
+            self.owner, self.repo, self.number
         );
         self.github.get::<Vec<PullCommit>>(&uri)
     }
@@ -52,9 +50,7 @@ impl<C: Clone + Connect> PullCommits<C> {
             self.github.clone(),
             self.github.get_pages(&format!(
                 "/repos/{}/{}/pulls/{}/commits",
-                self.owner,
-                self.repo,
-                self.number
+                self.owner, self.repo, self.number
             )),
             identity,
         )

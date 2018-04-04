@@ -2,7 +2,7 @@
 
 use hyper::client::Connect;
 
-use {Github, Future};
+use {Future, Github};
 use users::User;
 
 /// A structure for interfacing with a issue comments
@@ -35,9 +35,7 @@ impl<C: Clone + Connect> ReviewComments<C> {
     pub fn list(&self) -> Future<Vec<ReviewComment>> {
         self.github.get::<Vec<ReviewComment>>(&format!(
             "/repos/{}/{}/pulls/{}/comments",
-            self.owner,
-            self.repo,
-            self.number
+            self.owner, self.repo, self.number
         ))
     }
 }
