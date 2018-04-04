@@ -62,31 +62,31 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
-#[macro_use]
-extern crate error_chain;
 extern crate futures;
 #[macro_use]
-extern crate hyper;
-#[cfg(feature = "tls")]
-extern crate hyper_tls;
+extern crate error_chain;
 #[macro_use]
 extern crate log;
-extern crate serde;
+#[macro_use]
+extern crate hyper;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde;
 extern crate serde_json;
-extern crate tokio_core;
 extern crate url;
+extern crate tokio_core;
+#[cfg(feature = "tls")]
+extern crate hyper_tls;
 
 use std::fmt;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH, Duration};
 
-use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
+use futures::{future, stream, Stream as StdStream, Future as StdFuture, IntoFuture};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
-use hyper::{Client, Method, StatusCode};
+use hyper::{StatusCode, Client, Method};
 use hyper::client::{Connect, HttpConnector, Request};
-use hyper::header::{qitem, Accept, Authorization, Link, Location, RelationType, UserAgent};
+use hyper::header::{qitem, Accept, Authorization, UserAgent, Link, RelationType, Location};
 use hyper::mime::Mime;
 use serde::de::DeserializeOwned;
 use tokio_core::reactor::Handle;
@@ -122,7 +122,7 @@ pub use errors::{Error, ErrorKind, Result};
 use activity::Activity;
 use gists::{Gists, UserGists};
 use search::Search;
-use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
+use repositories::{Repositories, OrganizationRepositories, UserRepositories, Repository};
 use organizations::{Organization, Organizations, UserOrganizations};
 use users::Users;
 
@@ -179,7 +179,9 @@ impl From<MediaType> for Mime {
             MediaType::Preview(codename) => {
                 format!("application/vnd.github.{}-preview+json", codename)
                     .parse()
-                    .expect(format!("could not parse media type for preview {}", codename).as_str())
+                    .expect(
+                        format!("could not parse media type for preview {}", codename).as_str(),
+                    )
             }
         }
     }
@@ -409,10 +411,9 @@ where
             for value in response.headers().get::<XRateLimitLimit>() {
                 debug!("x-rate-limit-limit: {}", value.0)
             }
-            let remaining = response
-                .headers()
-                .get::<XRateLimitRemaining>()
-                .map(|val| val.0);
+            let remaining = response.headers().get::<XRateLimitRemaining>().map(
+                |val| val.0,
+            );
             let reset = response.headers().get::<XRateLimitReset>().map(|val| val.0);
             for value in remaining {
                 debug!("x-rate-limit-remaining: {}", value)
@@ -430,33 +431,31 @@ where
             }
             let link = response.headers().get::<Link>().map(|l| l.clone());
             Box::new(response.body().concat2().map_err(Error::from).and_then(
-                move |response_body| {
-                    if status.is_success() {
-                        debug!(
-                            "response payload {}",
-                            String::from_utf8_lossy(&response_body)
-                        );
-                        serde_json::from_slice::<Out>(&response_body)
-                            .map(|out| (link, out))
-                            .map_err(|error| ErrorKind::Codec(error).into())
-                    } else {
-                        let error = match (remaining, reset) {
-                            (Some(remaining), Some(reset)) if remaining == 0 => {
-                                let now = SystemTime::now()
-                                    .duration_since(UNIX_EPOCH)
-                                    .unwrap()
-                                    .as_secs();
-                                ErrorKind::RateLimit {
-                                    reset: Duration::from_secs(reset as u64 - now),
-                                }
-                            }
-                            _ => ErrorKind::Fault {
+                move |response_body| if status.is_success() {
+                    debug!(
+                        "response payload {}",
+                        String::from_utf8_lossy(&response_body)
+                    );
+                    serde_json::from_slice::<Out>(&response_body)
+                        .map(|out| (link, out))
+                        .map_err(|error| ErrorKind::Codec(error).into())
+                } else {
+                    let error = match (remaining, reset) {
+                        (Some(remaining), Some(reset)) if remaining == 0 => {
+                            let now = SystemTime::now()
+                                .duration_since(UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs();
+                            ErrorKind::RateLimit { reset: Duration::from_secs(reset as u64 - now) }
+                        }
+                        _ => {
+                            ErrorKind::Fault {
                                 code: status,
                                 error: serde_json::from_slice(&response_body)?,
-                            },
-                        };
-                        Err(error.into())
-                    }
+                            }
+                        }
+                    };
+                    Err(error.into())
                 },
             ))
         }))
@@ -472,10 +471,11 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        Box::new(
-            self.request(method, uri, body, media_type)
-                .map(|(_, entity)| entity),
-        )
+        Box::new(self.request(method, uri, body, media_type).map(
+            |(_, entity)| {
+                entity
+            },
+        ))
     }
 
     fn get<D>(&self, uri: &str) -> Future<D>
@@ -500,15 +500,17 @@ where
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
-        Box::new(self.request_entity::<()>(
-            Method::Delete,
-            self.host.clone() + uri,
-            None,
-            MediaType::Json,
-        ).or_else(|err| match err {
-            Error(ErrorKind::Codec(_), _) => Ok(()),
-            otherwise => Err(otherwise.into()),
-        }))
+        Box::new(
+            self.request_entity::<()>(
+                Method::Delete,
+                self.host.clone() + uri,
+                None,
+                MediaType::Json,
+            ).or_else(|err| match err {
+                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    otherwise => Err(otherwise.into()),
+                }),
+        )
     }
 
     fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
@@ -560,7 +562,9 @@ where
 fn next_link(l: Link) -> Option<String> {
     l.values()
         .into_iter()
-        .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
+        .find(|v| {
+            v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next)
+        })
         .map(|v| v.link().to_owned())
 }
 
@@ -584,15 +588,20 @@ where
                     (link, items),
                     move |(link, mut items)| match items.pop() {
                         Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(next_link).map(|url| {
-                            let url = Url::parse(&url).unwrap();
-                            let uri = [url.path(), url.query().unwrap_or_default()].join("?");
-                            Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
-                                let mut items = into_items(payload);
-                                items.reverse();
-                                (items.remove(0), (link, items))
-                            })) as Future<(I, (Option<Link>, Vec<I>))>
-                        }),
+                        _ => {
+                            link.and_then(next_link).map(|url| {
+                                let url = Url::parse(&url).unwrap();
+                                let uri = [url.path(), url.query().unwrap_or_default()].join("?");
+                                Box::new(
+                                    github.get_pages(uri.as_ref()).map(move |(link, payload)| {
+                                        let mut items = into_items(payload);
+                                        items.reverse();
+                                        (items.remove(0), (link, items))
+                                    }),
+                                ) as
+                                    Future<(I, (Option<Link>, Vec<I>))>
+                            })
+                        }
                     },
                 )
             })

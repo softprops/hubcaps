@@ -7,7 +7,7 @@ use hyper::client::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
-use {unfold, Future, Github, SortDirection, Stream};
+use {Github, Stream, Future, SortDirection, unfold};
 use labels::Label;
 use users::User;
 
@@ -128,8 +128,9 @@ impl<C: Clone + Connect> SearchIssues<C> {
     where
         Q: Into<String>,
     {
-        self.search
-            .search::<IssuesItem>(&self.search_uri(q, options))
+        self.search.search::<IssuesItem>(
+            &self.search_uri(q, options),
+        )
     }
 }
 
@@ -163,9 +164,7 @@ pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
     pub fn new() -> SearchIssuesOptionsBuilder {
-        SearchIssuesOptionsBuilder(SearchIssuesOptions {
-            ..Default::default()
-        })
+        SearchIssuesOptionsBuilder(SearchIssuesOptions { ..Default::default() })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -184,9 +183,7 @@ impl SearchIssuesOptionsBuilder {
     }
 
     pub fn build(&self) -> SearchIssuesOptions {
-        SearchIssuesOptions {
-            params: self.0.params.clone(),
-        }
+        SearchIssuesOptions { params: self.0.params.clone() }
     }
 }
 
@@ -196,6 +193,7 @@ pub struct SearchResult<D> {
     pub incomplete_results: bool,
     pub items: Vec<D>,
 }
+
 
 #[derive(Debug, Deserialize)]
 pub struct IssuesItem {

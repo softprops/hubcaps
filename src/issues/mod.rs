@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::Connect;
 use url::form_urlencoded;
 
-use {serde_json, Future, Github, SortDirection};
+use {Github, Future, SortDirection, serde_json};
 use comments::Comments;
 use users::User;
 use labels::Label;
@@ -92,7 +92,10 @@ impl<C: Clone + Connect> IssueLabels<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/issues/{}/labels{}",
-            self.owner, self.repo, self.number, more
+            self.owner,
+            self.repo,
+            self.number,
+            more
         )
     }
 
@@ -154,7 +157,10 @@ impl<C: Clone + Connect> IssueRef<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/issues/{}{}",
-            self.owner, self.repo, self.number, more
+            self.owner,
+            self.repo,
+            self.number,
+            more
         )
     }
 
@@ -265,9 +271,7 @@ pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
     pub fn new() -> IssueListOptionsBuilder {
-        IssueListOptionsBuilder(IssueListOptions {
-            ..Default::default()
-        })
+        IssueListOptionsBuilder(IssueListOptions { ..Default::default() })
     }
 
     pub fn state(&mut self, state: State) -> &mut IssueListOptionsBuilder {
@@ -341,9 +345,7 @@ impl IssueListOptionsBuilder {
     }
 
     pub fn build(&self) -> IssueListOptions {
-        IssueListOptions {
-            params: self.0.params.clone(),
-        }
+        IssueListOptions { params: self.0.params.clone() }
     }
 }
 
@@ -431,13 +433,13 @@ mod tests {
             (IssueListOptions::builder().build(), None),
             (
                 IssueListOptions::builder().state(State::Closed).build(),
-                Some("state=closed".to_owned()),
+                Some("state=closed".to_owned())
             ),
             (
                 IssueListOptions::builder()
                     .labels(vec!["foo", "bar"])
                     .build(),
-                Some("labels=foo%2Cbar".to_owned()),
+                Some("labels=foo%2Cbar".to_owned())
             ),
         ];
         test_serialize(tests)
@@ -455,7 +457,8 @@ mod tests {
             (Sort::Created, "created"),
             (Sort::Updated, "updated"),
             (Sort::Comments, "comments"),
-        ] {
+        ]
+        {
             assert_eq!(k.to_string(), v)
         }
     }

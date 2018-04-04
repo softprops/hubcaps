@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::Connect;
 use serde_json;
 
-use {Future, Github};
+use {Github, Future};
 
 pub struct Keys<C>
 where

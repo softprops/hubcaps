@@ -1,8 +1,8 @@
 extern crate env_logger;
-#[macro_use(quick_main)]
-extern crate error_chain;
 extern crate hubcaps;
 extern crate tokio_core;
+#[macro_use(quick_main)]
+extern crate error_chain;
 
 use std::env;
 
@@ -27,11 +27,9 @@ fn run() -> Result<()> {
                 Err(err) => println!("err {:#?}", err),
             }
 
-            match core.run(
-                github
-                    .users()
-                    .get(env::var("GH_USERNAME").ok().unwrap_or("bors".into())),
-            ) {
+            match core.run(github.users().get(env::var("GH_USERNAME").ok().unwrap_or(
+                "bors".into(),
+            ))) {
                 Ok(user) => println!("{:#?}", user),
                 Err(err) => println!("err {:#?}", err),
             }

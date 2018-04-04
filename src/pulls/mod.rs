@@ -8,7 +8,7 @@ use serde_json;
 use url::form_urlencoded;
 use futures::future;
 
-use {unfold, Future, Github, SortDirection, Stream};
+use {unfold, Stream, Github, Future, SortDirection};
 use comments::Comments;
 use pull_commits::PullCommits;
 use issues::{Sort as IssueSort, State};
@@ -78,7 +78,10 @@ impl<C: Clone + Connect> PullRequest<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/pulls/{}{}",
-            self.owner, self.repo, self.number, more
+            self.owner,
+            self.repo,
+            self.number,
+            more
         )
     }
 
@@ -257,9 +260,7 @@ pub struct PullEditOptionsBuilder(PullEditOptions);
 
 impl PullEditOptionsBuilder {
     pub fn new() -> PullEditOptionsBuilder {
-        PullEditOptionsBuilder(PullEditOptions {
-            ..Default::default()
-        })
+        PullEditOptionsBuilder(PullEditOptions { ..Default::default() })
     }
 
     /// set the title of the pull
@@ -397,9 +398,7 @@ pub struct PullListOptionsBuilder(PullListOptions);
 
 impl PullListOptionsBuilder {
     pub fn new() -> PullListOptionsBuilder {
-        PullListOptionsBuilder(PullListOptions {
-            ..Default::default()
-        })
+        PullListOptionsBuilder(PullListOptions { ..Default::default() })
     }
 
     pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {
@@ -418,9 +417,7 @@ impl PullListOptionsBuilder {
     }
 
     pub fn build(&self) -> PullListOptions {
-        PullListOptions {
-            params: self.0.params.clone(),
-        }
+        PullListOptions { params: self.0.params.clone() }
     }
 }
 
@@ -450,7 +447,7 @@ mod tests {
             (PullListOptions::builder().build(), None),
             (
                 PullListOptions::builder().state(State::Closed).build(),
-                Some("state=closed".to_owned()),
+                Some("state=closed".to_owned())
             ),
         ];
         test_serialize(tests)
@@ -461,18 +458,18 @@ mod tests {
         let tests = vec![
             (
                 PullEditOptions::builder().title("test").build(),
-                r#"{"title":"test"}"#,
+                r#"{"title":"test"}"#
             ),
             (
                 PullEditOptions::builder()
                     .title("test")
                     .body("desc")
                     .build(),
-                r#"{"title":"test","body":"desc"}"#,
+                r#"{"title":"test","body":"desc"}"#
             ),
             (
                 PullEditOptions::builder().state("closed").build(),
-                r#"{"state":"closed"}"#,
+                r#"{"state":"closed"}"#
             ),
         ];
         test_encoding(tests)

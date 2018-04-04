@@ -4,7 +4,7 @@ use hyper::client::Connect;
 use hyper::StatusCode;
 use futures::Future as StdFuture;
 
-use {Error, ErrorKind, Future, Github};
+use {Github, Future, Error, ErrorKind};
 
 pub struct Stars<C>
 where
@@ -30,13 +30,7 @@ impl<C: Clone + Connect> Stars<C> {
                 .get::<()>(&format!("/user/starred/{}/{}", owner.into(), repo.into()))
                 .map(|_| true)
                 .or_else(|err| match err {
-                    Error(
-                        ErrorKind::Fault {
-                            code: StatusCode::NotFound,
-                            ..
-                        },
-                        _,
-                    ) => Ok(false),
+                    Error(ErrorKind::Fault { code: StatusCode::NotFound, .. }, _) => Ok(false),
                     Error(ErrorKind::Codec(_), _) => Ok(true),
                     otherwise => Err(otherwise.into()),
                 }),
@@ -61,7 +55,10 @@ impl<C: Clone + Connect> Stars<C> {
         O: Into<String>,
         R: Into<String>,
     {
-        self.github
-            .delete(&format!("/user/starred/{}/{}", owner.into(), repo.into()))
+        self.github.delete(&format!(
+            "/user/starred/{}/{}",
+            owner.into(),
+            repo.into()
+        ))
     }
 }

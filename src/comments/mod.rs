@@ -1,9 +1,9 @@
 //! Comments interface
 
-extern crate futures;
 extern crate serde_json;
+extern crate futures;
 
-use {Future, Github};
+use {Github, Future};
 use futures::future;
 use hyper::client::Connect;
 use std::collections::HashMap;
@@ -53,7 +53,9 @@ impl<C: Clone + Connect> Comments<C> {
     fn path(&self) -> String {
         format!(
             "/repos/{}/{}/issues/{}/comments",
-            self.owner, self.repo, self.number
+            self.owner,
+            self.repo,
+            self.number
         )
     }
 }
@@ -103,9 +105,7 @@ pub struct CommentListOptionsBuilder(CommentListOptions);
 
 impl CommentListOptionsBuilder {
     pub fn new() -> CommentListOptionsBuilder {
-        CommentListOptionsBuilder(CommentListOptions {
-            ..Default::default()
-        })
+        CommentListOptionsBuilder(CommentListOptions { ..Default::default() })
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut CommentListOptionsBuilder
@@ -117,8 +117,6 @@ impl CommentListOptionsBuilder {
     }
 
     pub fn build(&self) -> CommentListOptions {
-        CommentListOptions {
-            params: self.0.params.clone(),
-        }
+        CommentListOptions { params: self.0.params.clone() }
     }
 }

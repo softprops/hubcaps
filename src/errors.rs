@@ -74,15 +74,16 @@ mod tests {
                             field: None,
                             message: Some(
                                 "Published releases \
-                                 must have a valid tag"
-                                    .to_owned(),
+                                                                            must have a valid tag"
+                                    .to_owned()
                             ),
                             documentation_url: None,
                         },
                     ]),
-                },
+                }
             ),
-        ] {
+        ]
+        {
             assert_eq!(serde_json::from_str::<ClientError>(json).unwrap(), expect);
         }
     }

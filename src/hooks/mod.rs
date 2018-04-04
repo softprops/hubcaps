@@ -5,7 +5,7 @@
 use futures::future;
 use serde_json;
 
-use {Future, Github};
+use {Github, Future};
 
 use hyper::client::Connect;
 use std::fmt;
@@ -64,8 +64,11 @@ impl<C: Clone + Connect> Hooks<C> {
 
     /// lists hook associated with a repository
     pub fn list(&self) -> Future<Vec<Hook>> {
-        self.github
-            .get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
+        self.github.get(&format!(
+            "/repos/{}/{}/hooks",
+            self.owner,
+            self.repo
+        ))
     }
 
     /// creates a new repository hook
@@ -90,8 +93,12 @@ impl<C: Clone + Connect> Hooks<C> {
 
     /// deletes a repository hook by id
     pub fn delete(&self, id: u64) -> Future<()> {
-        self.github
-            .delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
+        self.github.delete(&format!(
+            "/repos/{}/{}/hooks/{}",
+            self.owner,
+            self.repo,
+            id
+        ))
     }
 }
 
@@ -139,6 +146,7 @@ impl HookCreateOptionsBuilder {
             ..Default::default()
         })
     }
+
 
     pub fn active(&mut self, active: bool) -> &mut Self {
         self.0.active = active;
@@ -208,6 +216,7 @@ impl HookCreateOptionsBuilder {
     }
 }
 
+
 /// options for editing a repository hook
 /// see [this](https://developer.github.com/v3/repos/hooks/#edit-a-hook)
 /// for githubs official documentation
@@ -231,10 +240,9 @@ pub struct HookEditOptionsBuilder(HookEditOptions);
 
 impl HookEditOptionsBuilder {
     pub fn new() -> HookEditOptionsBuilder {
-        HookEditOptionsBuilder(HookEditOptions {
-            ..Default::default()
-        })
+        HookEditOptionsBuilder(HookEditOptions { ..Default::default() })
     }
+
 
     pub fn active(&mut self, active: bool) -> &mut Self {
         self.0.active = active;
@@ -305,6 +313,7 @@ impl HookEditOptionsBuilder {
     }
 }
 
+
 #[derive(Debug, Deserialize)]
 pub struct Hook {
     pub id: u64,
@@ -349,7 +358,8 @@ mod tests {
         for (ct, expect) in vec![
             (WebHookContentType::Form, "form"),
             (WebHookContentType::Json, "json"),
-        ] {
+        ]
+        {
             assert_eq!(ct.to_string(), expect)
         }
     }

@@ -12,7 +12,7 @@ use hyper::client::Connect;
 use statuses::State;
 use users::User;
 
-use {Future, Github};
+use {Github, Future};
 
 /// Interface for repository deployments
 pub struct Deployments<C>
@@ -53,7 +53,10 @@ impl<C: Clone + Connect> DeploymentStatuses<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/deployments/{}/statuses{}",
-            self.owner, self.repo, self.id, more
+            self.owner,
+            self.repo,
+            self.id,
+            more
         )
     }
 
@@ -322,9 +325,7 @@ pub struct DeploymentListOptionsBuilder(DeploymentListOptions);
 
 impl DeploymentListOptionsBuilder {
     pub fn new() -> DeploymentListOptionsBuilder {
-        DeploymentListOptionsBuilder(DeploymentListOptions {
-            ..Default::default()
-        })
+        DeploymentListOptionsBuilder(DeploymentListOptions { ..Default::default() })
     }
 
     pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder
@@ -360,15 +361,13 @@ impl DeploymentListOptionsBuilder {
     }
 
     pub fn build(&self) -> DeploymentListOptions {
-        DeploymentListOptions {
-            params: self.0.params.clone(),
-        }
+        DeploymentListOptions { params: self.0.params.clone() }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{DeploymentOptions, DeploymentStatusOptions};
+    use super::{DeploymentStatusOptions, DeploymentOptions};
     use serde::ser::Serialize;
     use serde_json;
     use statuses::State;
@@ -390,11 +389,11 @@ mod tests {
         let tests = vec![
             (
                 DeploymentOptions::builder("test").build(),
-                r#"{"ref":"test"}"#,
+                r#"{"ref":"test"}"#
             ),
             (
                 DeploymentOptions::builder("test").task("launchit").build(),
-                r#"{"ref":"test","task":"launchit"}"#,
+                r#"{"ref":"test","task":"launchit"}"#
             ),
             (
                 DeploymentOptions::builder("topic-branch")
@@ -407,7 +406,7 @@ mod tests {
                     r#""payload":"{\"room_id\":\"123456\",\"user\":\"atmos\"}","#,
                     r#""description":"description""#,
                     "}"
-                ),
+                )
             ),
         ];
         test_encoding(tests)
@@ -418,7 +417,7 @@ mod tests {
         let tests = vec![
             (
                 DeploymentStatusOptions::builder(State::Pending).build(),
-                r#"{"state":"pending"}"#,
+                r#"{"state":"pending"}"#
             ),
             (
                 DeploymentStatusOptions::builder(State::Pending)

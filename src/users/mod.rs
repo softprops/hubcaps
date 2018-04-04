@@ -1,6 +1,6 @@
 //! Users interface
 
-use {Future, Github};
+use {Github, Future};
 
 use hyper::client::Connect;
 
@@ -85,7 +85,9 @@ impl<C: Clone + Connect> Users<C> {
     where
         U: Into<String>,
     {
-        self.github
-            .get(&format!("/users/{username}", username = username.into()))
+        self.github.get(&format!(
+            "/users/{username}",
+            username = username.into()
+        ))
     }
 }

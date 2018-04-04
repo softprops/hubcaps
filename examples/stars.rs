@@ -1,9 +1,9 @@
 extern crate env_logger;
+extern crate hubcaps;
+extern crate futures;
+extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
-extern crate futures;
-extern crate hubcaps;
-extern crate tokio_core;
 
 use std::env;
 
@@ -25,9 +25,10 @@ fn run() -> Result<()> {
                 &core.handle(),
             );
             let stars = github.activity().stars();
-            let f = stars
-                .star("softprops", "hubcaps")
-                .join(stars.is_starred("softprops", "hubcaps"));
+            let f = stars.star("softprops", "hubcaps").join(stars.is_starred(
+                "softprops",
+                "hubcaps",
+            ));
             match core.run(f) {
                 Ok((_, starred)) => println!("starred? {:?}", starred),
                 Err(err) => println!("err {}", err),
