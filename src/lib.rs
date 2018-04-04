@@ -69,18 +69,18 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
-extern crate futures;
 #[macro_use]
 extern crate error_chain;
-#[macro_use]
-extern crate log;
+extern crate futures;
 #[macro_use]
 extern crate hyper;
-#[macro_use]
-extern crate serde_derive;
 #[cfg(feature = "tls")]
 extern crate hyper_tls;
+#[macro_use]
+extern crate log;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 extern crate tokio_core;
 extern crate url;

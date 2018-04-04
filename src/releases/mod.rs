@@ -4,7 +4,7 @@ extern crate serde_json;
 use futures::future;
 use hyper::client::Connect;
 
-use {Github, Future};
+use {Future, Github};
 use users::User;
 
 pub struct Assets<C>
@@ -38,10 +38,7 @@ impl<C: Connect + Clone> Assets<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/releases/{}/assets{}",
-            self.owner,
-            self.repo,
-            self.releaseid,
-            more
+            self.owner, self.repo, self.releaseid, more
         )
     }
 
@@ -87,10 +84,7 @@ impl<C: Clone + Connect> ReleaseRef<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/releases/{}{}",
-            self.owner,
-            self.repo,
-            self.id,
-            more
+            self.owner, self.repo, self.id, more
         )
     }
 
@@ -140,10 +134,8 @@ impl<C: Clone + Connect> Releases<C> {
     }
 
     pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
-        self.github.patch(
-            &self.path(&format!("/{}", id)),
-            json!(rel),
-        )
+        self.github
+            .patch(&self.path(&format!("/{}", id)), json!(rel))
     }
 
     pub fn delete(&self, id: u64) -> Future<()> {

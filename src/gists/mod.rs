@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::Connect;
 use url::form_urlencoded;
 
-use {Github, Future, serde_json};
+use {serde_json, Future, Github};
 use users::User;
 
 /// reference to gists associated with a github user
@@ -58,10 +58,8 @@ impl<C: Clone + Connect> Gists<C> {
     }
 
     pub fn star(&self, id: &str) -> Future<()> {
-        self.github.put_no_response(
-            &self.path(&format!("/{}/star", id)),
-            Vec::new(),
-        )
+        self.github
+            .put_no_response(&self.path(&format!("/{}/star", id)), Vec::new())
     }
 
     pub fn unstar(&self, id: &str) -> Future<()> {
@@ -69,10 +67,8 @@ impl<C: Clone + Connect> Gists<C> {
     }
 
     pub fn fork(&self, id: &str) -> Future<Gist> {
-        self.github.post(
-            &self.path(&format!("/{}/forks", id)),
-            Vec::new(),
-        )
+        self.github
+            .post(&self.path(&format!("/{}/forks", id)), Vec::new())
     }
 
     pub fn forks(&self, id: &str) -> Future<Vec<GistFork>> {
@@ -302,16 +298,15 @@ mod tests {
         let tests = vec![
             (
                 GistOptions::new(None as Option<String>, true, files.clone()),
-                r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#
+                r#"{"public":true,"files":{"foo":{"content":"bar"}}}"#,
             ),
             (
                 GistOptions::new(Some("desc"), true, files.clone()),
-                r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#
+                r#"{"description":"desc","public":true,"files":{"foo":{"content":"bar"}}}"#,
             ),
         ];
         test_encoding(tests);
     }
-
 
     #[test]
     fn gist_req() {
@@ -320,20 +315,20 @@ mod tests {
         let tests = vec![
             (
                 GistOptions::builder(files.clone()).build(),
-                r#"{"files":{"test":{"content":"foo"}}}"#
+                r#"{"files":{"test":{"content":"foo"}}}"#,
             ),
             (
                 GistOptions::builder(files.clone())
                     .description("desc")
                     .build(),
-                r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#
+                r#"{"description":"desc","files":{"test":{"content":"foo"}}}"#,
             ),
             (
                 GistOptions::builder(files.clone())
                     .description("desc")
                     .public(false)
                     .build(),
-                r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#
+                r#"{"description":"desc","public":false,"files":{"test":{"content":"foo"}}}"#,
             ),
         ];
         test_encoding(tests)

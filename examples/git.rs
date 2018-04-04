@@ -1,8 +1,8 @@
 extern crate env_logger;
-extern crate hubcaps;
-extern crate tokio_core;
 #[macro_use(quick_main)]
 extern crate error_chain;
+extern crate hubcaps;
+extern crate tokio_core;
 
 use std::env;
 
@@ -22,17 +22,22 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
-            for file in core.run(github.repo("softprops", "hubcaps").git().tree(
-                "master",
-                true,
-            ))?
+            for file in core.run(
+                github
+                    .repo("softprops", "hubcaps")
+                    .git()
+                    .tree("master", true),
+            )?
                 .tree
                 .iter()
                 .find(|file| file.path == "README.md")
             {
-                let blob = core.run(github.repo("softprops", "hubcaps").git().blob(
-                    file.sha.clone(),
-                ))?;
+                let blob = core.run(
+                    github
+                        .repo("softprops", "hubcaps")
+                        .git()
+                        .blob(file.sha.clone()),
+                )?;
                 println!("readme {:#?}", blob);
             }
             Ok(())

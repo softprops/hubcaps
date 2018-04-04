@@ -2,7 +2,7 @@
 
 use hyper::client::Connect;
 
-use {Github, Future};
+use {Future, Github};
 use repositories::OrgRepositories;
 use teams::OrgTeams;
 
@@ -37,7 +37,6 @@ impl<C: Clone + Connect> Organization<C> {
         OrgRepositories::new(self.github.clone(), self.org.clone())
     }
 }
-
 
 pub struct Organizations<C>
 where

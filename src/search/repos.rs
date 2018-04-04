@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use url::form_urlencoded;
 
-use {Stream, Future, SortDirection};
+use {Future, SortDirection, Stream};
 use std::fmt;
 
 use hyper::client::Connect;
@@ -68,9 +68,8 @@ impl<C: Clone + Connect> SearchRepos<C> {
     where
         Q: Into<String>,
     {
-        self.search.search::<ReposItem>(
-            &self.search_uri(q, options),
-        )
+        self.search
+            .search::<ReposItem>(&self.search_uri(q, options))
     }
 }
 
@@ -100,7 +99,9 @@ pub struct SearchReposOptionsBuilder(SearchReposOptions);
 
 impl SearchReposOptionsBuilder {
     pub fn new() -> SearchReposOptionsBuilder {
-        SearchReposOptionsBuilder(SearchReposOptions { ..Default::default() })
+        SearchReposOptionsBuilder(SearchReposOptions {
+            ..Default::default()
+        })
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -119,7 +120,9 @@ impl SearchReposOptionsBuilder {
     }
 
     pub fn build(&self) -> SearchReposOptions {
-        SearchReposOptions { params: self.0.params.clone() }
+        SearchReposOptions {
+            params: self.0.params.clone(),
+        }
     }
 }
 
