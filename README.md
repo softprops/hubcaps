@@ -144,9 +144,9 @@ let gists = github.gists();
 See [examples directory](examples/gists.rs) for examples
 
 
-### gists
+### hooks
 
-Gists is a service for managing repository hooks
+Hooks is a service for managing repository hooks
 
 ```rust
 let hooks = repo.hooks();
