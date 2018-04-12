@@ -107,7 +107,9 @@ impl<C: Clone + Connect> Gists<C> {
         self.github.post(&self.path(""), json!(gist))
     }
 
-    // todo: edit
+    pub fn edit(&self, id: &str, gist: &GistOptions) -> Future<Gist> {
+        self.github.patch(&self.path(&format!("/{}", id)), json!(gist))
+    }
 }
 
 // representations
