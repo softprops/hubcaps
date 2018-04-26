@@ -11,7 +11,7 @@ use futures::future;
 use {unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
 use pull_commits::PullCommits;
-use issues::{Sort as IssueSort, State};
+use issues::{IssueLabels, IssuesOrPull, Sort as IssueSort, State};
 use review_comments::ReviewComments;
 use users::User;
 
@@ -85,6 +85,17 @@ impl<C: Clone + Connect> PullRequest<C> {
     /// Request a pull requests information
     pub fn get(&self) -> Future<Pull> {
         self.github.get(&self.path(""))
+    }
+
+    /// Return a reference to labels operations available for this pull request
+    pub fn labels(&self) -> IssueLabels<C> {
+        IssueLabels::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            IssuesOrPull::Pull,
+            self.number,
+        )
     }
 
     /// short hand for editing state = open
