@@ -24,7 +24,7 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
-            // get labels associated with a pull
+            // add labels associated with a pull
             println!(
                 "{:#?}",
                 core.run(
