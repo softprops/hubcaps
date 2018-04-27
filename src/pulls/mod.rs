@@ -11,9 +11,10 @@ use futures::future;
 use {unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
 use pull_commits::PullCommits;
-use issues::{IssueLabels, IssuesOrPull, Sort as IssueSort, State};
+use issues::{IssueLabels, Sort as IssueSort, State};
 use review_comments::ReviewComments;
 use users::User;
+use labels::Label;
 
 fn identity<T>(x: T) -> T {
     x
@@ -93,7 +94,6 @@ impl<C: Clone + Connect> PullRequest<C> {
             self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),
-            IssuesOrPull::Pull,
             self.number,
         )
     }
@@ -253,6 +253,7 @@ pub struct Pull {
     pub additions: Option<u64>,
     pub deletions: Option<u64>,
     pub changed_files: Option<u64>,
+    pub labels: Vec<Label>,
 }
 
 #[derive(Debug, Deserialize)]

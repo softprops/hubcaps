@@ -1,3 +1,7 @@
+# 0.4.6
+
+* add support for pull request labels
+
 # 0.4.5
 
 * add support for iterating over a stream of repo issues `gitub.repo(.., ..).issues().iter(opts)`

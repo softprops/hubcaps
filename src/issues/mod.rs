@@ -88,13 +88,12 @@ pub struct IssueLabels<C: Clone + Connect> {
     github: Github<C>,
     owner: String,
     repo: String,
-    which: IssuesOrPull,
     number: u64,
 }
 
 impl<C: Clone + Connect> IssueLabels<C> {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, which: IssuesOrPull, number: u64) -> Self
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -103,7 +102,6 @@ impl<C: Clone + Connect> IssueLabels<C> {
             github: github,
             owner: owner.into(),
             repo: repo.into(),
-            which: which,
             number: number,
         }
     }
@@ -111,7 +109,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     fn path(&self, more: &str) -> String {
         format!(
             "/repos/{}/{}/{}/{}/labels{}",
-            self.owner, self.repo, self.which, self.number, more
+            self.owner, self.repo, "issues", self.number, more
         )
     }
 
@@ -183,7 +181,6 @@ impl<C: Clone + Connect> IssueRef<C> {
             self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),
-            IssuesOrPull::Issues,
             self.number,
         )
     }
