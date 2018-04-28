@@ -39,23 +39,6 @@ impl Default for State {
     }
 }
 
-/// enum representation of whether something is an issue or PR, for parts
-/// of the issues API that apply to both
-#[derive(Clone, Debug, PartialEq)]
-pub enum IssuesOrPull {
-    Issues,
-    Pull,
-}
-
-impl fmt::Display for IssuesOrPull {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            IssuesOrPull::Issues => "issues",
-            IssuesOrPull::Pull => "pull",
-        }.fmt(f)
-    }
-}
-
 /// Sort options available for github issues
 #[derive(Clone, Debug, PartialEq)]
 pub enum Sort {
@@ -108,8 +91,8 @@ impl<C: Clone + Connect> IssueLabels<C> {
 
     fn path(&self, more: &str) -> String {
         format!(
-            "/repos/{}/{}/{}/{}/labels{}",
-            self.owner, self.repo, "issues", self.number, more
+            "/repos/{}/{}/issues/{}/labels{}",
+            self.owner, self.repo, self.number, more
         )
     }
 

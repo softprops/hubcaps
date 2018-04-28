@@ -1,6 +1,14 @@
 # 0.4.6
 
-* add support for pull request labels
+* add support for pull request label deserialization and pull request issue interaction
+
+```rust
+github.repo("you", "repo")
+  .pulls()
+  .get(number)
+  .labels()
+  .add(vec!["enhancement"])
+```
 
 # 0.4.5
 
