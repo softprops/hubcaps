@@ -6,6 +6,14 @@
 github.repo("you", "repo")
   .pulls()
   .get(number)
+  .get()
+  .inspect(|&pull| println!("{:#?}",pull.labels))
+
+...
+
+github.repo("you", "repo")
+  .pulls()
+  .get(number)
   .labels()
   .add(vec!["enhancement"])
 ```
