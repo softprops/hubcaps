@@ -1,3 +1,23 @@
+# 0.4.6
+
+* add support for pull request label deserialization and pull request issue interaction
+
+```rust
+github.repo("you", "repo")
+  .pulls()
+  .get(number)
+  .get()
+  .inspect(|&pull| println!("{:#?}",pull.labels))
+
+...
+
+github.repo("you", "repo")
+  .pulls()
+  .get(number)
+  .labels()
+  .add(vec!["enhancement"])
+```
+
 # 0.4.5
 
 * add support for iterating over a stream of repo issues `gitub.repo(.., ..).issues().iter(opts)`

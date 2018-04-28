@@ -24,6 +24,19 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
+            // add labels associated with a pull
+            println!(
+                "{:#?}",
+                core.run(
+                    github
+                        .repo("softprops", "hubcaps")
+                        .pulls()
+                        .get(121)
+                        .labels()
+                        .add(vec!["enhancement"])
+                )?
+            );
+            // stream over all labels defined for a repo
             core.run(
                 github
                     .repo("rust-lang", "cargo")
