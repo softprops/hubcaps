@@ -57,6 +57,9 @@ impl<C: Clone + Connect> SearchRepos<C> {
         uri.join("?")
     }
 
+    /// Return a stream of search results repository query
+    /// See [github docs](https://developer.github.com/v3/search/#parameters)
+    /// for query format options
     pub fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> Stream<ReposItem>
     where
         Q: Into<String>,
@@ -64,6 +67,9 @@ impl<C: Clone + Connect> SearchRepos<C> {
         self.search.iter::<ReposItem>(&self.search_uri(q, options))
     }
 
+    /// Return the first page of search result repository query
+    /// See [github docs](https://developer.github.com/v3/search/#parameters)
+    /// for query format options
     pub fn list<Q>(&self, q: Q, options: &SearchReposOptions) -> Future<SearchResult<ReposItem>>
     where
         Q: Into<String>,

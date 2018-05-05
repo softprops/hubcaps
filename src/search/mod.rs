@@ -113,9 +113,9 @@ impl<C: Clone + Connect> SearchIssues<C> {
         uri.join("?")
     }
 
-    /// Returns an Iterator over pages of search results
-    /// Use this interface if you wish to iterate over all items
-    /// in a result set
+    /// Return a stream of search results repository query
+    /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
+    /// for query format options
     pub fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Stream<IssuesItem>
     where
         Q: Into<String>,
@@ -123,7 +123,9 @@ impl<C: Clone + Connect> SearchIssues<C> {
         self.search.iter::<IssuesItem>(&self.search_uri(q, options))
     }
 
-    /// Returns a single page of search results
+    /// Return the first page of search result repository query
+    /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
+    /// for query format options
     pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Future<SearchResult<IssuesItem>>
     where
         Q: Into<String>,

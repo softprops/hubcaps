@@ -25,13 +25,15 @@ fn run() -> Result<()> {
                 Some(Credentials::Token(token)),
                 &core.handle(),
             );
+            println!("issue search results");
+            // https://developer.github.com/v3/search/#parameters-3
             core.run(
                 github
                     .search()
                     .issues()
                     .iter(
                         "user:softprops",
-                        &SearchIssuesOptions::builder().per_page(1).build(),
+                        &SearchIssuesOptions::builder().per_page(100).build(),
                     )
                     .for_each(|issue| Ok(println!("{}", issue.title))),
             )?;
