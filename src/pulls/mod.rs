@@ -11,7 +11,7 @@ use futures::future;
 use {unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
 use pull_commits::PullCommits;
-use issues::{IssueLabels, Sort as IssueSort, State};
+use issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
 use review_comments::ReviewComments;
 use users::User;
 use labels::Label;
@@ -91,6 +91,16 @@ impl<C: Clone + Connect> PullRequest<C> {
     /// Return a reference to labels operations available for this pull request
     pub fn labels(&self) -> IssueLabels<C> {
         IssueLabels::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            self.number,
+        )
+    }
+
+    /// Return a reference to assignee operations available for this pull request
+    pub fn assignees(&self) -> IssueAssignees<C> {
+        IssueAssignees::new(
             self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),

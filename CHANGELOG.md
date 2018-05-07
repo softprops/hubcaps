@@ -1,3 +1,16 @@
+# 0.4.7
+
+* added assignee manage interfaces to pull request and issues interfaces
+* deserialize issue assignees
+
+```rust
+github.repo("you", "repo")
+  .pulls()
+  .get(number)
+  .assignees()
+  .add(vec!["your-github-login"])
+```
+
 # 0.4.6
 
 * add support for pull request label deserialization and pull request issue interaction
