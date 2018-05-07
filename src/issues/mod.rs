@@ -66,7 +66,45 @@ impl Default for Sort {
     }
 }
 
-/// Provides access to label operations available for an individual issues
+/// Provides access to assignee operations available for an individual issue
+pub struct IssueAssignees<C: Clone + Connect> {
+    github: Github<C>,
+    owner: String,
+    repo: String,
+    number: u64,
+}
+
+impl<C: Clone + Connect> IssueAssignees<C> {
+    #[doc(hidden)]
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    where
+        O: Into<String>,
+        R: Into<String>,
+    {
+        IssueAssignees {
+            github: github,
+            owner: owner.into(),
+            repo: repo.into(),
+            number: number,
+        }
+    }
+
+    fn path(&self, more: &str) -> String {
+        format!(
+            "/repos/{}/{}/issues/{}/assignees{}",
+            self.owner, self.repo, self.number, more
+        )
+    }
+
+    /// add a set of assignees
+    pub fn add(&self, assignees: Vec<&str>) -> Future<Issue> {
+        let mut payload = HashMap::new();
+        payload.insert("assignees", assignees);
+        self.github.post(&self.path(""), json!(payload))
+    }
+}
+
+/// Provides access to label operations available for an individual issue
 pub struct IssueLabels<C: Clone + Connect> {
     github: Github<C>,
     owner: String,
@@ -161,6 +199,16 @@ impl<C: Clone + Connect> IssueRef<C> {
     /// Return a reference to labels operations available for this issue
     pub fn labels(&self) -> IssueLabels<C> {
         IssueLabels::new(
+            self.github.clone(),
+            self.owner.as_str(),
+            self.repo.as_str(),
+            self.number,
+        )
+    }
+
+    /// Return a reference to assignee operations available for this issue
+    pub fn assignees(&self) -> IssueAssignees<C> {
+        IssueAssignees::new(
             self.github.clone(),
             self.owner.as_str(),
             self.repo.as_str(),
@@ -444,6 +492,7 @@ pub struct Issue {
     pub closed_at: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    pub assignees: Vec<User>,
 }
 
 #[cfg(test)]
