@@ -41,7 +41,7 @@ fn main() {
   let mut core = Core::new().expect("reactor fail");
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    Some(Credentials::Token("personal-access-token")),
+    Credentials::Token("personal-access-token"),
     &core.handle()
   );
 }

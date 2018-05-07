@@ -21,7 +21,7 @@ fn run() -> Result<()> {
             let mut core = Core::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-                Some(Credentials::Token(token)),
+                Credentials::Token(token),
                 &core.handle(),
             );
             // add labels associated with a pull

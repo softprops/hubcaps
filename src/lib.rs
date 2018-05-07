@@ -17,9 +17,9 @@
 //!   let mut core = Core::new().expect("reactor fail");
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
-//!     Some(Credentials::Token(
+//!     Credentials::Token(
 //!       String::from("personal-access-token")
-//!     )),
+//!     ),
 //!     &core.handle()
 //!   );
 //! }
@@ -241,17 +241,19 @@ where
 
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A>(agent: A, credentials: Option<Credentials>, handle: &Handle) -> Self
+    pub fn new<A, C>(agent: A, credentials: C, handle: &Handle) -> Self
     where
         A: Into<String>,
+        C: Into<Option<Credentials>>,
     {
         Self::host(DEFAULT_HOST, agent, credentials, handle)
     }
 
-    pub fn host<H, A>(host: H, agent: A, credentials: Option<Credentials>, handle: &Handle) -> Self
+    pub fn host<H, A, C>(host: H, agent: A, credentials: C, handle: &Handle) -> Self
     where
         H: Into<String>,
         A: Into<String>,
+        C: Into<Option<Credentials>>,
     {
         let connector = HttpsConnector::new(4, handle).unwrap();
         let http = Client::configure()
@@ -266,21 +268,17 @@ impl<C> Github<C>
 where
     C: Clone + Connect,
 {
-    pub fn custom<H, A>(
-        host: H,
-        agent: A,
-        credentials: Option<Credentials>,
-        http: Client<C>,
-    ) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
     where
         H: Into<String>,
         A: Into<String>,
+        CR: Into<Option<Credentials>>,
     {
         Self {
             host: host.into(),
             agent: agent.into(),
             client: http,
-            credentials: credentials,
+            credentials: credentials.into(),
         }
     }
 
