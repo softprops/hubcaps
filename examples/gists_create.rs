@@ -21,7 +21,7 @@ fn run() -> Result<()> {
             let mut core = Core::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-                Some(Credentials::Token(token)),
+                Credentials::Token(token),
                 &core.handle(),
             );
 
@@ -41,7 +41,10 @@ fn run() -> Result<()> {
 
             // rename file1 to file2
             let mut files = HashMap::new();
-            files.insert(String::from("file1"), Content::new(Some("file2"), "Hello World!!"));
+            files.insert(
+                String::from("file1"),
+                Content::new(Some("file2"), "Hello World!!"),
+            );
             let options = GistOptions {
                 description: None as Option<String>,
                 public: None,

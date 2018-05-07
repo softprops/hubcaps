@@ -11,6 +11,18 @@ github.repo("you", "repo")
   .add(vec!["your-github-login"])
 ```
 
+* introduced a minor ergonomic improvement in Github instance creation. Credentials
+  are now provided as `Into<Option<Credentials>>` meaning you no longer have to wrap
+  credentials with `Some(...)` when providing credentials
+
+```rust
+let github = Github::new(
+  "my-cool-user-agent/0.1.0",
+  Credentials::Token("personal-access-token"),
+  &core.handle()
+);
+```
+
 # 0.4.6
 
 * add support for pull request label deserialization and pull request issue interaction
