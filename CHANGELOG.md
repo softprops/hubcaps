@@ -15,6 +15,18 @@ github.repo("you", "repo")
   are now provided as `Into<Option<Credentials>>` meaning you no longer have to wrap
   credentials with `Some(...)` when providing credentials
 
+before
+
+```rust
+let github = Github::new(
+  "my-cool-user-agent/0.1.0",
+  Some(Credentials::Token("personal-access-token")),
+  &core.handle()
+);
+```
+
+after
+
 ```rust
 let github = Github::new(
   "my-cool-user-agent/0.1.0",
