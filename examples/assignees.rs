@@ -37,7 +37,7 @@ fn run() -> Result<()> {
         github
           .repo("softprops", "hubcaps")
           .issues()
-          .get(122)
+          .get(125)
           .assignees()
           .add(vec!["softprops"]),
       )?;
