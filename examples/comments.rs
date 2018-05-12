@@ -1,6 +1,4 @@
 extern crate env_logger;
-#[macro_use(quick_main)]
-extern crate error_chain;
 extern crate futures;
 extern crate hubcaps;
 extern crate tokio_core;
@@ -9,14 +7,12 @@ use std::env;
 
 use tokio_core::reactor::Core;
 
-use hubcaps::{Credentials, Github, Result};
 use hubcaps::comments::CommentOptions;
+use hubcaps::{Credentials, Github, Result};
 
-const USER_AGENT: &'static str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
-quick_main!(run);
-
-fn run() -> Result<()> {
+fn main() -> Result<()> {
     drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {

@@ -1,5 +1,3 @@
-#[macro_use(quick_main)]
-extern crate error_chain;
 extern crate hubcaps;
 extern crate tokio_core;
 
@@ -9,9 +7,7 @@ use tokio_core::reactor::Core;
 
 use hubcaps::{Credentials, Github, Result};
 
-quick_main!(run);
-
-fn run() -> Result<()> {
+fn main() -> Result<()> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut core = Core::new()?;
