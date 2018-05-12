@@ -89,12 +89,12 @@ use std::fmt;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-#[cfg(feature = "tls")]
-use hyper_tls::HttpsConnector;
-use hyper::{Client, Method, StatusCode};
 use hyper::client::{Connect, HttpConnector, Request};
 use hyper::header::{qitem, Accept, Authorization, Link, Location, RelationType, UserAgent};
 use hyper::mime::Mime;
+use hyper::{Client, Method, StatusCode};
+#[cfg(feature = "tls")]
+use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use tokio_core::reactor::Handle;
 use url::Url;
@@ -103,34 +103,34 @@ use url::Url;
 mod macros; // expose json! macro to child modules
 pub mod activity;
 pub mod branches;
-pub mod git;
-pub mod users;
 pub mod comments;
-pub mod review_comments;
-pub mod pull_commits;
-pub mod keys;
-pub mod gists;
 pub mod deployments;
 pub mod errors;
+pub mod gists;
+pub mod git;
 pub mod hooks;
 pub mod issues;
+pub mod keys;
 pub mod labels;
+pub mod organizations;
+pub mod pull_commits;
+pub mod pulls;
 pub mod releases;
 pub mod repositories;
+pub mod review_comments;
+pub mod search;
 pub mod stars;
 pub mod statuses;
-pub mod pulls;
-pub mod search;
 pub mod teams;
-pub mod organizations;
+pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
 
 use activity::Activity;
 use gists::{Gists, UserGists};
-use search::Search;
-use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
 use organizations::{Organization, Organizations, UserOrganizations};
+use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
+use search::Search;
 use users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
