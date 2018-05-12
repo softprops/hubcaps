@@ -1,6 +1,4 @@
 extern crate env_logger;
-#[macro_use(quick_main)]
-extern crate error_chain;
 extern crate hubcaps;
 extern crate tokio_core;
 
@@ -9,12 +7,10 @@ use std::env;
 
 use tokio_core::reactor::Core;
 
-use hubcaps::{Credentials, Github, Result};
 use hubcaps::gists::{Content, GistOptions};
+use hubcaps::{Credentials, Github, Result};
 
-quick_main!(run);
-
-fn run() -> Result<()> {
+fn main() -> Result<()> {
     drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
