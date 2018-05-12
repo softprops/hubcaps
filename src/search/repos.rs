@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use url::form_urlencoded;
 
-use {Future, SortDirection, Stream};
 use std::fmt;
+use {Future, SortDirection, Stream};
 
-use hyper::client::Connect;
 use super::{Search, SearchResult};
+use hyper::client::Connect;
 use users::User;
 
 #[derive(Debug, PartialEq)]
@@ -28,8 +28,8 @@ impl fmt::Display for ReposSort {
     }
 }
 
-/// Provides access to search operations for repositories
-/// https://developer.github.com/v3/search/#search-repositories
+/// Provides access to [search operations for repositories](https://developer.github.com/v3/search/#search-repositories)
+///
 pub struct SearchRepos<C>
 where
     C: Clone + Connect,

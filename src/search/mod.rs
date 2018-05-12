@@ -7,12 +7,11 @@ use hyper::client::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
-use {unfold, Future, Github, SortDirection, Stream};
 use labels::Label;
 use users::User;
+use {unfold, Future, Github, SortDirection, Stream};
 
 mod repos;
-use self::repos::SearchRepos;
 
 pub use self::repos::*;
 
@@ -37,8 +36,8 @@ impl fmt::Display for IssuesSort {
     }
 }
 
-/// Provides access to search operations
-/// https://developer.github.com/v3/search/#search-issues
+/// Provides access to general search operations
+///
 #[derive(Clone)]
 pub struct Search<C>
 where
@@ -160,7 +159,7 @@ impl SearchIssuesOptions {
     }
 }
 
-/// https://developer.github.com/v3/search/#search-issues
+/// Provides access to [search operations for issues and pull requests](https://developer.github.com/v3/search/#search-issues)
 pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
@@ -199,6 +198,8 @@ pub struct SearchResult<D> {
     pub items: Vec<D>,
 }
 
+/// May reporesent a Github Issue or PullRequest
+/// depending on the type of search
 #[derive(Debug, Deserialize)]
 pub struct IssuesItem {
     pub url: String,
