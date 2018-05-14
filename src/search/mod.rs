@@ -228,9 +228,11 @@ pub struct IssuesItem {
 impl IssuesItem {
     /// returns a tuple of (repo owner name, repo name) associated with this issue
     pub fn repo_tuple(&self) -> (String, String) {
+        // split the last two elements off the repo url path
         let parsed = url::Url::parse(&self.repository_url).unwrap();
-        let path = parsed.path().split("/").collect::<Vec<_>>();
-        (path[0].to_owned(), path[1].to_owned())
+        let mut path = parsed.path().split("/").collect::<Vec<_>>();
+        path.reverse();
+        (path[1].to_owned(), path[0].to_owned())
     }
 }
 

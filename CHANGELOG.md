@@ -1,3 +1,7 @@
+# 0.4.8
+
+* fixed bug with `hubcaps::search::IssueItem.repo_tuple()`
+
 # 0.4.7
 
 * added assignee manage interfaces to pull request and issues interfaces
