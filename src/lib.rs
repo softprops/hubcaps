@@ -115,6 +115,7 @@ pub mod labels;
 pub mod organizations;
 pub mod pull_commits;
 pub mod pulls;
+pub mod rate_limit;
 pub mod releases;
 pub mod repositories;
 pub mod review_comments;
@@ -129,6 +130,7 @@ pub use errors::{Error, ErrorKind, Result};
 use activity::Activity;
 use gists::{Gists, UserGists};
 use organizations::{Organization, Organizations, UserOrganizations};
+use rate_limit::RateLimit;
 use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
 use search::Search;
 use users::Users;
@@ -280,6 +282,10 @@ where
             client: http,
             credentials: credentials.into(),
         }
+    }
+
+    pub fn rate_limit(&self) -> RateLimit<C> {
+        RateLimit::new(self.clone())
     }
 
     /// Return a reference to user activity
