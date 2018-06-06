@@ -61,7 +61,7 @@ github.repo("you", "repo")
 
 # 0.4.5
 
-* add support for iterating over a stream of repo issues `gitub.repo(.., ..).issues().iter(opts)`
+* add support for iterating over a stream of repo issues `github.repo(.., ..).issues().iter(opts)`
 * support anonymous gist owners [#111](https://github.com/softprops/hubcaps/pull/111)
 
 # 0.4.4
@@ -75,7 +75,7 @@ github.repo("you", "repo")
 
 * fixed url bug with language looking for repositories
 * fixed url bug with iter based pagination
-* intoduce new ErrorKind::RateLimit error for better rate limit detection
+* introduce new ErrorKind::RateLimit error for better rate limit detection
 
 # 0.4.2
 
@@ -92,7 +92,7 @@ github.repo("you", "repo")
 
 ## breaking changes
 
-Hyper 0.11's switch to async API's had a major impact to the API design choices
+Hyper 0.11's switch to async APIs had a major impact to the API design choices
 in this release. The following are the major notable changes
 
 * interfaces that previously returned `hubcaps::Result` types now return `hubcaps::Future` types. The semantics are the same, the difference is that
@@ -183,7 +183,7 @@ computed asynchronously. To learn more about Streams and Stream combinators see
 * added support for repo hooks
 * `Github::new` now takes an owned reference to a hyper::Client. this makes it possible
   to pass a github instance into a threaded context.
-* upgrade to serde 0.9 (and now uneeded build.rs machinery)
+* upgrade to serde 0.9 (and now unneeded build.rs machinery)
 * sizable code restructure to support scalability in future growth. move foo.rs modules to foo/mod.rs files. moved respective rep.rs reps into mods
 * the effect of the above is that everything may no longer be accessible via the top level `hubcaps` module. For instance, in the past you would be able to to access `hubcaps::Pull` directly, now you would access it via is api category `hubcaps::pulls::Pull`.
 * update hyper to 0.10. the implications are that you now need to bring your own tls-configured hyper client
@@ -245,7 +245,7 @@ Many changes were made to transition into using serde as a serialization backend
 * pull request and issue listing fn's now both take options structs. This is a breaking change.
 * repo listing fn's now take option structs. This is a breaking change.
 * gist listing fn's now take option structs. This is a breaking change.
-* added support for fetching organization repoistory listings [via @carols10cents](https://github.com/softprops/hubcaps/pull/28)
+* added support for fetching organization repository listings [via @carols10cents](https://github.com/softprops/hubcaps/pull/28)
 
 # 0.1.1
 
