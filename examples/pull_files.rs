@@ -5,7 +5,6 @@ extern crate tokio_core;
 
 use std::env;
 
-use futures::Stream;
 use tokio_core::reactor::Core;
 
 use hubcaps::{Credentials, Github, Result};
