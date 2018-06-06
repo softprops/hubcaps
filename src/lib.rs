@@ -58,11 +58,11 @@
 //! A special case
 //! [hubcaps::ErrorKind::RateLimit](errors/enum.ErrorKind.html#variant.RateLimit)
 //! will be returned from api operations when the rate limit
-//! associated with credentials has been exhaused. This type will include a reset
+//! associated with credentials has been exhausted. This type will include a reset
 //! Duration to wait before making future requests.
 //!
 //! This crate uses the `log` crate's debug log interface to log x-rate-limit
-//! headers recieved from Github.
+//! headers received from Github.
 //! If you are attempting to test your access patterns against
 //! Github's rate limits, enable debug looking and look for "x-rate-limit"
 //! log patterns sourced from this crate
