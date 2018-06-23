@@ -163,8 +163,6 @@ header! {
   (XRateLimitReset, "X-RateLimit-Reset") => [u32]
 }
 
-/// alias for Result that infers hubcaps::Error as Err
-// pub type Result<T> = std::result::Result<T, Error>;
 /// Github defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information
 #[derive(Clone, Copy)]
