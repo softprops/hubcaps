@@ -1,7 +1,9 @@
 //! Git interface
 
+// Third party
 use hyper::client::Connect;
 
+// Ours
 use {Future, Github};
 
 /// reference to git operations associated with a github repo
@@ -65,6 +67,18 @@ impl<C: Clone + Connect> Git<C> {
     {
         self.github
             .get(&self.path(format!("/refs/{}", reference.into())))
+    }
+
+    //// deletes a refish
+    /// branches should be in the format `heads/feature-a`
+    /// tags should be in the format `tags/v1.0`
+    /// https://developer.github.com/v3/git/refs/#delete-a-reference
+    pub fn delete_reference<S>(&self, reference: S) -> Future<()>
+    where
+        S: Into<String>,
+    {
+        self.github
+            .delete(&self.path(format!("/refs/{}", reference.into())))
     }
 }
 
@@ -133,10 +147,10 @@ pub struct Object {
 
 #[cfg(test)]
 mod tests {
-    use std::fmt::Debug;
+    use super::*;
     use serde::Deserialize;
     use serde_json;
-    use super::*;
+    use std::fmt::Debug;
 
     fn test_deserializing<'de, T>(payload: &'static str, expected: T)
     where
