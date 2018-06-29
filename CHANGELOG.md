@@ -1,3 +1,13 @@
+# 0.4.9
+
+* add the ability to delete a git ref (tag, branch ect)
+
+```rust
+github.repo("you", "repo")
+  .git()
+  .delete_reference("heads/awesome-feature")
+```
+
 # 0.4.8
 
 * fixed bug with `hubcaps::search::IssueItem.repo_tuple()`
