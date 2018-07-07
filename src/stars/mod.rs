@@ -32,7 +32,7 @@ impl<C: Clone + Connect + 'static> Stars<C> {
                 .or_else(|err| match err {
                     Error(
                         ErrorKind::Fault {
-                            code: StatusCode::NotFound,
+                            code: StatusCode::NOT_FOUND,
                             ..
                         },
                         _,

@@ -435,7 +435,7 @@ where
             }
             let status = response.status();
             // handle redirect common with renamed repos
-            if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
+            if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
                 if let Some(location) = response.headers().get::<Location>() {
                     debug!("redirect location {:?}", location);
                     return instance2.request(method, &location.to_string(), body, media_type);
@@ -502,19 +502,19 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Get, &(self.host.clone() + uri), None, media)
+        self.request_entity(Method::GET, &(self.host.clone() + uri), None, media)
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
         D: DeserializeOwned + 'static,
     {
-        self.request(Method::Get, &(self.host.clone() + uri), None, MediaType::Json)
+        self.request(Method::GET, &(self.host.clone() + uri), None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
         Box::new(self.request_entity::<()>(
-            Method::Delete,
+            Method::DELETE,
             &(self.host.clone() + uri),
             None,
             MediaType::Json,
@@ -529,7 +529,7 @@ where
         D: DeserializeOwned + 'static,
     {
         self.request_entity(
-            Method::Post,
+            Method::POST,
             &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
@@ -547,7 +547,7 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Patch, &(self.host.clone() + uri), Some(message), media)
+        self.request_entity(Method::PATCH, &(self.host.clone() + uri), Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
@@ -569,7 +569,7 @@ where
         D: DeserializeOwned + 'static,
     {
         self.request_entity(
-            Method::Put,
+            Method::PUT,
             &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
