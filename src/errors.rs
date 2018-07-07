@@ -3,9 +3,10 @@
 use std::io::Error as IoError;
 use std::time::Duration;
 
-use hyper::Error as HttpError;
+use http::Error as HttpError;
+use http::uri::InvalidUri;
+use hyper::Error as HyperError;
 use hyper::StatusCode;
-use hyper::error::UriError;
 use serde_json::error::Error as SerdeError;
 
 error_chain! {
@@ -28,8 +29,9 @@ error_chain! {
     foreign_links {
         Codec(SerdeError);
         Http(HttpError);
+        Hyper(HyperError);
         IO(IoError);
-        URI(UriError);
+        URI(InvalidUri);
     }
 }
 
