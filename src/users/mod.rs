@@ -2,7 +2,7 @@
 
 use {Future, Github};
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 /// User information
 #[derive(Debug, Deserialize)]
@@ -66,12 +66,12 @@ pub struct AuthenticatedUser {
 /// Query user information
 pub struct Users<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> Users<C> {
+impl<C: Clone + Connect + 'static> Users<C> {
     pub fn new(github: Github<C>) -> Self {
         Users { github }
     }

@@ -4,21 +4,21 @@
 //! for motivation and use
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use serde_json;
 
 use {Future, Github};
 
 pub struct Keys<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Keys<C> {
+impl<C: Clone + Connect + 'static> Keys<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

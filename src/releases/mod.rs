@@ -2,7 +2,7 @@
 extern crate serde_json;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {Future, Github};
 use users::User;
@@ -12,7 +12,7 @@ use users::User;
 /// for more information.
 pub struct Assets<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -20,7 +20,7 @@ where
     releaseid: u64,
 }
 
-impl<C: Connect + Clone> Assets<C> {
+impl<C: Clone + Connect + 'static> Assets<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, releaseid: u64) -> Self
     where
@@ -74,7 +74,7 @@ impl<C: Connect + Clone> Assets<C> {
 
 pub struct ReleaseRef<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -82,7 +82,7 @@ where
     id: u64,
 }
 
-impl<C: Clone + Connect> ReleaseRef<C> {
+impl<C: Clone + Connect + 'static> ReleaseRef<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
     where
@@ -128,14 +128,14 @@ impl<C: Clone + Connect> ReleaseRef<C> {
 /// for more information.
 pub struct Releases<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Releases<C> {
+impl<C: Clone + Connect + 'static> Releases<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

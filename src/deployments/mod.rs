@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use futures::future;
 use url::form_urlencoded;
 use serde;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use statuses::State;
 use users::User;
 
@@ -17,7 +17,7 @@ use {Future, Github};
 /// Interface for repository deployments
 pub struct Deployments<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -27,7 +27,7 @@ where
 /// Interface for deployment statuses
 pub struct DeploymentStatuses<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -35,7 +35,7 @@ where
     id: u64,
 }
 
-impl<C: Clone + Connect> DeploymentStatuses<C> {
+impl<C: Clone + Connect + 'static> DeploymentStatuses<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
     where
@@ -69,7 +69,7 @@ impl<C: Clone + Connect> DeploymentStatuses<C> {
     }
 }
 
-impl<C: Clone + Connect> Deployments<C> {
+impl<C: Clone + Connect + 'static> Deployments<C> {
     /// Create a new deployments instance
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Deployments<C>
     where

@@ -5,7 +5,7 @@
 extern crate futures;
 extern crate serde_json;
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use futures::future;
 
 use {unfold, Future, Github, Stream};
@@ -17,14 +17,14 @@ fn identity<T>(x: T) -> T {
 /// reference to gists associated with a github user
 pub struct Branches<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Branches<C> {
+impl<C: Clone + Connect + 'static> Branches<C> {
     #[doc(hidden)]
     pub fn new<U, R>(github: Github<C>, owner: U, repo: R) -> Self
     where

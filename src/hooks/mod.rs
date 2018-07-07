@@ -7,7 +7,7 @@ use serde_json;
 
 use {Future, Github};
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use std::fmt;
 use std::collections::BTreeMap;
 
@@ -41,14 +41,14 @@ impl fmt::Display for WebHookContentType {
 /// Interface for managing repository hooks
 pub struct Hooks<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Hooks<C> {
+impl<C: Clone + Connect + 'static> Hooks<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

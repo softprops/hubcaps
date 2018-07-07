@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
@@ -41,7 +41,7 @@ impl fmt::Display for IssuesSort {
 #[derive(Clone)]
 pub struct Search<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
@@ -53,7 +53,7 @@ where
     result.items
 }
 
-impl<C: Clone + Connect> Search<C> {
+impl<C: Clone + Connect + 'static> Search<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }
@@ -88,12 +88,12 @@ impl<C: Clone + Connect> Search<C> {
 /// https://developer.github.com/v3/search/#search-issues
 pub struct SearchIssues<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     search: Search<C>,
 }
 
-impl<C: Clone + Connect> SearchIssues<C> {
+impl<C: Clone + Connect + 'static> SearchIssues<C> {
     #[doc(hidden)]
     pub fn new(search: Search<C>) -> Self {
         Self { search }

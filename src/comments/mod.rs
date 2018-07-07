@@ -5,7 +5,7 @@ extern crate serde_json;
 
 use {Future, Github};
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use std::collections::HashMap;
 use url::form_urlencoded;
 use users::User;
@@ -13,7 +13,7 @@ use users::User;
 /// A structure for interfacing with a issue comments
 pub struct Comments<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -21,7 +21,7 @@ where
     number: u64,
 }
 
-impl<C: Clone + Connect> Comments<C> {
+impl<C: Clone + Connect + 'static> Comments<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where

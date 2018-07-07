@@ -5,7 +5,7 @@ use std::fmt;
 use {Future, SortDirection, Stream};
 
 use super::{Search, SearchResult};
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use users::User;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -32,12 +32,12 @@ impl fmt::Display for ReposSort {
 ///
 pub struct SearchRepos<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     search: Search<C>,
 }
 
-impl<C: Clone + Connect> SearchRepos<C> {
+impl<C: Clone + Connect + 'static> SearchRepos<C> {
     #[doc(hidden)]
     pub fn new(search: Search<C>) -> Self {
         Self { search }

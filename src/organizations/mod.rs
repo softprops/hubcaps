@@ -1,6 +1,6 @@
 //! Organizations interface
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {Future, Github};
 use repositories::OrgRepositories;
@@ -9,13 +9,13 @@ use teams::OrgTeams;
 /// Provides access to label operations available for an individual organization
 pub struct Organization<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     org: String,
 }
 
-impl<C: Clone + Connect> Organization<C> {
+impl<C: Clone + Connect + 'static> Organization<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, org: O) -> Self
     where
@@ -40,12 +40,12 @@ impl<C: Clone + Connect> Organization<C> {
 
 pub struct Organizations<C>
 where
-    C: Connect + Clone,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Connect + Clone> Organizations<C> {
+impl<C: Clone + Connect + 'static> Organizations<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }
@@ -64,13 +64,13 @@ impl<C: Connect + Clone> Organizations<C> {
 
 pub struct UserOrganizations<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     user: String,
 }
 
-impl<C: Clone + Connect> UserOrganizations<C> {
+impl<C: Clone + Connect + 'static> UserOrganizations<C> {
     pub fn new<U>(github: Github<C>, user: U) -> Self
     where
         U: Into<String>,

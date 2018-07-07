@@ -1,6 +1,6 @@
 //! Stars interface
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use hyper::StatusCode;
 use futures::Future as StdFuture;
 
@@ -8,12 +8,12 @@ use {Error, ErrorKind, Future, Github};
 
 pub struct Stars<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> Stars<C> {
+impl<C: Clone + Connect + 'static> Stars<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }

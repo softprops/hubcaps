@@ -1,7 +1,7 @@
 //! Git interface
 
 // Third party
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 // Ours
 use {Future, Github};
@@ -9,14 +9,14 @@ use {Future, Github};
 /// reference to git operations associated with a github repo
 pub struct Git<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Git<C> {
+impl<C: Clone + Connect + 'static> Git<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

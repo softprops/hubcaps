@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
 use {serde_json, Future, Github};
@@ -13,13 +13,13 @@ use users::User;
 /// reference to gists associated with a github user
 pub struct UserGists<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
 }
 
-impl<C: Clone + Connect> UserGists<C> {
+impl<C: Clone + Connect + 'static> UserGists<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, owner: O) -> Self
     where
@@ -42,12 +42,12 @@ impl<C: Clone + Connect> UserGists<C> {
 
 pub struct Gists<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> Gists<C> {
+impl<C: Clone + Connect + 'static> Gists<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }

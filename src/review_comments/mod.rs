@@ -3,7 +3,7 @@
 extern crate futures;
 extern crate serde_json;
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {Future, Github};
 use futures::future;
@@ -12,7 +12,7 @@ use users::User;
 /// A structure for interfacing with a review comments
 pub struct ReviewComments<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -20,7 +20,7 @@ where
     number: u64,
 }
 
-impl<C: Clone + Connect> ReviewComments<C> {
+impl<C: Clone + Connect + 'static> ReviewComments<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where

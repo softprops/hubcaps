@@ -1,14 +1,14 @@
 //! Rate Limit interface
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {Future, Github};
 
-pub struct RateLimit<C: Clone + Connect> {
+pub struct RateLimit<C: Clone + Connect + 'static> {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> RateLimit<C> {
+impl<C: Clone + Connect + 'static> RateLimit<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }

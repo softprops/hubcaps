@@ -4,7 +4,7 @@ use std::fmt;
 use std::collections::HashMap;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
 use {serde_json, unfold, Future, Github, SortDirection, Stream};
@@ -67,14 +67,14 @@ impl Default for Sort {
 }
 
 /// Provides access to assignee operations available for an individual issue
-pub struct IssueAssignees<C: Clone + Connect> {
+pub struct IssueAssignees<C: Clone + Connect + 'static> {
     github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect> IssueAssignees<C> {
+impl<C: Clone + Connect + 'static> IssueAssignees<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
@@ -105,14 +105,14 @@ impl<C: Clone + Connect> IssueAssignees<C> {
 }
 
 /// Provides access to label operations available for an individual issue
-pub struct IssueLabels<C: Clone + Connect> {
+pub struct IssueLabels<C: Clone + Connect + 'static> {
     github: Github<C>,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect> IssueLabels<C> {
+impl<C: Clone + Connect + 'static> IssueLabels<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
@@ -163,7 +163,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
 /// Typically accessed from `github.repo(.., ..).issues().get(number)`
 pub struct IssueRef<C>
 where
-    C: Connect + Clone,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -171,7 +171,7 @@ where
     number: u64,
 }
 
-impl<C: Clone + Connect> IssueRef<C> {
+impl<C: Clone + Connect + 'static> IssueRef<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
@@ -238,7 +238,7 @@ impl<C: Clone + Connect> IssueRef<C> {
 /// Typically accessed via `github.repo(..., ...).issues()`
 pub struct Issues<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -249,7 +249,7 @@ fn identity<T>(x: T) -> T {
     x
 }
 
-impl<C: Clone + Connect> Issues<C> {
+impl<C: Clone + Connect + 'static> Issues<C> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

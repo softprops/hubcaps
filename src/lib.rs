@@ -90,7 +90,8 @@ use std::fmt;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-use hyper::client::{Connect, HttpConnector, Request};
+use hyper::client::connect::Connect;
+use hyper::client::{HttpConnector, Request};
 use hyper::header::{qitem, Accept, Authorization, Link, Location, RelationType, UserAgent};
 use hyper::mime::Mime;
 use hyper::{Client, Method, StatusCode};
@@ -234,7 +235,7 @@ pub enum Credentials {
 #[derive(Clone, Debug)]
 pub struct Github<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     host: String,
     agent: String,
@@ -269,7 +270,7 @@ impl Github<HttpsConnector<HttpConnector>> {
 
 impl<C> Github<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
     where
@@ -592,7 +593,7 @@ fn unfold<C, D, I>(
 where
     D: DeserializeOwned + 'static,
     I: 'static,
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     Box::new(
         first
