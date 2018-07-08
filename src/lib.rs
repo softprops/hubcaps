@@ -246,11 +246,10 @@ impl Github<HttpsConnector<HttpConnector>> {
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        let connector = HttpsConnector::new(4, handle).unwrap();
-        let http = Client::configure()
-            .connector(connector)
+        let connector = HttpsConnector::new(4).unwrap();
+        let http = Client::builder()
             .keep_alive(true)
-            .build(handle);
+            .build(connector);
         Self::custom(host, agent, credentials, http)
     }
 }
