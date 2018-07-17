@@ -230,7 +230,7 @@ impl IssuesItem {
     pub fn repo_tuple(&self) -> (String, String) {
         // split the last two elements off the repo url path
         let parsed = url::Url::parse(&self.repository_url).unwrap();
-        let mut path = parsed.path().split("/").collect::<Vec<_>>();
+        let mut path = parsed.path().split('/').collect::<Vec<_>>();
         path.reverse();
         (path[1].to_owned(), path[0].to_owned())
     }
