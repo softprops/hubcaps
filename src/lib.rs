@@ -412,10 +412,10 @@ where
         });
         let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
-            for value in response.headers().get::<XGithubRequestId>() {
+            if let Some(value) = response.headers().get::<XGithubRequestId>() {
                 debug!("x-github-request-id: {}", value)
             }
-            for value in response.headers().get::<XRateLimitLimit>() {
+            if let Some(value) = response.headers().get::<XRateLimitLimit>() {
                 debug!("x-rate-limit-limit: {}", value.0)
             }
             let remaining = response
@@ -423,10 +423,10 @@ where
                 .get::<XRateLimitRemaining>()
                 .map(|val| val.0);
             let reset = response.headers().get::<XRateLimitReset>().map(|val| val.0);
-            for value in remaining {
+            if let Some(value) = remaining {
                 debug!("x-rate-limit-remaining: {}", value)
             }
-            for value in reset {
+            if let Some(value) = reset {
                 debug!("x-rate-limit-reset: {}", value)
             }
             let status = response.status();
