@@ -516,7 +516,7 @@ where
             MediaType::Json,
         ).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
-            otherwise => Err(otherwise.into()),
+            otherwise => Err(otherwise),
         }))
     }
 
@@ -549,7 +549,7 @@ where
     fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::new(self.put(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
-            err => Err(err.into()),
+            err => Err(err),
         }))
     }
 

@@ -38,7 +38,7 @@ impl<C: Clone + Connect> Stars<C> {
                         _,
                     ) => Ok(false),
                     Error(ErrorKind::Codec(_), _) => Ok(true),
-                    otherwise => Err(otherwise.into()),
+                    otherwise => Err(otherwise),
                 }),
         )
     }
