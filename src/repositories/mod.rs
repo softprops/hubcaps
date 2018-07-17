@@ -651,6 +651,7 @@ impl RepoOptionsBuilder {
 }
 
 impl RepoOptions {
+    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
     pub fn new<N, D, H, GI, L>(
         name: N,
         description: Option<D>,
@@ -801,6 +802,7 @@ pub struct RepoEditOptions {
 }
 
 impl RepoEditOptions {
+    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
     pub fn new<N, D, H, DB>(
         name: N,
         description: Option<D>,
