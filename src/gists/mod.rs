@@ -212,7 +212,7 @@ impl GistOptionsBuilder {
         V: Into<String>,
     {
         let mut contents = HashMap::new();
-        for (k, v) in files.into_iter() {
+        for (k, v) in files {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
         GistOptionsBuilder(GistOptions {
@@ -260,7 +260,7 @@ impl GistOptions {
         V: Into<String>,
     {
         let mut contents = HashMap::new();
-        for (k, v) in files.into_iter() {
+        for (k, v) in files {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
         GistOptions {
