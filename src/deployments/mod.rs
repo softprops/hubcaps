@@ -318,13 +318,12 @@ impl DeploymentListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct DeploymentListOptionsBuilder(DeploymentListOptions);
 
 impl DeploymentListOptionsBuilder {
-    pub fn new() -> DeploymentListOptionsBuilder {
-        DeploymentListOptionsBuilder(DeploymentListOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder

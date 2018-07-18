@@ -227,13 +227,12 @@ impl HookEditOptions {
     }
 }
 
+#[derive(Default)]
 pub struct HookEditOptionsBuilder(HookEditOptions);
 
 impl HookEditOptionsBuilder {
-    pub fn new() -> HookEditOptionsBuilder {
-        HookEditOptionsBuilder(HookEditOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn active(&mut self, active: bool) -> &mut Self {

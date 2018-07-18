@@ -99,13 +99,12 @@ impl CommentListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct CommentListOptionsBuilder(CommentListOptions);
 
 impl CommentListOptionsBuilder {
-    pub fn new() -> CommentListOptionsBuilder {
-        CommentListOptionsBuilder(CommentListOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn since<S>(&mut self, since: S) -> &mut CommentListOptionsBuilder

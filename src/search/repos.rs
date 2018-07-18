@@ -101,13 +101,12 @@ impl SearchReposOptions {
     }
 }
 
+#[derive(Default)]
 pub struct SearchReposOptionsBuilder(SearchReposOptions);
 
 impl SearchReposOptionsBuilder {
-    pub fn new() -> SearchReposOptionsBuilder {
-        SearchReposOptionsBuilder(SearchReposOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {

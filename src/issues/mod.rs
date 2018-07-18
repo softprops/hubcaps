@@ -344,13 +344,12 @@ impl IssueListOptions {
 }
 
 /// a mutable issue list builder
+#[derive(Default)]
 pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
     pub fn new() -> Self {
-        IssueListOptionsBuilder(IssueListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn state(&mut self, state: State) -> &mut Self {

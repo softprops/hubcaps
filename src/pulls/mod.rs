@@ -275,13 +275,12 @@ pub struct Commit {
     pub user: User, //    pub repo: Option<Repo>,
 }
 
+#[derive(Default)]
 pub struct PullEditOptionsBuilder(PullEditOptions);
 
 impl PullEditOptionsBuilder {
-    pub fn new() -> PullEditOptionsBuilder {
-        PullEditOptionsBuilder(PullEditOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     /// set the title of the pull
@@ -415,13 +414,12 @@ impl PullListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct PullListOptionsBuilder(PullListOptions);
 
 impl PullListOptionsBuilder {
-    pub fn new() -> PullListOptionsBuilder {
-        PullListOptionsBuilder(PullListOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {

@@ -160,13 +160,12 @@ impl SearchIssuesOptions {
 }
 
 /// Provides access to [search operations for issues and pull requests](https://developer.github.com/v3/search/#search-issues)
+#[derive(Default)]
 pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
-    pub fn new() -> SearchIssuesOptionsBuilder {
-        SearchIssuesOptionsBuilder(SearchIssuesOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {

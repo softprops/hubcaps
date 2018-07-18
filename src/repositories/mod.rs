@@ -716,13 +716,12 @@ impl RepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct RepoListOptionsBuilder(RepoListOptions);
 
 impl RepoListOptionsBuilder {
     pub fn new() -> Self {
-        RepoListOptionsBuilder(RepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -955,13 +954,12 @@ impl OrgRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct OrgRepoListOptionsBuilder(OrgRepoListOptions);
 
 impl OrgRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrgRepoListOptionsBuilder(OrgRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -1004,13 +1002,12 @@ impl UserRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct UserRepoListOptionsBuilder(UserRepoListOptions);
 
 impl UserRepoListOptionsBuilder {
     pub fn new() -> Self {
-        UserRepoListOptionsBuilder(UserRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
@@ -1071,13 +1068,12 @@ impl OrganizationRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions);
 
 impl OrganizationRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
