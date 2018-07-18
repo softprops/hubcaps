@@ -456,7 +456,7 @@ where
                                     .unwrap()
                                     .as_secs();
                                 ErrorKind::RateLimit {
-                                    reset: Duration::from_secs(reset as u64 - now),
+                                    reset: Duration::from_secs(u64::from(reset) - now),
                                 }
                             }
                             _ => ErrorKind::Fault {
