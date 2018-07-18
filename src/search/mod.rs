@@ -104,7 +104,7 @@ impl<C: Clone + Connect> SearchIssues<C> {
         Q: Into<String>,
     {
         let mut uri = vec!["/search/issues".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
+        let query_options = options.serialize().unwrap_or_default();
         let query = form_urlencoded::Serializer::new(query_options)
             .append_pair("q", &q.into())
             .finish();

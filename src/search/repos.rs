@@ -48,7 +48,7 @@ impl<C: Clone + Connect> SearchRepos<C> {
         Q: Into<String>,
     {
         let mut uri = vec!["/search/repositories".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
+        let query_options = options.serialize().unwrap_or_default();
         let query = form_urlencoded::Serializer::new(query_options)
             .append_pair("q", &q.into())
             .finish();
