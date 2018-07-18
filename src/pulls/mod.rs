@@ -69,10 +69,10 @@ impl<C: Clone + Connect> PullRequest<C> {
         R: Into<String>,
     {
         PullRequest {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -177,7 +177,7 @@ impl<C: Clone + Connect> PullRequests<C> {
         R: Into<String>,
     {
         PullRequests {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

@@ -29,10 +29,10 @@ impl<C: Clone + Connect> Comments<C> {
         R: Into<String>,
     {
         Comments {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 

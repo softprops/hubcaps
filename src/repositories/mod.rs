@@ -194,7 +194,7 @@ impl<C: Clone + Connect> OrgRepositories<C> {
         O: Into<String>,
     {
         OrgRepositories {
-            github: github,
+            github,
             org: org.into(),
         }
     }
@@ -249,7 +249,7 @@ impl<C: Connect + Clone> UserRepositories<C> {
         O: Into<String>,
     {
         UserRepositories {
-            github: github,
+            github,
             owner: owner.into(),
         }
     }
@@ -298,7 +298,7 @@ impl<C: Clone + Connect> OrganizationRepositories<C> {
         O: Into<String>,
     {
         OrganizationRepositories {
-            github: github,
+            github,
             org: org.into(),
         }
     }
@@ -349,7 +349,7 @@ impl<C: Clone + Connect> Repository<C> {
         R: Into<String>,
     {
         Repository {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -677,12 +677,12 @@ impl RepoOptions {
             name: name.into(),
             description: description.map(|h| h.into()),
             homepage: homepage.map(|h| h.into()),
-            private: private,
-            has_issues: has_issues,
-            has_wiki: has_wiki,
-            has_downloads: has_downloads,
-            team_id: team_id,
-            auto_init: auto_init,
+            private,
+            has_issues,
+            has_wiki,
+            has_downloads,
+            team_id,
+            auto_init,
             gitignore_template: gitignore_template.map(|gi| gi.into()),
             license_template: license_template.map(|l| l.into()),
         }
@@ -826,14 +826,14 @@ impl RepoEditOptions {
             name: name.into(),
             description: description.map(|h| h.into()),
             homepage: homepage.map(|h| h.into()),
-            private: private,
-            has_issues: has_issues,
-            has_projects: has_projects,
-            has_wiki: has_wiki,
+            private,
+            has_issues,
+            has_projects,
+            has_wiki,
             default_branch: default_branch.map(|d| d.into()),
-            allow_squash_merge: allow_squash_merge,
-            allow_merge_commit: allow_merge_commit,
-            allow_rebase_merge: allow_rebase_merge,
+            allow_squash_merge,
+            allow_merge_commit,
+            allow_rebase_merge,
         }
     }
 

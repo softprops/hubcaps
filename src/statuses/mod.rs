@@ -26,7 +26,7 @@ impl<C: Clone + Connect> Statuses<C> {
         R: Into<String>,
     {
         Statuses {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -92,7 +92,7 @@ impl StatusOptionsBuilder {
     #[doc(hidden)]
     pub fn new(state: State) -> Self {
         StatusOptionsBuilder(StatusOptions {
-            state: state,
+            state,
             ..Default::default()
         })
     }
@@ -145,7 +145,7 @@ impl StatusOptions {
         C: Into<String>,
     {
         StatusOptions {
-            state: state,
+            state,
             target_url: target_url.map(|t| t.into()),
             description: descr.map(|d| d.into()),
             context: context.map(|c| c.into()),

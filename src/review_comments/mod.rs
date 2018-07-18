@@ -24,10 +24,10 @@ impl<C: Clone + Connect> ReviewComments<C> {
         R: Into<String>,
     {
         ReviewComments {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 

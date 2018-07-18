@@ -28,10 +28,10 @@ impl<C: Clone + Connect> PullCommits<C> {
         R: Into<String>,
     {
         PullCommits {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 

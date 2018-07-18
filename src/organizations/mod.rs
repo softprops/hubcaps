@@ -22,7 +22,7 @@ impl<C: Clone + Connect> Organization<C> {
         O: Into<String>,
     {
         Organization {
-            github: github,
+            github,
             org: org.into(),
         }
     }
@@ -76,7 +76,7 @@ impl<C: Clone + Connect> UserOrganizations<C> {
         U: Into<String>,
     {
         UserOrganizations {
-            github: github,
+            github,
             user: user.into(),
         }
     }

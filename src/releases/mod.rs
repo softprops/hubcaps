@@ -25,10 +25,10 @@ impl<C: Connect + Clone> Assets<C> {
         R: Into<String>,
     {
         Assets {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            releaseid: releaseid,
+            releaseid,
         }
     }
 
@@ -74,10 +74,10 @@ impl<C: Clone + Connect> ReleaseRef<C> {
         R: Into<String>,
     {
         ReleaseRef {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            id: id,
+            id,
         }
     }
 
@@ -119,7 +119,7 @@ impl<C: Clone + Connect> Releases<C> {
         R: Into<String>,
     {
         Releases {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -290,8 +290,8 @@ impl ReleaseOptions {
             target_commitish: commit.map(|c| c.into()),
             name: name.map(|n| n.into()),
             body: body.map(|b| b.into()),
-            draft: draft,
-            prerelease: prerelease,
+            draft,
+            prerelease,
         }
     }
 

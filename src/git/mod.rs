@@ -24,7 +24,7 @@ impl<C: Clone + Connect> Git<C> {
         R: Into<String>,
     {
         Git {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

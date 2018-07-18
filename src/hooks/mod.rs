@@ -56,7 +56,7 @@ impl<C: Clone + Connect> Hooks<C> {
         R: Into<String>,
     {
         Hooks {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

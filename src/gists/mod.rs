@@ -26,7 +26,7 @@ impl<C: Clone + Connect> UserGists<C> {
         O: Into<String>,
     {
         UserGists {
-            github: github,
+            github,
             owner: owner.into(),
         }
     }
@@ -126,7 +126,7 @@ impl GistListOptions {
     {
         let mut params = HashMap::new();
         params.insert("since", timestamp.into());
-        GistListOptions { params: params }
+        GistListOptions { params }
     }
 
     /// serialize options as a string. returns None if no options are defined

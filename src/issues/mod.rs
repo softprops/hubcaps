@@ -82,10 +82,10 @@ impl<C: Clone + Connect> IssueAssignees<C> {
         R: Into<String>,
     {
         IssueAssignees {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -120,10 +120,10 @@ impl<C: Clone + Connect> IssueLabels<C> {
         R: Into<String>,
     {
         IssueLabels {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -179,10 +179,10 @@ impl<C: Clone + Connect> IssueRef<C> {
         R: Into<String>,
     {
         IssueRef {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -257,7 +257,7 @@ impl<C: Clone + Connect> Issues<C> {
         R: Into<String>,
     {
         Issues {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -464,7 +464,7 @@ impl IssueOptions {
             title: title.into(),
             body: body.map(|b| b.into()),
             assignee: assignee.map(|a| a.into()),
-            milestone: milestone,
+            milestone,
             labels: labels
                 .into_iter()
                 .map(|l| l.into())
