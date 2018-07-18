@@ -8,7 +8,7 @@ use super::{Search, SearchResult};
 use hyper::client::Connect;
 use users::User;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {
     /// Sort by the number of stars
     Stars,

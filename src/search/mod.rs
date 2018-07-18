@@ -16,7 +16,7 @@ mod repos;
 pub use self::repos::*;
 
 /// Sort directions for pull requests
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum IssuesSort {
     /// Sort by time created
     Created,

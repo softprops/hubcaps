@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 
 /// Content-Type web hooks will receive
 /// deliveries in
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum WebHookContentType {
     /// application/json
     #[serde(rename = "json")]

@@ -13,7 +13,7 @@ use users::User;
 use labels::Label;
 
 /// enum representation of github pull and issue state
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum State {
     /// Only open issues
     Open,
@@ -40,7 +40,7 @@ impl Default for State {
 }
 
 /// Sort options available for github issues
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     /// sort by creation time of issue
     Created,
@@ -135,6 +135,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     }
 
     /// add a set of labels to this issue ref
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.post(&self.path(""), json!(labels))
     }
@@ -147,6 +148,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.put(&self.path(""), json!(labels))
     }

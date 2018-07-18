@@ -21,7 +21,7 @@ fn identity<T>(x: T) -> T {
 }
 
 /// Sort directions for pull requests
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     /// Sort by time created
     Created,

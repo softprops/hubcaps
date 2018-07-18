@@ -28,7 +28,7 @@ fn identity<T>(x: T) -> T {
 }
 
 /// describes repository visibilities
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Visibility {
     All,
     Public,
@@ -46,7 +46,7 @@ impl fmt::Display for Visibility {
 }
 
 /// Describes sorting options for repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     Created,
     Updated,
@@ -66,7 +66,7 @@ impl fmt::Display for Sort {
 }
 
 /// Describes member affiliation types for repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Affiliation {
     Owner,
     Collaborator,
@@ -84,7 +84,7 @@ impl fmt::Display for Affiliation {
 }
 
 /// Describes types of repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Type {
     All,
     Owner,
@@ -106,7 +106,7 @@ impl fmt::Display for Type {
 }
 
 /// Describes types of organization repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum OrgRepoType {
     All,
     Public,
@@ -522,6 +522,7 @@ impl Repo {
     ///
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
     where
         C: Clone + Connect,

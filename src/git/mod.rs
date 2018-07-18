@@ -30,7 +30,7 @@ impl<C: Clone + Connect> Git<C> {
         }
     }
 
-    fn path(&self, more: String) -> String {
+    fn path(&self, more: &str) -> String {
         format!("/repos/{}/{}/git{}", self.owner, self.repo, more)
     }
 
@@ -41,7 +41,7 @@ impl<C: Clone + Connect> Git<C> {
     where
         S: Into<String>,
     {
-        self.github.get(&self.path(format!(
+        self.github.get(&self.path(&format!(
             "/trees/{}?recursive={}",
             sha.into(),
             if recursive { "1" } else { "0" }
@@ -55,7 +55,7 @@ impl<C: Clone + Connect> Git<C> {
         S: Into<String>,
     {
         self.github
-            .get(&self.path(format!("/blobs/{}", sha.into())))
+            .get(&self.path(&format!("/blobs/{}", sha.into())))
     }
 
     /// get the git reference data of a given ref
@@ -66,7 +66,7 @@ impl<C: Clone + Connect> Git<C> {
         S: Into<String>,
     {
         self.github
-            .get(&self.path(format!("/refs/{}", reference.into())))
+            .get(&self.path(&format!("/refs/{}", reference.into())))
     }
 
     //// deletes a refish
@@ -78,7 +78,7 @@ impl<C: Clone + Connect> Git<C> {
         S: Into<String>,
     {
         self.github
-            .delete(&self.path(format!("/refs/{}", reference.into())))
+            .delete(&self.path(&format!("/refs/{}", reference.into())))
     }
 }
 

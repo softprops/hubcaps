@@ -193,7 +193,7 @@ impl From<MediaType> for Mime {
 }
 
 /// enum representation of Github list sorting options
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SortDirection {
     /// Sort in ascending order (the default)
     Asc,
@@ -374,7 +374,7 @@ where
     fn request<Out>(
         &self,
         method: Method,
-        uri: String,
+        uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
     ) -> Future<(Option<Link>, Out)>
@@ -434,7 +434,7 @@ where
             if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
                 if let Some(location) = response.headers().get::<Location>() {
                     debug!("redirect location {:?}", location);
-                    return instance2.request(method, location.to_string(), body, media_type);
+                    return instance2.request(method, &location.to_string(), body, media_type);
                 }
             }
             let link = response.headers().get::<Link>().cloned();
@@ -474,7 +474,7 @@ where
     fn request_entity<D>(
         &self,
         method: Method,
-        uri: String,
+        uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
     ) -> Future<D>
@@ -498,20 +498,20 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Get, self.host.clone() + uri, None, media)
+        self.request_entity(Method::Get, &(self.host.clone() + uri), None, media)
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
         D: DeserializeOwned + 'static,
     {
-        self.request(Method::Get, self.host.clone() + uri, None, MediaType::Json)
+        self.request(Method::Get, &(self.host.clone() + uri), None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
         Box::new(self.request_entity::<()>(
             Method::Delete,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             None,
             MediaType::Json,
         ).or_else(|err| match err {
@@ -526,7 +526,7 @@ where
     {
         self.request_entity(
             Method::Post,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
         )
@@ -536,7 +536,7 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
+        self.request_entity(Method::Patch, &(self.host.clone() + uri), Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
@@ -559,14 +559,14 @@ where
     {
         self.request_entity(
             Method::Put,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
         )
     }
 }
 
-fn next_link(l: Link) -> Option<String> {
+fn next_link(l: &Link) -> Option<String> {
     l.values()
         .into_iter()
         .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
@@ -593,7 +593,7 @@ where
                     (link, items),
                     move |(link, mut items)| match items.pop() {
                         Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(next_link).map(|url| {
+                        _ => link.and_then(|l| next_link(&l)).map(|url| {
                             let url = Url::parse(&url).unwrap();
                             let uri = [url.path(), url.query().unwrap_or_default()].join("?");
                             Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {

@@ -10,6 +10,7 @@ use serde_json;
 use {unfold, Future, Github, Stream};
 
 /// Team repository permissions
+#[derive(Clone, Copy)]
 pub enum Permission {
     Pull,
     Push,
