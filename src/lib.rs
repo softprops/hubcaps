@@ -437,7 +437,7 @@ where
                     return instance2.request(method, location.to_string(), body, media_type);
                 }
             }
-            let link = response.headers().get::<Link>().map(|l| l.clone());
+            let link = response.headers().get::<Link>().cloned();
             Box::new(response.body().concat2().map_err(Error::from).and_then(
                 move |response_body| {
                     if status.is_success() {
