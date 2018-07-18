@@ -186,7 +186,7 @@ impl From<MediaType> for Mime {
             MediaType::Preview(codename) => {
                 format!("application/vnd.github.{}-preview+json", codename)
                     .parse()
-                    .expect(format!("could not parse media type for preview {}", codename).as_str())
+                    .unwrap_or_else(|_| panic!("could not parse media type for preview {}", codename))
             }
         }
     }
