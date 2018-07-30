@@ -1,10 +1,10 @@
 extern crate env_logger;
 extern crate hubcaps;
-extern crate tokio_core;
+extern crate tokio;
 
 use std::env;
 
-use tokio_core::reactor::Core;
+use tokio::runtime::Runtime;
 
 use hubcaps::traffic::TimeUnit;
 use hubcaps::{Credentials, Github, Result};
@@ -13,27 +13,26 @@ fn main() -> Result<()> {
     drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut core = Core::new()?;
+            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-                &core.handle(),
             );
             let owner = "softprops";
             let repo = "hubcaps";
 
             println!("Top 10 referrers");
-            for referrer in core.run(github.repo(owner, repo).traffic().referrers())? {
+            for referrer in rt.block_on(github.repo(owner, repo).traffic().referrers())? {
                 println!("{:#?}", referrer)
             }
 
             println!("Top 10 paths");
-            for path in core.run(github.repo(owner, repo).traffic().paths())? {
+            for path in rt.block_on(github.repo(owner, repo).traffic().paths())? {
                 println!("{:#?}", path)
             }
 
             println!("Views per day");
-            let views = core.run(
+            let views = rt.block_on(
                 github
                     .repo(owner, repo)
                     .traffic()
@@ -42,7 +41,7 @@ fn main() -> Result<()> {
             println!("{:#?}", views);
 
             println!("Clones per day");
-            let clones = core.run(
+            let clones = rt.block_on(
                 github
                     .repo(owner, repo)
                     .traffic()

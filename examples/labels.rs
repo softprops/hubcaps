@@ -1,12 +1,12 @@
 extern crate env_logger;
 extern crate futures;
 extern crate hubcaps;
-extern crate tokio_core;
+extern crate tokio;
 
 use std::env;
 
 use futures::Stream;
-use tokio_core::reactor::Core;
+use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
 
@@ -14,16 +14,15 @@ fn main() -> Result<()> {
     drop(env_logger::init());
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut core = Core::new()?;
+            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-                &core.handle(),
             );
             // add labels associated with a pull
             println!(
                 "{:#?}",
-                core.run(
+                rt.block_on(
                     github
                         .repo("softprops", "hubcaps")
                         .pulls()
@@ -33,7 +32,7 @@ fn main() -> Result<()> {
                 )?
             );
             // stream over all labels defined for a repo
-            core.run(
+            rt.block_on(
                 github
                     .repo("rust-lang", "cargo")
                     .labels()

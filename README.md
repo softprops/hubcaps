@@ -21,9 +21,9 @@ hubcaps = "0.4"
 
 ## usage
 
-Basic usage requires a user agent string (because github requires this),
+Basic usage requires a user agent string (because github requires this) and
 optionally a flavor of `hubcaps::Credentials` for making requests as a particular
-github user, and a tokio_core `Handle`.
+github user.
 
 For user authenticated requests you'll typically want to use
 `hubcaps::Credentials::Token` with a
@@ -32,17 +32,13 @@ For user authenticated requests you'll typically want to use
 ```rust
 extern crate hyper;
 extern crate hubcaps;
-extern crate tokio_core;
 
-use tokio_core::reactor::Core;
 use hubcaps::{Credentials, Github};
 
 fn main() {
-  let mut core = Core::new().expect("reactor fail");
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
     Credentials::Token("personal-access-token"),
-    &core.handle()
   );
 }
 ```

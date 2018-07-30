@@ -3,24 +3,20 @@
 //! # Examples
 //!
 //!  Typical use will require instantiation of a Github client. Which requires
-//! a user agent string, set of `hubcaps::Credentials` and a tokio_core `Handle`.
+//! a user agent string and set of `hubcaps::Credentials`.
 //!
 //! ```no_run
 //! extern crate hubcaps;
 //! extern crate hyper;
-//! extern crate tokio_core;
 //!
-//! use tokio_core::reactor::Core;
 //! use hubcaps::{Credentials, Github};
 //!
 //! fn main() {
-//!   let mut core = Core::new().expect("reactor fail");
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
 //!     Credentials::Token(
 //!       String::from("personal-access-token")
 //!     ),
-//!     &core.handle()
 //!   );
 //! }
 //! ```
@@ -84,7 +80,6 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
-extern crate tokio_core;
 extern crate url;
 
 use std::fmt;
@@ -100,7 +95,6 @@ use hyper_tls::HttpsConnector;
 use hyperx::header::{qitem, Link, RelationType};
 use mime::Mime;
 use serde::de::DeserializeOwned;
-use tokio_core::reactor::Handle;
 use url::Url;
 
 #[macro_use]
@@ -232,15 +226,15 @@ where
 
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A, C>(agent: A, credentials: C, handle: &Handle) -> Self
+    pub fn new<A, C>(agent: A, credentials: C) -> Self
     where
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        Self::host(DEFAULT_HOST, agent, credentials, handle)
+        Self::host(DEFAULT_HOST, agent, credentials)
     }
 
-    pub fn host<H, A, C>(host: H, agent: A, credentials: C, handle: &Handle) -> Self
+    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Self
     where
         H: Into<String>,
         A: Into<String>,
