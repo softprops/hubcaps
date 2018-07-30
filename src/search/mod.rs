@@ -48,7 +48,7 @@ where
 
 fn items<D>(result: SearchResult<D>) -> Vec<D>
 where
-    D: DeserializeOwned + 'static,
+    D: DeserializeOwned + 'static + Send,
 {
     result.items
 }
@@ -71,14 +71,14 @@ impl<C: Clone + Connect + 'static> Search<C> {
 
     fn iter<D>(&self, url: &str) -> Stream<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         unfold(self.github.clone(), self.github.get_pages(url), items)
     }
 
     fn search<D>(&self, url: &str) -> Future<SearchResult<D>>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.github.get(url)
     }

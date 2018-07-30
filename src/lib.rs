@@ -144,10 +144,10 @@ use users::Users;
 const DEFAULT_HOST: &str = "https://api.github.com";
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
+pub type Future<T> = Box<StdFuture<Item = T, Error = Error> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
+pub type Stream<T> = Box<StdStream<Item = T, Error = Error> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -369,7 +369,7 @@ where
         media_type: MediaType,
     ) -> Future<(Option<Link>, Out)>
     where
-        Out: DeserializeOwned + 'static,
+        Out: DeserializeOwned + 'static + Send,
     {
         let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
             let mut parsed = Url::parse(&uri).unwrap();
@@ -486,7 +486,7 @@ where
         media_type: MediaType,
     ) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         Box::new(
             self.request(method, uri, body, media_type)
@@ -496,21 +496,21 @@ where
 
     fn get<D>(&self, uri: &str) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.get_media(uri, MediaType::Json)
     }
 
     fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(Method::GET, &(self.host.clone() + uri), None, media)
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request(Method::GET, &(self.host.clone() + uri), None, MediaType::Json)
     }
@@ -529,7 +529,7 @@ where
 
     fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(
             Method::POST,
@@ -548,14 +548,14 @@ where
 
     fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(Method::PATCH, &(self.host.clone() + uri), Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
@@ -569,7 +569,7 @@ where
 
     fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(
             Method::PUT,
@@ -594,8 +594,8 @@ fn unfold<C, D, I>(
     into_items: fn(D) -> Vec<I>,
 ) -> Stream<I>
 where
-    D: DeserializeOwned + 'static,
-    I: 'static,
+    D: DeserializeOwned + 'static + Send,
+    I: 'static + Send,
     C: Clone + Connect + 'static,
 {
     Box::new(
