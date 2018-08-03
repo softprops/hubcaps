@@ -26,7 +26,7 @@ impl<C: Clone + Connect> UserGists<C> {
         O: Into<String>,
     {
         UserGists {
-            github: github,
+            github,
             owner: owner.into(),
         }
     }
@@ -126,7 +126,7 @@ impl GistListOptions {
     {
         let mut params = HashMap::new();
         params.insert("since", timestamp.into());
-        GistListOptions { params: params }
+        GistListOptions { params }
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -212,7 +212,7 @@ impl GistOptionsBuilder {
         V: Into<String>,
     {
         let mut contents = HashMap::new();
-        for (k, v) in files.into_iter() {
+        for (k, v) in files {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
         GistOptionsBuilder(GistOptions {
@@ -260,7 +260,7 @@ impl GistOptions {
         V: Into<String>,
     {
         let mut contents = HashMap::new();
-        for (k, v) in files.into_iter() {
+        for (k, v) in files {
             contents.insert(k.into(), Content::new(None as Option<String>, v.into()));
         }
         GistOptions {

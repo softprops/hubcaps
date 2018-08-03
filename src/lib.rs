@@ -186,14 +186,14 @@ impl From<MediaType> for Mime {
             MediaType::Preview(codename) => {
                 format!("application/vnd.github.{}-preview+json", codename)
                     .parse()
-                    .expect(format!("could not parse media type for preview {}", codename).as_str())
+                    .unwrap_or_else(|_| panic!("could not parse media type for preview {}", codename))
             }
         }
     }
 }
 
 /// enum representation of Github list sorting options
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SortDirection {
     /// Sort in ascending order (the default)
     Asc,
@@ -374,7 +374,7 @@ where
     fn request<Out>(
         &self,
         method: Method,
-        uri: String,
+        uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
     ) -> Future<(Option<Link>, Out)>
@@ -412,10 +412,10 @@ where
         });
         let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
-            for value in response.headers().get::<XGithubRequestId>() {
+            if let Some(value) = response.headers().get::<XGithubRequestId>() {
                 debug!("x-github-request-id: {}", value)
             }
-            for value in response.headers().get::<XRateLimitLimit>() {
+            if let Some(value) = response.headers().get::<XRateLimitLimit>() {
                 debug!("x-rate-limit-limit: {}", value.0)
             }
             let remaining = response
@@ -423,10 +423,10 @@ where
                 .get::<XRateLimitRemaining>()
                 .map(|val| val.0);
             let reset = response.headers().get::<XRateLimitReset>().map(|val| val.0);
-            for value in remaining {
+            if let Some(value) = remaining {
                 debug!("x-rate-limit-remaining: {}", value)
             }
-            for value in reset {
+            if let Some(value) = reset {
                 debug!("x-rate-limit-reset: {}", value)
             }
             let status = response.status();
@@ -434,10 +434,10 @@ where
             if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
                 if let Some(location) = response.headers().get::<Location>() {
                     debug!("redirect location {:?}", location);
-                    return instance2.request(method, location.to_string(), body, media_type);
+                    return instance2.request(method, &location.to_string(), body, media_type);
                 }
             }
-            let link = response.headers().get::<Link>().map(|l| l.clone());
+            let link = response.headers().get::<Link>().cloned();
             Box::new(response.body().concat2().map_err(Error::from).and_then(
                 move |response_body| {
                     if status.is_success() {
@@ -456,7 +456,7 @@ where
                                     .unwrap()
                                     .as_secs();
                                 ErrorKind::RateLimit {
-                                    reset: Duration::from_secs(reset as u64 - now),
+                                    reset: Duration::from_secs(u64::from(reset) - now),
                                 }
                             }
                             _ => ErrorKind::Fault {
@@ -474,7 +474,7 @@ where
     fn request_entity<D>(
         &self,
         method: Method,
-        uri: String,
+        uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
     ) -> Future<D>
@@ -498,25 +498,25 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Get, self.host.clone() + uri, None, media)
+        self.request_entity(Method::Get, &(self.host.clone() + uri), None, media)
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
         D: DeserializeOwned + 'static,
     {
-        self.request(Method::Get, self.host.clone() + uri, None, MediaType::Json)
+        self.request(Method::Get, &(self.host.clone() + uri), None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
         Box::new(self.request_entity::<()>(
             Method::Delete,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             None,
             MediaType::Json,
         ).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
-            otherwise => Err(otherwise.into()),
+            otherwise => Err(otherwise),
         }))
     }
 
@@ -526,7 +526,7 @@ where
     {
         self.request_entity(
             Method::Post,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
         )
@@ -536,7 +536,7 @@ where
     where
         D: DeserializeOwned + 'static,
     {
-        self.request_entity(Method::Patch, self.host.clone() + uri, Some(message), media)
+        self.request_entity(Method::Patch, &(self.host.clone() + uri), Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
@@ -549,7 +549,7 @@ where
     fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::new(self.put(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
-            err => Err(err.into()),
+            err => Err(err),
         }))
     }
 
@@ -559,14 +559,14 @@ where
     {
         self.request_entity(
             Method::Put,
-            self.host.clone() + uri,
+            &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
         )
     }
 }
 
-fn next_link(l: Link) -> Option<String> {
+fn next_link(l: &Link) -> Option<String> {
     l.values()
         .into_iter()
         .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
@@ -593,7 +593,7 @@ where
                     (link, items),
                     move |(link, mut items)| match items.pop() {
                         Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(next_link).map(|url| {
+                        _ => link.and_then(|l| next_link(&l)).map(|url| {
                             let url = Url::parse(&url).unwrap();
                             let uri = [url.path(), url.query().unwrap_or_default()].join("?");
                             Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {

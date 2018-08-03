@@ -27,7 +27,7 @@ impl<C: Connect + Clone> Labels<C> {
         R: Into<String>,
     {
         Labels {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

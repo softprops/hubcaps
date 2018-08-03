@@ -28,7 +28,7 @@ fn identity<T>(x: T) -> T {
 }
 
 /// describes repository visibilities
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Visibility {
     All,
     Public,
@@ -46,7 +46,7 @@ impl fmt::Display for Visibility {
 }
 
 /// Describes sorting options for repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     Created,
     Updated,
@@ -66,7 +66,7 @@ impl fmt::Display for Sort {
 }
 
 /// Describes member affiliation types for repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Affiliation {
     Owner,
     Collaborator,
@@ -84,7 +84,7 @@ impl fmt::Display for Affiliation {
 }
 
 /// Describes types of repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Type {
     All,
     Owner,
@@ -106,7 +106,7 @@ impl fmt::Display for Type {
 }
 
 /// Describes types of organization repositories
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum OrgRepoType {
     All,
     Public,
@@ -194,7 +194,7 @@ impl<C: Clone + Connect> OrgRepositories<C> {
         O: Into<String>,
     {
         OrgRepositories {
-            github: github,
+            github,
             org: org.into(),
         }
     }
@@ -249,7 +249,7 @@ impl<C: Connect + Clone> UserRepositories<C> {
         O: Into<String>,
     {
         UserRepositories {
-            github: github,
+            github,
             owner: owner.into(),
         }
     }
@@ -298,7 +298,7 @@ impl<C: Clone + Connect> OrganizationRepositories<C> {
         O: Into<String>,
     {
         OrganizationRepositories {
-            github: github,
+            github,
             org: org.into(),
         }
     }
@@ -349,7 +349,7 @@ impl<C: Clone + Connect> Repository<C> {
         R: Into<String>,
     {
         Repository {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -522,6 +522,7 @@ impl Repo {
     ///
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
     where
         C: Clone + Connect,
@@ -651,6 +652,7 @@ impl RepoOptionsBuilder {
 }
 
 impl RepoOptions {
+    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
     pub fn new<N, D, H, GI, L>(
         name: N,
         description: Option<D>,
@@ -675,12 +677,12 @@ impl RepoOptions {
             name: name.into(),
             description: description.map(|h| h.into()),
             homepage: homepage.map(|h| h.into()),
-            private: private,
-            has_issues: has_issues,
-            has_wiki: has_wiki,
-            has_downloads: has_downloads,
-            team_id: team_id,
-            auto_init: auto_init,
+            private,
+            has_issues,
+            has_wiki,
+            has_downloads,
+            team_id,
+            auto_init,
             gitignore_template: gitignore_template.map(|gi| gi.into()),
             license_template: license_template.map(|l| l.into()),
         }
@@ -714,13 +716,12 @@ impl RepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct RepoListOptionsBuilder(RepoListOptions);
 
 impl RepoListOptionsBuilder {
     pub fn new() -> Self {
-        RepoListOptionsBuilder(RepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -801,6 +802,7 @@ pub struct RepoEditOptions {
 }
 
 impl RepoEditOptions {
+    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
     pub fn new<N, D, H, DB>(
         name: N,
         description: Option<D>,
@@ -824,14 +826,14 @@ impl RepoEditOptions {
             name: name.into(),
             description: description.map(|h| h.into()),
             homepage: homepage.map(|h| h.into()),
-            private: private,
-            has_issues: has_issues,
-            has_projects: has_projects,
-            has_wiki: has_wiki,
+            private,
+            has_issues,
+            has_projects,
+            has_wiki,
             default_branch: default_branch.map(|d| d.into()),
-            allow_squash_merge: allow_squash_merge,
-            allow_merge_commit: allow_merge_commit,
-            allow_rebase_merge: allow_rebase_merge,
+            allow_squash_merge,
+            allow_merge_commit,
+            allow_rebase_merge,
         }
     }
 
@@ -952,13 +954,12 @@ impl OrgRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct OrgRepoListOptionsBuilder(OrgRepoListOptions);
 
 impl OrgRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrgRepoListOptionsBuilder(OrgRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -1001,13 +1002,12 @@ impl UserRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct UserRepoListOptionsBuilder(UserRepoListOptions);
 
 impl UserRepoListOptionsBuilder {
     pub fn new() -> Self {
-        UserRepoListOptionsBuilder(UserRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
@@ -1068,13 +1068,12 @@ impl OrganizationRepoListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions);
 
 impl OrganizationRepoListOptionsBuilder {
     pub fn new() -> Self {
-        OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {

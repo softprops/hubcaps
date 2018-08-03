@@ -26,7 +26,7 @@ impl<C: Clone + Connect> Keys<C> {
         R: Into<String>,
     {
         Keys {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

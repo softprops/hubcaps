@@ -16,7 +16,7 @@ mod repos;
 pub use self::repos::*;
 
 /// Sort directions for pull requests
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum IssuesSort {
     /// Sort by time created
     Created,
@@ -104,7 +104,7 @@ impl<C: Clone + Connect> SearchIssues<C> {
         Q: Into<String>,
     {
         let mut uri = vec!["/search/issues".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
+        let query_options = options.serialize().unwrap_or_default();
         let query = form_urlencoded::Serializer::new(query_options)
             .append_pair("q", &q.into())
             .finish();
@@ -160,13 +160,12 @@ impl SearchIssuesOptions {
 }
 
 /// Provides access to [search operations for issues and pull requests](https://developer.github.com/v3/search/#search-issues)
+#[derive(Default)]
 pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
-    pub fn new() -> SearchIssuesOptionsBuilder {
-        SearchIssuesOptionsBuilder(SearchIssuesOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {
@@ -230,7 +229,7 @@ impl IssuesItem {
     pub fn repo_tuple(&self) -> (String, String) {
         // split the last two elements off the repo url path
         let parsed = url::Url::parse(&self.repository_url).unwrap();
-        let mut path = parsed.path().split("/").collect::<Vec<_>>();
+        let mut path = parsed.path().split('/').collect::<Vec<_>>();
         path.reverse();
         (path[1].to_owned(), path[0].to_owned())
     }

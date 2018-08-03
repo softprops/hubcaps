@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 
 /// Content-Type web hooks will receive
 /// deliveries in
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum WebHookContentType {
     /// application/json
     #[serde(rename = "json")]
@@ -56,7 +56,7 @@ impl<C: Clone + Connect> Hooks<C> {
         R: Into<String>,
     {
         Hooks {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -227,13 +227,12 @@ impl HookEditOptions {
     }
 }
 
+#[derive(Default)]
 pub struct HookEditOptionsBuilder(HookEditOptions);
 
 impl HookEditOptionsBuilder {
-    pub fn new() -> HookEditOptionsBuilder {
-        HookEditOptionsBuilder(HookEditOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn active(&mut self, active: bool) -> &mut Self {

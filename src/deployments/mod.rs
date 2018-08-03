@@ -43,10 +43,10 @@ impl<C: Clone + Connect> DeploymentStatuses<C> {
         R: Into<String>,
     {
         DeploymentStatuses {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            id: id,
+            id,
         }
     }
 
@@ -77,7 +77,7 @@ impl<C: Clone + Connect> Deployments<C> {
         R: Into<String>,
     {
         Deployments {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -249,7 +249,7 @@ pub struct DeploymentStatusOptionsBuilder(DeploymentStatusOptions);
 impl DeploymentStatusOptionsBuilder {
     pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
         DeploymentStatusOptionsBuilder(DeploymentStatusOptions {
-            state: state,
+            state,
             ..Default::default()
         })
     }
@@ -318,13 +318,12 @@ impl DeploymentListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct DeploymentListOptionsBuilder(DeploymentListOptions);
 
 impl DeploymentListOptionsBuilder {
-    pub fn new() -> DeploymentListOptionsBuilder {
-        DeploymentListOptionsBuilder(DeploymentListOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder

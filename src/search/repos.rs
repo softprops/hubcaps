@@ -8,7 +8,7 @@ use super::{Search, SearchResult};
 use hyper::client::Connect;
 use users::User;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {
     /// Sort by the number of stars
     Stars,
@@ -48,7 +48,7 @@ impl<C: Clone + Connect> SearchRepos<C> {
         Q: Into<String>,
     {
         let mut uri = vec!["/search/repositories".to_string()];
-        let query_options = options.serialize().unwrap_or(String::new());
+        let query_options = options.serialize().unwrap_or_default();
         let query = form_urlencoded::Serializer::new(query_options)
             .append_pair("q", &q.into())
             .finish();
@@ -101,13 +101,12 @@ impl SearchReposOptions {
     }
 }
 
+#[derive(Default)]
 pub struct SearchReposOptionsBuilder(SearchReposOptions);
 
 impl SearchReposOptionsBuilder {
-    pub fn new() -> SearchReposOptionsBuilder {
-        SearchReposOptionsBuilder(SearchReposOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn per_page(&mut self, n: usize) -> &mut Self {

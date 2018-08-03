@@ -13,7 +13,7 @@ use users::User;
 use labels::Label;
 
 /// enum representation of github pull and issue state
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum State {
     /// Only open issues
     Open,
@@ -40,7 +40,7 @@ impl Default for State {
 }
 
 /// Sort options available for github issues
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     /// sort by creation time of issue
     Created,
@@ -82,10 +82,10 @@ impl<C: Clone + Connect> IssueAssignees<C> {
         R: Into<String>,
     {
         IssueAssignees {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -120,10 +120,10 @@ impl<C: Clone + Connect> IssueLabels<C> {
         R: Into<String>,
     {
         IssueLabels {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -135,6 +135,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     }
 
     /// add a set of labels to this issue ref
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.post(&self.path(""), json!(labels))
     }
@@ -147,6 +148,7 @@ impl<C: Clone + Connect> IssueLabels<C> {
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.put(&self.path(""), json!(labels))
     }
@@ -177,10 +179,10 @@ impl<C: Clone + Connect> IssueRef<C> {
         R: Into<String>,
     {
         IssueRef {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -255,7 +257,7 @@ impl<C: Clone + Connect> Issues<C> {
         R: Into<String>,
     {
         Issues {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -342,13 +344,12 @@ impl IssueListOptions {
 }
 
 /// a mutable issue list builder
+#[derive(Default)]
 pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
     pub fn new() -> Self {
-        IssueListOptionsBuilder(IssueListOptions {
-            ..Default::default()
-        })
+        Default::default()
     }
 
     pub fn state(&mut self, state: State) -> &mut Self {
@@ -463,7 +464,7 @@ impl IssueOptions {
             title: title.into(),
             body: body.map(|b| b.into()),
             assignee: assignee.map(|a| a.into()),
-            milestone: milestone,
+            milestone,
             labels: labels
                 .into_iter()
                 .map(|l| l.into())

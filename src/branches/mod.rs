@@ -32,7 +32,7 @@ impl<C: Clone + Connect> Branches<C> {
         R: Into<String>,
     {
         Branches {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

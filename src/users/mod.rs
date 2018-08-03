@@ -73,7 +73,7 @@ where
 
 impl<C: Clone + Connect> Users<C> {
     pub fn new(github: Github<C>) -> Self {
-        Users { github: github }
+        Users { github }
     }
 
     /// Information about current authenticated user

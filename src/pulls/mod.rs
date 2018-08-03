@@ -21,7 +21,7 @@ fn identity<T>(x: T) -> T {
 }
 
 /// Sort directions for pull requests
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Sort {
     /// Sort by time created
     Created,
@@ -69,10 +69,10 @@ impl<C: Clone + Connect> PullRequest<C> {
         R: Into<String>,
     {
         PullRequest {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
-            number: number,
+            number,
         }
     }
 
@@ -177,7 +177,7 @@ impl<C: Clone + Connect> PullRequests<C> {
         R: Into<String>,
     {
         PullRequests {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -275,13 +275,12 @@ pub struct Commit {
     pub user: User, //    pub repo: Option<Repo>,
 }
 
+#[derive(Default)]
 pub struct PullEditOptionsBuilder(PullEditOptions);
 
 impl PullEditOptionsBuilder {
-    pub fn new() -> PullEditOptionsBuilder {
-        PullEditOptionsBuilder(PullEditOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     /// set the title of the pull
@@ -415,13 +414,12 @@ impl PullListOptions {
     }
 }
 
+#[derive(Default)]
 pub struct PullListOptionsBuilder(PullListOptions);
 
 impl PullListOptionsBuilder {
-    pub fn new() -> PullListOptionsBuilder {
-        PullListOptionsBuilder(PullListOptions {
-            ..Default::default()
-        })
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {

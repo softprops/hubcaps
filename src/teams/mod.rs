@@ -10,6 +10,7 @@ use serde_json;
 use {unfold, Future, Github, Stream};
 
 /// Team repository permissions
+#[derive(Clone, Copy)]
 pub enum Permission {
     Pull,
     Push,
@@ -48,7 +49,7 @@ impl<C: Connect + Clone> RepoTeams<C> {
         R: Into<String>,
     {
         RepoTeams {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }
@@ -87,7 +88,7 @@ impl<C: Clone + Connect> OrgTeams<C> {
         O: Into<String>,
     {
         OrgTeams {
-            github: github,
+            github,
             org: org.into(),
         }
     }
