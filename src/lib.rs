@@ -68,6 +68,7 @@
 //! log patterns sourced from this crate
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
+#![forbid(unsafe_code)]
 
 #[macro_use]
 extern crate error_chain;
