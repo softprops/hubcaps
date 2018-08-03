@@ -1,11 +1,15 @@
 //! Review comments interface
 
+extern crate futures;
+extern crate serde_json;
+
 use hyper::client::Connect;
 
 use {Future, Github};
+use futures::future;
 use users::User;
 
-/// A structure for interfacing with a issue comments
+/// A structure for interfacing with a review comments
 pub struct ReviewComments<C>
 where
     C: Clone + Connect,
@@ -31,16 +35,33 @@ impl<C: Clone + Connect> ReviewComments<C> {
         }
     }
 
-    /// list pull requests
+    /// list review comments
     pub fn list(&self) -> Future<Vec<ReviewComment>> {
-        self.github.get::<Vec<ReviewComment>>(&format!(
+        self.github.get::<Vec<ReviewComment>>(&self.path())
+    }
+
+    /// Create new review comment
+    pub fn create(&self, review_comment: &ReviewCommentOptions) -> Future<ReviewComment> {
+        self.github.post(&self.path(), json!(review_comment))
+    }
+
+    fn path(&self) -> String {
+        format!(
             "/repos/{}/{}/pulls/{}/comments",
             self.owner, self.repo, self.number
-        ))
+        )
     }
 }
 
 // representations (todo: replace with derive_builder)
+
+#[derive(Default, Serialize)]
+pub struct ReviewCommentOptions {
+    pub body: String,
+    pub commit_id: String,
+    pub path: String,
+    pub position: usize,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct ReviewComment {
