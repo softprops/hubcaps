@@ -20,6 +20,7 @@ use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
 use teams::RepoTeams;
+use traffic::Traffic;
 use statuses::Statuses;
 use users::User;
 
@@ -441,6 +442,12 @@ impl<C: Clone + Connect> Repository<C> {
     /// associated with this repository ref
     pub fn teams(&self) -> RepoTeams<C> {
         RepoTeams::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)
+    /// associated with this repository ref
+    pub fn traffic(&self) -> Traffic<C> {
+        Traffic::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 }
 
