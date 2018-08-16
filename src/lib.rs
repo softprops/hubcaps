@@ -123,6 +123,7 @@ pub mod search;
 pub mod stars;
 pub mod statuses;
 pub mod teams;
+pub mod traffic;
 pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
