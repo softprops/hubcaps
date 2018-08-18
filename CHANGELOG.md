@@ -2,7 +2,21 @@
 
 * added ability to post review comments [#142](https://github.com/softprops/hubcaps/pull/142)
 * added interfaces for [notifications apis](https://developer.github.com/v3/activity/notifications/) [#146](https://github.com/softprops/hubcaps/pull/146)
+
+```rust
+github.repo("you", "repo")
+  .activity()
+  .notifications()
+  .list(&Default::default())
+```
+
 * added interfaces for [traffic apis](https://developer.github.com/v3/repos/traffic/) [#145](https://github.com/softprops/hubcaps/pull/145)
+
+```rust
+github.repo("you", "repo")
+  .traffic()
+  .clones(TimeUnit::Day)
+```
 
 # 0.4.9
 
