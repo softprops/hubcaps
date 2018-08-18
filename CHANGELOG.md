@@ -1,5 +1,6 @@
 # 0.4.10
 
+* added ability to post review comments [#142](https://github.com/softprops/hubcaps/pull/142)
 * added interfaces for [notifications apis](https://developer.github.com/v3/activity/notifications/) [#146](https://github.com/softprops/hubcaps/pull/146)
 * added interfaces for [traffic apis](https://developer.github.com/v3/repos/traffic/) [#145](https://github.com/softprops/hubcaps/pull/145)
 
