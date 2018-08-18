@@ -7,6 +7,9 @@ use hyper::client::Connect;
 use {Future, Github};
 use users::User;
 
+/// Provides access to assets for a release.
+/// See the [github docs](https://developer.github.com/v3/repos/releases/)
+/// for more information.
 pub struct Assets<C>
 where
     C: Clone + Connect,
@@ -43,14 +46,27 @@ impl<C: Connect + Clone> Assets<C> {
     }
 
     // todo: stream interface to download
+
+    /// Get the asset information.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release-asset)
+    /// for more information.
     pub fn get(&self, id: u64) -> Future<Asset> {
         self.github.get(&self.path(&format!("/{}", id)))
     }
 
+    /// Delete an asset by id.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release-asset)
+    /// for more information.
     pub fn delete(&self, id: u64) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
+    /// List assets for a release.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-assets-for-a-release)
+    /// for more information.
     pub fn list(&self) -> Future<Vec<Asset>> {
         self.github.get(&self.path(""))
     }
@@ -88,10 +104,15 @@ impl<C: Clone + Connect> ReleaseRef<C> {
         )
     }
 
+    /// Get the release information.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release)
+    /// for more information.
     pub fn get(&self) -> Future<Release> {
         self.github.get::<Release>(&self.path(""))
     }
 
+    /// Get a reference to asset operations for a release.
     pub fn assets(&self) -> Assets<C> {
         Assets::new(
             self.github.clone(),
@@ -102,6 +123,9 @@ impl<C: Clone + Connect> ReleaseRef<C> {
     }
 }
 
+/// Provides access to published releases.
+/// See the [github docs](https://developer.github.com/v3/repos/releases/)
+/// for more information.
 pub struct Releases<C>
 where
     C: Clone + Connect,
@@ -129,23 +153,59 @@ impl<C: Clone + Connect> Releases<C> {
         format!("/repos/{}/{}/releases{}", self.owner, self.repo, more)
     }
 
+    /// Create new a release.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#create-a-release)
+    /// for more information.
     pub fn create(&self, rel: &ReleaseOptions) -> Future<Release> {
         self.github.post(&self.path(""), json!(rel))
     }
 
+    /// Edit a release by id.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#edit-a-release)
+    /// for more information.
     pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
         self.github
             .patch(&self.path(&format!("/{}", id)), json!(rel))
     }
 
+    /// Delete a release by id.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release)
+    /// for more information.
     pub fn delete(&self, id: u64) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
+    /// List published releases and draft releases for users with push access.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository)
+    /// for more information.
     pub fn list(&self) -> Future<Vec<Release>> {
         self.github.get(&self.path(""))
     }
 
+    /// Return the latest full release. Draft releases and prereleases are not returned.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-the-latest-release)
+    /// for more information.
+    pub fn latest(&self) -> Future<Release> {
+        self.github.get(&self.path("/latest"))
+    }
+
+    /// Return a release by tag name.
+    ///
+    /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name)
+    /// for more information.
+    pub fn by_tag<S>(&self, tag_name: S) -> Future<Release>
+    where
+        S: Into<String>,
+    {
+        self.github.get(&self.path(&format!("/tags/{}", tag_name.into())))
+    }
+
+    /// Get a reference to a specific release associated with a repository
     pub fn get(&self, id: u64) -> ReleaseRef<C> {
         ReleaseRef::new(
             self.github.clone(),
