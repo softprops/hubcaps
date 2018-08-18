@@ -112,6 +112,7 @@ pub mod hooks;
 pub mod issues;
 pub mod keys;
 pub mod labels;
+pub mod notifications;
 pub mod organizations;
 pub mod pull_commits;
 pub mod pulls;
@@ -531,6 +532,13 @@ where
             Some(message),
             MediaType::Json,
         )
+    }
+
+    fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+        Box::new(self.patch(uri, message).or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            err => Err(err),
+        }))
     }
 
     fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
