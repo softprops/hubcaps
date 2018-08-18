@@ -1,3 +1,8 @@
+# 0.4.10
+
+* added interfaces for [notifications apis](https://developer.github.com/v3/activity/notifications/) [#146](https://github.com/softprops/hubcaps/pull/146)
+* added interfaces for [traffic apis](https://developer.github.com/v3/repos/traffic/) [#145](https://github.com/softprops/hubcaps/pull/145)
+
 # 0.4.9
 
 * add the ability to delete a git ref (tag, branch ect)
