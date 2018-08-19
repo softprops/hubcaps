@@ -18,6 +18,14 @@ github.repo("you", "repo")
   .clones(TimeUnit::Day)
 ```
 
+* added interfaces for getting the latest release and release by tag [#147](https://github.com/softprops/hubcaps/pull/147)
+
+```rust
+github.repo("you", "repo")
+ .releases()
+ .latest()
+```
+
 # 0.4.9
 
 * add the ability to delete a git ref (tag, branch ect)
