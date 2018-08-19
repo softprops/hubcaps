@@ -4,7 +4,7 @@ extern crate serde_json;
 use std::collections::HashMap;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
 use users::User;
@@ -16,12 +16,12 @@ use Github;
 /// for more information.
 pub struct Notifications<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> Notifications<C> {
+impl<C: Clone + Connect + 'static> Notifications<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }

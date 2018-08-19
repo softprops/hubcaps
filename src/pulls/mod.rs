@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use serde_json;
 use url::form_urlencoded;
 use futures::future;
@@ -53,7 +53,7 @@ impl Default for Sort {
 /// A structure for accessing interfacing with a specific pull request
 pub struct PullRequest<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
@@ -61,7 +61,7 @@ where
     number: u64,
 }
 
-impl<C: Clone + Connect> PullRequest<C> {
+impl<C: Clone + Connect + 'static> PullRequest<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
     where
@@ -162,14 +162,14 @@ impl<C: Clone + Connect> PullRequest<C> {
 /// A structure for interfacing with a repositories list of pull requests
 pub struct PullRequests<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> PullRequests<C> {
+impl<C: Clone + Connect + 'static> PullRequests<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

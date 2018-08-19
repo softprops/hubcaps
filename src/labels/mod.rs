@@ -2,7 +2,7 @@
 
 use serde_json;
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {unfold, Future, Github, Stream};
 
@@ -12,14 +12,14 @@ fn identity<T>(x: T) -> T {
 
 pub struct Labels<C>
 where
-    C: Connect + Clone,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Connect + Clone> Labels<C> {
+impl<C: Clone + Connect + 'static> Labels<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

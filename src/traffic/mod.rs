@@ -1,7 +1,7 @@
 //! Traffic interface
 use std::fmt;
 
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 
 use {Future, Github};
 
@@ -24,14 +24,14 @@ impl fmt::Display for TimeUnit {
 /// Provides access to the traffic information for a repository
 pub struct Traffic<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Traffic<C> {
+impl<C: Clone + Connect + 'static> Traffic<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

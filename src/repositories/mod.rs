@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 
 use {unfold, Future, Github, SortDirection, Stream};
@@ -133,12 +133,12 @@ impl fmt::Display for OrgRepoType {
 #[derive(Clone)]
 pub struct Repositories<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
 }
 
-impl<C: Clone + Connect> Repositories<C> {
+impl<C: Clone + Connect + 'static> Repositories<C> {
     #[doc(hidden)]
     pub fn new(github: Github<C>) -> Self {
         Self { github }
@@ -182,13 +182,13 @@ impl<C: Clone + Connect> Repositories<C> {
 /// Provides access to the authenticated user's repositories
 pub struct OrgRepositories<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     org: String,
 }
 
-impl<C: Clone + Connect> OrgRepositories<C> {
+impl<C: Clone + Connect + 'static> OrgRepositories<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, org: O) -> Self
     where
@@ -237,13 +237,13 @@ impl<C: Clone + Connect> OrgRepositories<C> {
 /// Provides access to the authenticated user's repositories
 pub struct UserRepositories<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
 }
 
-impl<C: Connect + Clone> UserRepositories<C> {
+impl<C: Clone + Connect + 'static> UserRepositories<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, owner: O) -> Self
     where
@@ -286,13 +286,13 @@ impl<C: Connect + Clone> UserRepositories<C> {
 /// Provides access to an organization's repositories
 pub struct OrganizationRepositories<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     org: String,
 }
 
-impl<C: Clone + Connect> OrganizationRepositories<C> {
+impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, org: O) -> Self
     where
@@ -335,14 +335,14 @@ impl<C: Clone + Connect> OrganizationRepositories<C> {
 
 pub struct Repository<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Repository<C> {
+impl<C: Clone + Connect + 'static> Repository<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
@@ -532,7 +532,7 @@ impl Repo {
     #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
     pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
     where
-        C: Clone + Connect,
+        C: Clone + Connect + 'static,
     {
         let url = Url::parse(&self.languages_url).unwrap();
         let uri: String = url.path().into();

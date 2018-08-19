@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use std::fmt;
 
 use futures::future;
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use serde_json;
 
 use {unfold, Future, Github, Stream};
@@ -34,14 +34,14 @@ fn identity<T>(x: T) -> T {
 /// reference to teams associated with a github repo
 pub struct RepoTeams<C>
 where
-    C: Connect + Clone,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Connect + Clone> RepoTeams<C> {
+impl<C: Clone + Connect + 'static> RepoTeams<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where
@@ -75,13 +75,13 @@ impl<C: Connect + Clone> RepoTeams<C> {
 /// reference to teams associated with a github org
 pub struct OrgTeams<C>
 where
-    C: Connect + Clone,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     org: String,
 }
 
-impl<C: Clone + Connect> OrgTeams<C> {
+impl<C: Clone + Connect + 'static> OrgTeams<C> {
     #[doc(hidden)]
     pub fn new<O>(github: Github<C>, org: O) -> Self
     where

@@ -5,20 +5,20 @@ extern crate serde_json;
 
 use futures::future;
 use {Future, Github};
-use hyper::client::Connect;
+use hyper::client::connect::Connect;
 use users::User;
 
 /// interface for statuses associated with a repository
 pub struct Statuses<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     github: Github<C>,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect> Statuses<C> {
+impl<C: Clone + Connect + 'static> Statuses<C> {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
     where

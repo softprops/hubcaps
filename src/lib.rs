@@ -3,24 +3,20 @@
 //! # Examples
 //!
 //!  Typical use will require instantiation of a Github client. Which requires
-//! a user agent string, set of `hubcaps::Credentials` and a tokio_core `Handle`.
+//! a user agent string and set of `hubcaps::Credentials`.
 //!
 //! ```no_run
 //! extern crate hubcaps;
 //! extern crate hyper;
-//! extern crate tokio_core;
 //!
-//! use tokio_core::reactor::Core;
 //! use hubcaps::{Credentials, Github};
 //!
 //! fn main() {
-//!   let mut core = Core::new().expect("reactor fail");
 //!   let github = Github::new(
 //!     String::from("user-agent-name"),
 //!     Credentials::Token(
 //!       String::from("personal-access-token")
 //!     ),
-//!     &core.handle()
 //!   );
 //! }
 //! ```
@@ -72,31 +68,33 @@
 #[macro_use]
 extern crate error_chain;
 extern crate futures;
-#[macro_use]
+extern crate http;
 extern crate hyper;
 #[cfg(feature = "tls")]
 extern crate hyper_tls;
+extern crate hyperx;
 #[macro_use]
 extern crate log;
+extern crate mime;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
-extern crate tokio_core;
 extern crate url;
 
 use std::fmt;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-use hyper::client::{Connect, HttpConnector, Request};
-use hyper::header::{qitem, Accept, Authorization, Link, Location, RelationType, UserAgent};
-use hyper::mime::Mime;
-use hyper::{Client, Method, StatusCode};
+use hyper::client::connect::Connect;
+use hyper::client::HttpConnector;
+use hyper::header::{ACCEPT, AUTHORIZATION, LINK, LOCATION, USER_AGENT};
+use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
+use hyperx::header::{qitem, Link, RelationType};
+use mime::Mime;
 use serde::de::DeserializeOwned;
-use tokio_core::reactor::Handle;
 use url::Url;
 
 #[macro_use]
@@ -140,30 +138,15 @@ use users::Users;
 const DEFAULT_HOST: &str = "https://api.github.com";
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<StdFuture<Item = T, Error = Error>>;
+pub type Future<T> = Box<StdFuture<Item = T, Error = Error> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<StdStream<Item = T, Error = Error>>;
+pub type Stream<T> = Box<StdStream<Item = T, Error = Error> + Send>;
 
-header! {
-    #[doc(hidden)]
-    (XGithubRequestId, "X-GitHub-Request-Id") => [String]
-}
-
-header! {
-  #[doc(hidden)]
-  (XRateLimitLimit, "X-RateLimit-Limit") => [u16]
-}
-
-header! {
-  #[doc(hidden)]
-  (XRateLimitRemaining, "X-RateLimit-Remaining") => [u32]
-}
-
-header! {
-  #[doc(hidden)]
-  (XRateLimitReset, "X-RateLimit-Reset") => [u32]
-}
+const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
+const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
+const X_RATELIMIT_REMAINING: &str = "x-ratelimit-remaining";
+const X_RATELIMIT_RESET: &str = "x-ratelimit-reset";
 
 /// Github defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information
@@ -233,7 +216,7 @@ pub enum Credentials {
 #[derive(Clone, Debug)]
 pub struct Github<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     host: String,
     agent: String,
@@ -243,32 +226,31 @@ where
 
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A, C>(agent: A, credentials: C, handle: &Handle) -> Self
+    pub fn new<A, C>(agent: A, credentials: C) -> Self
     where
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        Self::host(DEFAULT_HOST, agent, credentials, handle)
+        Self::host(DEFAULT_HOST, agent, credentials)
     }
 
-    pub fn host<H, A, C>(host: H, agent: A, credentials: C, handle: &Handle) -> Self
+    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Self
     where
         H: Into<String>,
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        let connector = HttpsConnector::new(4, handle).unwrap();
-        let http = Client::configure()
-            .connector(connector)
+        let connector = HttpsConnector::new(4).unwrap();
+        let http = Client::builder()
             .keep_alive(true)
-            .build(handle);
+            .build(connector);
         Self::custom(host, agent, credentials, http)
     }
 }
 
 impl<C> Github<C>
 where
-    C: Clone + Connect,
+    C: Clone + Connect + 'static,
 {
     pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
     where
@@ -381,7 +363,7 @@ where
         media_type: MediaType,
     ) -> Future<(Option<Link>, Out)>
     where
-        Out: DeserializeOwned + 'static,
+        Out: DeserializeOwned + 'static + Send,
     {
         let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
             let mut parsed = Url::parse(&uri).unwrap();
@@ -389,7 +371,7 @@ where
                 .query_pairs_mut()
                 .append_pair("client_id", id)
                 .append_pair("client_secret", secret);
-            parsed.to_string().parse().into_future()
+            parsed.to_string().parse::<Uri>().into_future()
         } else {
             uri.parse().into_future()
         };
@@ -397,34 +379,43 @@ where
         let body2 = body.clone();
         let method2 = method.clone();
         let response = url.map_err(Error::from).and_then(move |url| {
-            let mut req = Request::new(method2, url);
-            {
-                let headers = req.headers_mut();
-                headers.set(UserAgent::new(instance.agent.clone()));
-                headers.set(Accept(vec![qitem(From::from(media_type))]));
-                if let Some(Credentials::Token(ref token)) = instance.credentials {
-                    headers.set(Authorization(format!("token {}", token)))
-                }
+            let mut req = Request::builder();
+            req.method(method2).uri(url);
+
+            req.header(USER_AGENT, &*instance.agent);
+            req.header(ACCEPT, &*format!("{}", qitem::<Mime>(From::from(media_type))));
+
+            if let Some(Credentials::Token(ref token)) = instance.credentials {
+                req.header(AUTHORIZATION, &*format!("token {}", token));
             }
 
-            if let Some(body) = body2 {
-                req.set_body(body)
-            }
-            instance.client.request(req).map_err(Error::from)
+            let req = match body2 {
+                Some(body) => req.body(Body::from(body)),
+                None => req.body(Body::empty()),
+            };
+
+            req.map_err(Error::from)
+                .into_future()
+                .and_then(move |req| instance.client.request(req).map_err(Error::from))
         });
         let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
-            if let Some(value) = response.headers().get::<XGithubRequestId>() {
-                debug!("x-github-request-id: {}", value)
+            if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
+                debug!("x-github-request-id: {:?}", value)
             }
-            if let Some(value) = response.headers().get::<XRateLimitLimit>() {
-                debug!("x-rate-limit-limit: {}", value.0)
+            if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
+                debug!("x-rate-limit-limit: {:?}", value)
             }
             let remaining = response
                 .headers()
-                .get::<XRateLimitRemaining>()
-                .map(|val| val.0);
-            let reset = response.headers().get::<XRateLimitReset>().map(|val| val.0);
+                .get(X_RATELIMIT_REMAINING)
+                .and_then(|val| val.to_str().ok())
+                .and_then(|val| val.parse::<u32>().ok());
+            let reset = response
+                .headers()
+                .get(X_RATELIMIT_RESET)
+                .and_then(|val| val.to_str().ok())
+                .and_then(|val| val.parse::<u32>().ok());
             if let Some(value) = remaining {
                 debug!("x-rate-limit-remaining: {}", value)
             }
@@ -433,14 +424,22 @@ where
             }
             let status = response.status();
             // handle redirect common with renamed repos
-            if StatusCode::MovedPermanently == status || StatusCode::TemporaryRedirect == status {
-                if let Some(location) = response.headers().get::<Location>() {
+            if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
+                let location = response.headers().get(LOCATION)
+                    .and_then(|l| l.to_str().ok());
+
+                if let Some(location) = location {
                     debug!("redirect location {:?}", location);
                     return instance2.request(method, &location.to_string(), body, media_type);
                 }
             }
-            let link = response.headers().get::<Link>().cloned();
-            Box::new(response.body().concat2().map_err(Error::from).and_then(
+            let link = response
+                .headers()
+                .get(LINK)
+                .and_then(|l| l.to_str().ok())
+                .and_then(|l| l.parse().ok());
+
+            Box::new(response.into_body().concat2().map_err(Error::from).and_then(
                 move |response_body| {
                     if status.is_success() {
                         debug!(
@@ -481,7 +480,7 @@ where
         media_type: MediaType,
     ) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         Box::new(
             self.request(method, uri, body, media_type)
@@ -491,28 +490,28 @@ where
 
     fn get<D>(&self, uri: &str) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.get_media(uri, MediaType::Json)
     }
 
     fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
-        self.request_entity(Method::Get, &(self.host.clone() + uri), None, media)
+        self.request_entity(Method::GET, &(self.host.clone() + uri), None, media)
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
-        self.request(Method::Get, &(self.host.clone() + uri), None, MediaType::Json)
+        self.request(Method::GET, &(self.host.clone() + uri), None, MediaType::Json)
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
         Box::new(self.request_entity::<()>(
-            Method::Delete,
+            Method::DELETE,
             &(self.host.clone() + uri),
             None,
             MediaType::Json,
@@ -524,10 +523,10 @@ where
 
     fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(
-            Method::Post,
+            Method::POST,
             &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
@@ -543,14 +542,14 @@ where
 
     fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
-        self.request_entity(Method::Patch, &(self.host.clone() + uri), Some(message), media)
+        self.request_entity(Method::PATCH, &(self.host.clone() + uri), Some(message), media)
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
@@ -564,10 +563,10 @@ where
 
     fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
-        D: DeserializeOwned + 'static,
+        D: DeserializeOwned + 'static + Send,
     {
         self.request_entity(
-            Method::Put,
+            Method::PUT,
             &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
@@ -589,9 +588,9 @@ fn unfold<C, D, I>(
     into_items: fn(D) -> Vec<I>,
 ) -> Stream<I>
 where
-    D: DeserializeOwned + 'static,
-    I: 'static,
-    C: Clone + Connect,
+    D: DeserializeOwned + 'static + Send,
+    I: 'static + Send,
+    C: Clone + Connect + 'static,
 {
     Box::new(
         first
