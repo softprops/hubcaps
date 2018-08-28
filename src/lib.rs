@@ -102,6 +102,7 @@ mod macros; // expose json! macro to child modules
 pub mod activity;
 pub mod branches;
 pub mod comments;
+pub mod content;
 pub mod deployments;
 pub mod errors;
 pub mod gists;
