@@ -11,6 +11,7 @@ use url::{form_urlencoded, Url};
 
 use {unfold, Future, Github, SortDirection, Stream};
 use branches::Branches;
+use content::Content;
 use deployments::Deployments;
 use git::Git;
 use hooks::Hooks;
@@ -376,6 +377,11 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     /// get a reference to branch operations
     pub fn branches(&self) -> Branches<C> {
         Branches::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to content operations
+    pub fn content(&self) -> Content<C> {
+        Content::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to git operations
