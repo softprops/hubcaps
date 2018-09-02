@@ -82,13 +82,17 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate url;
 
+use std::env;
+use std::ffi::OsStr;
 use std::fmt;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
-use hyper::header::{ACCEPT, AUTHORIZATION, LINK, LOCATION, USER_AGENT};
+use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, IF_NONE_MATCH, LINK, LOCATION, USER_AGENT};
 use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
@@ -366,6 +370,7 @@ where
     where
         Out: DeserializeOwned + 'static + Send,
     {
+        let uri = uri.to_string();
         let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
             let mut parsed = Url::parse(&uri).unwrap();
             parsed
@@ -377,10 +382,18 @@ where
             uri.parse().into_future()
         };
         let instance = self.clone();
+        let uri2 = uri.clone();
         let body2 = body.clone();
         let method2 = method.clone();
         let response = url.map_err(Error::from).and_then(move |url| {
             let mut req = Request::builder();
+
+            if method2 == Method::GET {
+                if let Ok(etag) = lookup_etag(&uri2) {
+                    req.header(IF_NONE_MATCH, etag);
+                }
+            }
+
             req.method(method2).uri(url);
 
             req.header(USER_AGENT, &*instance.agent);
@@ -406,6 +419,11 @@ where
             }
             if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
                 debug!("x-rate-limit-limit: {:?}", value)
+            }
+            let etag = response.headers().get(ETAG)
+                .map(|etag| etag.as_bytes().to_vec());
+            if let Some(value) = response.headers().get(ETAG) {
+                debug!("etag: {:?}", value)
             }
             let remaining = response
                 .headers()
@@ -447,9 +465,21 @@ where
                             "response payload {}",
                             String::from_utf8_lossy(&response_body)
                         );
+                        if let Some(etag) = etag {
+                            if let Err(e) = cache_body_and_etag(&uri, &response_body, &etag) {
+                                // failing to cache isn't fatal, so just log & swallow the error
+                                debug!("Failed to cache body & etag: {}", e);
+                            }
+                        }
                         serde_json::from_slice::<Out>(&response_body)
                             .map(|out| (link, out))
                             .map_err(|error| ErrorKind::Codec(error).into())
+                    } else if status == StatusCode::NOT_MODIFIED {
+                        lookup_body(&uri).map_err(Error::from).and_then(|body|
+                            serde_json::from_str::<Out>(&body)
+                                .map(|out| (link, out))
+                                .map_err(|error| ErrorKind::Codec(error).into())
+                        )
                     } else {
                         let error = match (remaining, reset) {
                             (Some(remaining), Some(reset)) if remaining == 0 => {
@@ -617,6 +647,42 @@ where
             .into_stream()
             .flatten(),
     )
+}
+
+fn cache_body_and_etag(uri: &str, body: &[u8], etag: &[u8]) -> Result<()> {
+    let mut path = cache_path(&uri, "json");
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(&path, body)?;
+    path.set_extension("etag");
+    fs::write(&path, etag)?;
+    Ok(())
+}
+
+fn lookup_etag(uri: &str) -> Result<String> {
+    fs::read_to_string(cache_path(uri, "etag")).map_err(Error::from)
+}
+
+fn lookup_body(uri: &str) -> Result<String> {
+    fs::read_to_string(cache_path(uri, "json")).map_err(Error::from)
+}
+
+///       cache_path("https://api.github.com/users/dwijnand/repos", "json") ==>
+/// ~/.hubcaps/cache/v1/https/api.github.com/users/dwijnand/repos.json
+fn cache_path<S: AsRef<OsStr>>(uri: &str, extension: S) -> PathBuf {
+    let uri = uri.parse::<Uri>().expect("Expected a URI");
+    let mut path = env::home_dir().expect("Expected a home dir");
+    path.push(".hubcaps/cache/v1");
+    path.push(uri.scheme_part().expect("Expected a URI scheme").as_ref()); // https
+    path.push(uri.authority_part().expect("Expected a URI authority").as_ref()); // api.github.com
+    path.push(
+        Path::new(uri.path()) // /users/dwijnand/repos
+            .strip_prefix("/")
+            .expect("Expected URI path to start with /"),
+    );
+    path.set_extension(extension);
+    path
 }
 
 #[cfg(test)]
