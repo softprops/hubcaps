@@ -1,5 +1,6 @@
 //! Implements <https://tools.ietf.org/html/rfc7232> Conditional Requests
 
+use std;
 use std::env;
 use std::io;
 use std::ffi::OsStr;
@@ -49,17 +50,21 @@ impl HttpCache {
     #[doc(hidden)]
     pub fn lookup_etag(&self, uri: &str) -> Result<String> {
         match self {
-            Noop => Err(Error::from(io::Error::new(io::ErrorKind::NotFound, "No etag cached"))),
-            FileBased(dir) => fs::read_to_string(cache_path(dir, uri, "etag")).map_err(Error::from),
+            Noop => HttpCache::no_read("No etag cached"),
+            FileBased(dir) => read_to_string(cache_path(dir, uri, "etag")),
         }
     }
 
     #[doc(hidden)]
     pub fn lookup_body(&self, uri: &str) -> Result<String> {
         match self {
-            Noop => Err(Error::from(io::Error::new(io::ErrorKind::NotFound, "No body cached"))),
-            FileBased(dir) => fs::read_to_string(cache_path(dir, uri, "json")).map_err(Error::from),
+            Noop => HttpCache::no_read("No body cached"),
+            FileBased(dir) => read_to_string(cache_path(dir, uri, "json")),
         }
+    }
+
+    fn no_read<E: Into<Box<std::error::Error + Send + Sync>>>(error: E) -> Result<String> {
+        Err(Error::from(io::Error::new(io::ErrorKind::NotFound, error)))
     }
 }
 
@@ -78,4 +83,8 @@ fn cache_path<S: AsRef<OsStr>>(dir: &Path, uri: &str, extension: S) -> PathBuf {
     );
     path.set_extension(extension);
     path
+}
+
+fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String> {
+    fs::read_to_string(path).map_err(Error::from)
 }
