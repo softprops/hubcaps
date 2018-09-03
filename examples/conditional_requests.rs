@@ -1,27 +1,32 @@
 extern crate env_logger;
 extern crate hubcaps;
+extern crate hyper;
+extern crate hyper_tls;
 extern crate tokio;
 
+use hyper_tls::HttpsConnector;
 use tokio::runtime::Runtime;
+use hyper::Client;
 
-use hubcaps::{Github, Result};
+use hubcaps::{Github, HttpCache, Result};
 
 fn main() -> Result<()> {
     drop(env_logger::init());
 
     let mut rt = Runtime::new()?;
 
+    let host = "https://api.github.com";
     let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
     let credentials = None;
-    let github = Github::new(agent, credentials);
+    let client = Client::builder().build(HttpsConnector::new(4).unwrap());
+    let http_cache = HttpCache::in_home_dir();
+    let github = Github::custom(host, agent, credentials, client, http_cache);
 
     let _repos = rt.block_on(github.user_repos("dwijnand").list(&Default::default()))?;
     let status1 = rt.block_on(github.rate_limit().get())?;
-    println!("rate limit status:\n{:#?}", status1);
 
     let _repos = rt.block_on(github.user_repos("dwijnand").list(&Default::default()))?;
     let status2 = rt.block_on(github.rate_limit().get())?;
-    println!("rate limit status:\n{:#?}", status2);
 
     let rem1 = status1.resources.core.remaining;
     let rem2 = status2.resources.core.remaining;
