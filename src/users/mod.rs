@@ -48,13 +48,13 @@ pub struct AuthenticatedUser {
     pub site_admin: bool,
 
     // extend over `User`:
-    pub name: String,
+    pub name: Option<String>,
     pub company: Option<String>,
     pub blog: String,
-    pub location: String,
-    pub email: String,
+    pub location: Option<String>,
+    pub email: Option<String>,
     pub hireable: Option<bool>,
-    pub bio: String,
+    pub bio: Option<String>,
     pub public_repos: u64,
     pub public_gists: u64,
     pub followers: u64,
