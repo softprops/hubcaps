@@ -24,6 +24,7 @@ use teams::RepoTeams;
 use traffic::Traffic;
 use statuses::Statuses;
 use users::User;
+use users::Contributors;
 
 fn identity<T>(x: T) -> T {
     x
@@ -448,6 +449,13 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     /// associated with this repository ref
     pub fn teams(&self) -> RepoTeams<C> {
         RepoTeams::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to
+    /// [contributors](https://developer.github.com/v3/repos/#list-contributors)
+    /// associated with this repository ref
+    pub fn contributors(&self) -> Contributors<C> {
+        Contributors::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)
