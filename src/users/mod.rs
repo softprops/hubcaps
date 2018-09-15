@@ -1,6 +1,6 @@
 //! Users interface
 
-use {Future, Github};
+use {unfold, Future, Github, Stream};
 
 use hyper::client::connect::Connect;
 
@@ -87,5 +87,50 @@ impl<C: Clone + Connect + 'static> Users<C> {
     {
         self.github
             .get(&format!("/users/{username}", username = username.into()))
+    }
+}
+
+/// reference to contributors associated with a github repo
+fn identity<T>(x: T) -> T {
+    x
+}
+
+pub struct Contributors<C>
+where
+    C: Clone + Connect + 'static,
+{
+    github: Github<C>,
+    owner: String,
+    repo: String,
+}
+
+impl<C: Clone + Connect + 'static> Contributors<C> {
+    #[doc(hidden)]
+    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    where
+        O: Into<String>,
+        R: Into<String>,
+    {
+        Contributors {
+            github,
+            owner: owner.into(),
+            repo: repo.into(),
+        }
+    }
+
+    /// list of contributors for this repo
+    pub fn list(&self) -> Future<Vec<User>> {
+        self.github
+            .get(&format!("/repos/{}/{}/contributors", self.owner, self.repo))
+    }
+
+    /// provides a stream over all pages of teams
+    pub fn iter(&self) -> Stream<User> {
+        unfold(
+            self.github.clone(),
+            self.github
+                .get_pages(&format!("/repos/{}/{}/contributors", self.owner, self.repo)),
+            identity,
+        )
     }
 }
