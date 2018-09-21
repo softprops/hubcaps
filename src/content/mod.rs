@@ -1,8 +1,18 @@
 //! Content interface
 
+use std::ops;
+use std::fmt;
+
+use base64;
+use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+use serde::de::{self, Deserialize, Deserializer, Visitor};
 use hyper::client::connect::Connect;
 
-use {Future, Github};
+use {unfold, Future, Github, Stream};
+
+fn identity<T>(x: T) -> T {
+    x
+}
 
 /// Provides access to the content information for a repository
 pub struct Content<C>
@@ -28,37 +38,69 @@ impl<C: Clone + Connect + 'static> Content<C> {
         }
     }
 
-    fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/contents{}", self.owner, self.repo, more)
+    fn path(&self, location: &str) -> String {
+        // Handle files with spaces and other characters that can mess up the
+        // final URL.
+        let location = percent_encode(location.as_ref(), DEFAULT_ENCODE_SET);
+        format!("/repos/{}/{}/contents{}", self.owner, self.repo, location)
     }
 
-    /// List the root directory
-    pub fn root(&self) -> Future<Vec<DirectoryItem>> {
-        self.github.get(&self.path("/"))
+    /// Gets the contents of the location. This could be a file, symlink, or
+    /// submodule. To list the contents of a directory, use `iter`.
+    pub fn get(&self, location: &str) -> Future<Contents> {
+        self.github.get(&self.path(location))
     }
 
-    /// Information on a single file
+    /// Information on a single file.
+    ///
+    /// GitHub only supports downloading files up to 1 megabyte in size. If you
+    /// need to retrieve larger files, the Git Data API must be used instead.
     pub fn file(&self, location: &str) -> Future<File> {
         self.github.get(&self.path(location))
     }
 
-    /// List the files in a directory
-    pub fn directory(&self, location: &str) -> Future<Vec<DirectoryItem>> {
-        self.github.get(&self.path(location))
+    /// List the root directory.
+    pub fn root(&self) -> Stream<DirectoryItem> {
+        self.iter("/")
+    }
+
+    /// Provides a stream over the directory items in `location`.
+    ///
+    /// GitHub limits the number of items returned to 1000 for this API. If you
+    /// need to retrieve more items, the Git Data API must be used instead.
+    pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
+        unfold(
+            self.github.clone(),
+            self.github.get_pages(&self.path(location)),
+            identity,
+        )
     }
 }
 
-// representations
+/// Contents of a path in a repository.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "type")]
+pub enum Contents {
+    File(File),
+    Symlink(Symlink),
+    Submodule(Submodule),
+}
+
+/// The type of content encoding.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Encoding {
+    Base64,
+    // Are there actually any other encoding types?
+}
 
 #[derive(Debug, Deserialize)]
 pub struct File {
-    #[serde(rename = "type")]
-    pub _type: String,
-    pub encoding: String,
+    pub encoding: Encoding,
     pub size: u32,
     pub name: String,
     pub path: String,
-    pub content: String,
+    pub content: DecodedContents,
     pub sha: String,
     pub url: String,
     pub git_url: String,
@@ -84,8 +126,6 @@ pub struct DirectoryItem {
 
 #[derive(Debug, Deserialize)]
 pub struct Symlink {
-    #[serde(rename = "type")]
-    pub _type: String,
     pub target: String,
     pub size: u32,
     pub name: String,
@@ -100,8 +140,6 @@ pub struct Symlink {
 
 #[derive(Debug, Deserialize)]
 pub struct Submodule {
-    #[serde(rename = "type")]
-    pub _type: String,
     pub submodule_git_url: String,
     pub size: u32,
     pub name: String,
@@ -120,4 +158,66 @@ pub struct Links {
     #[serde(rename = "self")]
     pub _self: String,
     pub html: String,
+}
+
+/// Decoded file contents.
+#[derive(Debug)]
+pub struct DecodedContents(Vec<u8>);
+
+impl Into<Vec<u8>> for DecodedContents {
+    fn into(self) -> Vec<u8> {
+        self.0
+    }
+}
+
+impl AsRef<[u8]> for DecodedContents {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
+
+impl ops::Deref for DecodedContents {
+    type Target = [u8];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'de> Deserialize<'de> for DecodedContents {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct DecodedContentsVisitor;
+
+        impl<'de> Visitor<'de> for DecodedContentsVisitor {
+            type Value = DecodedContents;
+
+            fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                write!(f, "base64 string")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                let decoded = base64::decode_config(v, base64::MIME).map_err(|e| match e {
+                    base64::DecodeError::InvalidLength => {
+                        E::invalid_length(v.len(), &"invalid base64 length")
+                    }
+                    base64::DecodeError::InvalidByte(offset, byte) => {
+                        E::invalid_value(
+                            de::Unexpected::Bytes(&[byte]),
+                            &format!("valid base64 character at offset {}", offset).as_str()
+                        )
+                    }
+                })?;
+
+                Ok(DecodedContents(decoded))
+            }
+        }
+
+        deserializer.deserialize_str(DecodedContentsVisitor)
+    }
 }

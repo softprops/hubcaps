@@ -32,6 +32,8 @@ serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
 error-chain = "0.12"
+base64 = "0.9"
+percent-encoding = "1"
 
 [dependencies.hyper-tls]
 optional = true
