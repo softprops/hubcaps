@@ -90,7 +90,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
-use hyper::header::{ACCEPT, AUTHORIZATION, LINK, LOCATION, USER_AGENT};
+use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, IF_NONE_MATCH, LINK, LOCATION, USER_AGENT};
 use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
@@ -99,6 +99,7 @@ use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
 
+mod http_cache;
 #[macro_use]
 mod macros; // expose json! macro to child modules
 pub mod activity;
@@ -129,6 +130,7 @@ pub mod traffic;
 pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
+pub use http_cache::HttpCache;
 
 use activity::Activity;
 use gists::{Gists, UserGists};
@@ -225,6 +227,7 @@ where
     agent: String,
     client: Client<C>,
     credentials: Option<Credentials>,
+    http_cache: HttpCache,
 }
 
 #[cfg(feature = "tls")]
@@ -247,7 +250,7 @@ impl Github<HttpsConnector<HttpConnector>> {
         let http = Client::builder()
             .keep_alive(true)
             .build(connector);
-        Self::custom(host, agent, credentials, http)
+        Self::custom(host, agent, credentials, http, HttpCache::noop())
     }
 }
 
@@ -255,7 +258,7 @@ impl<C> Github<C>
 where
     C: Clone + Connect + 'static,
 {
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: HttpCache) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -266,6 +269,7 @@ where
             agent: agent.into(),
             client: http,
             credentials: credentials.into(),
+            http_cache,
         }
     }
 
@@ -368,6 +372,7 @@ where
     where
         Out: DeserializeOwned + 'static + Send,
     {
+        let uri = uri.to_string();
         let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
             let mut parsed = Url::parse(&uri).unwrap();
             parsed
@@ -379,10 +384,18 @@ where
             uri.parse().into_future()
         };
         let instance = self.clone();
+        let uri2 = uri.clone();
         let body2 = body.clone();
         let method2 = method.clone();
         let response = url.map_err(Error::from).and_then(move |url| {
             let mut req = Request::builder();
+
+            if method2 == Method::GET {
+                if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
+                    req.header(IF_NONE_MATCH, etag);
+                }
+            }
+
             req.method(method2).uri(url);
 
             req.header(USER_AGENT, &*instance.agent);
@@ -408,6 +421,11 @@ where
             }
             if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
                 debug!("x-rate-limit-limit: {:?}", value)
+            }
+            let etag = response.headers().get(ETAG)
+                .map(|etag| etag.as_bytes().to_vec());
+            if let Some(value) = response.headers().get(ETAG) {
+                debug!("etag: {:?}", value)
             }
             let remaining = response
                 .headers()
@@ -449,9 +467,21 @@ where
                             "response payload {}",
                             String::from_utf8_lossy(&response_body)
                         );
+                        if let Some(etag) = etag {
+                            if let Err(e) = instance2.http_cache.cache_body_and_etag(&uri, &response_body, &etag) {
+                                // failing to cache isn't fatal, so just log & swallow the error
+                                debug!("Failed to cache body & etag: {}", e);
+                            }
+                        }
                         serde_json::from_slice::<Out>(&response_body)
                             .map(|out| (link, out))
                             .map_err(|error| ErrorKind::Codec(error).into())
+                    } else if status == StatusCode::NOT_MODIFIED {
+                        instance2.http_cache.lookup_body(&uri).map_err(Error::from).and_then(|body|
+                            serde_json::from_str::<Out>(&body)
+                                .map(|out| (link, out))
+                                .map_err(|error| ErrorKind::Codec(error).into())
+                        )
                     } else {
                         let error = match (remaining, reset) {
                             (Some(remaining), Some(reset)) if remaining == 0 => {
