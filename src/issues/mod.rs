@@ -490,10 +490,20 @@ pub struct Issue {
     pub assignee: Option<User>,
     pub locked: bool,
     pub comments: u64,
+    pub pull_request: Option<PullRef>,
     pub closed_at: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub assignees: Vec<User>,
+}
+
+/// A reference to a pull request.
+#[derive(Debug, Deserialize)]
+pub struct PullRef {
+    pub url: String,
+    pub html_url: String,
+    pub diff_url: String,
+    pub patch_url: String,
 }
 
 #[cfg(test)]
