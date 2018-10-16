@@ -2,32 +2,36 @@ sudo: required
 
 language: rust
 
+# only build pushes to master
+# prs are build separately
+# https://docs.travis-ci.com/user/pull-requests/#how-pull-requests-are-built
+branches:
+  only:
+  - master
+
 matrix:
   fast_finish: true
   include:
   - rust: nightly
   - rust: beta
   - rust: stable
-  allow_failures:
-  - rust: nightly
-  - rust: beta
 
 script:
-# https://github.com/rust-lang/rust/issues/47309#issuecomment-359166547
-#- RUSTFLAGS="$RUSTFLAGS -C link-dead-code" cargo test
 - travis_wait cargo test
 - cargo run --example rate_limit
 
+# Cache `cargo install`ed tools, but don't cache the project's `target`
+# directory (which ends up over-caching and filling all disk space!)
+# https://levans.fr/rust_travis_cache.html
+cache:
+  directories:
+    - /home/travis/.cargo
+
 before_cache:
+  # But don't cache the cargo registry
+  - rm -rf /home/travis/.cargo/registry
   # Travis can't cache files that are not readable by "others"
   - chmod -R a+r $HOME/.cargo
-
-cache:
-  cargo: true
-  apt: true
-  directories:
-  - target/debug/deps
-  - target/debug/build
 
 addons:
   apt:
@@ -47,8 +51,13 @@ after_success:
     [ $TRAVIS_BRANCH = master ] &&
     [ $TRAVIS_PULL_REQUEST = false ]
     && cargo doc --no-deps &&
-    echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d / -f 2`/index.html>" > target/doc/index.html &&
-    pip install --user ghp-import &&
-    /home/travis/.local/bin/ghp-import -n target/doc &&
-    git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages &&
-    echo "documented"'
+    echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d / -f 2`/index.html>" > target/doc/index.html'
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GH_TOKEN
+  local-dir: target/doc
+  keep-history: false
+  on:
+    branch: master
