@@ -25,6 +25,7 @@ impl HttpCache {
     }
 
     pub fn in_home_dir() -> Self {
+        #[allow(deprecated)] // TODO: Switch to the dirs crate.
         let mut dir = env::home_dir().expect("Expected a home dir");
         dir.push(".hubcaps/cache");
         HttpCache::FileBased(dir)
