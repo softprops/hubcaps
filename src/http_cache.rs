@@ -2,6 +2,7 @@
 
 use std;
 use std::env;
+use std::fmt::Debug;
 use std::io;
 use std::ffi::OsStr;
 use std::fs;
@@ -11,61 +12,67 @@ use hyper::Uri;
 
 use {Error, Result};
 
-#[derive(Clone, Debug)]
-pub enum HttpCache {
-    Noop,
-    FileBased(PathBuf),
+pub type BoxedHttpCache = Box<HttpCache + Send>;
+
+pub trait HttpCache: Debug {
+    fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()>;
+    fn lookup_etag(&self, uri: &str) -> Result<String>;
+    fn lookup_body(&self, uri: &str) -> Result<String>;
+
+    #[doc(hidden)]
+    fn clone_into_box(&self) -> BoxedHttpCache;
 }
 
-use HttpCache::*;
-
 impl HttpCache {
-    pub fn noop() -> Self {
-        HttpCache::Noop
+    pub fn noop() -> BoxedHttpCache {
+        Box::new(NoCache)
     }
 
-    pub fn in_home_dir() -> Self {
+    pub fn in_home_dir() -> BoxedHttpCache {
         #[allow(deprecated)] // TODO: Switch to the dirs crate.
         let mut dir = env::home_dir().expect("Expected a home dir");
         dir.push(".hubcaps/cache");
-        HttpCache::FileBased(dir)
+        Box::new(FileBasedCache { root: dir })
     }
+}
 
-    #[doc(hidden)]
-    pub fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()> {
-        match self {
-            Noop => Ok(()),
-            FileBased(dir) => {
-                let mut path = cache_path(dir, &uri, "json");
-                if let Some(parent) = path.parent() {
-                    fs::create_dir_all(parent)?;
-                }
-                fs::write(&path, body)?;
-                path.set_extension("etag");
-                fs::write(&path, etag)?;
-                Ok(())
-            },
+#[derive(Clone, Debug)]
+pub struct NoCache;
+
+impl HttpCache for NoCache {
+    fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> { Ok(()) }
+    fn lookup_etag(&self, _uri: &str) -> Result<String> { no_read("No etag cached") }
+    fn lookup_body(&self, _uri: &str) -> Result<String> { no_read("No body cached") }
+    fn clone_into_box(&self) -> BoxedHttpCache          { Box::new(NoCache) }
+}
+
+#[derive(Clone, Debug)]
+pub struct FileBasedCache {
+    root: PathBuf,
+}
+
+impl HttpCache for FileBasedCache {
+    fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()> {
+        let mut path = cache_path(&self.root, &uri, "json");
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
         }
+        fs::write(&path, body)?;
+        path.set_extension("etag");
+        fs::write(&path, etag)?;
+        Ok(())
     }
 
-    #[doc(hidden)]
-    pub fn lookup_etag(&self, uri: &str) -> Result<String> {
-        match self {
-            Noop => HttpCache::no_read("No etag cached"),
-            FileBased(dir) => read_to_string(cache_path(dir, uri, "etag")),
-        }
+    fn lookup_etag(&self, uri: &str) -> Result<String> {
+        read_to_string(cache_path(&self.root, uri, "etag"))
     }
 
-    #[doc(hidden)]
-    pub fn lookup_body(&self, uri: &str) -> Result<String> {
-        match self {
-            Noop => HttpCache::no_read("No body cached"),
-            FileBased(dir) => read_to_string(cache_path(dir, uri, "json")),
-        }
+    fn lookup_body(&self, uri: &str) -> Result<String> {
+        read_to_string(cache_path(&self.root, uri, "json"))
     }
 
-    fn no_read<E: Into<Box<std::error::Error + Send + Sync>>>(error: E) -> Result<String> {
-        Err(Error::from(io::Error::new(io::ErrorKind::NotFound, error)))
+    fn clone_into_box(&self) -> BoxedHttpCache {
+        Box::new(FileBasedCache { root: self.root.clone() })
     }
 }
 
@@ -88,4 +95,8 @@ fn cache_path<S: AsRef<OsStr>>(dir: &Path, uri: &str, extension: S) -> PathBuf {
 
 fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String> {
     fs::read_to_string(path).map_err(Error::from)
+}
+
+fn no_read<E: Into<Box<std::error::Error + Send + Sync>>>(error: E) -> Result<String> {
+    Err(Error::from(io::Error::new(io::ErrorKind::NotFound, error)))
 }

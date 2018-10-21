@@ -130,7 +130,7 @@ pub mod traffic;
 pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
-pub use http_cache::HttpCache;
+pub use http_cache::{BoxedHttpCache, HttpCache};
 
 use activity::Activity;
 use gists::{Gists, UserGists};
@@ -218,7 +218,7 @@ pub enum Credentials {
 }
 
 /// Entry point interface for interacting with Github API
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Github<C>
 where
     C: Clone + Connect + 'static,
@@ -227,8 +227,24 @@ where
     agent: String,
     client: Client<C>,
     credentials: Option<Credentials>,
-    http_cache: HttpCache,
+    http_cache: BoxedHttpCache,
 }
+
+impl<C> Clone for Github<C>
+where
+    C: Clone + Connect + 'static,
+{
+    fn clone(&self) -> Self {
+        Self {
+            host: self.host.clone(),
+            agent: self.agent.clone(),
+            client: self.client.clone(),
+            credentials: self.credentials.clone(),
+            http_cache: self.http_cache.clone_into_box(),
+        }
+    }
+}
+
 
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
@@ -258,7 +274,7 @@ impl<C> Github<C>
 where
     C: Clone + Connect + 'static,
 {
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: HttpCache) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: BoxedHttpCache) -> Self
     where
         H: Into<String>,
         A: Into<String>,
