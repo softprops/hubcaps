@@ -230,7 +230,6 @@ where
     http_cache: BoxedHttpCache,
 }
 
-
 #[cfg(feature = "tls")]
 impl Github<HttpsConnector<HttpConnector>> {
     pub fn new<A, C>(agent: A, credentials: C) -> Self

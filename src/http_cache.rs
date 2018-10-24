@@ -14,13 +14,10 @@ use {Error, Result};
 
 pub type BoxedHttpCache = Box<HttpCache + Send>;
 
-pub trait HttpCache: Debug {
+pub trait HttpCache: HttpCacheClone + Debug {
     fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()>;
     fn lookup_etag(&self, uri: &str) -> Result<String>;
     fn lookup_body(&self, uri: &str) -> Result<String>;
-
-    #[doc(hidden)]
-    fn box_clone(&self) -> BoxedHttpCache;
 }
 
 impl HttpCache {
@@ -49,7 +46,6 @@ impl HttpCache for NoCache {
     fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> { Ok(()) }
     fn lookup_etag(&self, _uri: &str) -> Result<String> { no_read("No etag cached") }
     fn lookup_body(&self, _uri: &str) -> Result<String> { no_read("No body cached") }
-    fn box_clone(&self) -> BoxedHttpCache               { Box::new(NoCache) }
 }
 
 #[derive(Clone, Debug)]
@@ -76,10 +72,6 @@ impl HttpCache for FileBasedCache {
     fn lookup_body(&self, uri: &str) -> Result<String> {
         read_to_string(cache_path(&self.root, uri, "json"))
     }
-
-    fn box_clone(&self) -> BoxedHttpCache {
-        Box::new(FileBasedCache { root: self.root.clone() })
-    }
 }
 
 ///       cache_path("https://api.github.com/users/dwijnand/repos", "json") ==>
@@ -105,4 +97,21 @@ fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String> {
 
 fn no_read<E: Into<Box<std::error::Error + Send + Sync>>>(error: E) -> Result<String> {
     Err(Error::from(io::Error::new(io::ErrorKind::NotFound, error)))
+}
+
+// Separate to provide a blanket implementation for `T: HttpCache + Clone`
+// https://stackoverflow.com/a/30353928/463761
+#[doc(hidden)]
+pub trait HttpCacheClone {
+    #[doc(hidden)]
+    fn box_clone(&self) -> BoxedHttpCache;
+}
+
+impl<T> HttpCacheClone for T
+    where
+        T: 'static + HttpCache + Clone + Send,
+{
+    fn box_clone(&self) -> BoxedHttpCache {
+        Box::new(self.clone())
+    }
 }
