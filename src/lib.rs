@@ -240,7 +240,7 @@ where
             agent: self.agent.clone(),
             client: self.client.clone(),
             credentials: self.credentials.clone(),
-            http_cache: self.http_cache.clone_into_box(),
+            http_cache: self.http_cache.box_clone(),
         }
     }
 }

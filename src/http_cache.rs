@@ -20,7 +20,7 @@ pub trait HttpCache: Debug {
     fn lookup_body(&self, uri: &str) -> Result<String>;
 
     #[doc(hidden)]
-    fn clone_into_box(&self) -> BoxedHttpCache;
+    fn box_clone(&self) -> BoxedHttpCache;
 }
 
 impl HttpCache {
@@ -43,7 +43,7 @@ impl HttpCache for NoCache {
     fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> { Ok(()) }
     fn lookup_etag(&self, _uri: &str) -> Result<String> { no_read("No etag cached") }
     fn lookup_body(&self, _uri: &str) -> Result<String> { no_read("No body cached") }
-    fn clone_into_box(&self) -> BoxedHttpCache          { Box::new(NoCache) }
+    fn box_clone(&self) -> BoxedHttpCache               { Box::new(NoCache) }
 }
 
 #[derive(Clone, Debug)]
@@ -71,7 +71,7 @@ impl HttpCache for FileBasedCache {
         read_to_string(cache_path(&self.root, uri, "json"))
     }
 
-    fn clone_into_box(&self) -> BoxedHttpCache {
+    fn box_clone(&self) -> BoxedHttpCache {
         Box::new(FileBasedCache { root: self.root.clone() })
     }
 }
