@@ -218,7 +218,7 @@ pub enum Credentials {
 }
 
 /// Entry point interface for interacting with Github API
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Github<C>
 where
     C: Clone + Connect + 'static,
@@ -228,21 +228,6 @@ where
     client: Client<C>,
     credentials: Option<Credentials>,
     http_cache: BoxedHttpCache,
-}
-
-impl<C> Clone for Github<C>
-where
-    C: Clone + Connect + 'static,
-{
-    fn clone(&self) -> Self {
-        Self {
-            host: self.host.clone(),
-            agent: self.agent.clone(),
-            client: self.client.clone(),
-            credentials: self.credentials.clone(),
-            http_cache: self.http_cache.box_clone(),
-        }
-    }
 }
 
 

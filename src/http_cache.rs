@@ -36,6 +36,12 @@ impl HttpCache {
     }
 }
 
+impl Clone for BoxedHttpCache {
+    fn clone(&self) -> Self {
+        self.box_clone()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct NoCache;
 
