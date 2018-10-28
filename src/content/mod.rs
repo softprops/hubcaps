@@ -1,12 +1,12 @@
 //! Content interface
 
-use std::ops;
 use std::fmt;
+use std::ops;
 
 use base64;
+use hyper::client::connect::Connect;
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::de::{self, Deserialize, Deserializer, Visitor};
-use hyper::client::connect::Connect;
 
 use {unfold, Future, Github, Stream};
 
@@ -202,16 +202,18 @@ impl<'de> Deserialize<'de> for DecodedContents {
             where
                 E: de::Error,
             {
-                let decoded = base64::decode_config(v, base64::MIME).map_err(|e| match e {
+                let decoded = base64::decode_config(v, base64::STANDARD).map_err(|e| match e {
                     base64::DecodeError::InvalidLength => {
                         E::invalid_length(v.len(), &"invalid base64 length")
                     }
-                    base64::DecodeError::InvalidByte(offset, byte) => {
-                        E::invalid_value(
-                            de::Unexpected::Bytes(&[byte]),
-                            &format!("valid base64 character at offset {}", offset).as_str()
-                        )
-                    }
+                    base64::DecodeError::InvalidByte(offset, byte) => E::invalid_value(
+                        de::Unexpected::Bytes(&[byte]),
+                        &format!("valid base64 character at offset {}", offset).as_str(),
+                    ),
+                    base64::DecodeError::InvalidLastSymbol(offset, byte) => E::invalid_value(
+                        de::Unexpected::Bytes(&[byte]),
+                        &format!("invalid last base64 character at offset {}", offset).as_str(),
+                    ),
                 })?;
 
                 Ok(DecodedContents(decoded))
