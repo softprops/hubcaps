@@ -3,8 +3,8 @@ extern crate futures;
 extern crate hubcaps;
 extern crate tokio;
 
-use std::str;
 use std::env;
+use std::str;
 
 use futures::Stream;
 use tokio::runtime::Runtime;
@@ -29,7 +29,8 @@ fn main() -> Result<()> {
 
             println!("Directory contents stream:");
             rt.block_on(repo.content().iter("/examples").for_each(|item| {
-                Ok(println!("  {}", item.path))
+                println!("  {}", item.path);
+                Ok(())
             }))?;
 
             println!("Root directory:");

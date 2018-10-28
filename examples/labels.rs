@@ -32,13 +32,12 @@ fn main() -> Result<()> {
                 )?
             );
             // stream over all labels defined for a repo
-            rt.block_on(
-                github
-                    .repo("rust-lang", "cargo")
-                    .labels()
-                    .iter()
-                    .for_each(move |label| Ok(println!("{}", label.name))),
-            )?;
+            rt.block_on(github.repo("rust-lang", "cargo").labels().iter().for_each(
+                move |label| {
+                    println!("{}", label.name);
+                    Ok(())
+                },
+            ))?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

@@ -15,6 +15,9 @@ matrix:
   - rust: nightly
   - rust: beta
   - rust: stable
+  allow_failures:
+    # hyper is not compiling on nightly https://github.com/hyperium/hyper/issues/1688
+    - rust: nightly
 
 script:
 - travis_wait cargo test

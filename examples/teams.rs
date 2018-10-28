@@ -20,20 +20,20 @@ fn main() -> Result<()> {
                 Credentials::Token(token),
             );
             println!("org teams");
-            rt.block_on(
-                github
-                    .org("meetup")
-                    .teams()
-                    .iter()
-                    .for_each(|team| Ok(println!("{:#?}", team))),
-            )?;
+            rt.block_on(github.org("meetup").teams().iter().for_each(|team| {
+                println!("{:#?}", team);
+                Ok(())
+            }))?;
             println!("repo teams");
             rt.block_on(
                 github
                     .repo("meetup", "k8s-nginx-dogstats")
                     .teams()
                     .iter()
-                    .for_each(|team| Ok(println!("{:#?}", team))),
+                    .for_each(|team| {
+                        println!("{:#?}", team);
+                        Ok(())
+                    }),
             )?;
             Ok(())
         }

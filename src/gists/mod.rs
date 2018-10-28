@@ -7,8 +7,8 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
-use {serde_json, Future, Github};
 use users::User;
+use {serde_json, Future, Github};
 
 /// reference to gists associated with a github user
 pub struct UserGists<C>
@@ -108,7 +108,8 @@ impl<C: Clone + Connect + 'static> Gists<C> {
     }
 
     pub fn edit(&self, id: &str, gist: &GistOptions) -> Future<Gist> {
-        self.github.patch(&self.path(&format!("/{}", id)), json!(gist))
+        self.github
+            .patch(&self.path(&format!("/{}", id)), json!(gist))
     }
 }
 

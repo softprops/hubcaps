@@ -30,7 +30,10 @@ fn main() -> Result<()> {
                         "user:softprops",
                         &SearchIssuesOptions::builder().per_page(100).build(),
                     )
-                    .for_each(|issue| Ok(println!("{}", issue.title))),
+                    .for_each(|issue| {
+                        println!("{}", issue.title);
+                        Ok(())
+                    }),
             )?;
             Ok(())
         }

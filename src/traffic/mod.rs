@@ -17,7 +17,8 @@ impl fmt::Display for TimeUnit {
         match *self {
             TimeUnit::Week => "week",
             TimeUnit::Day => "day",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

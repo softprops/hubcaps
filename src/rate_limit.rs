@@ -24,7 +24,7 @@ impl<C: Clone + Connect + 'static> RateLimit<C> {
 
 #[derive(Debug, Deserialize)]
 pub struct RateLimitStatus {
-    pub resources: RateLimitResourcesStatus
+    pub resources: RateLimitResourcesStatus,
 }
 
 #[derive(Debug, Deserialize)]
@@ -38,5 +38,5 @@ pub struct RateLimitResourcesStatus {
 pub struct RateLimitResourceStatus {
     pub limit: u32,
     pub remaining: u32,
-    pub reset: u32 // ideally something like std::time::Duration
+    pub reset: u32, // ideally something like std::time::Duration
 }

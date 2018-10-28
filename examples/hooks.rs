@@ -20,10 +20,12 @@ fn main() -> Result<()> {
             );
             let repo = github.repo("softprops", "hubcaps");
             let hook = rt.block_on(
-                repo.hooks().create(&HookCreateOptions::web()
-                    .url("http://localhost:8080")
-                    .content_type(WebHookContentType::Json)
-                    .build()),
+                repo.hooks().create(
+                    &HookCreateOptions::web()
+                        .url("http://localhost:8080")
+                        .content_type(WebHookContentType::Json)
+                        .build(),
+                ),
             );
             println!("{:#?}", hook);
             let hooks = repo.hooks();

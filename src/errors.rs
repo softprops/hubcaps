@@ -3,8 +3,8 @@
 use std::io::Error as IoError;
 use std::time::Duration;
 
-use http::Error as HttpError;
 use http::uri::InvalidUri;
+use http::Error as HttpError;
 use hyper::Error as HyperError;
 use hyper::StatusCode;
 use serde_json::error::Error as SerdeError;
@@ -54,8 +54,8 @@ pub struct ClientError {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use super::{ClientError, FieldErr};
+    use serde_json;
     #[test]
     fn deserialize_client_field_errors() {
         for (json, expect) in vec![
@@ -69,19 +69,17 @@ mod tests {
                 }]}"#,
                 ClientError {
                     message: "Validation Failed".to_owned(),
-                    errors: Some(vec![
-                        FieldErr {
-                            resource: "Release".to_owned(),
-                            code: "custom".to_owned(),
-                            field: None,
-                            message: Some(
-                                "Published releases \
-                                 must have a valid tag"
-                                    .to_owned(),
-                            ),
-                            documentation_url: None,
-                        },
-                    ]),
+                    errors: Some(vec![FieldErr {
+                        resource: "Release".to_owned(),
+                        code: "custom".to_owned(),
+                        field: None,
+                        message: Some(
+                            "Published releases \
+                             must have a valid tag"
+                                .to_owned(),
+                        ),
+                        documentation_url: None,
+                    }]),
                 },
             ),
         ] {

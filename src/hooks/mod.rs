@@ -8,8 +8,8 @@ use serde_json;
 use {Future, Github};
 
 use hyper::client::connect::Connect;
-use std::fmt;
 use std::collections::BTreeMap;
+use std::fmt;
 
 /// Content-Type web hooks will receive
 /// deliveries in
@@ -34,7 +34,8 @@ impl fmt::Display for WebHookContentType {
         match *self {
             WebHookContentType::Form => "form",
             WebHookContentType::Json => "json",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

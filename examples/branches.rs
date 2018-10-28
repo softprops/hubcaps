@@ -26,7 +26,10 @@ fn main() -> Result<()> {
                     .repo("softprops", "hubcaps")
                     .branches()
                     .iter()
-                    .for_each(|branch| Ok(println!("{:#?}", branch))),
+                    .for_each(|branch| {
+                        println!("{:#?}", branch);
+                        Ok(())
+                    }),
             ) {
                 println!("err {:#?}", err)
             }

@@ -23,7 +23,8 @@ impl fmt::Display for Permission {
             Permission::Pull => "pull",
             Permission::Push => "push",
             Permission::Admin => "admin",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

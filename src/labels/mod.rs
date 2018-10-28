@@ -1,8 +1,8 @@
 //! Labels interface
 
-use serde_json;
 use futures::future;
 use hyper::client::connect::Connect;
+use serde_json;
 
 use {unfold, Future, Github, Stream};
 

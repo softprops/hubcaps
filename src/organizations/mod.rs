@@ -2,9 +2,9 @@
 
 use hyper::client::connect::Connect;
 
-use {Future, Github};
 use repositories::OrgRepositories;
 use teams::OrgTeams;
+use {Future, Github};
 
 /// Provides access to label operations available for an individual organization
 pub struct Organization<C>

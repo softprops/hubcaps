@@ -9,22 +9,22 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 
-use {unfold, Future, Github, SortDirection, Stream};
 use branches::Branches;
 use content::Content;
 use deployments::Deployments;
 use git::Git;
 use hooks::Hooks;
-use keys::Keys;
 use issues::{IssueRef, Issues};
+use keys::Keys;
 use labels::Labels;
 use pulls::PullRequests;
 use releases::Releases;
+use statuses::Statuses;
 use teams::RepoTeams;
 use traffic::Traffic;
-use statuses::Statuses;
-use users::User;
 use users::Contributors;
+use users::User;
+use {unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -44,7 +44,8 @@ impl fmt::Display for Visibility {
             Visibility::All => "all",
             Visibility::Public => "public",
             Visibility::Private => "private",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -64,7 +65,8 @@ impl fmt::Display for Sort {
             Sort::Updated => "updated",
             Sort::Pushed => "pushed",
             Sort::FullName => "full_name",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -82,7 +84,8 @@ impl fmt::Display for Affiliation {
             Affiliation::Owner => "owner",
             Affiliation::Collaborator => "collaborator",
             Affiliation::OrganizationMember => "organization_member",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -104,7 +107,8 @@ impl fmt::Display for Type {
             Type::Public => "public",
             Type::Private => "private",
             Type::Member => "member",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -128,7 +132,8 @@ impl fmt::Display for OrgRepoType {
             OrgRepoType::Forks => "forks",
             OrgRepoType::Sources => "sources",
             OrgRepoType::Member => "member",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
