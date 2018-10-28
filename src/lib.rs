@@ -130,7 +130,7 @@ pub mod traffic;
 pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
-pub use http_cache::HttpCache;
+pub use http_cache::{BoxedHttpCache, HttpCache};
 
 use activity::Activity;
 use gists::{Gists, UserGists};
@@ -227,7 +227,7 @@ where
     agent: String,
     client: Client<C>,
     credentials: Option<Credentials>,
-    http_cache: HttpCache,
+    http_cache: BoxedHttpCache,
 }
 
 #[cfg(feature = "tls")]
@@ -258,7 +258,7 @@ impl<C> Github<C>
 where
     C: Clone + Connect + 'static,
 {
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: HttpCache) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: BoxedHttpCache) -> Self
     where
         H: Into<String>,
         A: Into<String>,
