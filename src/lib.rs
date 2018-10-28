@@ -79,10 +79,10 @@ extern crate mime;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
-extern crate url;
 extern crate base64;
 extern crate percent_encoding;
+extern crate serde_json;
+extern crate url;
 
 use std::fmt;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -176,7 +176,9 @@ impl From<MediaType> for Mime {
             MediaType::Preview(codename) => {
                 format!("application/vnd.github.{}-preview+json", codename)
                     .parse()
-                    .unwrap_or_else(|_| panic!("could not parse media type for preview {}", codename))
+                    .unwrap_or_else(|_| {
+                        panic!("could not parse media type for preview {}", codename)
+                    })
             }
         }
     }
@@ -196,7 +198,8 @@ impl fmt::Display for SortDirection {
         match *self {
             SortDirection::Asc => "asc",
             SortDirection::Desc => "desc",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -247,9 +250,7 @@ impl Github<HttpsConnector<HttpConnector>> {
         C: Into<Option<Credentials>>,
     {
         let connector = HttpsConnector::new(4).unwrap();
-        let http = Client::builder()
-            .keep_alive(true)
-            .build(connector);
+        let http = Client::builder().keep_alive(true).build(connector);
         Self::custom(host, agent, credentials, http, HttpCache::noop())
     }
 }
@@ -258,7 +259,13 @@ impl<C> Github<C>
 where
     C: Clone + Connect + 'static,
 {
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http_cache: BoxedHttpCache) -> Self
+    pub fn custom<H, A, CR>(
+        host: H,
+        agent: A,
+        credentials: CR,
+        http: Client<C>,
+        http_cache: BoxedHttpCache,
+    ) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -399,7 +406,10 @@ where
             req.method(method2).uri(url);
 
             req.header(USER_AGENT, &*instance.agent);
-            req.header(ACCEPT, &*format!("{}", qitem::<Mime>(From::from(media_type))));
+            req.header(
+                ACCEPT,
+                &*format!("{}", qitem::<Mime>(From::from(media_type))),
+            );
 
             if let Some(Credentials::Token(ref token)) = instance.credentials {
                 req.header(AUTHORIZATION, &*format!("token {}", token));
@@ -422,7 +432,9 @@ where
             if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
                 debug!("x-rate-limit-limit: {:?}", value)
             }
-            let etag = response.headers().get(ETAG)
+            let etag = response
+                .headers()
+                .get(ETAG)
                 .map(|etag| etag.as_bytes().to_vec());
             if let Some(value) = response.headers().get(ETAG) {
                 debug!("etag: {:?}", value)
@@ -446,7 +458,9 @@ where
             let status = response.status();
             // handle redirect common with renamed repos
             if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
-                let location = response.headers().get(LOCATION)
+                let location = response
+                    .headers()
+                    .get(LOCATION)
                     .and_then(|l| l.to_str().ok());
 
                 if let Some(location) = location {
@@ -460,48 +474,60 @@ where
                 .and_then(|l| l.to_str().ok())
                 .and_then(|l| l.parse().ok());
 
-            Box::new(response.into_body().concat2().map_err(Error::from).and_then(
-                move |response_body| {
-                    if status.is_success() {
-                        debug!(
-                            "response payload {}",
-                            String::from_utf8_lossy(&response_body)
-                        );
-                        if let Some(etag) = etag {
-                            if let Err(e) = instance2.http_cache.cache_body_and_etag(&uri, &response_body, &etag) {
-                                // failing to cache isn't fatal, so just log & swallow the error
-                                debug!("Failed to cache body & etag: {}", e);
-                            }
-                        }
-                        serde_json::from_slice::<Out>(&response_body)
-                            .map(|out| (link, out))
-                            .map_err(|error| ErrorKind::Codec(error).into())
-                    } else if status == StatusCode::NOT_MODIFIED {
-                        instance2.http_cache.lookup_body(&uri).map_err(Error::from).and_then(|body|
-                            serde_json::from_str::<Out>(&body)
-                                .map(|out| (link, out))
-                                .map_err(|error| ErrorKind::Codec(error).into())
-                        )
-                    } else {
-                        let error = match (remaining, reset) {
-                            (Some(remaining), Some(reset)) if remaining == 0 => {
-                                let now = SystemTime::now()
-                                    .duration_since(UNIX_EPOCH)
-                                    .unwrap()
-                                    .as_secs();
-                                ErrorKind::RateLimit {
-                                    reset: Duration::from_secs(u64::from(reset) - now),
+            Box::new(
+                response
+                    .into_body()
+                    .concat2()
+                    .map_err(Error::from)
+                    .and_then(move |response_body| {
+                        if status.is_success() {
+                            debug!(
+                                "response payload {}",
+                                String::from_utf8_lossy(&response_body)
+                            );
+                            if let Some(etag) = etag {
+                                if let Err(e) = instance2.http_cache.cache_body_and_etag(
+                                    &uri,
+                                    &response_body,
+                                    &etag,
+                                ) {
+                                    // failing to cache isn't fatal, so just log & swallow the error
+                                    debug!("Failed to cache body & etag: {}", e);
                                 }
                             }
-                            _ => ErrorKind::Fault {
-                                code: status,
-                                error: serde_json::from_slice(&response_body)?,
-                            },
-                        };
-                        Err(error.into())
-                    }
-                },
-            ))
+                            serde_json::from_slice::<Out>(&response_body)
+                                .map(|out| (link, out))
+                                .map_err(|error| ErrorKind::Codec(error).into())
+                        } else if status == StatusCode::NOT_MODIFIED {
+                            instance2
+                                .http_cache
+                                .lookup_body(&uri)
+                                .map_err(Error::from)
+                                .and_then(|body| {
+                                    serde_json::from_str::<Out>(&body)
+                                        .map(|out| (link, out))
+                                        .map_err(|error| ErrorKind::Codec(error).into())
+                                })
+                        } else {
+                            let error = match (remaining, reset) {
+                                (Some(remaining), Some(reset)) if remaining == 0 => {
+                                    let now = SystemTime::now()
+                                        .duration_since(UNIX_EPOCH)
+                                        .unwrap()
+                                        .as_secs();
+                                    ErrorKind::RateLimit {
+                                        reset: Duration::from_secs(u64::from(reset) - now),
+                                    }
+                                }
+                                _ => ErrorKind::Fault {
+                                    code: status,
+                                    error: serde_json::from_slice(&response_body)?,
+                                },
+                            };
+                            Err(error.into())
+                        }
+                    }),
+            )
         }))
     }
 
@@ -539,19 +565,27 @@ where
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.request(Method::GET, &(self.host.clone() + uri), None, MediaType::Json)
-    }
-
-    fn delete(&self, uri: &str) -> Future<()> {
-        Box::new(self.request_entity::<()>(
-            Method::DELETE,
+        self.request(
+            Method::GET,
             &(self.host.clone() + uri),
             None,
             MediaType::Json,
-        ).or_else(|err| match err {
-            Error(ErrorKind::Codec(_), _) => Ok(()),
-            otherwise => Err(otherwise),
-        }))
+        )
+    }
+
+    fn delete(&self, uri: &str) -> Future<()> {
+        Box::new(
+            self.request_entity::<()>(
+                Method::DELETE,
+                &(self.host.clone() + uri),
+                None,
+                MediaType::Json,
+            )
+            .or_else(|err| match err {
+                Error(ErrorKind::Codec(_), _) => Ok(()),
+                otherwise => Err(otherwise),
+            }),
+        )
     }
 
     fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
@@ -577,7 +611,12 @@ where
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.request_entity(Method::PATCH, &(self.host.clone() + uri), Some(message), media)
+        self.request_entity(
+            Method::PATCH,
+            &(self.host.clone() + uri),
+            Some(message),
+            media,
+        )
     }
 
     fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>

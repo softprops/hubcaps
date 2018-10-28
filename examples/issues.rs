@@ -24,11 +24,16 @@ fn main() -> Result<()> {
                 github
                     .repo("matthiasbeyer", "imag")
                     .issues()
-                    .iter(&IssueListOptions::builder()
-                        .per_page(100)
-                        .state(State::All)
-                        .build())
-                    .for_each(move |issue| Ok(println!("{} ({})", issue.title, issue.state))),
+                    .iter(
+                        &IssueListOptions::builder()
+                            .per_page(100)
+                            .state(State::All)
+                            .build(),
+                    )
+                    .for_each(move |issue| {
+                        println!("{} ({})", issue.title, issue.state);
+                        Ok(())
+                    }),
             )?;
             Ok(())
         }

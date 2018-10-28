@@ -1,16 +1,16 @@
 //! Issues interface
 
-use std::fmt;
 use std::collections::HashMap;
+use std::fmt;
 
 use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
-use {serde_json, unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
-use users::User;
 use labels::Label;
+use users::User;
+use {serde_json, unfold, Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -29,7 +29,8 @@ impl fmt::Display for State {
             State::Open => "open",
             State::Closed => "closed",
             State::All => "all",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 
@@ -56,7 +57,8 @@ impl fmt::Display for Sort {
             Sort::Created => "created",
             Sort::Updated => "updated",
             Sort::Comments => "comments",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

@@ -3,18 +3,18 @@
 use std::collections::HashMap;
 use std::fmt;
 
+use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 use url::form_urlencoded;
-use futures::future;
 
-use {unfold, Future, Github, SortDirection, Stream};
 use comments::Comments;
-use pull_commits::PullCommits;
 use issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
+use labels::Label;
+use pull_commits::PullCommits;
 use review_comments::ReviewComments;
 use users::User;
-use labels::Label;
+use {unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -40,7 +40,8 @@ impl fmt::Display for Sort {
             Sort::Updated => "updated",
             Sort::Popularity => "popularity",
             Sort::LongRunning => "long-running",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

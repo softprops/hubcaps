@@ -4,9 +4,9 @@ extern crate serde;
 extern crate serde_json;
 
 use futures::future;
-use {Future, Github};
 use hyper::client::connect::Connect;
 use users::User;
+use {Future, Github};
 
 /// interface for statuses associated with a repository
 pub struct Statuses<C>
@@ -181,8 +181,8 @@ impl Default for State {
 
 #[cfg(test)]
 mod tests {
-    use serde::ser::Serialize;
     use super::*;
+    use serde::ser::Serialize;
     use serde_json;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
@@ -219,20 +219,31 @@ mod tests {
 
     #[test]
     fn status_reqs() {
-        let tests = vec![(StatusOptions::builder(State::Pending).build(), r#"{"state":"pending"}"#),
-                 (StatusOptions::builder(State::Success)
-                      .target_url("http://acme.com")
-                      .build(),
-                  r#"{"state":"success","target_url":"http://acme.com"}"#),
-                 (StatusOptions::builder(State::Error)
-                      .description("desc")
-                      .build(),
-                  r#"{"state":"error","description":"desc"}"#),
-                 (StatusOptions::builder(State::Failure)
-                      .target_url("http://acme.com")
-                      .description("desc")
-                      .build(),
-                  r#"{"state":"failure","target_url":"http://acme.com","description":"desc"}"#)];
+        let tests = vec![
+            (
+                StatusOptions::builder(State::Pending).build(),
+                r#"{"state":"pending"}"#,
+            ),
+            (
+                StatusOptions::builder(State::Success)
+                    .target_url("http://acme.com")
+                    .build(),
+                r#"{"state":"success","target_url":"http://acme.com"}"#,
+            ),
+            (
+                StatusOptions::builder(State::Error)
+                    .description("desc")
+                    .build(),
+                r#"{"state":"error","description":"desc"}"#,
+            ),
+            (
+                StatusOptions::builder(State::Failure)
+                    .target_url("http://acme.com")
+                    .description("desc")
+                    .build(),
+                r#"{"state":"failure","target_url":"http://acme.com","description":"desc"}"#,
+            ),
+        ];
         test_encoding(tests)
     }
 

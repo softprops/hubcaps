@@ -4,8 +4,8 @@ extern crate serde_json;
 use futures::future;
 use hyper::client::connect::Connect;
 
-use {Future, Github};
 use users::User;
+use {Future, Github};
 
 /// Provides access to assets for a release.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
@@ -202,7 +202,8 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     where
         S: Into<String>,
     {
-        self.github.get(&self.path(&format!("/tags/{}", tag_name.into())))
+        self.github
+            .get(&self.path(&format!("/tags/{}", tag_name.into())))
     }
 
     /// Get a reference to a specific release associated with a repository

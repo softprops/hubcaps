@@ -2,10 +2,10 @@
 
 use std;
 use std::env;
-use std::fmt::Debug;
-use std::io;
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::fs;
+use std::io;
 use std::path::{Path, PathBuf};
 
 use hyper::Uri;
@@ -43,9 +43,15 @@ impl Clone for BoxedHttpCache {
 pub struct NoCache;
 
 impl HttpCache for NoCache {
-    fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> { Ok(()) }
-    fn lookup_etag(&self, _uri: &str) -> Result<String> { no_read("No etag cached") }
-    fn lookup_body(&self, _uri: &str) -> Result<String> { no_read("No body cached") }
+    fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> {
+        Ok(())
+    }
+    fn lookup_etag(&self, _uri: &str) -> Result<String> {
+        no_read("No etag cached")
+    }
+    fn lookup_body(&self, _uri: &str) -> Result<String> {
+        no_read("No body cached")
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -81,7 +87,11 @@ fn cache_path<S: AsRef<OsStr>>(dir: &Path, uri: &str, extension: S) -> PathBuf {
     let mut path = dir.to_path_buf();
     path.push("v1");
     path.push(uri.scheme_part().expect("Expected a URI scheme").as_ref()); // https
-    path.push(uri.authority_part().expect("Expected a URI authority").as_ref()); // api.github.com
+    path.push(
+        uri.authority_part()
+            .expect("Expected a URI authority")
+            .as_ref(),
+    ); // api.github.com
     path.push(
         Path::new(uri.path()) // /users/dwijnand/repos
             .strip_prefix("/")
@@ -108,8 +118,8 @@ pub trait HttpCacheClone {
 }
 
 impl<T> HttpCacheClone for T
-    where
-        T: 'static + HttpCache + Clone + Send,
+where
+    T: 'static + HttpCache + Clone + Send,
 {
     fn box_clone(&self) -> BoxedHttpCache {
         Box::new(self.clone())

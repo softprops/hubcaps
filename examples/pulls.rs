@@ -21,11 +21,10 @@ fn main() -> Result<()> {
             );
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
-            rt.block_on(
-                pulls
-                    .iter(&Default::default())
-                    .for_each(|pull| Ok(println!("{:#?}", pull))),
-            )?;
+            rt.block_on(pulls.iter(&Default::default()).for_each(|pull| {
+                println!("{:#?}", pull);
+                Ok(())
+            }))?;
 
             println!("comments");
             for c in rt.block_on(
@@ -47,7 +46,10 @@ fn main() -> Result<()> {
                     .get(28)
                     .commits()
                     .iter()
-                    .for_each(|c| Ok(println!("{:#?}", c))),
+                    .for_each(|c| {
+                        println!("{:#?}", c);
+                        Ok(())
+                    }),
             )?;
             Ok(())
         }

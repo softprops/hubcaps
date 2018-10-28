@@ -23,9 +23,11 @@ fn main() -> Result<()> {
             }
 
             match rt.block_on(
-                github
-                    .users()
-                    .get(env::var("GH_USERNAME").ok().unwrap_or("bors".into())),
+                github.users().get(
+                    env::var("GH_USERNAME")
+                        .ok()
+                        .unwrap_or_else(|| "bors".into()),
+                ),
             ) {
                 Ok(user) => println!("{:#?}", user),
                 Err(err) => println!("err {:#?}", err),

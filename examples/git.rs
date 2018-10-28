@@ -17,12 +17,13 @@ fn main() -> Result<()> {
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             );
-            for file in rt.block_on(
-                github
-                    .repo("softprops", "hubcaps")
-                    .git()
-                    .tree("master", true),
-            )?
+            if let Some(file) = rt
+                .block_on(
+                    github
+                        .repo("softprops", "hubcaps")
+                        .git()
+                        .tree("master", true),
+                )?
                 .tree
                 .iter()
                 .find(|file| file.path == "README.md")

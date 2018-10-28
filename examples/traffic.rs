@@ -32,21 +32,11 @@ fn main() -> Result<()> {
             }
 
             println!("Views per day");
-            let views = rt.block_on(
-                github
-                    .repo(owner, repo)
-                    .traffic()
-                    .views(TimeUnit::Day),
-            )?;
+            let views = rt.block_on(github.repo(owner, repo).traffic().views(TimeUnit::Day))?;
             println!("{:#?}", views);
 
             println!("Clones per day");
-            let clones = rt.block_on(
-                github
-                    .repo(owner, repo)
-                    .traffic()
-                    .clones(TimeUnit::Day),
-            )?;
+            let clones = rt.block_on(github.repo(owner, repo).traffic().clones(TimeUnit::Day))?;
             println!("{:#?}", clones);
             Ok(())
         }

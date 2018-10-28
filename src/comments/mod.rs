@@ -3,12 +3,12 @@
 extern crate futures;
 extern crate serde_json;
 
-use {Future, Github};
 use futures::future;
 use hyper::client::connect::Connect;
 use std::collections::HashMap;
 use url::form_urlencoded;
 use users::User;
+use {Future, Github};
 
 /// A structure for interfacing with a issue comments
 pub struct Comments<C>
