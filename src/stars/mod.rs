@@ -1,8 +1,8 @@
 //! Stars interface
 
+use futures::Future as StdFuture;
 use hyper::client::connect::Connect;
 use hyper::StatusCode;
-use futures::Future as StdFuture;
 
 use {Error, ErrorKind, Future, Github};
 

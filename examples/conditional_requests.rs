@@ -4,9 +4,9 @@ extern crate hyper;
 extern crate hyper_tls;
 extern crate tokio;
 
+use hyper::Client;
 use hyper_tls::HttpsConnector;
 use tokio::runtime::Runtime;
-use hyper::Client;
 
 use hubcaps::{Github, HttpCache, Result};
 

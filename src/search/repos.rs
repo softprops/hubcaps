@@ -24,7 +24,8 @@ impl fmt::Display for ReposSort {
             ReposSort::Stars => "stars",
             ReposSort::Forks => "forks",
             ReposSort::Updated => "updated",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

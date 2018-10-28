@@ -32,7 +32,8 @@ impl fmt::Display for IssuesSort {
             IssuesSort::Comments => "comments",
             IssuesSort::Created => "created",
             IssuesSort::Updated => "updated",
-        }.fmt(f)
+        }
+        .fmt(f)
     }
 }
 

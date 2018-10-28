@@ -6,10 +6,10 @@ extern crate serde_json;
 use std::collections::HashMap;
 
 use futures::future;
-use url::form_urlencoded;
-use serde;
 use hyper::client::connect::Connect;
+use serde;
 use statuses::State;
+use url::form_urlencoded;
 use users::User;
 
 use {Future, Github};
@@ -423,14 +423,14 @@ mod tests {
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .build(),
-                r#"{"state":"pending","target_url":"http://host.com"}"#
+                r#"{"state":"pending","target_url":"http://host.com"}"#,
             ),
             (
                 DeploymentStatusOptions::builder(State::Pending)
                     .target_url("http://host.com")
                     .description("desc")
                     .build(),
-                r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#
+                r#"{"state":"pending","target_url":"http://host.com","description":"desc"}"#,
             ),
         ];
         test_encoding(tests)

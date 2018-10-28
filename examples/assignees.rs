@@ -10,34 +10,34 @@ use tokio::runtime::Runtime;
 use hubcaps::{Credentials, Github, Result};
 
 fn main() -> Result<()> {
-  drop(env_logger::init());
-  match env::var("GITHUB_TOKEN").ok() {
-    Some(token) => {
-      let mut rt = Runtime::new()?;
-      let github = Github::new(
-        concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-        Credentials::Token(token),
-      );
-      let pull = rt.block_on(
-        github
-          .repo("softprops", "hubcaps")
-          .pulls()
-          .get(122)
-          .assignees()
-          .add(vec!["softprops"]),
-      )?;
-      println!("{:#?}", pull);
+    drop(env_logger::init());
+    match env::var("GITHUB_TOKEN").ok() {
+        Some(token) => {
+            let mut rt = Runtime::new()?;
+            let github = Github::new(
+                concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+                Credentials::Token(token),
+            );
+            let pull = rt.block_on(
+                github
+                    .repo("softprops", "hubcaps")
+                    .pulls()
+                    .get(122)
+                    .assignees()
+                    .add(vec!["softprops"]),
+            )?;
+            println!("{:#?}", pull);
 
-      let issue = rt.block_on(
-        github
-          .repo("softprops", "hubcaps")
-          .issues()
-          .get(125)
-          .assignees()
-          .add(vec!["softprops"]),
-      )?;
-      Ok(println!("{:#?}", issue))
+            let issue = rt.block_on(
+                github
+                    .repo("softprops", "hubcaps")
+                    .issues()
+                    .get(125)
+                    .assignees()
+                    .add(vec!["softprops"]),
+            )?;
+            Ok(println!("{:#?}", issue))
+        }
+        _ => Err("example missing GITHUB_TOKEN".into()),
     }
-    _ => Err("example missing GITHUB_TOKEN".into()),
-  }
 }
