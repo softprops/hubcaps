@@ -75,7 +75,7 @@
 //!
 //! ```toml
 //! [dependencies.hubcaps]
-//!  version = "0.5.0"
+//!  version = "..."
 //!  default-features = false
 //!  features = ["tls","httpcache"]
 //! ```
