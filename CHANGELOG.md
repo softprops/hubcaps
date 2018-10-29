@@ -26,6 +26,22 @@ after
 * add experimental features for http [etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) caching [#151](https://github.com/softprops/hubcaps/pull/151) [#160](https://github.com/softprops/hubcaps/pull/160)
 
 This allows clients to keep a local cache of response data to avoid the need to download responses when data hasn't changed
+This features is currently behind a feature flag until its stabalized.
+
+You can find an example in this repo with
+
+```sh
+$ cargo run --no-default-features --features tls,httpcache --example conditional_requests
+```
+
+To enable this feature in your application dependencies add the following to you're `Cargo.toml` file
+
+```toml
+[dependencies.hubcaps]
+version = "0.5.0"
+default-features = false
+features = ["tls","httpcache"]
+```
 
 * add `pull_request` field to issue struct [#156](https://github.com/softprops/hubcaps/pull/156)
 * improve contents API [#155](https://github.com/softprops/hubcaps/pull/155)

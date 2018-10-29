@@ -63,6 +63,26 @@
 //! Github's rate limits, enable debug looking and look for "x-rate-limit"
 //! log patterns sourced from this crate
 //!
+//! # Features
+//!
+//! ## httpcache
+//!
+//! Github supports conditional HTTP requests using etags to checksum responses
+//! Experimental support for utilizing this to cache responses locally with the
+//! `httpcache` feature flag
+//!
+//! To enable this, add the following to your `Cargo.toml` file
+//!
+//! ```toml
+//! [dependencies.hubcaps]
+//!  version = "0.5.0"
+//!  default-features = false
+//!  features = ["tls","httpcache"]
+//! ```
+//!
+//! Then use the `Github::custom` constructor to provide a cache implementation. See
+//! the conditional_requests example in this crates github repository for an example usage
+//!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
 #[macro_use]
@@ -90,7 +110,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
-use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, IF_NONE_MATCH, LINK, LOCATION, USER_AGENT};
+#[cfg(feature = "httpcache")]
+use hyper::header::IF_NONE_MATCH;
+use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
 use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
@@ -99,6 +121,7 @@ use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
 
+#[cfg(feature = "httpcache")]
 mod http_cache;
 #[macro_use]
 mod macros; // expose json! macro to child modules
@@ -130,6 +153,7 @@ pub mod traffic;
 pub mod users;
 
 pub use errors::{Error, ErrorKind, Result};
+#[cfg(feature = "httpcache")]
 pub use http_cache::{BoxedHttpCache, HttpCache};
 
 use activity::Activity;
@@ -230,6 +254,7 @@ where
     agent: String,
     client: Client<C>,
     credentials: Option<Credentials>,
+    #[cfg(feature = "httpcache")]
     http_cache: BoxedHttpCache,
 }
 
@@ -251,7 +276,14 @@ impl Github<HttpsConnector<HttpConnector>> {
     {
         let connector = HttpsConnector::new(4).unwrap();
         let http = Client::builder().keep_alive(true).build(connector);
-        Self::custom(host, agent, credentials, http, HttpCache::noop())
+        #[cfg(feature = "httpcache")]
+        {
+            Self::custom(host, agent, credentials, http, HttpCache::noop())
+        }
+        #[cfg(not(feature = "httpcache"))]
+        {
+            Self::custom(host, agent, credentials, http)
+        }
     }
 }
 
@@ -259,6 +291,7 @@ impl<C> Github<C>
 where
     C: Clone + Connect + 'static,
 {
+    #[cfg(feature = "httpcache")]
     pub fn custom<H, A, CR>(
         host: H,
         agent: A,
@@ -277,6 +310,21 @@ where
             client: http,
             credentials: credentials.into(),
             http_cache,
+        }
+    }
+
+    #[cfg(not(feature = "httpcache"))]
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
+    where
+        H: Into<String>,
+        A: Into<String>,
+        CR: Into<Option<Credentials>>,
+    {
+        Self {
+            host: host.into(),
+            agent: agent.into(),
+            client: http,
+            credentials: credentials.into(),
         }
     }
 
@@ -391,15 +439,19 @@ where
             uri.parse().into_future()
         };
         let instance = self.clone();
+        #[cfg(feature = "httpcache")]
         let uri2 = uri.clone();
         let body2 = body.clone();
         let method2 = method.clone();
         let response = url.map_err(Error::from).and_then(move |url| {
             let mut req = Request::builder();
 
-            if method2 == Method::GET {
-                if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
-                    req.header(IF_NONE_MATCH, etag);
+            #[cfg(feature = "httpcache")]
+            {
+                if method2 == Method::GET {
+                    if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
+                        req.header(IF_NONE_MATCH, etag);
+                    }
                 }
             }
 
@@ -432,6 +484,7 @@ where
             if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
                 debug!("x-rate-limit-limit: {:?}", value)
             }
+            #[cfg(feature = "httpcache")]
             let etag = response
                 .headers()
                 .get(ETAG)
@@ -485,29 +538,41 @@ where
                                 "response payload {}",
                                 String::from_utf8_lossy(&response_body)
                             );
-                            if let Some(etag) = etag {
-                                if let Err(e) = instance2.http_cache.cache_body_and_etag(
-                                    &uri,
-                                    &response_body,
-                                    &etag,
-                                ) {
-                                    // failing to cache isn't fatal, so just log & swallow the error
-                                    debug!("Failed to cache body & etag: {}", e);
+                            #[cfg(feature = "httpcache")]
+                            {
+                                if let Some(etag) = etag {
+                                    if let Err(e) = instance2.http_cache.cache_body_and_etag(
+                                        &uri,
+                                        &response_body,
+                                        &etag,
+                                    ) {
+                                        // failing to cache isn't fatal, so just log & swallow the error
+                                        debug!("Failed to cache body & etag: {}", e);
+                                    }
                                 }
                             }
                             serde_json::from_slice::<Out>(&response_body)
                                 .map(|out| (link, out))
                                 .map_err(|error| ErrorKind::Codec(error).into())
                         } else if status == StatusCode::NOT_MODIFIED {
-                            instance2
-                                .http_cache
-                                .lookup_body(&uri)
-                                .map_err(Error::from)
-                                .and_then(|body| {
-                                    serde_json::from_str::<Out>(&body)
-                                        .map(|out| (link, out))
-                                        .map_err(|error| ErrorKind::Codec(error).into())
-                                })
+                            // only supported case is when client provides if-none-matche
+                            // header when cargo builds with --cfg feature="httpcache"
+                            #[cfg(feature = "httpcache")]
+                            {
+                                instance2
+                                    .http_cache
+                                    .lookup_body(&uri)
+                                    .map_err(Error::from)
+                                    .and_then(|body| {
+                                        serde_json::from_str::<Out>(&body)
+                                            .map(|out| (link, out))
+                                            .map_err(|error| ErrorKind::Codec(error).into())
+                                    })
+                            }
+                            #[cfg(not(feature = "httpcache"))]
+                            {
+                                unreachable!("this should not be reachable without the httpcache feature enabled")
+                            }
                         } else {
                             let error = match (remaining, reset) {
                                 (Some(remaining), Some(reset)) if remaining == 0 => {
