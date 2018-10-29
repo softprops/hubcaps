@@ -218,7 +218,7 @@ pub struct ThreadListOptions {
 
 impl ThreadListOptions {
     pub fn builder() -> ThreadListOptionsBuilder {
-        ThreadListOptionsBuilder::new()
+        ThreadListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -238,10 +238,6 @@ impl ThreadListOptions {
 pub struct ThreadListOptionsBuilder(ThreadListOptions);
 
 impl ThreadListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     /// if `true`, show notifications marked as read. Default: `false`
     pub fn all(&mut self, all: bool) -> &mut Self {
         self.0.params.insert("all", all.to_string());

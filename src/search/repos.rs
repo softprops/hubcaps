@@ -87,7 +87,7 @@ pub struct SearchReposOptions {
 
 impl SearchReposOptions {
     pub fn builder() -> SearchReposOptionsBuilder {
-        SearchReposOptionsBuilder::new()
+        SearchReposOptionsBuilder::default()
     }
 
     pub fn serialize(&self) -> Option<String> {
@@ -106,10 +106,6 @@ impl SearchReposOptions {
 pub struct SearchReposOptionsBuilder(SearchReposOptions);
 
 impl SearchReposOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn per_page(&mut self, n: usize) -> &mut Self {
         self.0.params.insert("per_page", n.to_string());
         self
