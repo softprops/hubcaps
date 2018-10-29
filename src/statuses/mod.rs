@@ -90,7 +90,7 @@ pub struct StatusOptionsBuilder(StatusOptions);
 
 impl StatusOptionsBuilder {
     #[doc(hidden)]
-    pub fn new(state: State) -> Self {
+    pub(crate) fn new(state: State) -> Self {
         StatusOptionsBuilder(StatusOptions {
             state,
             ..Default::default()

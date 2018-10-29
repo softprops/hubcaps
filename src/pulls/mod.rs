@@ -280,12 +280,8 @@ pub struct Commit {
 pub struct PullEditOptionsBuilder(PullEditOptions);
 
 impl PullEditOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     /// set the title of the pull
-    pub fn title<T>(&mut self, title: T) -> &mut PullEditOptionsBuilder
+    pub fn title<T>(&mut self, title: T) -> &mut Self
     where
         T: Into<String>,
     {
@@ -294,7 +290,7 @@ impl PullEditOptionsBuilder {
     }
 
     /// set the body of the pull
-    pub fn body<B>(&mut self, body: B) -> &mut PullEditOptionsBuilder
+    pub fn body<B>(&mut self, body: B) -> &mut Self
     where
         B: Into<String>,
     {
@@ -303,7 +299,7 @@ impl PullEditOptionsBuilder {
     }
 
     /// set the state of the pull
-    pub fn state<S>(&mut self, state: S) -> &mut PullEditOptionsBuilder
+    pub fn state<S>(&mut self, state: S) -> &mut Self
     where
         S: Into<String>,
     {
@@ -346,7 +342,7 @@ impl PullEditOptions {
         }
     }
     pub fn builder() -> PullEditOptionsBuilder {
-        PullEditOptionsBuilder::new()
+        PullEditOptionsBuilder::default()
     }
 }
 
@@ -399,7 +395,7 @@ pub struct PullListOptions {
 
 impl PullListOptions {
     pub fn builder() -> PullListOptionsBuilder {
-        PullListOptionsBuilder::new()
+        PullListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -419,21 +415,17 @@ impl PullListOptions {
 pub struct PullListOptionsBuilder(PullListOptions);
 
 impl PullListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn state(&mut self, state: State) -> &mut PullListOptionsBuilder {
+    pub fn state(&mut self, state: State) -> &mut Self {
         self.0.params.insert("state", state.to_string());
         self
     }
 
-    pub fn sort(&mut self, sort: IssueSort) -> &mut PullListOptionsBuilder {
+    pub fn sort(&mut self, sort: IssueSort) -> &mut Self {
         self.0.params.insert("sort", sort.to_string());
         self
     }
 
-    pub fn direction(&mut self, direction: SortDirection) -> &mut PullListOptionsBuilder {
+    pub fn direction(&mut self, direction: SortDirection) -> &mut Self {
         self.0.params.insert("direction", direction.to_string());
         self
     }

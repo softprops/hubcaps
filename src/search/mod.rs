@@ -144,7 +144,7 @@ pub struct SearchIssuesOptions {
 
 impl SearchIssuesOptions {
     pub fn builder() -> SearchIssuesOptionsBuilder {
-        SearchIssuesOptionsBuilder::new()
+        SearchIssuesOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -165,10 +165,6 @@ impl SearchIssuesOptions {
 pub struct SearchIssuesOptionsBuilder(SearchIssuesOptions);
 
 impl SearchIssuesOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn per_page(&mut self, n: usize) -> &mut Self {
         self.0.params.insert("per_page", n.to_string());
         self

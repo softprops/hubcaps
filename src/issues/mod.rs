@@ -330,7 +330,7 @@ pub struct IssueListOptions {
 
 impl IssueListOptions {
     pub fn builder() -> IssueListOptionsBuilder {
-        IssueListOptionsBuilder::new()
+        IssueListOptionsBuilder::default()
     }
 
     pub fn serialize(&self) -> Option<String> {
@@ -350,10 +350,6 @@ impl IssueListOptions {
 pub struct IssueListOptionsBuilder(IssueListOptions);
 
 impl IssueListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn state(&mut self, state: State) -> &mut Self {
         self.0.params.insert("state", state.to_string());
         self
@@ -551,12 +547,12 @@ mod tests {
 
     #[test]
     fn sort_display() {
-        for (k, v) in vec![
+        for (k, v) in &[
             (Sort::Created, "created"),
             (Sort::Updated, "updated"),
             (Sort::Comments, "comments"),
         ] {
-            assert_eq!(k.to_string(), v)
+            assert_eq!(k.to_string(), *v)
         }
     }
 }

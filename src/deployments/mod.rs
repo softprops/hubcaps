@@ -164,17 +164,17 @@ impl DeploymentOptions {
 pub struct DeploymentOptionsBuilder(DeploymentOptions);
 
 impl DeploymentOptionsBuilder {
-    pub fn new<C>(commit: C) -> DeploymentOptionsBuilder
+    pub(crate) fn new<C>(commit: C) -> DeploymentOptionsBuilder
     where
         C: Into<String>,
     {
         DeploymentOptionsBuilder(DeploymentOptions {
             commit_ref: commit.into(),
-            ..Default::default()
+            ..DeploymentOptions::default()
         })
     }
 
-    pub fn task<T>(&mut self, task: T) -> &mut DeploymentOptionsBuilder
+    pub fn task<T>(&mut self, task: T) -> &mut Self
     where
         T: Into<String>,
     {
@@ -182,12 +182,12 @@ impl DeploymentOptionsBuilder {
         self
     }
 
-    pub fn auto_merge(&mut self, auto_merge: bool) -> &mut DeploymentOptionsBuilder {
+    pub fn auto_merge(&mut self, auto_merge: bool) -> &mut Self {
         self.0.auto_merge = Some(auto_merge);
         self
     }
 
-    pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut DeploymentOptionsBuilder
+    pub fn required_contexts<C>(&mut self, ctxs: Vec<C>) -> &mut Self
     where
         C: Into<String>,
     {
@@ -196,12 +196,12 @@ impl DeploymentOptionsBuilder {
         self
     }
 
-    pub fn payload<T: serde::ser::Serialize>(&mut self, pl: T) -> &mut DeploymentOptionsBuilder {
+    pub fn payload<T: serde::ser::Serialize>(&mut self, pl: T) -> &mut Self {
         self.0.payload = serde_json::ser::to_string(&pl).ok();
         self
     }
 
-    pub fn environment<E>(&mut self, env: E) -> &mut DeploymentOptionsBuilder
+    pub fn environment<E>(&mut self, env: E) -> &mut Self
     where
         E: Into<String>,
     {
@@ -209,7 +209,7 @@ impl DeploymentOptionsBuilder {
         self
     }
 
-    pub fn description<D>(&mut self, desc: D) -> &mut DeploymentOptionsBuilder
+    pub fn description<D>(&mut self, desc: D) -> &mut Self
     where
         D: Into<String>,
     {
@@ -247,7 +247,7 @@ pub struct DeploymentStatus {
 pub struct DeploymentStatusOptionsBuilder(DeploymentStatusOptions);
 
 impl DeploymentStatusOptionsBuilder {
-    pub fn new(state: State) -> DeploymentStatusOptionsBuilder {
+    pub(crate) fn new(state: State) -> DeploymentStatusOptionsBuilder {
         DeploymentStatusOptionsBuilder(DeploymentStatusOptions {
             state,
             ..Default::default()
@@ -302,7 +302,7 @@ pub struct DeploymentListOptions {
 impl DeploymentListOptions {
     /// return a new instance of a builder for options
     pub fn builder() -> DeploymentListOptionsBuilder {
-        DeploymentListOptionsBuilder::new()
+        DeploymentListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -322,11 +322,7 @@ impl DeploymentListOptions {
 pub struct DeploymentListOptionsBuilder(DeploymentListOptions);
 
 impl DeploymentListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn sha<S>(&mut self, s: S) -> &mut DeploymentListOptionsBuilder
+    pub fn sha<S>(&mut self, s: S) -> &mut Self
     where
         S: Into<String>,
     {
@@ -334,7 +330,7 @@ impl DeploymentListOptionsBuilder {
         self
     }
 
-    pub fn commit_ref<G>(&mut self, r: G) -> &mut DeploymentListOptionsBuilder
+    pub fn commit_ref<G>(&mut self, r: G) -> &mut Self
     where
         G: Into<String>,
     {
@@ -342,7 +338,7 @@ impl DeploymentListOptionsBuilder {
         self
     }
 
-    pub fn task<T>(&mut self, t: T) -> &mut DeploymentListOptionsBuilder
+    pub fn task<T>(&mut self, t: T) -> &mut Self
     where
         T: Into<String>,
     {
@@ -350,7 +346,7 @@ impl DeploymentListOptionsBuilder {
         self
     }
 
-    pub fn environment<E>(&mut self, e: E) -> &mut DeploymentListOptionsBuilder
+    pub fn environment<E>(&mut self, e: E) -> &mut Self
     where
         E: Into<String>,
     {
