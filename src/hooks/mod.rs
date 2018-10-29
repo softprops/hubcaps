@@ -346,11 +346,11 @@ mod tests {
 
     #[test]
     fn webhook_content_type_display() {
-        for (ct, expect) in vec![
+        for (ct, expect) in &[
             (WebHookContentType::Form, "form"),
             (WebHookContentType::Json, "json"),
         ] {
-            assert_eq!(ct.to_string(), expect)
+            assert_eq!(ct.to_string(), *expect)
         }
     }
 

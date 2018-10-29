@@ -13,7 +13,7 @@ use hubcaps::{Credentials, Github, Result};
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 fn main() -> Result<()> {
-    drop(env_logger::init());
+    env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;

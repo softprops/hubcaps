@@ -551,12 +551,12 @@ mod tests {
 
     #[test]
     fn sort_display() {
-        for (k, v) in vec![
+        for (k, v) in &[
             (Sort::Created, "created"),
             (Sort::Updated, "updated"),
             (Sort::Comments, "comments"),
         ] {
-            assert_eq!(k.to_string(), v)
+            assert_eq!(k.to_string(), *v)
         }
     }
 }
