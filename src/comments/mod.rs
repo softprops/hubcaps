@@ -83,7 +83,7 @@ pub struct CommentListOptions {
 
 impl CommentListOptions {
     pub fn builder() -> CommentListOptionsBuilder {
-        CommentListOptionsBuilder::new()
+        CommentListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -103,11 +103,7 @@ impl CommentListOptions {
 pub struct CommentListOptionsBuilder(CommentListOptions);
 
 impl CommentListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn since<S>(&mut self, since: S) -> &mut CommentListOptionsBuilder
+    pub fn since<S>(&mut self, since: S) -> &mut Self
     where
         S: Into<String>,
     {

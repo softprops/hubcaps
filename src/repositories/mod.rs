@@ -588,7 +588,7 @@ pub struct RepoOptions {
 pub struct RepoOptionsBuilder(RepoOptions);
 
 impl RepoOptionsBuilder {
-    pub fn new<N>(name: N) -> Self
+    pub(crate) fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
@@ -726,7 +726,7 @@ pub struct RepoListOptions {
 
 impl RepoListOptions {
     pub fn builder() -> RepoListOptionsBuilder {
-        RepoListOptionsBuilder::new()
+        RepoListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -746,10 +746,6 @@ impl RepoListOptions {
 pub struct RepoListOptionsBuilder(RepoListOptions);
 
 impl RepoListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn per_page(&mut self, n: usize) -> &mut Self {
         self.0.params.insert("per_page", n.to_string());
         self
@@ -871,7 +867,7 @@ impl RepoEditOptions {
 pub struct RepoEditOptionsBuilder(RepoEditOptions);
 
 impl RepoEditOptionsBuilder {
-    pub fn new<N>(name: N) -> Self
+    pub(crate) fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
@@ -964,7 +960,7 @@ pub struct OrgRepoListOptions {
 
 impl OrgRepoListOptions {
     pub fn builder() -> OrgRepoListOptionsBuilder {
-        OrgRepoListOptionsBuilder::new()
+        OrgRepoListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -984,10 +980,6 @@ impl OrgRepoListOptions {
 pub struct OrgRepoListOptionsBuilder(OrgRepoListOptions);
 
 impl OrgRepoListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn per_page(&mut self, n: usize) -> &mut Self {
         self.0.params.insert("per_page", n.to_string());
         self
@@ -1012,7 +1004,7 @@ pub struct UserRepoListOptions {
 
 impl UserRepoListOptions {
     pub fn builder() -> UserRepoListOptionsBuilder {
-        UserRepoListOptionsBuilder::new()
+        UserRepoListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -1032,10 +1024,6 @@ impl UserRepoListOptions {
 pub struct UserRepoListOptionsBuilder(UserRepoListOptions);
 
 impl UserRepoListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
         self.0.params.insert("type", tpe.to_string());
         self
@@ -1078,7 +1066,7 @@ pub struct OrganizationRepoListOptions {
 
 impl OrganizationRepoListOptions {
     pub fn builder() -> OrganizationRepoListOptionsBuilder {
-        OrganizationRepoListOptionsBuilder::new()
+        OrganizationRepoListOptionsBuilder::default()
     }
 
     /// serialize options as a string. returns None if no options are defined
@@ -1098,10 +1086,6 @@ impl OrganizationRepoListOptions {
 pub struct OrganizationRepoListOptionsBuilder(OrganizationRepoListOptions);
 
 impl OrganizationRepoListOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn per_page(&mut self, n: usize) -> &mut Self {
         self.0.params.insert("per_page", n.to_string());
         self

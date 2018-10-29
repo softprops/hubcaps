@@ -275,7 +275,7 @@ pub struct ReleaseOptions {
 pub struct ReleaseOptionsBuilder(ReleaseOptions);
 
 impl ReleaseOptionsBuilder {
-    pub fn new<T>(tag: T) -> Self
+    pub(crate) fn new<T>(tag: T) -> Self
     where
         T: Into<String>,
     {

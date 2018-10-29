@@ -207,7 +207,7 @@ impl Content {
 pub struct GistOptionsBuilder(GistOptions);
 
 impl GistOptionsBuilder {
-    pub fn new<K, V>(files: HashMap<K, V>) -> GistOptionsBuilder
+    pub(crate) fn new<K, V>(files: HashMap<K, V>) -> Self
     where
         K: Clone + Hash + Eq + Into<String>,
         V: Into<String>,
@@ -222,7 +222,7 @@ impl GistOptionsBuilder {
         })
     }
 
-    pub fn description<D>(&mut self, desc: D) -> &mut GistOptionsBuilder
+    pub fn description<D>(&mut self, desc: D) -> &mut Self
     where
         D: Into<String>,
     {
@@ -230,7 +230,7 @@ impl GistOptionsBuilder {
         self
     }
 
-    pub fn public(&mut self, p: bool) -> &mut GistOptionsBuilder {
+    pub fn public(&mut self, p: bool) -> &mut Self {
         self.0.public = Some(p);
         self
     }

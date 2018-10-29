@@ -130,7 +130,7 @@ pub struct HookCreateOptionsBuilder(HookCreateOptions);
 
 impl HookCreateOptionsBuilder {
     #[doc(hidden)]
-    pub fn new<N>(name: N) -> HookCreateOptionsBuilder
+    pub(crate) fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
@@ -224,7 +224,7 @@ pub struct HookEditOptions {
 impl HookEditOptions {
     /// creates a new builder instance
     pub fn builder() -> HookEditOptionsBuilder {
-        HookEditOptionsBuilder::new()
+        HookEditOptionsBuilder::default()
     }
 }
 
@@ -232,10 +232,6 @@ impl HookEditOptions {
 pub struct HookEditOptionsBuilder(HookEditOptions);
 
 impl HookEditOptionsBuilder {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn active(&mut self, active: bool) -> &mut Self {
         self.0.active = active;
         self
