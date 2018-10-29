@@ -2,7 +2,7 @@
 
 * BREAKING CHANGE: replace `tokio-core` with `tokio`
 
-This simplifies interfaces for constructing instances as it removes the need to pass borrowed `Handle` around
+This simplifies interfaces for constructing instances as it removes the need to pass a borrowed `Handle` around
 
 before
 
