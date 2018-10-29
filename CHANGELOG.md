@@ -1,8 +1,8 @@
-# 0.5.0 (unreleased)
+# 0.5.0
 
 * BREAKING CHANGE: replace `tokio-core` with `tokio`
 
-This simplifies interfaces for constructing instances as it removes the need to pass borrowed `Handle` around
+This simplifies interfaces for constructing instances as it removes the need to pass a borrowed `Handle` around
 
 before
 
@@ -23,7 +23,7 @@ after
     Credentials::Token(token)
  );
 ```
-* add experimental features for http [etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) caching [#151](https://github.com/softprops/hubcaps/pull/151) [#160](https://github.com/softprops/hubcaps/pull/160)
+* add experimental feature for http [etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) caching [#151](https://github.com/softprops/hubcaps/pull/151) [#160](https://github.com/softprops/hubcaps/pull/160)
 
 This allows clients to keep a local cache of response data to avoid the need to download responses when data hasn't changed
 This features is currently behind a feature flag until its stabalized.
@@ -47,7 +47,6 @@ features = ["tls","httpcache"]
 * improve contents API [#155](https://github.com/softprops/hubcaps/pull/155)
 * implement repository [contributors api](https://developer.github.com/v3/repos/#list-contributors) [#154](https://github.com/softprops/hubcaps/pull/154)
 * add release helper methods to get `latest` release and `release_by_tag` [#147](https://github.com/softprops/hubcaps/pull/147)
-*
 
 
 # 0.4.10

@@ -16,7 +16,7 @@ Add the following to your `Cargo.toml` file
 
 ```toml
 [dependencies]
-hubcaps = "0.4"
+hubcaps = "0.5"
 ```
 
 ## usage
@@ -168,4 +168,4 @@ let teams = repo.teams();
 
 See [examples directory](examples/teams.rs) for examples
 
-Doug Tangren (softprops) 2015-2017
+Doug Tangren (softprops) 2015-2018
