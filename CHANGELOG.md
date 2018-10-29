@@ -1,6 +1,6 @@
 # 0.5.0
 
-* BREAKING CHANGE: replace `tokio-core` with `tokio`
+* BREAKING CHANGE: upgrade to hyper 0.12 and replace `tokio-core` with `tokio` [#136](https://github.com/softprops/hubcaps/pull/136)
 
 This simplifies interfaces for constructing instances as it removes the need to pass a borrowed `Handle` around
 
