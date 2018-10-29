@@ -1,9 +1,9 @@
 [package]
 name = "hubcaps"
-version = "0.4.10"
+version = "0.5.0"
 authors = ["softprops <d.tangren@gmail.com>"]
 description = "Rust interface for Github"
-documentation = "https://softprops.github.io/hubcaps"
+documentation = "https://docs.rs/hubcaps/"
 homepage = "https://github.com/softprops/hubcaps"
 repository = "https://github.com/softprops/hubcaps"
 keywords = ["hyper", "github"]
