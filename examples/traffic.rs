@@ -10,7 +10,7 @@ use hubcaps::traffic::TimeUnit;
 use hubcaps::{Credentials, Github, Result};
 
 fn main() -> Result<()> {
-    drop(env_logger::init());
+    env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;

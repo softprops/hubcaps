@@ -11,7 +11,7 @@ use tokio::runtime::Runtime;
 use hubcaps::{Github, HttpCache, Result};
 
 fn main() -> Result<()> {
-    drop(env_logger::init());
+    env_logger::init();
 
     let mut rt = Runtime::new()?;
 

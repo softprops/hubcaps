@@ -8,7 +8,7 @@ use tokio::runtime::Runtime;
 use hubcaps::{Github, Result};
 
 fn main() -> Result<()> {
-    drop(env_logger::init());
+    env_logger::init();
     let mut rt = Runtime::new()?;
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
