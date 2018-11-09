@@ -659,11 +659,18 @@ where
     where
         D: DeserializeOwned + 'static + Send,
     {
+        self.post_media(uri, message, MediaType::Json)
+    }
+
+    fn post_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    where
+        D: DeserializeOwned + 'static + Send,
+    {
         self.request_entity(
             Method::POST,
             &(self.host.clone() + uri),
             Some(message),
-            MediaType::Json,
+            media,
         )
     }
 
