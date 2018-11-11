@@ -85,6 +85,7 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
+extern crate dirs;
 #[macro_use]
 extern crate error_chain;
 extern crate futures;
