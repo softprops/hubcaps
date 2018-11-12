@@ -85,6 +85,7 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
+#[cfg(feature = "use_dirs")]
 extern crate dirs;
 #[macro_use]
 extern crate error_chain;
