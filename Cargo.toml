@@ -41,10 +41,8 @@ optional = true
 version = "0.3"
 
 [features]
-default = ["use_dirs", "tls"]
-# favour dirs functions over stdlib
-use_dirs = ["dirs"]
+default = ["tls"]
 # enable tls
 tls = ["hyper-tls"]
 # enable etag-based http_cache functionality
-httpcache = []
+httpcache = ["dirs"]
