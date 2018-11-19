@@ -8,6 +8,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use dirs;
 use hyper::Uri;
 
 use {Error, Result};
@@ -26,8 +27,7 @@ impl HttpCache {
     }
 
     pub fn in_home_dir() -> BoxedHttpCache {
-        #[allow(deprecated)] // TODO: Switch to the dirs crate.
-        let mut dir = env::home_dir().expect("Expected a home dir");
+        let mut dir = dirs::home_dir().expect("Expected a home dir");
         dir.push(".hubcaps/cache");
         Box::new(FileBasedCache { root: dir })
     }
