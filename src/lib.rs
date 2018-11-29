@@ -218,6 +218,15 @@ impl From<MediaType> for Mime {
     }
 }
 
+/// Controls what sort of authentication is required for this request
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum AuthenticationConstraint {
+    /// No constraint
+    Unconstrained,
+    /// Must be JWT
+    JWT,
+}
+
 /// enum representation of Github list sorting options
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SortDirection {
@@ -256,6 +265,9 @@ pub enum Credentials {
     /// background. app-id, DER key-file.
     /// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/
     JWT(JWTCredentials),
+    /// JWT-based App Installation Token
+    /// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/
+    InstallationToken(InstallationTokenGenerator),
 }
 
 /// JSON Web Token authentication mechanism
@@ -284,6 +296,10 @@ impl JWTCredentials {
             private_key: private_key,
             cache: Arc::new(Mutex::new(creds)),
         })
+    }
+
+    fn is_stale(&self) -> bool {
+        self.cache.lock().unwrap().is_stale()
     }
 
     /// Fetch a valid JWT token, regenerating it if necessary
@@ -343,6 +359,49 @@ impl ExpiringJWTCredential {
 
     fn is_stale(&self) -> bool {
         self.created_at.elapsed() >= JWT_TOKEN_REFRESH_PERIOD
+    }
+}
+
+/// A caching token "generator" which contains JWT credentials.
+///
+/// The authentication mechanism in the GitHub client library
+/// determines if the token is stale, and if so, uses the contained
+/// JWT credentials to fetch a new installation token.
+///
+/// The Mutex<Option> access key is for interior mutability.
+#[derive(Debug, Clone)]
+pub struct InstallationTokenGenerator {
+    pub installation_id: u64,
+    pub jwt_credential: Box<Credentials>,
+    access_key: Arc<Mutex<Option<String>>>,
+}
+
+impl InstallationTokenGenerator {
+    pub fn new(installation_id: u64, creds: JWTCredentials) -> InstallationTokenGenerator {
+        InstallationTokenGenerator {
+            installation_id: installation_id,
+            jwt_credential: Box::new(Credentials::JWT(creds)),
+            access_key: Arc::new(Mutex::new(None)),
+        }
+    }
+
+    fn token(&self) -> Option<String> {
+        if let Credentials::JWT(ref creds) = *self.jwt_credential {
+            if creds.is_stale() {
+                return None;
+            }
+        }
+        self.access_key.lock().unwrap().clone()
+    }
+
+    fn jwt(&self) -> &Credentials {
+        &*self.jwt_credential
+    }
+}
+
+impl PartialEq for InstallationTokenGenerator {
+    fn eq(&self, other: &InstallationTokenGenerator) -> bool {
+        self.installation_id == other.installation_id && self.jwt_credential == other.jwt_credential
     }
 }
 
@@ -428,6 +487,13 @@ where
             client: http,
             credentials: credentials.into(),
         }
+    }
+
+    pub fn set_credentials<CR>(&mut self, credentials: CR)
+    where
+        CR: Into<Option<Credentials>>,
+    {
+        self.credentials = credentials.into();
     }
 
     pub fn rate_limit(&self) -> RateLimit<C> {
@@ -524,71 +590,144 @@ where
         App::new(self.clone())
     }
 
+    fn credentials(&self, authentication: AuthenticationConstraint) -> Option<&Credentials> {
+        match (authentication, self.credentials.as_ref()) {
+            (AuthenticationConstraint::Unconstrained, creds) => creds,
+            (AuthenticationConstraint::JWT, creds @ Some(&Credentials::JWT(_))) => creds,
+            (
+                AuthenticationConstraint::JWT,
+                Some(&Credentials::InstallationToken(ref apptoken)),
+            ) => Some(apptoken.jwt()),
+            (AuthenticationConstraint::JWT, creds) => {
+                error!(
+                    "Request needs JWT authentication but only {:?} available",
+                    creds
+                );
+                None
+            }
+        }
+    }
+
     fn request<Out>(
         &self,
         method: Method,
         uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
+        authentication: AuthenticationConstraint,
     ) -> Future<(Option<Link>, Out)>
     where
         Out: DeserializeOwned + 'static + Send,
     {
-        let uri = uri.to_string();
-        let url = if let Some(Credentials::Client(ref id, ref secret)) = self.credentials {
-            let mut parsed = Url::parse(&uri).unwrap();
-            parsed
-                .query_pairs_mut()
-                .append_pair("client_id", id)
-                .append_pair("client_secret", secret);
-            parsed.to_string().parse::<Uri>().into_future()
-        } else {
-            uri.parse().into_future()
+        let parsed_uri = uri.to_string().parse::<Uri>();
+        let url_and_auth: Future<(Uri, Option<String>)> = match self.credentials(authentication) {
+            Some(&Credentials::Client(ref id, ref secret)) => {
+                let mut parsed = Url::parse(uri).unwrap();
+                parsed
+                    .query_pairs_mut()
+                    .append_pair("client_id", id)
+                    .append_pair("client_secret", secret);
+                Box::new(
+                    parsed
+                        .to_string()
+                        .parse::<Uri>()
+                        .map(|u| (u, None))
+                        .map_err(Error::from)
+                        .into_future(),
+                )
+            }
+            Some(&Credentials::Token(ref token)) => {
+                let auth = format!("token {}", token);
+                Box::new(
+                    parsed_uri
+                        .map(|u| (u, Some(auth)))
+                        .map_err(Error::from)
+                        .into_future(),
+                )
+            }
+            Some(&Credentials::JWT(ref jwt)) => {
+                let auth = format!("Bearer {}", jwt.token());
+                Box::new(
+                    parsed_uri
+                        .map(|u| (u, Some(auth)))
+                        .map_err(Error::from)
+                        .into_future(),
+                )
+            }
+            Some(&Credentials::InstallationToken(ref apptoken)) => {
+                if let Some(token) = apptoken.token() {
+                    let auth = format!("token {}", token);
+                    Box::new(
+                        parsed_uri
+                            .map(|u| (u, Some(auth)))
+                            .map_err(Error::from)
+                            .into_future(),
+                    )
+                } else {
+                    debug!("App token is stale, refreshing");
+                    let token_ref = apptoken.access_key.clone();
+                    Box::new(
+                        self.app()
+                            .make_access_token(apptoken.installation_id)
+                            .and_then(move |token| {
+                                let auth = format!("token {}", &token.token);
+                                *token_ref.lock().unwrap() = Some(token.token);
+                                parsed_uri
+                                    .map(|u| (u, Some(auth)))
+                                    .map_err(Error::from)
+                                    .into_future()
+                            }),
+                    )
+                }
+            }
+            None => Box::new(
+                parsed_uri
+                    .map(|u| (u, None))
+                    .map_err(Error::from)
+                    .into_future(),
+            ),
         };
         let instance = self.clone();
         #[cfg(feature = "httpcache")]
         let uri2 = uri.clone();
         let body2 = body.clone();
         let method2 = method.clone();
-        let response = url.map_err(Error::from).and_then(move |url| {
-            let mut req = Request::builder();
+        let response = url_and_auth
+            .map_err(Error::from)
+            .and_then(move |(url, auth)| {
+                let mut req = Request::builder();
 
-            #[cfg(feature = "httpcache")]
-            {
-                if method2 == Method::GET {
-                    if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
-                        req.header(IF_NONE_MATCH, etag);
+                #[cfg(feature = "httpcache")]
+                {
+                    if method2 == Method::GET {
+                        if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
+                            req.header(IF_NONE_MATCH, etag);
+                        }
                     }
                 }
-            }
 
-            req.method(method2).uri(url);
+                req.method(method2).uri(url);
 
-            req.header(USER_AGENT, &*instance.agent);
-            req.header(
-                ACCEPT,
-                &*format!("{}", qitem::<Mime>(From::from(media_type))),
-            );
+                req.header(USER_AGENT, &*instance.agent);
+                req.header(
+                    ACCEPT,
+                    &*format!("{}", qitem::<Mime>(From::from(media_type))),
+                );
 
-            match instance.credentials {
-                Some(Credentials::Token(ref token)) => {
-                    req.header(AUTHORIZATION, &*format!("token {}", token));
+                if let Some(auth_str) = auth {
+                    req.header(AUTHORIZATION, &*auth_str);
                 }
-                Some(Credentials::JWT(ref jwt)) => {
-                    req.header(AUTHORIZATION, &*format!("Bearer {}", jwt.token()));
-                }
-                _ => (),
-            }
 
-            let req = match body2 {
-                Some(body) => req.body(Body::from(body)),
-                None => req.body(Body::empty()),
-            };
+                let req = match body2 {
+                    Some(body) => req.body(Body::from(body)),
+                    None => req.body(Body::empty()),
+                };
+                debug!("Request: {:?}", &req);
 
-            req.map_err(Error::from)
-                .into_future()
-                .and_then(move |req| instance.client.request(req).map_err(Error::from))
-        });
+                req.map_err(Error::from)
+                    .into_future()
+                    .and_then(move |req| instance.client.request(req).map_err(Error::from))
+            });
         let instance2 = self.clone();
         Box::new(response.and_then(move |response| {
             if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
@@ -631,7 +770,7 @@ where
 
                 if let Some(location) = location {
                     debug!("redirect location {:?}", location);
-                    return instance2.request(method, &location.to_string(), body, media_type);
+                    return instance2.request(method, &location.to_string(), body, media_type, authentication);
                 }
             }
             let link = response
@@ -715,12 +854,13 @@ where
         uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
+        authentication: AuthenticationConstraint,
     ) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
         Box::new(
-            self.request(method, uri, body, media_type)
+            self.request(method, uri, body, media_type, authentication)
                 .map(|(_, entity)| entity),
         )
     }
@@ -736,7 +876,13 @@ where
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.request_entity(Method::GET, &(self.host.clone() + uri), None, media)
+        self.request_entity(
+            Method::GET,
+            &(self.host.clone() + uri),
+            None,
+            media,
+            AuthenticationConstraint::Unconstrained,
+        )
     }
 
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
@@ -748,6 +894,7 @@ where
             &(self.host.clone() + uri),
             None,
             MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
     }
 
@@ -758,6 +905,7 @@ where
                 &(self.host.clone() + uri),
                 None,
                 MediaType::Json,
+                AuthenticationConstraint::Unconstrained,
             )
             .or_else(|err| match err {
                 Error(ErrorKind::Codec(_), _) => Ok(()),
@@ -770,10 +918,21 @@ where
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.post_media(uri, message, MediaType::Json)
+        self.post_media(
+            uri,
+            message,
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
+        )
     }
 
-    fn post_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    fn post_media<D>(
+        &self,
+        uri: &str,
+        message: Vec<u8>,
+        media: MediaType,
+        authentication: AuthenticationConstraint,
+    ) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -782,6 +941,7 @@ where
             &(self.host.clone() + uri),
             Some(message),
             media,
+            authentication,
         )
     }
 
@@ -801,6 +961,7 @@ where
             &(self.host.clone() + uri),
             Some(message),
             media,
+            AuthenticationConstraint::Unconstrained,
         )
     }
 
@@ -827,6 +988,7 @@ where
             &(self.host.clone() + uri),
             Some(message),
             MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
     }
 }

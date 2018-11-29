@@ -1,10 +1,8 @@
 //! Labels interface
 
-extern crate serde_json;
-
 use hyper::client::connect::Connect;
 
-use self::super::{Future, Github, MediaType};
+use self::super::{AuthenticationConstraint, Future, Github, MediaType};
 
 pub struct App<C>
 where
@@ -26,11 +24,12 @@ where
         format!("/app{}", more)
     }
 
-    pub fn make_access_token(&self, installation_id: i32) -> Future<AccessToken> {
+    pub fn make_access_token(&self, installation_id: u64) -> Future<AccessToken> {
         self.github.post_media::<AccessToken>(
             &self.path(&format!("/installations/{}/access_tokens", installation_id)),
             Vec::new(),
             MediaType::Preview("machine-man"),
+            AuthenticationConstraint::JWT,
         )
     }
 }
