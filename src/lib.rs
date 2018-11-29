@@ -131,6 +131,7 @@ mod http_cache;
 #[macro_use]
 mod macros; // expose json! macro to child modules
 pub mod activity;
+pub mod app;
 pub mod branches;
 pub mod comments;
 pub mod content;
@@ -162,6 +163,7 @@ pub use errors::{Error, ErrorKind, Result};
 pub use http_cache::{BoxedHttpCache, HttpCache};
 
 use activity::Activity;
+use app::App;
 use gists::{Gists, UserGists};
 use organizations::{Organization, Organizations, UserOrganizations};
 use rate_limit::RateLimit;
@@ -515,6 +517,11 @@ where
         O: Into<String>,
     {
         OrganizationRepositories::new(self.clone(), org)
+    }
+
+    /// Return a reference to GitHub Apps
+    pub fn app(&self) -> App<C> {
+        App::new(self.clone())
     }
 
     fn request<Out>(
