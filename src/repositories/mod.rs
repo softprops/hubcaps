@@ -10,6 +10,7 @@ use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 
 use branches::Branches;
+use checks::CheckRuns;
 use content::Content;
 use deployments::Deployments;
 use git::Git;
@@ -419,6 +420,11 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     /// get a reference to github issues associated with this repository ref
     pub fn issues(&self) -> Issues<C> {
         Issues::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to github checks associated with this repository ref
+    pub fn checkruns(&self) -> CheckRuns<C> {
+        CheckRuns::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)
