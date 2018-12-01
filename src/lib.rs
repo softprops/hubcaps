@@ -173,9 +173,11 @@ use search::Search;
 use users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
-const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 10);
-// 9 minutes so we refresh sooner than it actually expires
-const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 9);
+// We use 9 minutes for the life to give some buffer for clock drift between
+// our clock and GitHub's. The absolute max is 10 minutes.
+const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
+// 8 minutes so we refresh sooner than it actually expires
+const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
 pub type Future<T> = Box<StdFuture<Item = T, Error = Error> + Send>;
