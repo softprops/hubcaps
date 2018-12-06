@@ -16,7 +16,7 @@ where
     repo: String,
 }
 
-impl<'a, C> CheckRuns<C>
+impl<C> CheckRuns<C>
 where
     C: Clone + Connect + 'static,
 {
