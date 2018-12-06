@@ -8,11 +8,11 @@ use std::collections::HashMap;
 use futures::future;
 use hyper::client::connect::Connect;
 use serde;
-use statuses::State;
+use crate::statuses::State;
 use url::form_urlencoded;
-use users::User;
+use crate::users::User;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 /// Interface for repository deployments
 pub struct Deployments<C>
@@ -366,7 +366,7 @@ mod tests {
     use super::{DeploymentOptions, DeploymentStatusOptions};
     use serde::ser::Serialize;
     use serde_json;
-    use statuses::State;
+    use crate::statuses::State;
     use std::collections::BTreeMap;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {

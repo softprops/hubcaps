@@ -7,7 +7,7 @@ use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 /// Team repository permissions
 #[derive(Clone, Copy)]

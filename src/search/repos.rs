@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use url::form_urlencoded;
 
 use std::fmt;
-use {Future, SortDirection, Stream};
+use crate::{Future, SortDirection, Stream};
 
 use super::{Search, SearchResult};
 use hyper::client::connect::Connect;
-use users::User;
+use crate::users::User;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {

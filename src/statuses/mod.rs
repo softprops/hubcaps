@@ -5,8 +5,8 @@ extern crate serde_json;
 
 use futures::future;
 use hyper::client::connect::Connect;
-use users::User;
-use {Future, Github};
+use crate::users::User;
+use crate::{Future, Github};
 
 /// interface for statuses associated with a repository
 pub struct Statuses<C>

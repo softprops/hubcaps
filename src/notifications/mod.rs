@@ -7,9 +7,9 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
-use users::User;
-use Future;
-use Github;
+use crate::users::User;
+use crate::Future;
+use crate::Github;
 
 /// Provides access to notifications.
 /// See the [github docs](https://developer.github.com/v3/activity/notifications/)

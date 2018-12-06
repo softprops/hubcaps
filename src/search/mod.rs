@@ -7,9 +7,9 @@ use hyper::client::connect::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
-use labels::Label;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::labels::Label;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 mod repos;
 

@@ -4,7 +4,7 @@ use futures::Future as StdFuture;
 use hyper::client::connect::Connect;
 use hyper::StatusCode;
 
-use {Error, ErrorKind, Future, Github};
+use crate::{Error, ErrorKind, Future, Github};
 
 pub struct Stars<C>
 where

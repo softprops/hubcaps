@@ -7,10 +7,10 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
-use comments::Comments;
-use labels::Label;
-use users::User;
-use {serde_json, unfold, Future, Github, SortDirection, Stream};
+use crate::comments::Comments;
+use crate::labels::Label;
+use crate::users::User;
+use crate::{serde_json, unfold, Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]

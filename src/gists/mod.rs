@@ -7,8 +7,8 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
-use users::User;
-use {serde_json, Future, Github};
+use crate::users::User;
+use crate::{serde_json, Future, Github};
 
 /// reference to gists associated with a github user
 pub struct UserGists<C>

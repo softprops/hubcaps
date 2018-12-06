@@ -9,23 +9,23 @@ use futures::future;
 use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 
-use branches::Branches;
-use checks::CheckRuns;
-use content::Content;
-use deployments::Deployments;
-use git::Git;
-use hooks::Hooks;
-use issues::{IssueRef, Issues};
-use keys::Keys;
-use labels::Labels;
-use pulls::PullRequests;
-use releases::Releases;
-use statuses::Statuses;
-use teams::RepoTeams;
-use traffic::Traffic;
-use users::Contributors;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::branches::Branches;
+use crate::checks::CheckRuns;
+use crate::content::Content;
+use crate::deployments::Deployments;
+use crate::git::Git;
+use crate::hooks::Hooks;
+use crate::issues::{IssueRef, Issues};
+use crate::keys::Keys;
+use crate::labels::Labels;
+use crate::pulls::PullRequests;
+use crate::releases::Releases;
+use crate::statuses::Statuses;
+use crate::teams::RepoTeams;
+use crate::traffic::Traffic;
+use crate::users::Contributors;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x

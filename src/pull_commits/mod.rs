@@ -2,8 +2,8 @@
 
 use hyper::client::connect::Connect;
 
-use users::User;
-use {unfold, Future, Github, Stream};
+use crate::users::User;
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

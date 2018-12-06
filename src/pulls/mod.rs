@@ -8,13 +8,13 @@ use hyper::client::connect::Connect;
 use serde_json;
 use url::form_urlencoded;
 
-use comments::Comments;
-use issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
-use labels::Label;
-use pull_commits::PullCommits;
-use review_comments::ReviewComments;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::comments::Comments;
+use crate::issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
+use crate::labels::Label;
+use crate::pull_commits::PullCommits;
+use crate::review_comments::ReviewComments;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x

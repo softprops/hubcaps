@@ -3,7 +3,7 @@ use std::fmt;
 
 use hyper::client::connect::Connect;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 /// Describes types of breakdowns of the data for views or clones
 #[derive(Clone, Copy, Debug, PartialEq)]

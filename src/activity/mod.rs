@@ -2,9 +2,9 @@
 
 use hyper::client::connect::Connect;
 
-use notifications::Notifications;
-use stars::Stars;
-use Github;
+use crate::notifications::Notifications;
+use crate::stars::Stars;
+use crate::Github;
 
 pub struct Activity<C>
 where

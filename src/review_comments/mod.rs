@@ -6,8 +6,8 @@ extern crate serde_json;
 use hyper::client::connect::Connect;
 
 use futures::future;
-use users::User;
-use {Future, Github};
+use crate::users::User;
+use crate::{Future, Github};
 
 /// A structure for interfacing with a review comments
 pub struct ReviewComments<C>

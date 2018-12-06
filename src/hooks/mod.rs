@@ -5,7 +5,7 @@
 use futures::future;
 use serde_json;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 use hyper::client::connect::Connect;
 use std::collections::BTreeMap;

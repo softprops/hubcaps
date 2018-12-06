@@ -4,7 +4,7 @@ use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

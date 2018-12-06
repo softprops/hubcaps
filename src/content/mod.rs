@@ -8,7 +8,7 @@ use hyper::client::connect::Connect;
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::de::{self, Deserialize, Deserializer, Visitor};
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

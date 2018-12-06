@@ -159,18 +159,18 @@ pub mod teams;
 pub mod traffic;
 pub mod users;
 
-pub use errors::{Error, ErrorKind, Result};
+pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
 pub use http_cache::{BoxedHttpCache, HttpCache};
 
-use activity::Activity;
-use app::App;
-use gists::{Gists, UserGists};
-use organizations::{Organization, Organizations, UserOrganizations};
-use rate_limit::RateLimit;
-use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
-use search::Search;
-use users::Users;
+use crate::activity::Activity;
+use crate::app::App;
+use crate::gists::{Gists, UserGists};
+use crate::organizations::{Organization, Organizations, UserOrganizations};
+use crate::rate_limit::RateLimit;
+use crate::repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
+use crate::search::Search;
+use crate::users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
 const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 10);
