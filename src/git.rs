@@ -152,9 +152,9 @@ mod tests {
     use serde_json;
     use std::fmt::Debug;
 
-    fn test_deserializing<T>(payload: &'static str, expected: T)
+    fn test_deserializing<'de, T>(payload: &'static str, expected: T)
     where
-        T: Debug + PartialEq + Deserialize<'_>,
+        T: Debug + PartialEq + Deserialize<'de>,
     {
         let incoming: T = serde_json::from_str(payload).unwrap();
         assert_eq!(incoming, expected)
