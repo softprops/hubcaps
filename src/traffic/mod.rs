@@ -13,7 +13,7 @@ pub enum TimeUnit {
 }
 
 impl fmt::Display for TimeUnit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             TimeUnit::Week => "week",
             TimeUnit::Day => "day",

@@ -1,6 +1,4 @@
 //! Releases interface
-extern crate serde_json;
-
 use futures::future;
 use hyper::client::connect::Connect;
 

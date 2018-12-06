@@ -1,13 +1,9 @@
-extern crate env_logger;
-extern crate hubcaps;
-extern crate jsonwebtoken as jwt;
-extern crate serde_json;
-extern crate tokio;
-
 use std::env;
 use std::fs::File;
 use std::io::Read;
 
+use env_logger;
+use serde_json;
 use tokio::runtime::Runtime;
 
 use hubcaps::checks::{

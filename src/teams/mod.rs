@@ -5,7 +5,6 @@ use std::fmt;
 
 use futures::future;
 use hyper::client::connect::Connect;
-use serde_json;
 
 use crate::{unfold, Future, Github, Stream};
 
@@ -18,7 +17,7 @@ pub enum Permission {
 }
 
 impl fmt::Display for Permission {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Permission::Pull => "pull",
             Permission::Push => "push",

@@ -1,11 +1,8 @@
 //! Review comments interface
 
-extern crate futures;
-extern crate serde_json;
-
+use futures::future;
 use hyper::client::connect::Connect;
 
-use futures::future;
 use crate::users::User;
 use crate::{Future, Github};
 

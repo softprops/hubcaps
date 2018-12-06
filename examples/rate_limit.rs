@@ -1,8 +1,4 @@
-extern crate env_logger;
-extern crate futures;
-extern crate hubcaps;
-extern crate tokio;
-
+use env_logger;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Github, Result};

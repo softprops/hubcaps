@@ -1,13 +1,8 @@
-extern crate env_logger;
-extern crate futures;
-extern crate hubcaps;
-extern crate tokio;
-
 use std::env;
 
-use tokio::runtime::Runtime;
-
+use env_logger;
 use hubcaps::{Credentials, Github, Result};
+use tokio::runtime::Runtime;
 
 fn main() -> Result<()> {
     env_logger::init();

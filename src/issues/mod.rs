@@ -24,7 +24,7 @@ pub enum State {
 }
 
 impl fmt::Display for State {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             State::Open => "open",
             State::Closed => "closed",
@@ -52,7 +52,7 @@ pub enum Sort {
 }
 
 impl fmt::Display for Sort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Sort::Created => "created",
             Sort::Updated => "updated",

@@ -1,10 +1,6 @@
-extern crate env_logger;
-extern crate futures;
-extern crate hubcaps;
-extern crate tokio;
-
 use std::env;
 
+use env_logger;
 use tokio::runtime::Runtime;
 
 use hubcaps::comments::CommentOptions;

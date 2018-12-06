@@ -1,7 +1,4 @@
 //! Repository interface
-extern crate futures;
-extern crate serde_json;
-
 use std::collections::HashMap;
 use std::fmt;
 
@@ -40,7 +37,7 @@ pub enum Visibility {
 }
 
 impl fmt::Display for Visibility {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Visibility::All => "all",
             Visibility::Public => "public",
@@ -60,7 +57,7 @@ pub enum Sort {
 }
 
 impl fmt::Display for Sort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Sort::Created => "created",
             Sort::Updated => "updated",
@@ -80,7 +77,7 @@ pub enum Affiliation {
 }
 
 impl fmt::Display for Affiliation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Affiliation::Owner => "owner",
             Affiliation::Collaborator => "collaborator",
@@ -101,7 +98,7 @@ pub enum Type {
 }
 
 impl fmt::Display for Type {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Type::All => "all",
             Type::Owner => "owner",
@@ -125,7 +122,7 @@ pub enum OrgRepoType {
 }
 
 impl fmt::Display for OrgRepoType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             OrgRepoType::All => "all",
             OrgRepoType::Public => "public",

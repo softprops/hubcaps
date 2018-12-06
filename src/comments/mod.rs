@@ -1,12 +1,10 @@
 //! Comments interface
-
-extern crate futures;
-extern crate serde_json;
+use std::collections::HashMap;
 
 use futures::future;
 use hyper::client::connect::Connect;
-use std::collections::HashMap;
 use url::form_urlencoded;
+
 use crate::users::User;
 use crate::{Future, Github};
 

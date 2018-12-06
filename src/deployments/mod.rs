@@ -1,17 +1,14 @@
 //! Deployments interface
-
-extern crate futures;
-extern crate serde_json;
-
 use std::collections::HashMap;
 
 use futures::future;
 use hyper::client::connect::Connect;
 use serde;
-use crate::statuses::State;
+use serde_json;
 use url::form_urlencoded;
-use crate::users::User;
 
+use crate::statuses::State;
+use crate::users::User;
 use crate::{Future, Github};
 
 /// Interface for repository deployments

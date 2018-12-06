@@ -2,8 +2,6 @@
 //!
 //! For more information, visit the official
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
-extern crate futures;
-extern crate serde_json;
 
 use futures::future;
 use hyper::client::connect::Connect;

@@ -194,7 +194,7 @@ impl<'de> Deserialize<'de> for DecodedContents {
         impl<'de> Visitor<'de> for DecodedContentsVisitor {
             type Value = DecodedContents;
 
-            fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f, "base64 string")
             }
 

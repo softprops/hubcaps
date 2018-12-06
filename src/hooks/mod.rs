@@ -30,7 +30,7 @@ impl Default for WebHookContentType {
 }
 
 impl fmt::Display for WebHookContentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             WebHookContentType::Form => "form",
             WebHookContentType::Json => "json",

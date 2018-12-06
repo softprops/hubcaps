@@ -1,17 +1,14 @@
-extern crate env_logger;
-extern crate hubcaps;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate tokio;
-
+use env_logger;
+#[cfg(feature = "httpcache")]
 use hyper::Client;
+#[cfg(feature = "httpcache")]
 use hyper_tls::HttpsConnector;
+#[cfg(feature = "httpcache")]
 use tokio::runtime::Runtime;
 
-use hubcaps::{Github, Result};
-
 #[cfg(feature = "httpcache")]
-use hubcaps::HttpCache;
+use hubcaps::{Github, HttpCache};
+use hubcaps::Result;
 
 fn main() -> Result<()> {
     env_logger::init();

@@ -6,9 +6,6 @@
 //! a user agent string and set of `hubcaps::Credentials`.
 //!
 //! ```no_run
-//! extern crate hubcaps;
-//! extern crate hyper;
-//!
 //! use hubcaps::{Credentials, Github};
 //!
 //! fn main() {
@@ -85,27 +82,12 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
-#[cfg(feature = "httpcache")]
-extern crate dirs;
 #[macro_use]
 extern crate error_chain;
-extern crate futures;
-extern crate http;
-extern crate hyper;
-#[cfg(feature = "tls")]
-extern crate hyper_tls;
-extern crate hyperx;
-extern crate jsonwebtoken as jwt;
-#[macro_use]
-extern crate log;
-extern crate mime;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate base64;
-extern crate percent_encoding;
-extern crate serde_json;
-extern crate url;
+#[macro_use]
+extern crate log;
 
 use std::fmt;
 use std::sync::{Arc, Mutex};
@@ -113,8 +95,8 @@ use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
+use hyper::client::connect::Connect;
 #[cfg(feature = "httpcache")]
 use hyper::header::IF_NONE_MATCH;
 use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
@@ -122,9 +104,11 @@ use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
 use hyperx::header::{qitem, Link, RelationType};
+use jsonwebtoken as jwt;
 use mime::Mime;
 use serde::de::DeserializeOwned;
-use url::Url;
+use serde_json;
+use url::{self, Url};
 
 #[cfg(feature = "httpcache")]
 mod http_cache;
@@ -178,10 +162,10 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 10);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 9);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<StdFuture<Item = T, Error = Error> + Send>;
+pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<StdStream<Item = T, Error = Error> + Send>;
+pub type Stream<T> = Box<dyn StdStream<Item = T, Error = Error> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -238,7 +222,7 @@ pub enum SortDirection {
 }
 
 impl fmt::Display for SortDirection {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             SortDirection::Asc => "asc",
             SortDirection::Desc => "desc",

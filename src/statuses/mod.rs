@@ -1,10 +1,8 @@
 //! Statuses interface
-extern crate futures;
-extern crate serde;
-extern crate serde_json;
 
 use futures::future;
 use hyper::client::connect::Connect;
+
 use crate::users::User;
 use crate::{Future, Github};
 
