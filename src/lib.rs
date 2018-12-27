@@ -622,7 +622,7 @@ where
     where
         Out: DeserializeOwned + 'static + Send,
     {
-        let parsed_uri = uri.to_string().parse::<Uri>();
+        let parsed_uri = uri.parse::<Uri>();
         let url_and_auth: Future<(Uri, Option<String>)> = match self.credentials(authentication) {
             Some(&Credentials::Client(ref id, ref secret)) => {
                 let mut parsed = Url::parse(uri).unwrap();
@@ -692,7 +692,7 @@ where
         };
         let instance = self.clone();
         #[cfg(feature = "httpcache")]
-        let uri2 = uri.clone();
+        let uri2 = uri.to_string();
         let body2 = body.clone();
         let method2 = method.clone();
         let response = url_and_auth
@@ -732,6 +732,8 @@ where
                     .and_then(move |req| instance.client.request(req).map_err(Error::from))
             });
         let instance2 = self.clone();
+        #[cfg(feature = "httpcache")]
+        let uri3 = uri.to_string();
         Box::new(response.and_then(move |response| {
             if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
                 debug!("x-github-request-id: {:?}", value)
@@ -797,7 +799,7 @@ where
                             {
                                 if let Some(etag) = etag {
                                     if let Err(e) = instance2.http_cache.cache_body_and_etag(
-                                        &uri,
+                                        &uri3,
                                         &response_body,
                                         &etag,
                                     ) {
@@ -810,13 +812,13 @@ where
                                 .map(|out| (link, out))
                                 .map_err(|error| ErrorKind::Codec(error).into())
                         } else if status == StatusCode::NOT_MODIFIED {
-                            // only supported case is when client provides if-none-matche
+                            // only supported case is when client provides if-none-match
                             // header when cargo builds with --cfg feature="httpcache"
                             #[cfg(feature = "httpcache")]
                             {
                                 instance2
                                     .http_cache
-                                    .lookup_body(&uri)
+                                    .lookup_body(&uri3)
                                     .map_err(Error::from)
                                     .and_then(|body| {
                                         serde_json::from_str::<Out>(&body)
