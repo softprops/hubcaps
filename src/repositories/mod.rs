@@ -263,29 +263,26 @@ impl<C: Clone + Connect + 'static> UserRepositories<C> {
         }
     }
 
-    fn path(&self, more: &str) -> String {
-        format!("/users/{}/repos{}", self.owner, more)
+    fn uri(&self, options: &UserRepoListOptions) -> String {
+        let mut uri = ["/users/", &self.owner, "/repos"].concat();
+        if let Some(query) = options.serialize() {
+            uri.push('?');
+            uri.push_str(&query);
+        }
+        uri
     }
 
     /// https://developer.github.com/v3/repos/#list-user-repositories
     pub fn list(&self, options: &UserRepoListOptions) -> Future<Vec<Repo>> {
-        let mut uri = vec![self.path("")];
-        if let Some(query) = options.serialize() {
-            uri.push(query);
-        }
-        self.github.get(&uri.join("?"))
+        self.github.get(&self.uri(options))
     }
 
     /// provides a stream over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
     pub fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
-        let mut uri = vec![self.path("")];
-        if let Some(query) = options.serialize() {
-            uri.push(query);
-        }
         unfold(
             self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
+            self.github.get_pages(&self.uri(options)),
             identity,
         )
     }
