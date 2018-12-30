@@ -1,7 +1,6 @@
 //! Implements <https://tools.ietf.org/html/rfc7232> Conditional Requests
 
 use std;
-use std::env;
 use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::fs;
