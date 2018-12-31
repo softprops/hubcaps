@@ -17,9 +17,16 @@ use {Error, Result};
 pub type BoxedHttpCache = Box<HttpCache + Send>;
 
 pub trait HttpCache: HttpCacheClone + Debug {
-    fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()>;
+    fn cache_response(
+        &self,
+        uri: &str,
+        body: &[u8],
+        etag: &[u8],
+        next_link: &Option<String>,
+    ) -> Result<()>;
     fn lookup_etag(&self, uri: &str) -> Result<String>;
     fn lookup_body(&self, uri: &str) -> Result<String>;
+    fn lookup_next_link(&self, uri: &str) -> Result<Option<String>>;
 }
 
 impl HttpCache {
@@ -44,7 +51,7 @@ impl Clone for BoxedHttpCache {
 pub struct NoCache;
 
 impl HttpCache for NoCache {
-    fn cache_body_and_etag(&self, _: &str, _: &[u8], _: &[u8]) -> Result<()> {
+    fn cache_response(&self, _: &str, _: &[u8], _: &[u8], _: &Option<String>) -> Result<()> {
         Ok(())
     }
     fn lookup_etag(&self, _uri: &str) -> Result<String> {
@@ -52,6 +59,9 @@ impl HttpCache for NoCache {
     }
     fn lookup_body(&self, _uri: &str) -> Result<String> {
         no_read("No body cached")
+    }
+    fn lookup_next_link(&self, _uri: &str) -> Result<Option<String>> {
+        no_read("No next link cached")
     }
 }
 
@@ -68,7 +78,13 @@ impl FileBasedCache {
 }
 
 impl HttpCache for FileBasedCache {
-    fn cache_body_and_etag(&self, uri: &str, body: &[u8], etag: &[u8]) -> Result<()> {
+    fn cache_response(
+        &self,
+        uri: &str,
+        body: &[u8],
+        etag: &[u8],
+        next_link: &Option<String>,
+    ) -> Result<()> {
         let mut path = cache_path(&self.root, &uri, "json");
         trace!("caching body at path: {}", path.display());
         if let Some(parent) = path.parent() {
@@ -77,6 +93,10 @@ impl HttpCache for FileBasedCache {
         fs::write(&path, body)?;
         path.set_extension("etag");
         fs::write(&path, etag)?;
+        if let Some(next_link) = next_link {
+            path.set_extension("next_link");
+            fs::write(&path, next_link)?;
+        }
         Ok(())
     }
 
@@ -86,6 +106,15 @@ impl HttpCache for FileBasedCache {
 
     fn lookup_body(&self, uri: &str) -> Result<String> {
         read_to_string(cache_path(&self.root, uri, "json"))
+    }
+
+    fn lookup_next_link(&self, uri: &str) -> Result<Option<String>> {
+        let path = cache_path(&self.root, uri, "next_link");
+        if path.exists() {
+            Ok(Some(read_to_string(path)?))
+        } else {
+            Ok(None)
+        }
     }
 }
 
