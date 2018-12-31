@@ -126,8 +126,9 @@ use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
 
+#[doc(hidden)] // public for doc testing only
 #[cfg(feature = "httpcache")]
-mod http_cache;
+pub mod http_cache;
 #[macro_use]
 mod macros; // expose json! macro to child modules
 pub mod activity;
