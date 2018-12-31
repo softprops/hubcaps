@@ -126,7 +126,7 @@ use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
 
-#[doc(hidden)] // public for doc testing only
+#[doc(hidden)] // public for doc testing and integration testing only
 #[cfg(feature = "httpcache")]
 pub mod http_cache;
 #[macro_use]

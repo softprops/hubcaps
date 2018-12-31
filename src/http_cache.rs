@@ -30,7 +30,7 @@ impl HttpCache {
     pub fn in_home_dir() -> BoxedHttpCache {
         let mut dir = dirs::home_dir().expect("Expected a home dir");
         dir.push(".hubcaps/cache");
-        Box::new(FileBasedCache { root: dir })
+        Box::new(FileBasedCache::new(dir))
     }
 }
 
@@ -58,6 +58,13 @@ impl HttpCache for NoCache {
 #[derive(Clone, Debug)]
 pub struct FileBasedCache {
     root: PathBuf,
+}
+
+impl FileBasedCache {
+    #[doc(hidden)] // public for integration testing only
+    pub fn new<P: Into<PathBuf>>(root: P) -> FileBasedCache {
+        FileBasedCache { root: root.into() }
+    }
 }
 
 impl HttpCache for FileBasedCache {
