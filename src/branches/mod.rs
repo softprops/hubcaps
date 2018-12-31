@@ -5,7 +5,6 @@
 extern crate futures;
 extern crate serde_json;
 
-use futures::future;
 use hyper::client::connect::Connect;
 
 use {unfold, Future, Github, Stream};

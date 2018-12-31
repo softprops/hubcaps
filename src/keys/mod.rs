@@ -3,7 +3,6 @@
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
 //! for motivation and use
 
-use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 

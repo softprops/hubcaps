@@ -5,7 +5,6 @@ extern crate serde_json;
 use std::collections::HashMap;
 use std::fmt;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 

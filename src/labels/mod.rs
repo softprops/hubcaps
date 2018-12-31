@@ -1,6 +1,5 @@
 //! Labels interface
 
-use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 

@@ -5,7 +5,6 @@ extern crate serde_json;
 
 use std::collections::HashMap;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use serde;
 use statuses::State;

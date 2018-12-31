@@ -5,7 +5,6 @@ extern crate serde_json;
 
 use hyper::client::connect::Connect;
 
-use futures::future;
 use users::User;
 use {Future, Github};
 
