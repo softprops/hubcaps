@@ -158,6 +158,7 @@ pub mod statuses;
 pub mod teams;
 pub mod traffic;
 pub mod users;
+pub mod watching;
 
 pub use errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
