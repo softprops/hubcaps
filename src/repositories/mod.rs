@@ -771,7 +771,7 @@ impl RepoListOptionsBuilder {
         self
     }
 
-    pub fn repo_type(&mut self, tpe: Sort) -> &mut Self {
+    pub fn repo_type(&mut self, tpe: Type) -> &mut Self {
         self.0.params.insert("type", tpe.to_string());
         self
     }
