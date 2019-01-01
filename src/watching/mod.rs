@@ -1,7 +1,5 @@
 //! Watching interface
 /// https://developer.github.com/v3/activity/watching
-use std::collections::HashMap;
-
 use hyper::client::connect::Connect;
 
 use repositories::Repo;
@@ -43,11 +41,9 @@ impl<C: Clone + Connect + 'static> Watching<C> {
         O: Into<String>,
         R: Into<String>,
     {
-        let mut map = HashMap::new();
-        map.insert("subscribed", true);
         self.github.put(
             &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
-            json!(map),
+            json_lit!({ "subscribed": true }),
         )
     }
 
@@ -56,11 +52,9 @@ impl<C: Clone + Connect + 'static> Watching<C> {
         O: Into<String>,
         R: Into<String>,
     {
-        let mut map = HashMap::new();
-        map.insert("ignored", true);
         self.github.put(
             &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
-            json!(map),
+            json_lit!({ "ignored": true }),
         )
     }
 

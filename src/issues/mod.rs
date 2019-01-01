@@ -99,9 +99,7 @@ impl<C: Clone + Connect + 'static> IssueAssignees<C> {
 
     /// add a set of assignees
     pub fn add(&self, assignees: Vec<&str>) -> Future<Issue> {
-        let mut payload = HashMap::new();
-        payload.insert("assignees", assignees);
-        self.github.post(&self.path(""), json!(payload))
+        self.github.post(&self.path(""), json_lit!({ "assignees": assignees }))
     }
 }
 
