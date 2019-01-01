@@ -1,9 +1,7 @@
 //! Teams interface
 
-use std::collections::BTreeMap;
 use std::fmt;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 
@@ -119,11 +117,9 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
     where
         N: Into<String>,
     {
-        let mut payload = BTreeMap::new();
-        payload.insert("permission", permission.to_string());
         self.github.put_no_response(
             &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
-            json!(payload),
+            json_lit!({ "permission": permission.to_string() }),
         )
     }
 }

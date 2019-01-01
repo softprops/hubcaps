@@ -3,7 +3,6 @@ extern crate futures;
 extern crate serde;
 extern crate serde_json;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use users::User;
 use {Future, Github};

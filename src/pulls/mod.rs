@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use serde_json;
 use url::form_urlencoded;

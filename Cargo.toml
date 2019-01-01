@@ -17,7 +17,7 @@ coveralls = { repository = "softprops/hubcaps" }
 maintenance = { status = "actively-developed" }
 
 [dev-dependencies]
-env_logger = "0.6"
+pretty_env_logger = "0.3"
 tokio = "0.1"
 
 [dependencies]

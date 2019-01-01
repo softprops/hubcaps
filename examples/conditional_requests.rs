@@ -1,4 +1,4 @@
-extern crate env_logger;
+extern crate pretty_env_logger;
 extern crate hubcaps;
 extern crate hyper;
 extern crate hyper_tls;
@@ -17,7 +17,7 @@ use hubcaps::Result;
 use hubcaps::{Github, HttpCache};
 
 fn main() -> Result<()> {
-    env_logger::init();
+    pretty_env_logger::init();
 
     #[cfg(not(feature = "httpcache"))]
     {

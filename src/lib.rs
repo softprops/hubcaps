@@ -158,6 +158,7 @@ pub mod statuses;
 pub mod teams;
 pub mod traffic;
 pub mod users;
+pub mod watching;
 
 pub use errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
@@ -721,6 +722,7 @@ where
                     req.header(AUTHORIZATION, &*auth_str);
                 }
 
+                trace!("Body: {:?}", &body2);
                 let req = match body2 {
                     Some(body) => req.body(Body::from(body)),
                     None => req.body(Body::empty()),

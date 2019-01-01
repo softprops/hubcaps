@@ -1,4 +1,4 @@
-extern crate env_logger;
+extern crate pretty_env_logger;
 extern crate hubcaps;
 extern crate tokio;
 
@@ -11,7 +11,7 @@ use hubcaps::gists::{Content, GistOptions};
 use hubcaps::{Credentials, Github, Result};
 
 fn main() -> Result<()> {
-    env_logger::init();
+    pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;

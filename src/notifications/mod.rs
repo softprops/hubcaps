@@ -3,7 +3,6 @@ extern crate serde_json;
 
 use std::collections::HashMap;
 
-use futures::future;
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
 
@@ -155,12 +154,9 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     where
         S: Into<String>,
     {
-        let mut map = HashMap::new();
-        map.insert("subscribed", true);
-
         self.github.put(
             &format!("/notifications/threads/{}/subscription", id.into()),
-            json!(map),
+            json_lit!({ "subscribed": true }),
         )
     }
 
@@ -172,12 +168,9 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     where
         S: Into<String>,
     {
-        let mut map = HashMap::new();
-        map.insert("ignored", true);
-
         self.github.put(
             &format!("/notifications/threads/{}/subscription", id.into()),
-            json!(map),
+            json_lit!({ "ignored": true }),
         )
     }
 

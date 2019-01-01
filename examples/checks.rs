@@ -1,4 +1,4 @@
-extern crate env_logger;
+extern crate pretty_env_logger;
 extern crate hubcaps;
 extern crate jsonwebtoken as jwt;
 extern crate serde_json;
@@ -27,7 +27,7 @@ fn var(name: &str) -> Result<String> {
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 fn main() -> Result<()> {
-    env_logger::init();
+    pretty_env_logger::init();
     let key_file = var("GH_APP_KEY")?;
     let app_id = var("GH_APP_ID")?;
     let user_name = var("GH_USERNAME")?;

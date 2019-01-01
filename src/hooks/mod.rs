@@ -2,7 +2,6 @@
 //!
 //! See the [github docs](https://developer.github.com/v3/repos/hooks/) for more information
 
-use futures::future;
 use serde_json;
 
 use {Future, Github};
