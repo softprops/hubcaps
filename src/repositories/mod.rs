@@ -1037,7 +1037,7 @@ impl UserRepoListOptionsBuilder {
         self
     }
 
-    pub fn sort(&mut self, sort: Type) -> &mut Self {
+    pub fn sort(&mut self, sort: Sort) -> &mut Self {
         self.0.params.insert("sort", sort.to_string());
         self
     }
