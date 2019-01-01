@@ -1,4 +1,4 @@
-extern crate env_logger;
+extern crate pretty_env_logger;
 extern crate futures;
 extern crate hubcaps;
 extern crate tokio;
@@ -13,7 +13,7 @@ use hubcaps::{Credentials, Github, Result};
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 fn main() -> Result<()> {
-    env_logger::init();
+    pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;
