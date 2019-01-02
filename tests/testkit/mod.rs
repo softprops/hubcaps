@@ -34,8 +34,10 @@ fn test_root() -> PathBuf {
             return;
         }
         i.set(true);
-        fs::remove_dir_all(&root).expect("removing root");
-        debug!("deleted root {}", root.display());
+        if root.exists() {
+            fs::remove_dir_all(&root).expect("removing root");
+            debug!("deleted root {}", root.display());
+        }
     });
 
     root
