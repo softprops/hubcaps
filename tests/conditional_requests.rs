@@ -1,4 +1,4 @@
-extern crate env_logger;
+extern crate pretty_env_logger;
 extern crate futures;
 extern crate hubcaps;
 extern crate hyper;
@@ -33,7 +33,7 @@ mod testkit;
 #[test]
 #[cfg(feature = "httpcache")]
 fn compare_counts() -> Result<()> {
-    env_logger::init();
+    pretty_env_logger::init();
 
     let mut rt = Runtime::new()?;
 
