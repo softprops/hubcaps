@@ -38,7 +38,17 @@ fn compare_counts() -> Result<()> {
     let mut rt = Runtime::new()?;
 
     let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
-    let credentials = env::var("GITHUB_TOKEN").ok().map(Credentials::Token);
+    let credentials = match env::var("GITHUB_TOKEN").ok() {
+        Some(token) => Some(Credentials::Token(token)),
+        None => {
+            if env::var("CI") == Ok(String::from("true")) {
+                println!("No GITHUB_TOKEN env var in CI, skipping test");
+                return Ok(());
+            } else {
+                None
+            }
+        }
+    };
     let owner = "octocat";
     let per_page = 5;
     let repo_list_options = UserRepoListOptions::builder().per_page(per_page).build();
