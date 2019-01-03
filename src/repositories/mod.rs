@@ -377,6 +377,11 @@ impl<C: Clone + Connect + 'static> Repository<C> {
         self.github.post(&self.path(""), json!(options))
     }
 
+    /// https://developer.github.com/v3/repos/#delete-a-repository
+    pub fn delete(&self) -> Future<()> {
+        self.github.delete(&self.path(""))
+    }
+
     /// get a reference to branch operations
     pub fn branches(&self) -> Branches<C> {
         Branches::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
