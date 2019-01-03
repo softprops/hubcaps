@@ -51,6 +51,17 @@ fn main() -> Result<()> {
                         Ok(())
                     }),
             )?;
+
+            println!("review requests");
+            println!("{:#?}",
+                     rt.block_on(
+                         github
+                             .repo("softprops", "hubcaps")
+                             .pulls()
+                             .get(190)
+                             .review_requests()
+                             .get()
+                     )?);
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),
