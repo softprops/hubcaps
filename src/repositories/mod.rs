@@ -553,7 +553,7 @@ impl Repo {
     ///
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
     where
         C: Clone + Connect + 'static,
@@ -683,7 +683,7 @@ impl RepoOptionsBuilder {
 }
 
 impl RepoOptions {
-    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
+    #[allow(clippy::too_many_arguments)] // exempted
     pub fn new<N, D, H, GI, L>(
         name: N,
         description: Option<D>,
@@ -829,7 +829,7 @@ pub struct RepoEditOptions {
 }
 
 impl RepoEditOptions {
-    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
+    #[allow(clippy::too_many_arguments)] // exempted
     pub fn new<N, D, H, DB>(
         name: N,
         description: Option<D>,

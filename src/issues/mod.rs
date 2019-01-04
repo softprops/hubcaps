@@ -134,7 +134,7 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
     }
 
     /// add a set of labels to this issue ref
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.post(&self.path(""), json!(labels))
     }
@@ -147,7 +147,7 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.put(&self.path(""), json!(labels))
     }
