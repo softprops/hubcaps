@@ -4,6 +4,7 @@ use std::fmt;
 
 use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
+use serde::{Deserialize, Serialize};
 
 use crate::branches::Branches;
 use crate::checks::CheckRuns;

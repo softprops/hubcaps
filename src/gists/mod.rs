@@ -1,10 +1,10 @@
 //! Gists interface
-
 use std::collections::HashMap;
 use std::hash::Hash;
 
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
+use serde::{Deserialize, Serialize};
 
 use crate::users::User;
 use crate::{Future, Github};

@@ -2,9 +2,8 @@
 //!
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
 //! for motivation and use
-
 use hyper::client::connect::Connect;
-use serde_json;
+use serde::{Deserialize, Serialize};
 
 use crate::{Future, Github};
 

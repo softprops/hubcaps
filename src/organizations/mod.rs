@@ -1,6 +1,6 @@
 //! Organizations interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use crate::repositories::OrgRepositories;
 use crate::teams::OrgTeams;

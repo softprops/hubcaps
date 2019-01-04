@@ -1,6 +1,6 @@
 //! Labels interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
 

@@ -4,7 +4,8 @@ use std::ops;
 
 use hyper::client::connect::Connect;
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-use serde::de::{self, Deserialize, Deserializer, Visitor};
+use serde::Deserialize;
+use serde::de::{self, Visitor};
 
 use crate::{unfold, Future, Github, Stream};
 
@@ -185,7 +186,7 @@ impl ops::Deref for DecodedContents {
 impl<'de> Deserialize<'de> for DecodedContents {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: Deserializer<'de>,
+        D: serde::Deserializer<'de>,
     {
         struct DecodedContentsVisitor;
 

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
+use serde::{Deserialize, Serialize};
 
 use crate::statuses::State;
 use crate::users::User;

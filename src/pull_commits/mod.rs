@@ -1,6 +1,6 @@
 //! Pull Commits interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use crate::users::User;
 use crate::{unfold, Future, Github, Stream};

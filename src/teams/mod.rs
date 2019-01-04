@@ -2,6 +2,7 @@
 use std::fmt;
 
 use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
 
 use crate::users::User;
 use crate::{unfold, Future, Github, Stream};

@@ -3,6 +3,7 @@ use std::fmt;
 
 use url::form_urlencoded;
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use super::{Search, SearchResult};
 use crate::{Future, SortDirection, Stream};

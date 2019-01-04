@@ -1,6 +1,6 @@
 //! Rate Limit interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use crate::{Future, Github};
 

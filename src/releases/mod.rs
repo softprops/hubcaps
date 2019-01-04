@@ -1,5 +1,6 @@
 //! Releases interface
 use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
 
 use crate::users::User;
 use crate::{Future, Github};

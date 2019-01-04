@@ -1,6 +1,7 @@
 //! Watching interface
 /// https://developer.github.com/v3/activity/watching
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use crate::repositories::Repo;
 use crate::{unfold, Future, Github, Stream};

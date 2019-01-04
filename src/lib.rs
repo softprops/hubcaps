@@ -83,7 +83,6 @@
 #![allow(missing_docs)] // todo: make this a deny eventually
 
 #[macro_use] extern crate error_chain;
-#[macro_use] extern crate serde_derive;
 
 use std::fmt;
 use std::sync::{Arc, Mutex};
@@ -106,6 +105,7 @@ use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use url::Url;
 
 #[doc(hidden)] // public for doc testing and integration testing only

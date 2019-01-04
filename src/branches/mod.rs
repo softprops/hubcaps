@@ -3,6 +3,7 @@
 //! For more information, visit the official
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
 use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
 
 use crate::{unfold, Future, Github, Stream};
 

@@ -1,7 +1,6 @@
 //! Labels interface
-
 use hyper::client::connect::Connect;
-use serde_json;
+use serde::{Deserialize, Serialize};
 
 use crate::{unfold, Future, Github, Stream};
 

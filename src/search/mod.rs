@@ -5,6 +5,7 @@ use std::fmt;
 use hyper::client::connect::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
+use serde::Deserialize;
 
 use crate::labels::Label;
 use crate::users::User;

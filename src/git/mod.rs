@@ -2,6 +2,7 @@
 
 // Third party
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 // Ours
 use crate::{Future, Github};

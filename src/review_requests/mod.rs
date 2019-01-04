@@ -1,5 +1,6 @@
 //! Review requests interface
 use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
 
 use crate::pulls::Pull;
 use crate::teams::Team;

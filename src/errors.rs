@@ -1,5 +1,4 @@
 //! Client errors
-
 use std::io::Error as IoError;
 use std::time::Duration;
 
@@ -7,6 +6,7 @@ use http::uri::InvalidUri;
 use http::Error as HttpError;
 use hyper::Error as HyperError;
 use hyper::StatusCode;
+use serde::Deserialize;
 use serde_json::error::Error as SerdeError;
 
 use crate::jwt::errors::Error as JWTError;
