@@ -20,6 +20,8 @@ script:
 - travis_wait cargo test
 - cargo run --example rate_limit
 - cargo build --features httpcache --example conditional_requests
+- cargo test --features httpcache --doc http_cache
+- cargo test --features httpcache --test conditional_requests
 
 # Cache `cargo install`ed tools, but don't cache the project's `target`
 # directory (which ends up over-caching and filling all disk space!)

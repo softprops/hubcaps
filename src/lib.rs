@@ -121,13 +121,16 @@ use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
 use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
+#[cfg(feature = "httpcache")]
+use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
 use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
 
+#[doc(hidden)] // public for doc testing and integration testing only
 #[cfg(feature = "httpcache")]
-mod http_cache;
+pub mod http_cache;
 #[macro_use]
 mod macros; // expose json! macro to child modules
 pub mod activity;
@@ -800,10 +803,12 @@ where
                             #[cfg(feature = "httpcache")]
                             {
                                 if let Some(etag) = etag {
-                                    if let Err(e) = instance2.http_cache.cache_body_and_etag(
+                                    let next_link = link.as_ref().and_then(|l| next_link(&l));
+                                    if let Err(e) = instance2.http_cache.cache_response(
                                         &uri3,
                                         &response_body,
                                         &etag,
+                                        &next_link,
                                     ) {
                                         // failing to cache isn't fatal, so just log & swallow the error
                                         debug!("Failed to cache body & etag: {}", e);
@@ -824,8 +829,20 @@ where
                                     .map_err(Error::from)
                                     .and_then(|body| {
                                         serde_json::from_str::<Out>(&body)
-                                            .map(|out| (link, out))
-                                            .map_err(|error| ErrorKind::Codec(error).into())
+                                            .map_err(Error::from)
+                                            .and_then(|out| {
+                                                let link = match link {
+                                                    Some(link) => Ok(Some(link)),
+                                                    None => instance2
+                                                        .http_cache
+                                                        .lookup_next_link(&uri3)
+                                                        .map(|next_link| next_link.map(|next| {
+                                                            let next = LinkValue::new(next).push_rel(RelationType::Next);
+                                                            Link::new(vec![next])
+                                                        }))
+                                                };
+                                                link.map(|link| (link, out))
+                                            })
                                     })
                             }
                             #[cfg(not(feature = "httpcache"))]
