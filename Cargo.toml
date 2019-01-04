@@ -10,6 +10,7 @@ keywords = ["hyper", "github"]
 license = "MIT"
 categories = ["api-bindings", "web-programming::http-client"]
 readme = "README.md"
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "softprops/hubcaps" }

@@ -6,7 +6,7 @@
 use hyper::client::connect::Connect;
 use serde_json;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 pub struct Keys<C>
 where

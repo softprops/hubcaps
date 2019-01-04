@@ -1,5 +1,4 @@
 //! Search interface
-
 use std::collections::HashMap;
 use std::fmt;
 
@@ -7,9 +6,9 @@ use hyper::client::connect::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 
-use labels::Label;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::labels::Label;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 mod repos;
 
@@ -27,7 +26,7 @@ pub enum IssuesSort {
 }
 
 impl fmt::Display for IssuesSort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             IssuesSort::Comments => "comments",
             IssuesSort::Created => "created",

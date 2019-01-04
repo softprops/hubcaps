@@ -2,12 +2,9 @@
 //!
 //! For more information, visit the official
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
-extern crate futures;
-extern crate serde_json;
-
 use hyper::client::connect::Connect;
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

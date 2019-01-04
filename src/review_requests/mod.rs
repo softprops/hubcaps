@@ -1,14 +1,10 @@
 //! Review requests interface
-
-extern crate futures;
-extern crate serde_json;
-
 use hyper::client::connect::Connect;
 
-use pulls::Pull;
-use teams::Team;
-use users::User;
-use {Future, Github};
+use crate::pulls::Pull;
+use crate::teams::Team;
+use crate::users::User;
+use crate::{Future, Github};
 
 /// A structure for interfacing with review requests
 pub struct ReviewRequests<C>

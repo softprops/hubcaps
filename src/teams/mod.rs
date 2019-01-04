@@ -1,12 +1,10 @@
 //! Teams interface
-
 use std::fmt;
 
 use hyper::client::connect::Connect;
-use serde_json;
 
-use users::User;
-use {unfold, Future, Github, Stream};
+use crate::users::User;
+use crate::{unfold, Future, Github, Stream};
 
 /// Team repository permissions
 #[derive(Clone, Copy)]
@@ -17,7 +15,7 @@ pub enum Permission {
 }
 
 impl fmt::Display for Permission {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Permission::Pull => "pull",
             Permission::Push => "push",

@@ -2,7 +2,7 @@
 
 use hyper::client::connect::Connect;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 pub struct RateLimit<C: Clone + Connect + 'static> {
     github: Github<C>,

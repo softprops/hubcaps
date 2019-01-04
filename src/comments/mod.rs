@@ -1,13 +1,11 @@
 //! Comments interface
-
-extern crate futures;
-extern crate serde_json;
+use std::collections::HashMap;
 
 use hyper::client::connect::Connect;
-use std::collections::HashMap;
 use url::form_urlencoded;
-use users::User;
-use {Future, Github};
+
+use crate::users::User;
+use crate::{Future, Github};
 
 /// A structure for interfacing with a issue comments
 pub struct Comments<C>

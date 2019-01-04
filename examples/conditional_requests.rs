@@ -1,9 +1,3 @@
-extern crate pretty_env_logger;
-extern crate hubcaps;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate tokio;
-
 #[cfg(feature = "httpcache")]
 use hyper::Client;
 #[cfg(feature = "httpcache")]

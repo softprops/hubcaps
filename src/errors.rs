@@ -7,8 +7,9 @@ use http::uri::InvalidUri;
 use http::Error as HttpError;
 use hyper::Error as HyperError;
 use hyper::StatusCode;
-use jwt::errors::Error as JWTError;
 use serde_json::error::Error as SerdeError;
+
+use crate::jwt::errors::Error as JWTError;
 
 error_chain! {
     errors {

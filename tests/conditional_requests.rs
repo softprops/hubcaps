@@ -1,12 +1,5 @@
-extern crate pretty_env_logger;
-extern crate futures;
-extern crate hubcaps;
-extern crate hyper;
-extern crate hyper_tls;
 #[cfg(feature = "httpcache")]
-#[macro_use]
-extern crate log;
-extern crate tokio;
+#[macro_use] extern crate log;
 
 #[cfg(feature = "httpcache")]
 use std::env;

@@ -1,6 +1,4 @@
 //! Implements <https://tools.ietf.org/html/rfc7232> Conditional Requests
-
-use std;
 use std::collections::hash_map::DefaultHasher;
 use std::ffi::OsStr;
 use std::fmt::Debug;
@@ -9,12 +7,11 @@ use std::hash::{Hash, Hasher};
 use std::io;
 use std::path::{Path, PathBuf};
 
-use dirs;
 use hyper::Uri;
 
-use {Error, Result};
+use crate::{Error, Result};
 
-pub type BoxedHttpCache = Box<HttpCache + Send>;
+pub type BoxedHttpCache = Box<dyn HttpCache + Send>;
 
 pub trait HttpCache: HttpCacheClone + Debug {
     fn cache_response(
@@ -29,7 +26,7 @@ pub trait HttpCache: HttpCacheClone + Debug {
     fn lookup_next_link(&self, uri: &str) -> Result<Option<String>>;
 }
 
-impl HttpCache {
+impl dyn HttpCache {
     pub fn noop() -> BoxedHttpCache {
         Box::new(NoCache)
     }
@@ -158,7 +155,7 @@ fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String> {
     fs::read_to_string(path).map_err(Error::from)
 }
 
-fn no_read<T, E: Into<Box<std::error::Error + Send + Sync>>>(error: E) -> Result<T> {
+fn no_read<T, E: Into<Box<dyn std::error::Error + Send + Sync>>>(error: E) -> Result<T> {
     Err(Error::from(io::Error::new(io::ErrorKind::NotFound, error)))
 }
 
