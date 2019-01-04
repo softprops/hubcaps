@@ -1,7 +1,4 @@
 #[cfg(feature = "httpcache")]
-#[macro_use] extern crate log;
-
-#[cfg(feature = "httpcache")]
 use {
     std::env,
 
@@ -9,6 +6,7 @@ use {
     hyper::Client,
     hyper_tls::HttpsConnector,
     tokio::runtime::Runtime,
+    log::info,
 
     hubcaps::http_cache::FileBasedCache,
     hubcaps::repositories::UserRepoListOptions,

@@ -8,6 +8,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use hyper::Uri;
+use log::trace;
 
 use crate::{Error, Result};
 

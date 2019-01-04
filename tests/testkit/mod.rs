@@ -4,6 +4,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
 
+use log::debug;
+
 fn global_test_root() -> PathBuf {
     let mut path = env::current_exe().unwrap();
     path.pop(); // chop off exe name

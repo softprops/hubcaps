@@ -83,7 +83,6 @@
 #![allow(missing_docs)] // todo: make this a deny eventually
 
 #[macro_use] extern crate error_chain;
-#[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
 use std::fmt;
@@ -104,6 +103,7 @@ use hyper_tls::HttpsConnector;
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
+use log::{debug, error, trace};
 use mime::Mime;
 use serde::de::DeserializeOwned;
 use url::Url;
