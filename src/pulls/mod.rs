@@ -12,6 +12,7 @@ use issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
 use labels::Label;
 use pull_commits::PullCommits;
 use review_comments::ReviewComments;
+use review_requests::ReviewRequests;
 use users::User;
 use {unfold, Future, Github, SortDirection, Stream};
 
@@ -141,6 +142,15 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     /// returns review comments interface
     pub fn review_comments(&self) -> ReviewComments<C> {
         ReviewComments::new(
+            self.github.clone(),
+            self.owner.clone(),
+            self.repo.clone(),
+            self.number,
+        )
+    }
+
+    pub fn review_requests(&self) -> ReviewRequests<C> {
+        ReviewRequests::new(
             self.github.clone(),
             self.owner.clone(),
             self.repo.clone(),

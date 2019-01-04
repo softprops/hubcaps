@@ -155,6 +155,7 @@ pub mod rate_limit;
 pub mod releases;
 pub mod repositories;
 pub mod review_comments;
+pub mod review_requests;
 pub mod search;
 pub mod stars;
 pub mod statuses;
@@ -928,6 +929,22 @@ where
                 Method::DELETE,
                 &(self.host.clone() + uri),
                 None,
+                MediaType::Json,
+                AuthenticationConstraint::Unconstrained,
+            )
+            .or_else(|err| match err {
+                Error(ErrorKind::Codec(_), _) => Ok(()),
+                otherwise => Err(otherwise),
+            }),
+        )
+    }
+
+    fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+        Box::new(
+            self.request_entity::<()>(
+                Method::DELETE,
+                &(self.host.clone() + uri),
+                Some(message),
                 MediaType::Json,
                 AuthenticationConstraint::Unconstrained,
             )
