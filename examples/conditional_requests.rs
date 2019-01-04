@@ -1,9 +1,9 @@
 #[cfg(feature = "httpcache")]
-use hyper::Client;
-#[cfg(feature = "httpcache")]
-use hyper_tls::HttpsConnector;
-#[cfg(feature = "httpcache")]
-use tokio::runtime::Runtime;
+use {
+    hyper::Client,
+    hyper_tls::HttpsConnector,
+    tokio::runtime::Runtime,
+};
 
 use hubcaps::Result;
 

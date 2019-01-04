@@ -2,23 +2,18 @@
 #[macro_use] extern crate log;
 
 #[cfg(feature = "httpcache")]
-use std::env;
+use {
+    std::env,
 
-#[cfg(feature = "httpcache")]
-use futures::{future, Stream};
-#[cfg(feature = "httpcache")]
-use hyper::Client;
-#[cfg(feature = "httpcache")]
-use hyper_tls::HttpsConnector;
-#[cfg(feature = "httpcache")]
-use tokio::runtime::Runtime;
+    futures::{future, Stream},
+    hyper::Client,
+    hyper_tls::HttpsConnector,
+    tokio::runtime::Runtime,
 
-#[cfg(feature = "httpcache")]
-use hubcaps::http_cache::FileBasedCache;
-#[cfg(feature = "httpcache")]
-use hubcaps::repositories::UserRepoListOptions;
-#[cfg(feature = "httpcache")]
-use hubcaps::{Credentials, Error, Github, Result};
+    hubcaps::http_cache::FileBasedCache,
+    hubcaps::repositories::UserRepoListOptions,
+    hubcaps::{Credentials, Error, Github, Result},
+};
 
 #[cfg(feature = "httpcache")]
 mod testkit;
