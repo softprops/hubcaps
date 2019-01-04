@@ -82,8 +82,6 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
-#[macro_use] extern crate error_chain;
-
 use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time;

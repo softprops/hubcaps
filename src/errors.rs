@@ -2,6 +2,7 @@
 use std::io::Error as IoError;
 use std::time::Duration;
 
+use error_chain::*;
 use http::uri::InvalidUri;
 use http::Error as HttpError;
 use hyper::Error as HyperError;
