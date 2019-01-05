@@ -1,10 +1,8 @@
 //! Checks interface
 // see: https://developer.github.com/v3/checks/suites/
-
-extern crate serde_json;
-
 use futures::IntoFuture;
 use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
 

@@ -1,10 +1,10 @@
 //! Organizations interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
-use repositories::OrgRepositories;
-use teams::OrgTeams;
-use {Future, Github};
+use crate::repositories::OrgRepositories;
+use crate::teams::OrgTeams;
+use crate::{Future, Github};
 
 /// Provides access to label operations available for an individual organization
 pub struct Organization<C>

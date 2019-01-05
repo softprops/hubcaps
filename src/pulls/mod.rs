@@ -1,20 +1,19 @@
 //! Pull requests interface
-
 use std::collections::HashMap;
 use std::fmt;
 
 use hyper::client::connect::Connect;
-use serde_json;
 use url::form_urlencoded;
+use serde::{Deserialize, Serialize};
 
-use comments::Comments;
-use issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
-use labels::Label;
-use pull_commits::PullCommits;
-use review_comments::ReviewComments;
-use review_requests::ReviewRequests;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::comments::Comments;
+use crate::issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};
+use crate::labels::Label;
+use crate::pull_commits::PullCommits;
+use crate::review_comments::ReviewComments;
+use crate::review_requests::ReviewRequests;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -34,7 +33,7 @@ pub enum Sort {
 }
 
 impl fmt::Display for Sort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Sort::Created => "created",
             Sort::Updated => "updated",

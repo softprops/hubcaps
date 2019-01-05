@@ -2,9 +2,10 @@
 
 // Third party
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 // Ours
-use {Future, Github};
+use crate::{Future, Github};
 
 /// reference to git operations associated with a github repo
 pub struct Git<C>

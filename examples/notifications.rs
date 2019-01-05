@@ -1,7 +1,3 @@
-extern crate pretty_env_logger;
-extern crate hubcaps;
-extern crate tokio;
-
 use std::env;
 
 use tokio::runtime::Runtime;

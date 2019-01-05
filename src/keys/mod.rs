@@ -2,11 +2,10 @@
 //!
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
 //! for motivation and use
-
 use hyper::client::connect::Connect;
-use serde_json;
+use serde::{Deserialize, Serialize};
 
-use {Future, Github};
+use crate::{Future, Github};
 
 pub struct Keys<C>
 where

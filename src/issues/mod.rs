@@ -1,15 +1,15 @@
 //! Issues interface
-
 use std::collections::HashMap;
 use std::fmt;
 
 use hyper::client::connect::Connect;
 use url::form_urlencoded;
+use serde::{Deserialize, Serialize};
 
-use comments::Comments;
-use labels::Label;
-use users::User;
-use {serde_json, unfold, Future, Github, SortDirection, Stream};
+use crate::comments::Comments;
+use crate::labels::Label;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -23,7 +23,7 @@ pub enum State {
 }
 
 impl fmt::Display for State {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             State::Open => "open",
             State::Closed => "closed",
@@ -51,7 +51,7 @@ pub enum Sort {
 }
 
 impl fmt::Display for Sort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Sort::Created => "created",
             Sort::Updated => "updated",
@@ -134,7 +134,7 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
     }
 
     /// add a set of labels to this issue ref
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.post(&self.path(""), json!(labels))
     }
@@ -147,7 +147,7 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
         self.github.put(&self.path(""), json!(labels))
     }

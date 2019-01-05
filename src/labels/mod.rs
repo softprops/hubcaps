@@ -1,9 +1,8 @@
 //! Labels interface
-
 use hyper::client::connect::Connect;
-use serde_json;
+use serde::{Deserialize, Serialize};
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

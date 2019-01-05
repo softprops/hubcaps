@@ -1,14 +1,13 @@
 //! Hooks interface
 //!
 //! See the [github docs](https://developer.github.com/v3/repos/hooks/) for more information
-
-use serde_json;
-
-use {Future, Github};
-
-use hyper::client::connect::Connect;
 use std::collections::BTreeMap;
 use std::fmt;
+
+use hyper::client::connect::Connect;
+use serde::{Deserialize, Serialize};
+
+use crate::{Future, Github};
 
 /// Content-Type web hooks will receive
 /// deliveries in
@@ -29,7 +28,7 @@ impl Default for WebHookContentType {
 }
 
 impl fmt::Display for WebHookContentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             WebHookContentType::Form => "form",
             WebHookContentType::Json => "json",

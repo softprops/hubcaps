@@ -1,30 +1,28 @@
 //! Repository interface
-extern crate futures;
-extern crate serde_json;
-
 use std::collections::HashMap;
 use std::fmt;
 
 use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
+use serde::{Deserialize, Serialize};
 
-use branches::Branches;
-use checks::CheckRuns;
-use content::Content;
-use deployments::Deployments;
-use git::Git;
-use hooks::Hooks;
-use issues::{IssueRef, Issues};
-use keys::Keys;
-use labels::Labels;
-use pulls::PullRequests;
-use releases::Releases;
-use statuses::Statuses;
-use teams::RepoTeams;
-use traffic::Traffic;
-use users::Contributors;
-use users::User;
-use {unfold, Future, Github, SortDirection, Stream};
+use crate::branches::Branches;
+use crate::checks::CheckRuns;
+use crate::content::Content;
+use crate::deployments::Deployments;
+use crate::git::Git;
+use crate::hooks::Hooks;
+use crate::issues::{IssueRef, Issues};
+use crate::keys::Keys;
+use crate::labels::Labels;
+use crate::pulls::PullRequests;
+use crate::releases::Releases;
+use crate::statuses::Statuses;
+use crate::teams::RepoTeams;
+use crate::traffic::Traffic;
+use crate::users::Contributors;
+use crate::users::User;
+use crate::{unfold, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -39,7 +37,7 @@ pub enum Visibility {
 }
 
 impl fmt::Display for Visibility {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Visibility::All => "all",
             Visibility::Public => "public",
@@ -59,7 +57,7 @@ pub enum Sort {
 }
 
 impl fmt::Display for Sort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Sort::Created => "created",
             Sort::Updated => "updated",
@@ -79,7 +77,7 @@ pub enum Affiliation {
 }
 
 impl fmt::Display for Affiliation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Affiliation::Owner => "owner",
             Affiliation::Collaborator => "collaborator",
@@ -100,7 +98,7 @@ pub enum Type {
 }
 
 impl fmt::Display for Type {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Type::All => "all",
             Type::Owner => "owner",
@@ -124,7 +122,7 @@ pub enum OrgRepoType {
 }
 
 impl fmt::Display for OrgRepoType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             OrgRepoType::All => "all",
             OrgRepoType::Public => "public",
@@ -555,7 +553,7 @@ impl Repo {
     ///
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))] // shippied public API
+    #[allow(clippy::needless_pass_by_value)] // shipped public API
     pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
     where
         C: Clone + Connect + 'static,
@@ -685,7 +683,7 @@ impl RepoOptionsBuilder {
 }
 
 impl RepoOptions {
-    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
+    #[allow(clippy::too_many_arguments)] // exempted
     pub fn new<N, D, H, GI, L>(
         name: N,
         description: Option<D>,
@@ -831,7 +829,7 @@ pub struct RepoEditOptions {
 }
 
 impl RepoEditOptions {
-    #![cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))] // exempted
+    #[allow(clippy::too_many_arguments)] // exempted
     pub fn new<N, D, H, DB>(
         name: N,
         description: Option<D>,

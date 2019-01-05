@@ -1,9 +1,10 @@
 //! Watching interface
 /// https://developer.github.com/v3/activity/watching
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
-use repositories::Repo;
-use {unfold, Future, Github, Stream};
+use crate::repositories::Repo;
+use crate::{unfold, Future, Github, Stream};
 
 pub struct Watching<C>
 where

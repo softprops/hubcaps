@@ -2,8 +2,9 @@
 use std::fmt;
 
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
-use {Future, Github};
+use crate::{Future, Github};
 
 /// Describes types of breakdowns of the data for views or clones
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -13,7 +14,7 @@ pub enum TimeUnit {
 }
 
 impl fmt::Display for TimeUnit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             TimeUnit::Week => "week",
             TimeUnit::Day => "day",

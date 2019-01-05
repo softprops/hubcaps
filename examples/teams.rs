@@ -1,8 +1,3 @@
-extern crate futures;
-extern crate hubcaps;
-extern crate pretty_env_logger;
-extern crate tokio;
-
 use std::env;
 
 use futures::Stream;

@@ -6,9 +6,6 @@
 //! a user agent string and set of `hubcaps::Credentials`.
 //!
 //! ```no_run
-//! extern crate hubcaps;
-//! extern crate hyper;
-//!
 //! use hubcaps::{Credentials, Github};
 //!
 //! fn main() {
@@ -85,28 +82,6 @@
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
 
-#[cfg(feature = "httpcache")]
-extern crate dirs;
-#[macro_use]
-extern crate error_chain;
-extern crate futures;
-extern crate http;
-extern crate hyper;
-#[cfg(feature = "tls")]
-extern crate hyper_tls;
-extern crate hyperx;
-extern crate jsonwebtoken as jwt;
-#[macro_use]
-extern crate log;
-extern crate mime;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate base64;
-extern crate percent_encoding;
-extern crate serde_json;
-extern crate url;
-
 use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time;
@@ -124,8 +99,11 @@ use hyper_tls::HttpsConnector;
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
+use jsonwebtoken as jwt;
+use log::{debug, error, trace};
 use mime::Mime;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use url::Url;
 
 #[doc(hidden)] // public for doc testing and integration testing only
@@ -164,18 +142,18 @@ pub mod traffic;
 pub mod users;
 pub mod watching;
 
-pub use errors::{Error, ErrorKind, Result};
+pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
-pub use http_cache::{BoxedHttpCache, HttpCache};
+pub use crate::http_cache::{BoxedHttpCache, HttpCache};
 
-use activity::Activity;
-use app::App;
-use gists::{Gists, UserGists};
-use organizations::{Organization, Organizations, UserOrganizations};
-use rate_limit::RateLimit;
-use repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
-use search::Search;
-use users::Users;
+use crate::activity::Activity;
+use crate::app::App;
+use crate::gists::{Gists, UserGists};
+use crate::organizations::{Organization, Organizations, UserOrganizations};
+use crate::rate_limit::RateLimit;
+use crate::repositories::{OrganizationRepositories, Repositories, Repository, UserRepositories};
+use crate::search::Search;
+use crate::users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
 // We use 9 minutes for the life to give some buffer for clock drift between
@@ -185,10 +163,10 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<StdFuture<Item = T, Error = Error> + Send>;
+pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<StdStream<Item = T, Error = Error> + Send>;
+pub type Stream<T> = Box<dyn StdStream<Item = T, Error = Error> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -245,7 +223,7 @@ pub enum SortDirection {
 }
 
 impl fmt::Display for SortDirection {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             SortDirection::Asc => "asc",
             SortDirection::Desc => "desc",

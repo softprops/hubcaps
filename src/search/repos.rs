@@ -1,12 +1,13 @@
 use std::collections::HashMap;
-use url::form_urlencoded;
-
 use std::fmt;
-use {Future, SortDirection, Stream};
+
+use url::form_urlencoded;
+use hyper::client::connect::Connect;
+use serde::Deserialize;
 
 use super::{Search, SearchResult};
-use hyper::client::connect::Connect;
-use users::User;
+use crate::{Future, SortDirection, Stream};
+use crate::users::User;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {
@@ -19,7 +20,7 @@ pub enum ReposSort {
 }
 
 impl fmt::Display for ReposSort {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             ReposSort::Stars => "stars",
             ReposSort::Forks => "forks",

@@ -30,9 +30,6 @@ For user authenticated requests you'll typically want to use
 [personal access token](https://github.com/settings/tokens).
 
 ```rust
-extern crate hyper;
-extern crate hubcaps;
-
 use hubcaps::{Credentials, Github};
 
 fn main() {

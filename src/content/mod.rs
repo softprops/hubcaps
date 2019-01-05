@@ -1,14 +1,13 @@
 //! Content interface
-
 use std::fmt;
 use std::ops;
 
-use base64;
 use hyper::client::connect::Connect;
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-use serde::de::{self, Deserialize, Deserializer, Visitor};
+use serde::Deserialize;
+use serde::de::{self, Visitor};
 
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -187,14 +186,14 @@ impl ops::Deref for DecodedContents {
 impl<'de> Deserialize<'de> for DecodedContents {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: Deserializer<'de>,
+        D: serde::Deserializer<'de>,
     {
         struct DecodedContentsVisitor;
 
         impl<'de> Visitor<'de> for DecodedContentsVisitor {
             type Value = DecodedContents;
 
-            fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f, "base64 string")
             }
 

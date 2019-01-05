@@ -1,15 +1,9 @@
-extern crate pretty_env_logger;
-extern crate hubcaps;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate tokio;
-
 #[cfg(feature = "httpcache")]
-use hyper::Client;
-#[cfg(feature = "httpcache")]
-use hyper_tls::HttpsConnector;
-#[cfg(feature = "httpcache")]
-use tokio::runtime::Runtime;
+use {
+    hyper::Client,
+    hyper_tls::HttpsConnector,
+    tokio::runtime::Runtime,
+};
 
 use hubcaps::Result;
 

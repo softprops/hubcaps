@@ -1,6 +1,6 @@
 //! Users interface
-
-use {unfold, Future, Github, Stream};
+use crate::{unfold, Future, Github, Stream};
+use serde::Deserialize;
 
 use hyper::client::connect::Connect;
 

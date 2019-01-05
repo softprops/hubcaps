@@ -1,9 +1,9 @@
 //! Pull Commits interface
-
 use hyper::client::connect::Connect;
+use serde::Deserialize;
 
-use users::User;
-use {unfold, Future, Github, Stream};
+use crate::users::User;
+use crate::{unfold, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x

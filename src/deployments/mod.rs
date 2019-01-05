@@ -1,17 +1,13 @@
 //! Deployments interface
-
-extern crate futures;
-extern crate serde_json;
-
 use std::collections::HashMap;
 
 use hyper::client::connect::Connect;
-use serde;
-use statuses::State;
 use url::form_urlencoded;
-use users::User;
+use serde::{Deserialize, Serialize};
 
-use {Future, Github};
+use crate::statuses::State;
+use crate::users::User;
+use crate::{Future, Github};
 
 /// Interface for repository deployments
 pub struct Deployments<C>
@@ -362,11 +358,10 @@ impl DeploymentListOptionsBuilder {
 
 #[cfg(test)]
 mod tests {
-    use super::{DeploymentOptions, DeploymentStatusOptions};
-    use serde::ser::Serialize;
-    use serde_json;
-    use statuses::State;
     use std::collections::BTreeMap;
+    use serde::ser::Serialize;
+    use super::{DeploymentOptions, DeploymentStatusOptions};
+    use crate::statuses::State;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
         for test in tests {
