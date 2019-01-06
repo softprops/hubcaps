@@ -3,7 +3,7 @@ use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// A structure for interfacing with a review comments
 pub struct ReviewComments<C>
@@ -32,12 +32,12 @@ impl<C: Clone + Connect + 'static> ReviewComments<C> {
     }
 
     /// list review comments
-    pub fn list(&self) -> Future<Vec<ReviewComment>> {
+    pub fn list(&self) -> impl Future<Item = Vec<ReviewComment>, Error = Error> {
         self.github.get::<Vec<ReviewComment>>(&self.path())
     }
 
     /// Create new review comment
-    pub fn create(&self, review_comment: &ReviewCommentOptions) -> Future<ReviewComment> {
+    pub fn create(&self, review_comment: &ReviewCommentOptions) -> impl Future<Item = ReviewComment, Error = Error> {
         self.github.post(&self.path(), json!(review_comment))
     }
 

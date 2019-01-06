@@ -7,7 +7,7 @@ use std::fmt;
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// Content-Type web hooks will receive
 /// deliveries in
@@ -62,7 +62,7 @@ impl<C: Clone + Connect + 'static> Hooks<C> {
     }
 
     /// lists hook associated with a repository
-    pub fn list(&self) -> Future<Vec<Hook>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Hook>, Error = Error> {
         self.github
             .get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
     }
@@ -72,7 +72,7 @@ impl<C: Clone + Connect + 'static> Hooks<C> {
     /// Creating hooks for a service that already has one configured will update the existing hook.
     /// see [github docs](https://developer.github.com/v3/repos/hooks/)
     /// for more information
-    pub fn create(&self, options: &HookCreateOptions) -> Future<Hook> {
+    pub fn create(&self, options: &HookCreateOptions) -> impl Future<Item = Hook, Error = Error> {
         self.github.post(
             &format!("/repos/{}/{}/hooks", self.owner, self.repo),
             json!(options),
@@ -80,7 +80,7 @@ impl<C: Clone + Connect + 'static> Hooks<C> {
     }
 
     /// edits an existing repository hook
-    pub fn edit(&self, id: u64, options: &HookEditOptions) -> Future<Hook> {
+    pub fn edit(&self, id: u64, options: &HookEditOptions) -> impl Future<Item = Hook, Error = Error> {
         self.github.patch(
             &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
             json!(options),
@@ -88,7 +88,7 @@ impl<C: Clone + Connect + 'static> Hooks<C> {
     }
 
     /// deletes a repository hook by id
-    pub fn delete(&self, id: u64) -> Future<()> {
+    pub fn delete(&self, id: u64) -> impl Future<Item = (), Error = Error> {
         self.github
             .delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
     }

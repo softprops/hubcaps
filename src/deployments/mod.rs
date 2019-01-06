@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::statuses::State;
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// Interface for repository deployments
 pub struct Deployments<C>
@@ -53,13 +53,13 @@ impl<C: Clone + Connect + 'static> DeploymentStatuses<C> {
     }
 
     /// lists all statuses associated with a deployment
-    pub fn list(&self) -> Future<Vec<DeploymentStatus>> {
+    pub fn list(&self) -> impl Future<Item = Vec<DeploymentStatus>, Error = Error> {
         self.github.get(&self.path(""))
     }
 
     /// creates a new deployment status. For convenience, a DeploymentStatusOptions.builder
     /// interface is required for building up a request
-    pub fn create(&self, status: &DeploymentStatusOptions) -> Future<DeploymentStatus> {
+    pub fn create(&self, status: &DeploymentStatusOptions) -> impl Future<Item = DeploymentStatus, Error = Error> {
         self.github.post(&self.path(""), json!(status))
     }
 }
@@ -83,7 +83,7 @@ impl<C: Clone + Connect + 'static> Deployments<C> {
     }
 
     /// lists all deployments for a repository
-    pub fn list(&self, opts: &DeploymentListOptions) -> Future<Vec<Deployment>> {
+    pub fn list(&self, opts: &DeploymentListOptions) -> impl Future<Item = Vec<Deployment>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = opts.serialize() {
             uri.push(query);
@@ -92,7 +92,7 @@ impl<C: Clone + Connect + 'static> Deployments<C> {
     }
 
     /// creates a new deployment for this repository
-    pub fn create(&self, dep: &DeploymentOptions) -> Future<Deployment> {
+    pub fn create(&self, dep: &DeploymentOptions) -> impl Future<Item = Deployment, Error = Error> {
         self.github.post(&self.path(""), json!(dep))
     }
 

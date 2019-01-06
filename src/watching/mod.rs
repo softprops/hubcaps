@@ -30,7 +30,7 @@ impl<C: Clone + Connect + 'static> Watching<C> {
     }
 
     /// https://developer.github.com/v3/activity/watching/#get-a-repository-subscription
-    pub fn get_for_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription> where
+    pub fn get_for_repo<O, R>(&self, owner: O, repo: R) -> impl Future<Item = Subscription, Error = Error> where
         O: Into<String>,
         R: Into<String>,
     {
@@ -38,7 +38,7 @@ impl<C: Clone + Connect + 'static> Watching<C> {
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn watch_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription> where
+    pub fn watch_repo<O, R>(&self, owner: O, repo: R) -> impl Future<Item = Subscription, Error = Error> where
         O: Into<String>,
         R: Into<String>,
     {
@@ -49,7 +49,7 @@ impl<C: Clone + Connect + 'static> Watching<C> {
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn ignore_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription> where
+    pub fn ignore_repo<O, R>(&self, owner: O, repo: R) -> impl Future<Item = Subscription, Error = Error> where
         O: Into<String>,
         R: Into<String>,
     {
@@ -60,7 +60,7 @@ impl<C: Clone + Connect + 'static> Watching<C> {
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn unwatch_repo<O, R>(&self, owner: O, repo: R) -> Future<()> where
+    pub fn unwatch_repo<O, R>(&self, owner: O, repo: R) -> impl Future<Item = (), Error = Error> where
         O: Into<String>,
         R: Into<String>,
     {

@@ -155,13 +155,13 @@ impl<C: Clone + Connect + 'static> Repositories<C> {
 
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
+    pub fn create(&self, repo: &RepoOptions) -> impl Future<Item = Repo, Error = Error> {
         self.github.post(&self.path(""), json!(repo))
     }
 
     /// list the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn list(&self, options: &RepoListOptions) -> Future<Vec<Repo>> {
+    pub fn list(&self, options: &RepoListOptions) -> impl Future<Item = Vec<Repo>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -210,7 +210,7 @@ impl<C: Clone + Connect + 'static> OrgRepositories<C> {
     }
 
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrgRepoListOptions) -> Future<Vec<Repo>> {
+    pub fn list(&self, options: &OrgRepoListOptions) -> impl Future<Item = Vec<Repo>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -234,7 +234,7 @@ impl<C: Clone + Connect + 'static> OrgRepositories<C> {
 
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
+    pub fn create(&self, repo: &RepoOptions) -> impl Future<Item = Repo, Error = Error> {
         self.github.post(&self.path(""), json!(repo))
     }
 }
@@ -270,7 +270,7 @@ impl<C: Clone + Connect + 'static> UserRepositories<C> {
     }
 
     /// https://developer.github.com/v3/repos/#list-user-repositories
-    pub fn list(&self, options: &UserRepoListOptions) -> Future<Vec<Repo>> {
+    pub fn list(&self, options: &UserRepoListOptions) -> impl Future<Item = Vec<Repo>, Error = Error> {
         self.github.get(&self.uri(options))
     }
 
@@ -312,7 +312,7 @@ impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
 
     /// list an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrganizationRepoListOptions) -> Future<Vec<Repo>> {
+    pub fn list(&self, options: &OrganizationRepoListOptions) -> impl Future<Item = Vec<Repo>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -363,12 +363,12 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     }
 
     /// get a reference to the GitHub repository object that this `Repository` refers to
-    pub fn get(&self) -> Future<Repo> {
+    pub fn get(&self) -> impl Future<Item = Repo, Error = Error> {
         self.github.get(&self.path(""))
     }
 
     /// https://developer.github.com/v3/repos/#edit
-    pub fn edit(&self, options: &RepoEditOptions) -> Future<Repo> {
+    pub fn edit(&self, options: &RepoEditOptions) -> impl Future<Item = Repo, Error = Error> {
         // Note that this intentionally calls POST rather than PATCH,
         // even though the docs say PATCH.
         // In my tests (changing the default branch) POST works while PATCH doesn't.
@@ -376,7 +376,7 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     }
 
     /// https://developer.github.com/v3/repos/#delete-a-repository
-    pub fn delete(&self) -> Future<()> {
+    pub fn delete(&self) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(""))
     }
 
@@ -554,7 +554,7 @@ impl Repo {
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
+    pub fn languages<C>(&self, github: Github<C>) -> impl Future<Item = HashMap<String, i64>, Error = Error>
     where
         C: Clone + Connect + 'static,
     {

@@ -72,7 +72,7 @@ impl<C: Clone + Connect + 'static> SearchRepos<C> {
     /// Return the first page of search result repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters)
     /// for query format options
-    pub fn list<Q>(&self, q: Q, options: &SearchReposOptions) -> Future<SearchResult<ReposItem>>
+    pub fn list<Q>(&self, q: Q, options: &SearchReposOptions) -> impl Future<Item = SearchResult<ReposItem>, Error = Error>
     where
         Q: Into<String>,
     {

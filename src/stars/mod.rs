@@ -1,6 +1,4 @@
 //! Stars interface
-
-use futures::Future as StdFuture;
 use hyper::client::connect::Connect;
 use hyper::StatusCode;
 
@@ -20,7 +18,7 @@ impl<C: Clone + Connect + 'static> Stars<C> {
     }
 
     /// Returns whether or not authenticated user has started a repo
-    pub fn is_starred<O, R>(&self, owner: O, repo: R) -> Future<bool>
+    pub fn is_starred<O, R>(&self, owner: O, repo: R) -> impl Future<Item = bool, Error = Error>
     where
         O: Into<String>,
         R: Into<String>,
@@ -44,7 +42,7 @@ impl<C: Clone + Connect + 'static> Stars<C> {
     }
 
     /// star a repo
-    pub fn star<O, R>(&self, owner: O, repo: R) -> Future<()>
+    pub fn star<O, R>(&self, owner: O, repo: R) -> impl Future<Item = (), Error = Error>
     where
         O: Into<String>,
         R: Into<String>,
@@ -56,7 +54,7 @@ impl<C: Clone + Connect + 'static> Stars<C> {
     }
 
     /// unstar a repo
-    pub fn unstar<O, R>(&self, owner: O, repo: R) -> Future<()>
+    pub fn unstar<O, R>(&self, owner: O, repo: R) -> impl Future<Item = (), Error = Error>
     where
         O: Into<String>,
         R: Into<String>,

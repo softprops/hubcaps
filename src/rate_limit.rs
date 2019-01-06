@@ -2,7 +2,7 @@
 use hyper::client::connect::Connect;
 use serde::Deserialize;
 
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 pub struct RateLimit<C: Clone + Connect + 'static> {
     github: Github<C>,
@@ -15,7 +15,7 @@ impl<C: Clone + Connect + 'static> RateLimit<C> {
     }
 
     /// https://developer.github.com/v3/rate_limit/#get-your-current-rate-limit-status
-    pub fn get(&self) -> Future<RateLimitStatus> {
+    pub fn get(&self) -> impl Future<Item = RateLimitStatus, Error = Error> {
         self.github.get("/rate_limit")
     }
 }

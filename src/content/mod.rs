@@ -46,7 +46,7 @@ impl<C: Clone + Connect + 'static> Content<C> {
 
     /// Gets the contents of the location. This could be a file, symlink, or
     /// submodule. To list the contents of a directory, use `iter`.
-    pub fn get(&self, location: &str) -> Future<Contents> {
+    pub fn get(&self, location: &str) -> impl Future<Item = Contents, Error = Error> {
         self.github.get(&self.path(location))
     }
 
@@ -54,7 +54,7 @@ impl<C: Clone + Connect + 'static> Content<C> {
     ///
     /// GitHub only supports downloading files up to 1 megabyte in size. If you
     /// need to retrieve larger files, the Git Data API must be used instead.
-    pub fn file(&self, location: &str) -> Future<File> {
+    pub fn file(&self, location: &str) -> impl Future<Item = File, Error = Error> {
         self.github.get(&self.path(location))
     }
 

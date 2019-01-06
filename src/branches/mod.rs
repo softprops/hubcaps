@@ -36,7 +36,7 @@ impl<C: Clone + Connect + 'static> Branches<C> {
     }
 
     /// list of branches for this repo
-    pub fn list(&self) -> Future<Vec<Branch>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Branch>, Error = Error> {
         self.github.get(&format!(
             "/repos/{owner}/{repo}/branches",
             owner = self.owner,
@@ -58,7 +58,7 @@ impl<C: Clone + Connect + 'static> Branches<C> {
     }
 
     /// gets a branch for this repo by name
-    pub fn get<B>(&self, branch: B) -> Future<Branch>
+    pub fn get<B>(&self, branch: B) -> impl Future<Item = Branch, Error = Error>
     where
         B: Into<String>,
     {
@@ -73,7 +73,7 @@ impl<C: Clone + Connect + 'static> Branches<C> {
     /// update branch production for a given branch
     ///
     /// https://developer.github.com/v3/repos/branches/#update-branch-protection
-    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Future<ProtectionState>
+    pub fn protection<B>(&self, branch: B, pro: &Protection) -> impl Future<Item = ProtectionState, Error = Error>
     where
         B: Into<String>,
     {

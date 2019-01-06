@@ -36,7 +36,7 @@ impl<C: Clone + Connect + 'static> PullCommits<C> {
     }
 
     /// list pull commits
-    pub fn list(&self) -> Future<Vec<PullCommit>> {
+    pub fn list(&self) -> impl Future<Item = Vec<PullCommit>, Error = Error> {
         let uri = format!(
             "/repos/{}/{}/pulls/{}/commits",
             self.owner, self.repo, self.number

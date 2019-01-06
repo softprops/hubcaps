@@ -77,11 +77,11 @@ impl<C: Clone + Connect + 'static> Users<C> {
     }
 
     /// Information about current authenticated user
-    pub fn authenticated(&self) -> Future<AuthenticatedUser> {
+    pub fn authenticated(&self) -> impl Future<Item = AuthenticatedUser, Error = Error> {
         self.github.get("/user")
     }
 
-    pub fn get<U>(&self, username: U) -> Future<User>
+    pub fn get<U>(&self, username: U) -> impl Future<Item = User, Error = Error>
     where
         U: Into<String>,
     {
@@ -119,7 +119,7 @@ impl<C: Clone + Connect + 'static> Contributors<C> {
     }
 
     /// list of contributors for this repo
-    pub fn list(&self) -> Future<Vec<User>> {
+    pub fn list(&self) -> impl Future<Item = Vec<User>, Error = Error> {
         self.github
             .get(&format!("/repos/{}/{}/contributors", self.owner, self.repo))
     }

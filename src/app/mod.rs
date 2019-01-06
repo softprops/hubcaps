@@ -2,7 +2,7 @@
 use hyper::client::connect::Connect;
 use serde::Deserialize;
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType};
+use self::super::{AuthenticationConstraint, Error, Future, Github, MediaType};
 
 pub struct App<C>
 where
@@ -24,7 +24,7 @@ where
         format!("/app{}", more)
     }
 
-    pub fn make_access_token(&self, installation_id: u64) -> Future<AccessToken> {
+    pub fn make_access_token(&self, installation_id: u64) -> impl Future<Item = AccessToken, Error = Error> {
         self.github.post_media::<AccessToken>(
             &self.path(&format!("/installations/{}/access_tokens", installation_id)),
             Vec::new(),
@@ -33,7 +33,7 @@ where
         )
     }
 
-    pub fn find_repo_installation<O, R>(&self, owner: O, repo: R) -> Future<Installation>
+    pub fn find_repo_installation<O, R>(&self, owner: O, repo: R) -> impl Future<Item = Installation, Error = Error>
     where
         O: Into<String>,
         R: Into<String> {

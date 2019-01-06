@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::repositories::OrgRepositories;
 use crate::teams::OrgTeams;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// Provides access to label operations available for an individual organization
 pub struct Organization<C>
@@ -57,7 +57,7 @@ impl<C: Clone + Connect + 'static> Organizations<C> {
 
     /// list the authenticated user's organizations
     /// https://developer.github.com/v3/orgs/#list-your-organizations
-    pub fn list(&self) -> Future<Vec<Org>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Org>, Error = Error> {
         self.github.get(&self.path(""))
     }
 }
@@ -87,7 +87,7 @@ impl<C: Clone + Connect + 'static> UserOrganizations<C> {
 
     /// list the organizations this user is publicly associated with
     /// https://developer.github.com/v3/orgs/#list-user-organizations
-    pub fn list(&self) -> Future<Vec<Org>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Org>, Error = Error> {
         self.github.get(&self.path(""))
     }
 }

@@ -5,7 +5,7 @@
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 pub struct Keys<C>
 where
@@ -34,19 +34,19 @@ impl<C: Clone + Connect + 'static> Keys<C> {
         format!("/repos/{}/{}/keys{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, key: &KeyOptions) -> Future<Key> {
+    pub fn create(&self, key: &KeyOptions) -> impl Future<Item = Vec<Key>, Error = Error> {
         self.github.post(&self.path(""), json!(key))
     }
 
-    pub fn list(&self) -> Future<Vec<Key>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Key>, Error = Error> {
         self.github.get(&self.path(""))
     }
 
-    pub fn get(&self, id: u64) -> Future<Key> {
+    pub fn get(&self, id: u64) -> impl Future<Item = Key, Error = Error> {
         self.github.get(&self.path(&format!("/{}", id)))
     }
 
-    pub fn delete(&self, id: u64) -> Future<()> {
+    pub fn delete(&self, id: u64) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 }

@@ -1,10 +1,9 @@
 //! Checks interface
 // see: https://developer.github.com/v3/checks/suites/
-use futures::IntoFuture;
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType};
+use self::super::{AuthenticationConstraint, Error, Future, Github, MediaType};
 
 pub struct CheckRuns<C>
 where
@@ -36,35 +35,31 @@ where
         format!("/repos/{}/{}/check-runs{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, check_run_options: &CheckRunOptions) -> Future<CheckRun> {
-        match serde_json::to_string(check_run_options) {
-            Ok(data) => self.github.post_media::<CheckRun>(
-                &self.path(""),
-                data.into_bytes(),
-                MediaType::Preview("antiope"),
-                AuthenticationConstraint::Unconstrained,
-            ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
-        }
+    pub fn create(&self, check_run_options: &CheckRunOptions) -> impl Future<Item = CheckRun, Error = Error> {
+        let data = serde_json::to_string(check_run_options).expect("serialising options to string");
+        self.github.post_media::<CheckRun>(
+            &self.path(""),
+            data.into_bytes(),
+            MediaType::Preview("antiope"),
+            AuthenticationConstraint::Unconstrained,
+        )
     }
 
     pub fn update(
         &self,
         check_run_id: &str,
         check_run_options: &CheckRunUpdateOptions,
-    ) -> Future<CheckRun> {
-        match serde_json::to_string(check_run_options) {
-            Ok(data) => self.github.post_media::<CheckRun>(
-                &self.path(&format!("/{}", check_run_id)),
-                data.into_bytes(),
-                MediaType::Preview("antiope"),
-                AuthenticationConstraint::Unconstrained,
-            ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
-        }
+    ) -> impl Future<Item = CheckRun, Error = Error> {
+        let data = serde_json::to_string(check_run_options).expect("serialising options to string");
+        self.github.post_media::<CheckRun>(
+            &self.path(&format!("/{}", check_run_id)),
+            data.into_bytes(),
+            MediaType::Preview("antiope"),
+            AuthenticationConstraint::Unconstrained,
+        )
     }
 
-    pub fn list_for_suite(&self, suite_id: &str) -> Future<Vec<CheckRun>> {
+    pub fn list_for_suite(&self, suite_id: &str) -> impl Future<Item = Vec<CheckRun>, Error = Error> {
         // !!! does this actually work?
         // https://developer.github.com/v3/checks/runs/#list-check-runs-in-a-check-suite
         self.github.get_media::<Vec<CheckRun>>(

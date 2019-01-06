@@ -6,8 +6,7 @@ use url::form_urlencoded;
 use serde::Deserialize;
 
 use crate::users::User;
-use crate::Future;
-use crate::Github;
+use crate::{Error, Future, Github};
 
 /// Provides access to notifications.
 /// See the [github docs](https://developer.github.com/v3/activity/notifications/)
@@ -29,7 +28,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#list-your-notifications)
     /// for more information.
-    pub fn list(&self, options: &ThreadListOptions) -> Future<Vec<Thread>> {
+    pub fn list(&self, options: &ThreadListOptions) -> impl Future<Item = Vec<Thread>, Error = Error> {
         let mut uri = vec!["/notifications".into()];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -46,7 +45,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
         owner: O,
         repo: R,
         options: &ThreadListOptions,
-    ) -> Future<Vec<Thread>>
+    ) -> impl Future<Item = Vec<Thread>, Error = Error>
     where
         O: Into<String>,
         R: Into<String>,
@@ -66,7 +65,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#mark-as-read)
     /// for more information.
-    pub fn mark_as_read<S>(&self, last_read_at: S) -> Future<()>
+    pub fn mark_as_read<S>(&self, last_read_at: S) -> impl Future<Item = (), Error = Error>
     where
         S: Into<Option<String>>,
     {
@@ -86,7 +85,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See [github docs](https://developer.github.com/v3/activity/notifications/#mark-notifications-as-read-in-a-repository)
     /// for more information.
-    pub fn mark_as_read_for_repo<O, R, S>(&self, owner: O, repo: R, last_read_at: S) -> Future<()>
+    pub fn mark_as_read_for_repo<O, R, S>(&self, owner: O, repo: R, last_read_at: S) -> impl Future<Item = (), Error = Error>
     where
         O: Into<String>,
         R: Into<String>,
@@ -111,7 +110,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#view-a-single-thread)
     /// for more information.
-    pub fn get_thread<S>(&self, id: S) -> Future<Thread>
+    pub fn get_thread<S>(&self, id: S) -> impl Future<Item = Thread, Error = Error>
     where
         S: Into<String>,
     {
@@ -123,7 +122,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read)
     /// for more information.
-    pub fn mark_thread_as_read<S>(&self, id: S) -> Future<()>
+    pub fn mark_thread_as_read<S>(&self, id: S) -> impl Future<Item = (), Error = Error>
     where
         S: Into<String>,
     {
@@ -135,7 +134,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#get-a-thread-subscription)
     /// for more information.
-    pub fn get_subscription<S>(&self, id: S) -> Future<Subscription>
+    pub fn get_subscription<S>(&self, id: S) -> impl Future<Item = Subscription, Error = Error>
     where
         S: Into<String>,
     {
@@ -149,7 +148,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#set-a-thread-subscription)
     /// for more information.
-    pub fn subscribe<S>(&self, id: S) -> Future<Subscription>
+    pub fn subscribe<S>(&self, id: S) -> impl Future<Item = Subscription, Error = Error>
     where
         S: Into<String>,
     {
@@ -163,7 +162,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#set-a-thread-subscription)
     /// for more information.
-    pub fn unsubscribe<S>(&self, id: S) -> Future<Subscription>
+    pub fn unsubscribe<S>(&self, id: S) -> impl Future<Item = Subscription, Error = Error>
     where
         S: Into<String>,
     {
@@ -177,7 +176,7 @@ impl<C: Clone + Connect + 'static> Notifications<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/activity/notifications/#delete-a-thread-subscription)
     /// for more information.
-    pub fn delete_subscription<S>(&self, id: S) -> Future<()>
+    pub fn delete_subscription<S>(&self, id: S) -> impl Future<Item = (), Error = Error>
     where
         S: Into<String>,
     {

@@ -6,7 +6,7 @@ use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// A structure for interfacing with a issue comments
 pub struct Comments<C>
@@ -35,12 +35,12 @@ impl<C: Clone + Connect + 'static> Comments<C> {
     }
 
     /// add a new comment
-    pub fn create(&self, comment: &CommentOptions) -> Future<Comment> {
+    pub fn create(&self, comment: &CommentOptions) -> impl Future<Item = Comment, Error = Error> {
         self.github.post(&self.path(), json!(comment))
     }
 
     /// list pull requests
-    pub fn list(&self, options: &CommentListOptions) -> Future<Vec<Comment>> {
+    pub fn list(&self, options: &CommentListOptions) -> impl Future<Item = Vec<Comment>, Error = Error> {
         let mut uri = vec![self.path()];
         if let Some(query) = options.serialize() {
             uri.push(query);

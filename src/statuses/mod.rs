@@ -3,7 +3,7 @@ use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// interface for statuses associated with a repository
 pub struct Statuses<C>
@@ -34,13 +34,13 @@ impl<C: Clone + Connect + 'static> Statuses<C> {
     }
 
     /// creates a new status for a target sha
-    pub fn create(&self, sha: &str, status: &StatusOptions) -> Future<Status> {
+    pub fn create(&self, sha: &str, status: &StatusOptions) -> impl Future<Item = Status, Error = Error> {
         self.github
             .post(&self.path(&format!("/{}", sha)), json!(status))
     }
 
     /// lists all statuses associated with a given git sha
-    pub fn list(&self, sha: &str) -> Future<Vec<Status>> {
+    pub fn list(&self, sha: &str) -> impl Future<Item = Vec<Status>, Error = Error> {
         self.github.get(&format!(
             "/repos/{}/{}/commits/{}/statuses",
             self.owner, self.repo, sha
@@ -49,7 +49,7 @@ impl<C: Clone + Connect + 'static> Statuses<C> {
 
     /// list the combined statuses for a given git sha
     /// fixme: give this a type
-    pub fn combined(&self, sha: &str) -> Future<String> {
+    pub fn combined(&self, sha: &str) -> impl Future<Item = String, Error = Error> {
         self.github.get(&format!(
             "/repos/{}/{}/commits/{}/status",
             self.owner, self.repo, sha

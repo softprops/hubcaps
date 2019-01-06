@@ -98,7 +98,7 @@ impl<C: Clone + Connect + 'static> IssueAssignees<C> {
     }
 
     /// add a set of assignees
-    pub fn add(&self, assignees: Vec<&str>) -> Future<Issue> {
+    pub fn add(&self, assignees: Vec<&str>) -> impl Future<Item = Issue, Error = Error> {
         self.github.post(&self.path(""), json_lit!({ "assignees": assignees }))
     }
 }
@@ -135,12 +135,12 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
 
     /// add a set of labels to this issue ref
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
+    pub fn add(&self, labels: Vec<&str>) -> impl Future<Item = Vec<Label>, Error = Error> {
         self.github.post(&self.path(""), json!(labels))
     }
 
     /// remove a label from this issue
-    pub fn remove(&self, label: &str) -> Future<()> {
+    pub fn remove(&self, label: &str) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", label)))
     }
 
@@ -148,12 +148,12 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
+    pub fn set(&self, labels: Vec<&str>) -> impl Future<Item = Vec<Label>, Error = Error> {
         self.github.put(&self.path(""), json!(labels))
     }
 
     /// remove all labels from an issue
-    pub fn clear(&self) -> Future<()> {
+    pub fn clear(&self) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(""))
     }
 }
@@ -186,7 +186,7 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
     }
 
     /// Request an issue's information
-    pub fn get(&self) -> Future<Issue> {
+    pub fn get(&self) -> impl Future<Item = Issue, Error = Error> {
         self.github.get(&self.path(""))
     }
 
@@ -218,7 +218,7 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
     }
 
     /// Edit the issues options
-    pub fn edit(&self, is: &IssueOptions) -> Future<Issue> {
+    pub fn edit(&self, is: &IssueOptions) -> impl Future<Item = Issue, Error = Error> {
         self.github.patch(&self.path(""), json!(is))
     }
 
@@ -275,14 +275,14 @@ impl<C: Clone + Connect + 'static> Issues<C> {
         )
     }
 
-    pub fn create(&self, is: &IssueOptions) -> Future<Issue> {
+    pub fn create(&self, is: &IssueOptions) -> impl Future<Item = Issue, Error = Error> {
         self.github.post(&self.path(""), json!(is))
     }
 
     /// Return the first page of issues for this repisotiry
     /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
     /// for more information
-    pub fn list(&self, options: &IssueListOptions) -> Future<Vec<Issue>> {
+    pub fn list(&self, options: &IssueListOptions) -> impl Future<Item = Vec<Issue>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);

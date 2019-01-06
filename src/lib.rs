@@ -87,7 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::{future, stream, Future as StdFuture, IntoFuture, Stream};
+use futures::{future, stream, Future, IntoFuture, Stream};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
 #[cfg(feature = "httpcache")]
@@ -163,7 +163,7 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
+pub type BoxedFuture<T> = Box<dyn Future<Item = T, Error = Error> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -599,12 +599,12 @@ where
         body: Option<Vec<u8>>,
         media_type: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Option<Link>, Out)>
+    ) -> BoxedFuture<(Option<Link>, Out)>
     where
         Out: DeserializeOwned + 'static + Send,
     {
         let parsed_uri = uri.parse::<Uri>();
-        let url_and_auth: Future<(Uri, Option<String>)> = match self.credentials(authentication) {
+        let url_and_auth: BoxedFuture<(Uri, Option<String>)> = match self.credentials(authentication) {
             Some(&Credentials::Client(ref id, ref secret)) => {
                 let mut parsed = Url::parse(uri).unwrap();
                 parsed
@@ -853,24 +853,22 @@ where
         body: Option<Vec<u8>>,
         media_type: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<D>
+    ) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        Box::new(
-            self.request(method, uri, body, media_type, authentication)
-                .map(|(_, entity)| entity),
-        )
+        self.request(method, uri, body, media_type, authentication)
+            .map(|(_, entity)| entity)
     }
 
-    fn get<D>(&self, uri: &str) -> Future<D>
+    fn get<D>(&self, uri: &str) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
         self.get_media(uri, MediaType::Json)
     }
 
-    fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
+    fn get_media<D>(&self, uri: &str, media: MediaType) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -883,7 +881,7 @@ where
         )
     }
 
-    fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
+    fn get_pages<D>(&self, uri: &str) -> impl Future<Item = (Option<Link>, D), Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -896,39 +894,35 @@ where
         )
     }
 
-    fn delete(&self, uri: &str) -> Future<()> {
-        Box::new(
-            self.request_entity::<()>(
-                Method::DELETE,
-                &(self.host.clone() + uri),
-                None,
-                MediaType::Json,
-                AuthenticationConstraint::Unconstrained,
-            )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
-            }),
+    fn delete(&self, uri: &str) -> impl Future<Item = (), Error = Error> {
+        self.request_entity::<()>(
+            Method::DELETE,
+            &(self.host.clone() + uri),
+            None,
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
+        .or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            otherwise => Err(otherwise),
+        })
     }
 
-    fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(
-            self.request_entity::<()>(
-                Method::DELETE,
-                &(self.host.clone() + uri),
-                Some(message),
-                MediaType::Json,
-                AuthenticationConstraint::Unconstrained,
-            )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
-            }),
+    fn delete_message(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = (), Error = Error> {
+        self.request_entity::<()>(
+            Method::DELETE,
+            &(self.host.clone() + uri),
+            Some(message),
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
+        .or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            otherwise => Err(otherwise),
+        })
     }
 
-    fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    fn post<D>(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -946,7 +940,7 @@ where
         message: Vec<u8>,
         media: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<D>
+    ) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -959,14 +953,14 @@ where
         )
     }
 
-    fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.patch(uri, message).or_else(|err| match err {
+    fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = (), Error = Error> {
+        self.patch(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
-        }))
+        })
     }
 
-    fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -979,21 +973,21 @@ where
         )
     }
 
-    fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    fn patch<D>(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
 
-    fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.put(uri, message).or_else(|err| match err {
+    fn put_no_response(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = (), Error = Error> {
+        self.put(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
-        }))
+        })
     }
 
-    fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    fn put<D>(&self, uri: &str, message: Vec<u8>) -> impl Future<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -1015,40 +1009,39 @@ fn next_link(l: &Link) -> Option<String> {
 }
 
 /// "unfold" paginated results of a list of github entities
-fn unfold<C, D, I>(
+fn unfold<C, D, F, I>(
     github: Github<C>,
-    first: Future<(Option<Link>, D)>,
+    first: F,
     into_items: fn(D) -> Vec<I>,
 ) -> impl Stream<Item = I, Error = Error>
 where
     D: DeserializeOwned + 'static + Send,
+    F: Future<Item = (Option<Link>, D), Error = Error>,
     I: 'static + Send,
     C: Clone + Connect + 'static,
 {
-    Box::new(
-        first
-            .map(move |(link, payload)| {
-                let mut items = into_items(payload);
-                items.reverse();
-                stream::unfold::<_, _, Future<(I, (Option<Link>, Vec<I>))>, _>(
-                    (link, items),
-                    move |(link, mut items)| match items.pop() {
-                        Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(|l| next_link(&l)).map(|url| {
-                            let url = Url::parse(&url).unwrap();
-                            let uri = [url.path(), url.query().unwrap_or_default()].join("?");
-                            Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
-                                let mut items = into_items(payload);
-                                items.reverse();
-                                (items.remove(0), (link, items))
-                            })) as Future<(I, (Option<Link>, Vec<I>))>
-                        }),
-                    },
-                )
-            })
-            .into_stream()
-            .flatten(),
-    )
+    first
+        .map(move |(link, payload)| {
+            let mut items = into_items(payload);
+            items.reverse();
+            stream::unfold::<_, _, BoxedFuture<(I, (Option<Link>, Vec<I>))>, _>(
+                (link, items),
+                move |(link, mut items)| match items.pop() {
+                    Some(item) => Some(Box::new(future::ok((item, (link, items))))),
+                    _ => link.and_then(|l| next_link(&l)).map(|url| {
+                        let url = Url::parse(&url).unwrap();
+                        let uri = [url.path(), url.query().unwrap_or_default()].join("?");
+                        Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
+                            let mut items = into_items(payload);
+                            items.reverse();
+                            (items.remove(0), (link, items))
+                        })) as BoxedFuture<(I, (Option<Link>, Vec<I>))>
+                    }),
+                },
+            )
+        })
+        .into_stream()
+        .flatten()
 }
 
 #[cfg(test)]

@@ -35,20 +35,20 @@ impl<C: Clone + Connect + 'static> Labels<C> {
         format!("/repos/{}/{}/labels{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, lab: &LabelOptions) -> Future<Label> {
+    pub fn create(&self, lab: &LabelOptions) -> impl Future<Item = Label, Error = Error> {
         self.github.post(&self.path(""), json!(lab))
     }
 
-    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Future<Label> {
+    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> impl Future<Item = Label, Error = Error> {
         self.github
             .patch(&self.path(&format!("/{}", prevname)), json!(lab))
     }
 
-    pub fn delete(&self, name: &str) -> Future<()> {
+    pub fn delete(&self, name: &str) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", name)))
     }
 
-    pub fn list(&self) -> Future<Vec<Label>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Label>, Error = Error> {
         self.github.get(&self.path(""))
     }
 

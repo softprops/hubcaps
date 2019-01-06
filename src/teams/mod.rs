@@ -55,7 +55,7 @@ impl<C: Clone + Connect + 'static> RepoTeams<C> {
     }
 
     /// list of teams for this repo
-    pub fn list(&self) -> Future<Vec<Team>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Team>, Error = Error> {
         self.github
             .get(&format!("/repos/{}/{}/teams", self.owner, self.repo))
     }
@@ -93,7 +93,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
     }
 
     /// list of teams for this org
-    pub fn list(&self) -> Future<Vec<Team>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Team>, Error = Error> {
         self.github.get(&format!("/orgs/{}/teams", self.org))
     }
 
@@ -104,7 +104,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
     }
 
     /// create team
-    pub fn create(&self, team_options: &TeamOptions) -> Future<Team> {
+    pub fn create(&self, team_options: &TeamOptions) -> impl Future<Item = Team, Error = Error> {
         self.github
             .post(&format!("/orgs/{}/teams", self.org), json!(team_options))
     }
@@ -125,7 +125,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
         team_id: u64,
         repo_name: N,
         permission: Permission,
-    ) -> Future<()>
+    ) -> impl Future<Item = (), Error = Error>
     where
         N: Into<String>,
     {
@@ -156,22 +156,22 @@ impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
     }
 
     /// list the team
-    pub fn get(&self) -> Future<Team> {
+    pub fn get(&self) -> impl Future<Item = Team, Error = Error> {
         self.github.get(&self.path(""))
     }
 
     /// edit the team
-    pub fn update(&self, team_options: &TeamOptions) -> Future<Team> {
+    pub fn update(&self, team_options: &TeamOptions) -> impl Future<Item = Team, Error = Error> {
         self.github.patch(&self.path(""), json!(team_options))
     }
 
     /// delete the team
-    pub fn delete(&self) -> Future<()> {
+    pub fn delete(&self) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(""))
     }
 
     /// list of teams for this org
-    pub fn list_members(&self) -> Future<Vec<User>> {
+    pub fn list_members(&self) -> impl Future<Item = Vec<User>, Error = Error> {
         self.github.get(&self.path("/members"))
     }
 
@@ -187,7 +187,7 @@ impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
     /// add a user to the team, if they are already on the team,
     /// change the role. If the user is not yet part of the
     /// organization, they are invited to join.
-    pub fn add_user(&self, user: &str, user_options: TeamMemberOptions) -> Future<TeamMember> {
+    pub fn add_user(&self, user: &str, user_options: TeamMemberOptions) -> impl Future<Item = TeamMember, Error = Error> {
         self.github.put(
             &self.path(&format!("/memberships/{}", user)),
             json!(user_options),
@@ -195,7 +195,7 @@ impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
     }
 
     /// Remove the user from the team
-    pub fn remove_user(&self, user: &str) -> Future<()> {
+    pub fn remove_user(&self, user: &str) -> impl Future<Item = (), Error = Error> {
         self.github
             .delete(&self.path(&format!("/memberships/{}", user)))
     }

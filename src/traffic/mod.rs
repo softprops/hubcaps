@@ -4,7 +4,7 @@ use std::fmt;
 use hyper::client::connect::Connect;
 use serde::Deserialize;
 
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// Describes types of breakdowns of the data for views or clones
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -52,17 +52,17 @@ impl<C: Clone + Connect + 'static> Traffic<C> {
     }
 
     /// List the top 10 referrers over the past 14 days
-    pub fn referrers(&self) -> Future<Vec<Referrer>> {
+    pub fn referrers(&self) -> impl Future<Item = Vec<Referrer>, Error = Error> {
         self.github.get(&self.path("/popular/referrers"))
     }
 
     /// List the top 10 popular contents over the past 14 days
-    pub fn paths(&self) -> Future<Vec<Path>> {
+    pub fn paths(&self) -> impl Future<Item = Vec<Path>, Error = Error> {
         self.github.get(&self.path("/popular/paths"))
     }
 
     /// Return the total number of views and breakdown per day or week for the last 14 days
-    pub fn views(&self, unit: TimeUnit) -> Future<Views> {
+    pub fn views(&self, unit: TimeUnit) -> impl Future<Item = Views, Error = Error> {
         let path = match unit {
             TimeUnit::Week => "/views?per=week",
             TimeUnit::Day => "/views?per=day",
@@ -71,7 +71,7 @@ impl<C: Clone + Connect + 'static> Traffic<C> {
     }
 
     /// Return the total number of clones and breakdown per day or week for the last 14 days
-    pub fn clones(&self, unit: TimeUnit) -> Future<Clones> {
+    pub fn clones(&self, unit: TimeUnit) -> impl Future<Item = Clones, Error = Error> {
         let path = match unit {
             TimeUnit::Week => "/clones?per=week",
             TimeUnit::Day => "/clones?per=day",

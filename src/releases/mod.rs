@@ -3,7 +3,7 @@ use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// Provides access to assets for a release.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
@@ -49,7 +49,7 @@ impl<C: Clone + Connect + 'static> Assets<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release-asset)
     /// for more information.
-    pub fn get(&self, id: u64) -> Future<Asset> {
+    pub fn get(&self, id: u64) -> impl Future<Item = Asset, Error = Error> {
         self.github.get(&self.path(&format!("/{}", id)))
     }
 
@@ -57,7 +57,7 @@ impl<C: Clone + Connect + 'static> Assets<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release-asset)
     /// for more information.
-    pub fn delete(&self, id: u64) -> Future<()> {
+    pub fn delete(&self, id: u64) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
@@ -65,7 +65,7 @@ impl<C: Clone + Connect + 'static> Assets<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-assets-for-a-release)
     /// for more information.
-    pub fn list(&self) -> Future<Vec<Asset>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Asset>, Error = Error> {
         self.github.get(&self.path(""))
     }
 }
@@ -106,7 +106,7 @@ impl<C: Clone + Connect + 'static> ReleaseRef<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release)
     /// for more information.
-    pub fn get(&self) -> Future<Release> {
+    pub fn get(&self) -> impl Future<Item = Release, Error = Error> {
         self.github.get::<Release>(&self.path(""))
     }
 
@@ -155,7 +155,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#create-a-release)
     /// for more information.
-    pub fn create(&self, rel: &ReleaseOptions) -> Future<Release> {
+    pub fn create(&self, rel: &ReleaseOptions) -> impl Future<Item = Release, Error = Error> {
         self.github.post(&self.path(""), json!(rel))
     }
 
@@ -163,7 +163,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#edit-a-release)
     /// for more information.
-    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
+    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> impl Future<Item = Release, Error = Error> {
         self.github
             .patch(&self.path(&format!("/{}", id)), json!(rel))
     }
@@ -172,7 +172,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release)
     /// for more information.
-    pub fn delete(&self, id: u64) -> Future<()> {
+    pub fn delete(&self, id: u64) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
@@ -180,7 +180,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository)
     /// for more information.
-    pub fn list(&self) -> Future<Vec<Release>> {
+    pub fn list(&self) -> impl Future<Item = Vec<Release>, Error = Error> {
         self.github.get(&self.path(""))
     }
 
@@ -188,7 +188,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-the-latest-release)
     /// for more information.
-    pub fn latest(&self) -> Future<Release> {
+    pub fn latest(&self) -> impl Future<Item = Release, Error = Error> {
         self.github.get(&self.path("/latest"))
     }
 
@@ -196,7 +196,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name)
     /// for more information.
-    pub fn by_tag<S>(&self, tag_name: S) -> Future<Release>
+    pub fn by_tag<S>(&self, tag_name: S) -> impl Future<Item = Release, Error = Error>
     where
         S: Into<String>,
     {

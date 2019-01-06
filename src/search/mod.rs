@@ -77,7 +77,7 @@ impl<C: Clone + Connect + 'static> Search<C> {
         unfold(self.github.clone(), self.github.get_pages(url), items)
     }
 
-    fn search<D>(&self, url: &str) -> Future<SearchResult<D>>
+    fn search<D>(&self, url: &str) -> impl Future<Item = SearchResult<D>, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -126,7 +126,7 @@ impl<C: Clone + Connect + 'static> SearchIssues<C> {
     /// Return the first page of search result repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
     /// for query format options
-    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Future<SearchResult<IssuesItem>>
+    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> impl Future<Item = SearchResult<IssuesItem>, Error = Error>
     where
         Q: Into<String>,
     {

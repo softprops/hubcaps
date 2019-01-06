@@ -84,7 +84,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// Request a pull requests information
-    pub fn get(&self) -> Future<Pull> {
+    pub fn get(&self) -> impl Future<Item = Pull, Error = Error> {
         self.github.get(&self.path(""))
     }
 
@@ -109,22 +109,22 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// short hand for editing state = open
-    pub fn open(&self) -> Future<Pull> {
+    pub fn open(&self) -> impl Future<Item = Pull, Error = Error> {
         self.edit(&PullEditOptions::builder().state("open").build())
     }
 
     /// shorthand for editing state = closed
-    pub fn close(&self) -> Future<Pull> {
+    pub fn close(&self) -> impl Future<Item = Pull, Error = Error> {
         self.edit(&PullEditOptions::builder().state("closed").build())
     }
 
     /// Edit a pull request
-    pub fn edit(&self, pr: &PullEditOptions) -> Future<Pull> {
+    pub fn edit(&self, pr: &PullEditOptions) -> impl Future<Item = Pull, Error = Error> {
         self.github.patch::<Pull>(&self.path(""), json!(pr))
     }
 
     /// Returns a vector of file diffs associated with this pull
-    pub fn files(&self) -> Future<Vec<FileDiff>> {
+    pub fn files(&self) -> impl Future<Item = Vec<FileDiff>, Error = Error> {
         self.github.get(&self.path("/files"))
     }
 
@@ -207,12 +207,12 @@ impl<C: Clone + Connect + 'static> PullRequests<C> {
     }
 
     /// Create a new pull request
-    pub fn create(&self, pr: &PullOptions) -> Future<Pull> {
+    pub fn create(&self, pr: &PullOptions) -> impl Future<Item = Pull, Error = Error> {
         self.github.post(&self.path(""), json!(pr))
     }
 
     /// list pull requests
-    pub fn list(&self, options: &PullListOptions) -> Future<Vec<Pull>> {
+    pub fn list(&self, options: &PullListOptions) -> impl Future<Item = Vec<Pull>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);

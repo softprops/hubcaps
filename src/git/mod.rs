@@ -5,7 +5,7 @@ use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 // Ours
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// reference to git operations associated with a github repo
 pub struct Git<C>
@@ -38,7 +38,7 @@ impl<C: Clone + Connect + 'static> Git<C> {
     /// list a git tree of files for this repo at a given sha
     /// https://developer.github.com/v3/git/trees/#get-a-tree
     /// https://developer.github.com/v3/git/trees/#get-a-tree-recursively
-    pub fn tree<S>(&self, sha: S, recursive: bool) -> Future<TreeData>
+    pub fn tree<S>(&self, sha: S, recursive: bool) -> impl Future<Item = TreeData, Error = Error>
     where
         S: Into<String>,
     {
@@ -51,7 +51,7 @@ impl<C: Clone + Connect + 'static> Git<C> {
 
     /// get the blob contents of a given sha
     /// https://developer.github.com/v3/git/blobs/#get-a-blob
-    pub fn blob<S>(&self, sha: S) -> Future<Blob>
+    pub fn blob<S>(&self, sha: S) -> impl Future<Item = Blob, Error = Error>
     where
         S: Into<String>,
     {
@@ -62,7 +62,7 @@ impl<C: Clone + Connect + 'static> Git<C> {
     /// get the git reference data of a given ref
     /// the specified reference must be formatted as as "heads/branch", not just "branch"
     /// https://developer.github.com/v3/git/refs/#get-a-reference
-    pub fn reference<S>(&self, reference: S) -> Future<GetReferenceResponse>
+    pub fn reference<S>(&self, reference: S) -> impl Future<Item = GetReferenceResponse, Error = Error>
     where
         S: Into<String>,
     {
@@ -74,7 +74,7 @@ impl<C: Clone + Connect + 'static> Git<C> {
     /// branches should be in the format `heads/feature-a`
     /// tags should be in the format `tags/v1.0`
     /// https://developer.github.com/v3/git/refs/#delete-a-reference
-    pub fn delete_reference<S>(&self, reference: S) -> Future<()>
+    pub fn delete_reference<S>(&self, reference: S) -> impl Future<Item = (), Error = Error>
     where
         S: Into<String>,
     {

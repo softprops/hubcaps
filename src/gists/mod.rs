@@ -7,7 +7,7 @@ use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Error, Future, Github};
 
 /// reference to gists associated with a github user
 pub struct UserGists<C>
@@ -30,7 +30,7 @@ impl<C: Clone + Connect + 'static> UserGists<C> {
         }
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
+    pub fn list(&self, options: &GistListOptions) -> impl Future<Item = Vec<Gist>, Error = Error> {
         let mut uri = vec![format!("/users/{}/gists", self.owner)];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -56,37 +56,37 @@ impl<C: Clone + Connect + 'static> Gists<C> {
         format!("/gists{}", more)
     }
 
-    pub fn star(&self, id: &str) -> Future<()> {
+    pub fn star(&self, id: &str) -> impl Future<Item = (), Error = Error> {
         self.github
             .put_no_response(&self.path(&format!("/{}/star", id)), Vec::new())
     }
 
-    pub fn unstar(&self, id: &str) -> Future<()> {
+    pub fn unstar(&self, id: &str) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}/star", id)))
     }
 
-    pub fn fork(&self, id: &str) -> Future<Gist> {
+    pub fn fork(&self, id: &str) -> impl Future<Item = Gist, Error = Error> {
         self.github
             .post(&self.path(&format!("/{}/forks", id)), Vec::new())
     }
 
-    pub fn forks(&self, id: &str) -> Future<Vec<GistFork>> {
+    pub fn forks(&self, id: &str) -> impl Future<Item = Vec<GistFork>, Error = Error> {
         self.github.get(&self.path(&format!("/{}/forks", id)))
     }
 
-    pub fn delete(&self, id: &str) -> Future<()> {
+    pub fn delete(&self, id: &str) -> impl Future<Item = (), Error = Error> {
         self.github.delete(&self.path(&format!("/{}", id)))
     }
 
-    pub fn get(&self, id: &str) -> Future<Gist> {
+    pub fn get(&self, id: &str) -> impl Future<Item = Gist, Error = Error> {
         self.github.get(&self.path(&format!("/{}", id)))
     }
 
-    pub fn getrev(&self, id: &str, sha: &str) -> Future<Gist> {
+    pub fn getrev(&self, id: &str, sha: &str) -> impl Future<Item = Gist, Error = Error> {
         self.github.get(&self.path(&format!("/{}/{}", id, sha)))
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
+    pub fn list(&self, options: &GistListOptions) -> impl Future<Item = Vec<Gist>, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -94,19 +94,19 @@ impl<C: Clone + Connect + 'static> Gists<C> {
         self.github.get::<Vec<Gist>>(&uri.join("?"))
     }
 
-    pub fn public(&self) -> Future<Vec<Gist>> {
+    pub fn public(&self) -> impl Future<Item = Vec<Gist>, Error = Error> {
         self.github.get(&self.path("/public"))
     }
 
-    pub fn starred(&self) -> Future<Vec<Gist>> {
+    pub fn starred(&self) -> impl Future<Item = Vec<Gist>, Error = Error> {
         self.github.get(&self.path("/starred"))
     }
 
-    pub fn create(&self, gist: &GistOptions) -> Future<Gist> {
+    pub fn create(&self, gist: &GistOptions) -> impl Future<Item = Gist, Error = Error> {
         self.github.post(&self.path(""), json!(gist))
     }
 
-    pub fn edit(&self, id: &str, gist: &GistOptions) -> Future<Gist> {
+    pub fn edit(&self, id: &str, gist: &GistOptions) -> impl Future<Item = Gist, Error = Error> {
         self.github
             .patch(&self.path(&format!("/{}", id)), json!(gist))
     }
