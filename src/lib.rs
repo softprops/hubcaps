@@ -725,14 +725,6 @@ where
             if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
                 debug!("x-rate-limit-limit: {:?}", value)
             }
-            #[cfg(feature = "httpcache")]
-            let etag = response
-                .headers()
-                .get(ETAG)
-                .map(|etag| etag.as_bytes().to_vec());
-            if let Some(value) = response.headers().get(ETAG) {
-                debug!("etag: {:?}", value)
-            }
             let remaining = response
                 .headers()
                 .get(X_RATELIMIT_REMAINING)
@@ -749,6 +741,11 @@ where
             if let Some(value) = reset {
                 debug!("x-rate-limit-reset: {}", value)
             }
+            let etag = response.headers().get(ETAG);
+            if let Some(value) = etag {
+                debug!("etag: {:?}", value)
+            }
+            let etag = etag.map(|etag| etag.as_bytes().to_vec());
             let status = response.status();
             // handle redirect common with renamed repos
             if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
@@ -759,7 +756,7 @@ where
 
                 if let Some(location) = location {
                     debug!("redirect location {:?}", location);
-                    return instance2.request(method, &location.to_string(), body, media_type, authentication);
+                    return instance2.request(method, location, body, media_type, authentication);
                 }
             }
             let link = response
