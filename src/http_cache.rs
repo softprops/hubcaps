@@ -28,14 +28,14 @@ pub trait HttpCache: HttpCacheClone + Debug {
 }
 
 impl dyn HttpCache {
-    pub fn noop() -> BoxedHttpCache {
-        Box::new(NoCache)
+    pub fn noop() -> impl HttpCache {
+        NoCache
     }
 
-    pub fn in_home_dir() -> BoxedHttpCache {
+    pub fn in_home_dir() -> impl HttpCache {
         let mut dir = dirs::home_dir().expect("Expected a home dir");
         dir.push(".hubcaps/cache");
-        Box::new(FileBasedCache::new(dir))
+        FileBasedCache::new(dir)
     }
 }
 
@@ -170,7 +170,7 @@ pub trait HttpCacheClone {
 
 impl<T> HttpCacheClone for T
 where
-    T: 'static + HttpCache + Clone + Send,
+    T: HttpCache + Clone + Send + 'static,
 {
     fn box_clone(&self) -> BoxedHttpCache {
         Box::new(self.clone())

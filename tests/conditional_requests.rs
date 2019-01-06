@@ -60,7 +60,7 @@ fn compare_counts() -> Result<()> {
     let host = "https://api.github.com";
     let client = Client::builder().build(HttpsConnector::new(4).unwrap());
     let cache_path = testkit::test_home().join(".hubcaps/cache");
-    let http_cache = Box::new(FileBasedCache::new(cache_path));
+    let http_cache = FileBasedCache::new(cache_path);
     let github: Github<_> = Github::custom(host, agent, credentials, client, http_cache);
 
     info!("first populate the cache");

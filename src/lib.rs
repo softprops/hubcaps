@@ -439,24 +439,25 @@ where
     C: Clone + Connect + 'static,
 {
     #[cfg(feature = "httpcache")]
-    pub fn custom<H, A, CR>(
+    pub fn custom<H, A, CR, HC>(
         host: H,
         agent: A,
         credentials: CR,
         http: Client<C>,
-        http_cache: BoxedHttpCache,
+        http_cache: HC,
     ) -> Self
     where
         H: Into<String>,
         A: Into<String>,
         CR: Into<Option<Credentials>>,
+        HC: HttpCache + Send + 'static,
     {
         Self {
             host: host.into(),
             agent: agent.into(),
             client: http,
             credentials: credentials.into(),
-            http_cache,
+            http_cache: Box::new(http_cache),
         }
     }
 
