@@ -6,7 +6,7 @@ use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use super::{Search, SearchResult};
-use crate::{Future, SortDirection, Stream};
+use crate::{Error, Future, SortDirection, Stream};
 use crate::users::User;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -62,7 +62,7 @@ impl<C: Clone + Connect + 'static> SearchRepos<C> {
     /// Return a stream of search results repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters)
     /// for query format options
-    pub fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> Stream<ReposItem>
+    pub fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> impl Stream<Item = ReposItem, Error = Error>
     where
         Q: Into<String>,
     {

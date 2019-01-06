@@ -1,5 +1,5 @@
 //! Users interface
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 use serde::Deserialize;
 
 use hyper::client::connect::Connect;
@@ -125,7 +125,7 @@ impl<C: Clone + Connect + 'static> Contributors<C> {
     }
 
     /// provides a stream over all pages of teams
-    pub fn iter(&self) -> Stream<User> {
+    pub fn iter(&self) -> impl Stream<Item = User, Error = Error> {
         unfold(
             self.github.clone(),
             self.github

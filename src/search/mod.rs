@@ -9,7 +9,7 @@ use serde::Deserialize;
 
 use crate::labels::Label;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{unfold, Error, Future, Github, SortDirection, Stream};
 
 mod repos;
 
@@ -70,7 +70,7 @@ impl<C: Clone + Connect + 'static> Search<C> {
         SearchRepos::new(self.clone())
     }
 
-    fn iter<D>(&self, url: &str) -> Stream<D>
+    fn iter<D>(&self, url: &str) -> impl Stream<Item = D, Error = Error>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -116,7 +116,7 @@ impl<C: Clone + Connect + 'static> SearchIssues<C> {
     /// Return a stream of search results repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
     /// for query format options
-    pub fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Stream<IssuesItem>
+    pub fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> impl Stream<Item = IssuesItem, Error = Error>
     where
         Q: Into<String>,
     {

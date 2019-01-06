@@ -3,7 +3,7 @@ use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::users::User;
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -45,7 +45,7 @@ impl<C: Clone + Connect + 'static> PullCommits<C> {
     }
 
     /// provides a stream over all pages of pull commits
-    pub fn iter(&self) -> Stream<PullCommit> {
+    pub fn iter(&self) -> impl Stream<Item = PullCommit, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&format!(

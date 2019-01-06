@@ -5,7 +5,7 @@ use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 
 /// Team repository permissions
 #[derive(Clone, Copy)]
@@ -61,7 +61,7 @@ impl<C: Clone + Connect + 'static> RepoTeams<C> {
     }
 
     /// provides a stream over all pages of teams
-    pub fn iter(&self) -> Stream<Team> {
+    pub fn iter(&self) -> impl Stream<Item = Team, Error = Error> {
         unfold(
             self.github.clone(),
             self.github
@@ -110,7 +110,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
     }
 
     /// provides an iterator over all pages of teams
-    pub fn iter(&self) -> Stream<Team> {
+    pub fn iter(&self) -> impl Stream<Item = Team, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&format!("/orgs/{}/teams", self.org)),
@@ -176,7 +176,7 @@ impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
     }
 
     /// provides an iterator over all pages of members
-    pub fn iter_members(&self) -> Stream<User> {
+    pub fn iter_members(&self) -> impl Stream<Item = User, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&self.path("/members")),

@@ -5,7 +5,7 @@
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -45,7 +45,7 @@ impl<C: Clone + Connect + 'static> Branches<C> {
     }
 
     /// provides an stream over branches for this repo
-    pub fn iter(&self) -> Stream<Branch> {
+    pub fn iter(&self) -> impl Stream<Item = Branch, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&format!(

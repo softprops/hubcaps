@@ -2,7 +2,7 @@
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -53,7 +53,7 @@ impl<C: Clone + Connect + 'static> Labels<C> {
     }
 
     /// provides a stream over all pages of this repo's labels
-    pub fn iter(&self) -> Stream<Label> {
+    pub fn iter(&self) -> impl Stream<Item = Label, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&self.path("")),

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::comments::Comments;
 use crate::labels::Label;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{unfold, Error, Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -297,7 +297,7 @@ impl<C: Clone + Connect + 'static> Issues<C> {
     ///
     /// Note: You'll typically want to use a `IssueListOptions` with a `per_page`
     /// of 100 for maximum api credential rate limit efficency
-    pub fn iter(&self, options: &IssueListOptions) -> Stream<Issue> {
+    pub fn iter(&self, options: &IssueListOptions) -> impl Stream<Item = Issue, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);

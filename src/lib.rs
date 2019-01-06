@@ -87,7 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
+use futures::{future, stream, Future as StdFuture, IntoFuture, Stream};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
 #[cfg(feature = "httpcache")]
@@ -164,9 +164,6 @@ const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
 pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
-
-/// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<dyn StdStream<Item = T, Error = Error> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -1022,7 +1019,7 @@ fn unfold<C, D, I>(
     github: Github<C>,
     first: Future<(Option<Link>, D)>,
     into_items: fn(D) -> Vec<I>,
-) -> Stream<I>
+) -> impl Stream<Item = I, Error = Error>
 where
     D: DeserializeOwned + 'static + Send,
     I: 'static + Send,

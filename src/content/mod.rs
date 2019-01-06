@@ -7,7 +7,7 @@ use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::Deserialize;
 use serde::de::{self, Visitor};
 
-use crate::{unfold, Future, Github, Stream};
+use crate::{unfold, Error, Future, Github, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -59,7 +59,7 @@ impl<C: Clone + Connect + 'static> Content<C> {
     }
 
     /// List the root directory.
-    pub fn root(&self) -> Stream<DirectoryItem> {
+    pub fn root(&self) -> impl Stream<Item = DirectoryItem, Error = Error> {
         self.iter("/")
     }
 
@@ -67,7 +67,7 @@ impl<C: Clone + Connect + 'static> Content<C> {
     ///
     /// GitHub limits the number of items returned to 1000 for this API. If you
     /// need to retrieve more items, the Git Data API must be used instead.
-    pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
+    pub fn iter(&self, location: &str) -> impl Stream<Item = DirectoryItem, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&self.path(location)),

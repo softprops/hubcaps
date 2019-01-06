@@ -13,7 +13,7 @@ use crate::pull_commits::PullCommits;
 use crate::review_comments::ReviewComments;
 use crate::review_requests::ReviewRequests;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{unfold, Error, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -221,7 +221,7 @@ impl<C: Clone + Connect + 'static> PullRequests<C> {
     }
 
     /// provides a stream over all pages of pull requests
-    pub fn iter(&self, options: &PullListOptions) -> Stream<Pull> {
+    pub fn iter(&self, options: &PullListOptions) -> impl Stream<Item = Pull, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);

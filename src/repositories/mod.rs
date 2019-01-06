@@ -22,7 +22,7 @@ use crate::teams::RepoTeams;
 use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{unfold, Error, Future, Github, SortDirection, Stream};
 
 fn identity<T>(x: T) -> T {
     x
@@ -171,7 +171,7 @@ impl<C: Clone + Connect + 'static> Repositories<C> {
 
     /// provides a stream over all pages of the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &RepoListOptions) -> Stream<Repo> {
+    pub fn iter(&self, options: &RepoListOptions) -> impl Stream<Item = Repo, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -220,7 +220,7 @@ impl<C: Clone + Connect + 'static> OrgRepositories<C> {
 
     /// provides a stream over all pages of an orgs's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrgRepoListOptions) -> Stream<Repo> {
+    pub fn iter(&self, options: &OrgRepoListOptions) -> impl Stream<Item = Repo, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
@@ -276,7 +276,7 @@ impl<C: Clone + Connect + 'static> UserRepositories<C> {
 
     /// provides a stream over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
+    pub fn iter(&self, options: &UserRepoListOptions) -> impl Stream<Item = Repo, Error = Error> {
         unfold(
             self.github.clone(),
             self.github.get_pages(&self.uri(options)),
@@ -322,7 +322,7 @@ impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
 
     /// Provides a stream over all pages of an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrganizationRepoListOptions) -> Stream<Repo> {
+    pub fn iter(&self, options: &OrganizationRepoListOptions) -> impl Stream<Item = Repo, Error = Error> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
