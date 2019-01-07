@@ -5,11 +5,7 @@
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{unfold, Future, Github, Stream};
-
-fn identity<T>(x: T) -> T {
-    x
-}
+use crate::{Future, Github, Stream};
 
 /// reference to gists associated with a github user
 pub struct Branches<C>
@@ -46,15 +42,11 @@ impl<C: Clone + Connect + 'static> Branches<C> {
 
     /// provides an stream over branches for this repo
     pub fn iter(&self) -> Stream<Branch> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&format!(
-                "/repos/{owner}/{repo}/branches",
-                owner = self.owner,
-                repo = self.repo
-            )),
-            identity,
-        )
+        self.github.get_stream(&format!(
+            "/repos/{owner}/{repo}/branches",
+            owner = self.owner,
+            repo = self.repo
+        ))
     }
 
     /// gets a branch for this repo by name

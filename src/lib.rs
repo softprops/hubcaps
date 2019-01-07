@@ -885,6 +885,13 @@ where
         )
     }
 
+    fn get_stream<D>(&self, uri: &str) -> Stream<D>
+    where
+        D: DeserializeOwned + 'static + Send,
+    {
+        unfold(self.clone(), self.get_pages(uri), |x| x)
+    }
+
     fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
     where
         D: DeserializeOwned + 'static + Send,

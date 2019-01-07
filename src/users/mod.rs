@@ -1,5 +1,5 @@
 //! Users interface
-use crate::{unfold, Future, Github, Stream};
+use crate::{Future, Github, Stream};
 use serde::Deserialize;
 
 use hyper::client::connect::Connect;
@@ -91,10 +91,6 @@ impl<C: Clone + Connect + 'static> Users<C> {
 }
 
 /// reference to contributors associated with a github repo
-fn identity<T>(x: T) -> T {
-    x
-}
-
 pub struct Contributors<C>
 where
     C: Clone + Connect + 'static,
@@ -126,11 +122,7 @@ impl<C: Clone + Connect + 'static> Contributors<C> {
 
     /// provides a stream over all pages of teams
     pub fn iter(&self) -> Stream<User> {
-        unfold(
-            self.github.clone(),
-            self.github
-                .get_pages(&format!("/repos/{}/{}/contributors", self.owner, self.repo)),
-            identity,
-        )
+        self.github
+            .get_stream(&format!("/repos/{}/{}/contributors", self.owner, self.repo))
     }
 }

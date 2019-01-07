@@ -5,7 +5,7 @@ use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{unfold, Future, Github, Stream};
+use crate::{Future, Github, Stream};
 
 /// Team repository permissions
 #[derive(Clone, Copy)]
@@ -24,10 +24,6 @@ impl fmt::Display for Permission {
         }
         .fmt(f)
     }
-}
-
-fn identity<T>(x: T) -> T {
-    x
 }
 
 /// reference to teams associated with a github repo
@@ -62,12 +58,8 @@ impl<C: Clone + Connect + 'static> RepoTeams<C> {
 
     /// provides a stream over all pages of teams
     pub fn iter(&self) -> Stream<Team> {
-        unfold(
-            self.github.clone(),
-            self.github
-                .get_pages(&format!("/repos/{}/{}/teams", self.owner, self.repo)),
-            identity,
-        )
+        self.github
+            .get_stream(&format!("/repos/{}/{}/teams", self.owner, self.repo))
     }
 }
 
@@ -111,11 +103,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
 
     /// provides an iterator over all pages of teams
     pub fn iter(&self) -> Stream<Team> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&format!("/orgs/{}/teams", self.org)),
-            identity,
-        )
+        self.github.get_stream(&format!("/orgs/{}/teams", self.org))
     }
 
     /// adds a repository permission to this team
@@ -177,11 +165,7 @@ impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
 
     /// provides an iterator over all pages of members
     pub fn iter_members(&self) -> Stream<User> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&self.path("/members")),
-            identity,
-        )
+        self.github.get_stream(&self.path("/members"))
     }
 
     /// add a user to the team, if they are already on the team,

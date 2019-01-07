@@ -13,11 +13,7 @@ use crate::pull_commits::PullCommits;
 use crate::review_comments::ReviewComments;
 use crate::review_requests::ReviewRequests;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
-
-fn identity<T>(x: T) -> T {
-    x
-}
+use crate::{Future, Github, SortDirection, Stream};
 
 /// Sort directions for pull requests
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -226,11 +222,7 @@ impl<C: Clone + Connect + 'static> PullRequests<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
-            identity,
-        )
+        self.github.get_stream(&uri.join("?"))
     }
 }
 
