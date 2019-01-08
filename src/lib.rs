@@ -745,6 +745,7 @@ where
             if let Some(value) = etag {
                 debug!("etag: {:?}", value)
             }
+            #[cfg(feature = "httpcache")]
             let etag = etag.map(|etag| etag.as_bytes().to_vec());
             let status = response.status();
             // handle redirect common with renamed repos
