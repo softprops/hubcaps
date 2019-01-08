@@ -254,7 +254,7 @@ pub struct Release {
     pub assets: Vec<Asset>,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Builder, Debug, Default, Serialize)]
 pub struct ReleaseOptions {
     pub tag_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -269,63 +269,14 @@ pub struct ReleaseOptions {
     pub prerelease: Option<bool>,
 }
 
-/// builder interface for ReleaseOptions
-pub struct ReleaseOptionsBuilder(ReleaseOptions);
-
 impl ReleaseOptionsBuilder {
     pub(crate) fn new<T>(tag: T) -> Self
     where
         T: Into<String>,
     {
-        ReleaseOptionsBuilder(ReleaseOptions {
-            tag_name: tag.into(),
-            ..Default::default()
-        })
-    }
-
-    pub fn commitish<C>(&mut self, commit: C) -> &mut Self
-    where
-        C: Into<String>,
-    {
-        self.0.target_commitish = Some(commit.into());
-        self
-    }
-
-    pub fn name<N>(&mut self, name: N) -> &mut Self
-    where
-        N: Into<String>,
-    {
-        self.0.name = Some(name.into());
-        self
-    }
-
-    pub fn body<B>(&mut self, body: B) -> &mut Self
-    where
-        B: Into<String>,
-    {
-        self.0.body = Some(body.into());
-        self
-    }
-
-    pub fn draft(&mut self, draft: bool) -> &mut Self {
-        self.0.draft = Some(draft);
-        self
-    }
-
-    pub fn prerelease(&mut self, pre: bool) -> &mut Self {
-        self.0.prerelease = Some(pre);
-        self
-    }
-
-    pub fn build(&self) -> ReleaseOptions {
-        ReleaseOptions::new(
-            self.0.tag_name.as_str(),
-            self.0.target_commitish.clone(),
-            self.0.name.clone(),
-            self.0.body.clone(),
-            self.0.draft,
-            self.0.prerelease,
-        )
+        let mut b = ReleaseOptionsBuilder::default();
+        b.tag_name(tag.into());
+        b
     }
 }
 

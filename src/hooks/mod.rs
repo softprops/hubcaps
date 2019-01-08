@@ -99,7 +99,7 @@ impl<C: Clone + Connect + 'static> Hooks<C> {
 /// options for creating a repository hook
 /// see [this](https://developer.github.com/v3/repos/hooks/#create-a-hook)
 /// for githubs official documentation
-#[derive(Debug, Default, Serialize)]
+#[derive(Builder, Debug, Default, Serialize)]
 pub struct HookCreateOptions {
     name: String,
     config: BTreeMap<String, ::serde_json::Value>,
@@ -124,24 +124,16 @@ impl HookCreateOptions {
     }
 }
 
-pub struct HookCreateOptionsBuilder(HookCreateOptions);
-
 impl HookCreateOptionsBuilder {
     #[doc(hidden)]
     pub(crate) fn new<N>(name: N) -> Self
     where
         N: Into<String>,
     {
-        HookCreateOptionsBuilder(HookCreateOptions {
-            name: name.into(),
-            active: true,
-            ..Default::default()
-        })
-    }
-
-    pub fn active(&mut self, active: bool) -> &mut Self {
-        self.0.active = active;
-        self
+        let mut b = HookCreateOptionsBuilder::default();
+        b.name(name.into());
+        b.active(true);
+        b
     }
 
     /// a list of github events this hook should receive deliveries for
@@ -151,7 +143,7 @@ impl HookCreateOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.0.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+        self.events = Some(events.into_iter().map(|e| e.into()).collect::<Vec<_>>());
         self
     }
 
@@ -193,24 +185,15 @@ impl HookCreateOptionsBuilder {
     where
         N: Into<String>,
     {
-        self.0.config.insert(name.into(), value);
+        self.config.get_or_insert_with(|| Default::default()).insert(name.into(), value);
         self
-    }
-
-    pub fn build(&self) -> HookCreateOptions {
-        HookCreateOptions {
-            name: self.0.name.clone(),
-            config: self.0.config.clone(),
-            events: self.0.events.clone(),
-            active: self.0.active,
-        }
     }
 }
 
 /// options for editing a repository hook
 /// see [this](https://developer.github.com/v3/repos/hooks/#edit-a-hook)
 /// for githubs official documentation
-#[derive(Debug, Default, Serialize)]
+#[derive(Builder, Debug, Default, Serialize)]
 pub struct HookEditOptions {
     config: BTreeMap<String, ::serde_json::Value>,
     events: Vec<String>,
@@ -226,15 +209,7 @@ impl HookEditOptions {
     }
 }
 
-#[derive(Default)]
-pub struct HookEditOptionsBuilder(HookEditOptions);
-
 impl HookEditOptionsBuilder {
-    pub fn active(&mut self, active: bool) -> &mut Self {
-        self.0.active = active;
-        self
-    }
-
     /// a list of github events this hook should receive deliveries for
     /// the default is "push". for a full list, see
     /// the [Github api docs](https://developer.github.com/webhooks/#events)
@@ -242,7 +217,7 @@ impl HookEditOptionsBuilder {
     where
         E: Into<String>,
     {
-        self.0.events = events.into_iter().map(|e| e.into()).collect::<Vec<_>>();
+        self.events = Some(events.into_iter().map(|e| e.into()).collect::<Vec<_>>());
         self
     }
 
@@ -284,18 +259,8 @@ impl HookEditOptionsBuilder {
     where
         N: Into<String>,
     {
-        self.0.config.insert(name.into(), value);
+        self.config.get_or_insert_with(|| Default::default()).insert(name.into(), value);
         self
-    }
-
-    pub fn build(&self) -> HookEditOptions {
-        HookEditOptions {
-            config: self.0.config.clone(),
-            events: self.0.events.clone(),
-            add_events: self.0.add_events.clone(),
-            remove_events: self.0.remove_events.clone(),
-            active: self.0.active,
-        }
     }
 }
 

@@ -37,6 +37,7 @@ serde_json = "1.0"
 error-chain = "0.12"
 base64 = "0.10"
 percent-encoding = "1"
+derive_builder = "0.7.0"
 
 [dependencies.hyper-tls]
 optional = true

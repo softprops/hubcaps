@@ -72,7 +72,7 @@ pub struct Status {
     pub creator: User,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Builder, Debug, Default, Serialize)]
 pub struct StatusOptions {
     state: State,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,48 +83,12 @@ pub struct StatusOptions {
     context: Option<String>,
 }
 
-pub struct StatusOptionsBuilder(StatusOptions);
-
 impl StatusOptionsBuilder {
     #[doc(hidden)]
     pub(crate) fn new(state: State) -> Self {
-        StatusOptionsBuilder(StatusOptions {
-            state,
-            ..Default::default()
-        })
-    }
-
-    pub fn target_url<T>(&mut self, url: T) -> &mut Self
-    where
-        T: Into<String>,
-    {
-        self.0.target_url = Some(url.into());
-        self
-    }
-
-    pub fn description<D>(&mut self, desc: D) -> &mut Self
-    where
-        D: Into<String>,
-    {
-        self.0.description = Some(desc.into());
-        self
-    }
-
-    pub fn context<C>(&mut self, ctx: C) -> &mut Self
-    where
-        C: Into<String>,
-    {
-        self.0.context = Some(ctx.into());
-        self
-    }
-
-    pub fn build(&self) -> StatusOptions {
-        StatusOptions::new(
-            self.0.state.clone(),
-            self.0.target_url.clone(),
-            self.0.description.clone(),
-            self.0.context.clone(),
-        )
+        let mut b = StatusOptionsBuilder::default();
+        b.state(state);
+        b
     }
 }
 
