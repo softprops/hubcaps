@@ -3,11 +3,7 @@ use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::users::User;
-use crate::{unfold, Future, Github, Stream};
-
-fn identity<T>(x: T) -> T {
-    x
-}
+use crate::{Future, Github, Stream};
 
 /// A structure for interfacing with a pull commits
 pub struct PullCommits<C>
@@ -46,14 +42,10 @@ impl<C: Clone + Connect + 'static> PullCommits<C> {
 
     /// provides a stream over all pages of pull commits
     pub fn iter(&self) -> Stream<PullCommit> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&format!(
-                "/repos/{}/{}/pulls/{}/commits",
-                self.owner, self.repo, self.number
-            )),
-            identity,
-        )
+        self.github.get_stream(&format!(
+            "/repos/{}/{}/pulls/{}/commits",
+            self.owner, self.repo, self.number
+        ))
     }
 }
 

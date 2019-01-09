@@ -22,11 +22,7 @@ use crate::teams::RepoTeams;
 use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
-
-fn identity<T>(x: T) -> T {
-    x
-}
+use crate::{Future, Github, SortDirection, Stream};
 
 /// describes repository visibilities
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -176,11 +172,7 @@ impl<C: Clone + Connect + 'static> Repositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
-            identity,
-        )
+        self.github.get_stream(&uri.join("?"))
     }
 }
 
@@ -225,11 +217,7 @@ impl<C: Clone + Connect + 'static> OrgRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
-            identity,
-        )
+        self.github.get_stream(&uri.join("?"))
     }
 
     /// Create a new org repository
@@ -277,11 +265,7 @@ impl<C: Clone + Connect + 'static> UserRepositories<C> {
     /// provides a stream over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
     pub fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&self.uri(options)),
-            identity,
-        )
+        self.github.get_stream(&self.uri(options))
     }
 }
 
@@ -327,11 +311,7 @@ impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
-            identity,
-        )
+        self.github.get_stream(&uri.join("?"))
     }
 }
 

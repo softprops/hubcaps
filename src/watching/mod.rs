@@ -4,7 +4,7 @@ use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::repositories::Repo;
-use crate::{unfold, Future, Github, Stream};
+use crate::{Future, Github, Stream};
 
 pub struct Watching<C>
 where
@@ -22,11 +22,7 @@ impl<C: Clone + Connect + 'static> Watching<C> {
     /// Provides a stream over all pages of the repositories watched by the authenticated user.
     /// https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
     pub fn iter(&self) -> Stream<Repo> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages("/user/subscriptions"),
-            |x| x,
-        )
+        self.github.get_stream("/user/subscriptions")
     }
 
     /// https://developer.github.com/v3/activity/watching/#get-a-repository-subscription

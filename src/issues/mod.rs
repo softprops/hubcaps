@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::comments::Comments;
 use crate::labels::Label;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -244,10 +244,6 @@ where
     repo: String,
 }
 
-fn identity<T>(x: T) -> T {
-    x
-}
-
 impl<C: Clone + Connect + 'static> Issues<C> {
     /// create a new instance of a github repo issue ref
     pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
@@ -302,11 +298,7 @@ impl<C: Clone + Connect + 'static> Issues<C> {
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&uri.join("?")),
-            identity,
-        )
+        self.github.get_stream(&uri.join("?"))
     }
 }
 

@@ -7,11 +7,7 @@ use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::Deserialize;
 use serde::de::{self, Visitor};
 
-use crate::{unfold, Future, Github, Stream};
-
-fn identity<T>(x: T) -> T {
-    x
-}
+use crate::{Future, Github, Stream};
 
 /// Provides access to the content information for a repository
 pub struct Content<C>
@@ -68,11 +64,7 @@ impl<C: Clone + Connect + 'static> Content<C> {
     /// GitHub limits the number of items returned to 1000 for this API. If you
     /// need to retrieve more items, the Git Data API must be used instead.
     pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
-        unfold(
-            self.github.clone(),
-            self.github.get_pages(&self.path(location)),
-            identity,
-        )
+        self.github.get_stream(&self.path(location))
     }
 }
 
