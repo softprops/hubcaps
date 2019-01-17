@@ -47,6 +47,7 @@ features = ["tls","httpcache"]
 * improve contents API [#155](https://github.com/softprops/hubcaps/pull/155)
 * implement repository [contributors api](https://developer.github.com/v3/repos/#list-contributors) [#154](https://github.com/softprops/hubcaps/pull/154)
 * add release helper methods to get `latest` release and `release_by_tag` [#147](https://github.com/softprops/hubcaps/pull/147)
+* add optional [rustls](https://github.com/ctz/rustls) support
 
 
 # 0.4.10
