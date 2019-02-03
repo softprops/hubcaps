@@ -193,7 +193,9 @@ impl<'de> Deserialize<'de> for DecodedContents {
             where
                 E: de::Error,
             {
-                let decoded = base64::decode_config(v, base64::STANDARD).map_err(|e| match e {
+                //If base64 contains a line break, it will be InvalidBytes
+                let v = v.replace("\n", "");
+                let decoded = base64::decode_config(&v, base64::STANDARD).map_err(|e| match e {
                     base64::DecodeError::InvalidLength => {
                         E::invalid_length(v.len(), &"invalid base64 length")
                     }
