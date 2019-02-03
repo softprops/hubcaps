@@ -866,14 +866,14 @@ where
         )
     }
 
-    fn get<D>(&self, uri: &str) -> Future<D>
+    pub fn get<D>(&self, uri: &str) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
         self.get_media(uri, MediaType::Json)
     }
 
-    fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
+    pub fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -906,7 +906,7 @@ where
         )
     }
 
-    fn delete(&self, uri: &str) -> Future<()> {
+    pub fn delete(&self, uri: &str) -> Future<()> {
         Box::new(
             self.request_entity::<()>(
                 Method::DELETE,
@@ -922,7 +922,7 @@ where
         )
     }
 
-    fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+    pub fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::new(
             self.request_entity::<()>(
                 Method::DELETE,
@@ -938,7 +938,7 @@ where
         )
     }
 
-    fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    pub fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -950,7 +950,7 @@ where
         )
     }
 
-    fn post_media<D>(
+    pub fn post_media<D>(
         &self,
         uri: &str,
         message: Vec<u8>,
@@ -969,14 +969,14 @@ where
         )
     }
 
-    fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+    pub fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::new(self.patch(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
         }))
     }
 
-    fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    pub fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -989,21 +989,21 @@ where
         )
     }
 
-    fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    pub fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
         self.patch_media(uri, message, MediaType::Json)
     }
 
-    fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
+    pub fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::new(self.put(uri, message).or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
         }))
     }
 
-    fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    pub fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
