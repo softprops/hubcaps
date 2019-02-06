@@ -96,6 +96,8 @@ use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
 use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
+#[cfg(feature = "rustls")]
+use hyper_rustls::HttpsConnector;
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
@@ -406,6 +408,15 @@ where
 }
 
 #[cfg(feature = "tls")]
+fn create_connector() -> HttpsConnector<HttpConnector> {
+    HttpsConnector::new(4).unwrap()
+}
+#[cfg(feature = "rustls")]
+fn create_connector() -> HttpsConnector<HttpConnector> {
+    HttpsConnector::new(4)
+}
+
+#[cfg(any(feature = "tls", feature = "rustls"))]
 impl Github<HttpsConnector<HttpConnector>> {
     pub fn new<A, C>(agent: A, credentials: C) -> Self
     where
@@ -421,7 +432,7 @@ impl Github<HttpsConnector<HttpConnector>> {
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        let connector = HttpsConnector::new(4).unwrap();
+        let connector = create_connector();
         let http = Client::builder().keep_alive(true).build(connector);
         #[cfg(feature = "httpcache")]
         {
