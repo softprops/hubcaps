@@ -44,7 +44,7 @@ version = "0.3"
 
 [dependencies.hyper-rustls]
 optional = true
-version = "0.14"
+version = "0.16"
 
 [features]
 default = ["tls"]
