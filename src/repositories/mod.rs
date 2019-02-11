@@ -521,6 +521,7 @@ pub struct Repo {
     pub has_wiki: bool,
     pub has_pages: bool,
     pub has_downloads: bool,
+    pub archived: bool,
     pub pushed_at: String,
     pub created_at: String,
     pub updated_at: String, // permissions: Permissions
