@@ -1060,8 +1060,9 @@ where
                             let uri = [url.path(), url.query().unwrap_or_default()].join("?");
                             Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
                                 let mut items = into_items(payload);
+                                let item = items.remove(0);
                                 items.reverse();
-                                (items.remove(0), (link, items))
+                                (item, (link, items))
                             })) as Future<(I, (Option<Link>, Vec<I>))>
                         }),
                     },
