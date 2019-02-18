@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use hyper::client::connect::Connect;
 use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
@@ -10,17 +9,14 @@ use crate::users::User;
 use crate::{Future, Github};
 
 /// reference to gists associated with a github user
-pub struct UserGists<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct UserGists {
+    github: Github,
     owner: String,
 }
 
-impl<C: Clone + Connect + 'static> UserGists<C> {
+impl UserGists {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, owner: O) -> Self
+    pub fn new<O>(github: Github, owner: O) -> Self
     where
         O: Into<String>,
     {
@@ -39,16 +35,13 @@ impl<C: Clone + Connect + 'static> UserGists<C> {
     }
 }
 
-pub struct Gists<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Gists {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Gists<C> {
+impl Gists {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 

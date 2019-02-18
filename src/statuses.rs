@@ -1,23 +1,19 @@
 //! Statuses interface
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
 use crate::{Future, Github};
 
 /// interface for statuses associated with a repository
-pub struct Statuses<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Statuses {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Statuses<C> {
+impl Statuses {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

@@ -1,21 +1,17 @@
 //! Watching interface
 /// https://developer.github.com/v3/activity/watching
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::repositories::Repo;
 use crate::{Future, Github, Stream};
 
-pub struct Watching<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Watching {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Watching<C> {
+impl Watching {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 

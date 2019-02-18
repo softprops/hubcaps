@@ -1,26 +1,19 @@
 //! Checks interface
 // see: https://developer.github.com/v3/checks/suites/
 use futures::IntoFuture;
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
 
-pub struct CheckRuns<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct CheckRuns {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<'a, C> CheckRuns<C>
-where
-    C: Clone + Connect + 'static,
-{
+impl<'a> CheckRuns {
     #[doc(hidden)]
-    pub(crate) fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub(crate) fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

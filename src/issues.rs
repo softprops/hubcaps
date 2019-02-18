@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
@@ -68,16 +67,16 @@ impl Default for Sort {
 }
 
 /// Provides access to assignee operations available for an individual issue
-pub struct IssueAssignees<C: Clone + Connect + 'static> {
-    github: Github<C>,
+pub struct IssueAssignees {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> IssueAssignees<C> {
+impl IssueAssignees {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -104,16 +103,16 @@ impl<C: Clone + Connect + 'static> IssueAssignees<C> {
 }
 
 /// Provides access to label operations available for an individual issue
-pub struct IssueLabels<C: Clone + Connect + 'static> {
-    github: Github<C>,
+pub struct IssueLabels {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> IssueLabels<C> {
+impl IssueLabels {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -160,19 +159,16 @@ impl<C: Clone + Connect + 'static> IssueLabels<C> {
 
 /// Provides access to operations available for a single issue
 /// Typically accessed from `github.repo(.., ..).issues().get(number)`
-pub struct IssueRef<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct IssueRef {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> IssueRef<C> {
+impl IssueRef {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -198,7 +194,7 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
     }
 
     /// Return a reference to labels operations available for this issue
-    pub fn labels(&self) -> IssueLabels<C> {
+    pub fn labels(&self) -> IssueLabels {
         IssueLabels::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -208,7 +204,7 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
     }
 
     /// Return a reference to assignee operations available for this issue
-    pub fn assignees(&self) -> IssueAssignees<C> {
+    pub fn assignees(&self) -> IssueAssignees {
         IssueAssignees::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -223,7 +219,7 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
     }
 
     /// Return a reference to comment operations available for this issue
-    pub fn comments(&self) -> Comments<C> {
+    pub fn comments(&self) -> Comments {
         Comments::new(
             self.github.clone(),
             self.owner.clone(),
@@ -235,18 +231,15 @@ impl<C: Clone + Connect + 'static> IssueRef<C> {
 
 /// Provides access to operations available for a repository issues
 /// Typically accessed via `github.repo(..., ...).issues()`
-pub struct Issues<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Issues {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Issues<C> {
+impl Issues {
     /// create a new instance of a github repo issue ref
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -262,7 +255,7 @@ impl<C: Clone + Connect + 'static> Issues<C> {
         format!("/repos/{}/{}/issues{}", self.owner, self.repo, more)
     }
 
-    pub fn get(&self, number: u64) -> IssueRef<C> {
+    pub fn get(&self, number: u64) -> IssueRef {
         IssueRef::new(
             self.github.clone(),
             self.owner.as_str(),

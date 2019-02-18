@@ -1,24 +1,20 @@
 //! Review comments interface
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
 use crate::{Future, Github};
 
 /// A structure for interfacing with a review comments
-pub struct ReviewComments<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct ReviewComments {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> ReviewComments<C> {
+impl ReviewComments {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,

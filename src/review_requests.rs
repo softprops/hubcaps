@@ -1,5 +1,4 @@
 //! Review requests interface
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::pulls::Pull;
@@ -8,19 +7,16 @@ use crate::users::User;
 use crate::{Future, Github};
 
 /// A structure for interfacing with review requests
-pub struct ReviewRequests<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct ReviewRequests {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> ReviewRequests<C> {
+impl ReviewRequests {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,

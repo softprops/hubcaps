@@ -1,7 +1,6 @@
 //! Deployments interface
 use std::collections::HashMap;
 
-use hyper::client::connect::Connect;
 use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
@@ -10,29 +9,23 @@ use crate::users::User;
 use crate::{Future, Github};
 
 /// Interface for repository deployments
-pub struct Deployments<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Deployments {
+    github: Github,
     owner: String,
     repo: String,
 }
 
 /// Interface for deployment statuses
-pub struct DeploymentStatuses<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct DeploymentStatuses {
+    github: Github,
     owner: String,
     repo: String,
     id: u64,
 }
 
-impl<C: Clone + Connect + 'static> DeploymentStatuses<C> {
+impl DeploymentStatuses {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, id: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -64,9 +57,9 @@ impl<C: Clone + Connect + 'static> DeploymentStatuses<C> {
     }
 }
 
-impl<C: Clone + Connect + 'static> Deployments<C> {
+impl Deployments {
     /// Create a new deployments instance
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Deployments<C>
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Deployments
     where
         O: Into<String>,
         R: Into<String>,
@@ -97,7 +90,7 @@ impl<C: Clone + Connect + 'static> Deployments<C> {
     }
 
     /// get a reference to the statuses api for a give deployment
-    pub fn statuses(&self, id: u64) -> DeploymentStatuses<C> {
+    pub fn statuses(&self, id: u64) -> DeploymentStatuses {
         DeploymentStatuses::new(
             self.github.clone(),
             self.owner.as_str(),

@@ -1,22 +1,15 @@
 //! Labels interface
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
 
-pub struct App<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct App {
+    github: Github,
 }
 
-impl<C> App<C>
-where
-    C: Clone + Connect + 'static,
-{
+impl App {
     #[doc(hidden)]
-    pub(crate) fn new(github: Github<C>) -> Self {
+    pub(crate) fn new(github: Github) -> Self {
         App { github: github }
     }
 

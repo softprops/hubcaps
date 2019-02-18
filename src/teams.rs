@@ -1,7 +1,6 @@
 //! Teams interface
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
@@ -27,18 +26,15 @@ impl fmt::Display for Permission {
 }
 
 /// reference to teams associated with a github repo
-pub struct RepoTeams<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct RepoTeams {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> RepoTeams<C> {
+impl RepoTeams {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -64,17 +60,14 @@ impl<C: Clone + Connect + 'static> RepoTeams<C> {
 }
 
 /// reference to teams associated with a github org
-pub struct OrgTeams<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct OrgTeams {
+    github: Github,
     org: String,
 }
 
-impl<C: Clone + Connect + 'static> OrgTeams<C> {
+impl OrgTeams {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, org: O) -> Self
+    pub fn new<O>(github: Github, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -91,7 +84,7 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
 
     /// Get a reference to a structure for interfacing with a specific
     /// team
-    pub fn get(&self, number: u64) -> OrgTeamActions<C> {
+    pub fn get(&self, number: u64) -> OrgTeamActions {
         OrgTeamActions::new(self.github.clone(), number)
     }
 
@@ -125,17 +118,14 @@ impl<C: Clone + Connect + 'static> OrgTeams<C> {
 }
 
 /// reference to teams associated with a github org
-pub struct OrgTeamActions<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct OrgTeamActions {
+    github: Github,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> OrgTeamActions<C> {
+impl OrgTeamActions {
     #[doc(hidden)]
-    pub fn new(github: Github<C>, number: u64) -> Self {
+    pub fn new(github: Github, number: u64) -> Self {
         OrgTeamActions { github, number }
     }
 

@@ -2,23 +2,19 @@
 //!
 //! This [this document](https://developer.github.com/guides/managing-deploy-keys/)
 //! for motivation and use
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::{Future, Github};
 
-pub struct Keys<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Keys {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Keys<C> {
+impl Keys {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

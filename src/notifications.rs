@@ -1,7 +1,6 @@
 //! Notifications interface
 use std::collections::HashMap;
 
-use hyper::client::connect::Connect;
 use url::form_urlencoded;
 use serde::Deserialize;
 
@@ -12,16 +11,13 @@ use crate::Github;
 /// Provides access to notifications.
 /// See the [github docs](https://developer.github.com/v3/activity/notifications/)
 /// for more information.
-pub struct Notifications<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Notifications {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Notifications<C> {
+impl Notifications {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 

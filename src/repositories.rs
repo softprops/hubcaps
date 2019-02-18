@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use url::{form_urlencoded, Url};
 use serde::{Deserialize, Serialize};
 
@@ -132,16 +131,13 @@ impl fmt::Display for OrgRepoType {
 }
 
 #[derive(Clone)]
-pub struct Repositories<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Repositories {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Repositories<C> {
+impl Repositories {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 
@@ -177,17 +173,14 @@ impl<C: Clone + Connect + 'static> Repositories<C> {
 }
 
 /// Provides access to the authenticated user's repositories
-pub struct OrgRepositories<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct OrgRepositories {
+    github: Github,
     org: String,
 }
 
-impl<C: Clone + Connect + 'static> OrgRepositories<C> {
+impl OrgRepositories {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, org: O) -> Self
+    pub fn new<O>(github: Github, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -228,17 +221,14 @@ impl<C: Clone + Connect + 'static> OrgRepositories<C> {
 }
 
 /// Provides access to the authenticated user's repositories
-pub struct UserRepositories<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct UserRepositories {
+    github: Github,
     owner: String,
 }
 
-impl<C: Clone + Connect + 'static> UserRepositories<C> {
+impl UserRepositories {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, owner: O) -> Self
+    pub fn new<O>(github: Github, owner: O) -> Self
     where
         O: Into<String>,
     {
@@ -270,17 +260,14 @@ impl<C: Clone + Connect + 'static> UserRepositories<C> {
 }
 
 /// Provides access to an organization's repositories
-pub struct OrganizationRepositories<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct OrganizationRepositories {
+    github: Github,
     org: String,
 }
 
-impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
+impl OrganizationRepositories {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, org: O) -> Self
+    pub fn new<O>(github: Github, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -315,18 +302,15 @@ impl<C: Clone + Connect + 'static> OrganizationRepositories<C> {
     }
 }
 
-pub struct Repository<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Repository {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Repository<C> {
+impl Repository {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -361,33 +345,33 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     }
 
     /// get a reference to branch operations
-    pub fn branches(&self) -> Branches<C> {
+    pub fn branches(&self) -> Branches {
         Branches::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to content operations
-    pub fn content(&self) -> Content<C> {
+    pub fn content(&self) -> Content {
         Content::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to git operations
-    pub fn git(&self) -> Git<C> {
+    pub fn git(&self) -> Git {
         Git::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to repo hook operations
-    pub fn hooks(&self) -> Hooks<C> {
+    pub fn hooks(&self) -> Hooks {
         Hooks::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)
     /// associated with this repository ref
-    pub fn deployments(&self) -> Deployments<C> {
+    pub fn deployments(&self) -> Deployments {
         Deployments::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to a specific github issue associated with this repository ref
-    pub fn issue(&self, number: u64) -> IssueRef<C> {
+    pub fn issue(&self, number: u64) -> IssueRef {
         IssueRef::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -397,60 +381,60 @@ impl<C: Clone + Connect + 'static> Repository<C> {
     }
 
     /// get a reference to github issues associated with this repository ref
-    pub fn issues(&self) -> Issues<C> {
+    pub fn issues(&self) -> Issues {
         Issues::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to github checks associated with this repository ref
-    pub fn checkruns(&self) -> CheckRuns<C> {
+    pub fn checkruns(&self) -> CheckRuns {
         CheckRuns::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)
     /// associated with this repository ref
-    pub fn keys(&self) -> Keys<C> {
+    pub fn keys(&self) -> Keys {
         Keys::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a list of labels associated with this repository ref
-    pub fn labels(&self) -> Labels<C> {
+    pub fn labels(&self) -> Labels {
         Labels::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a list of [pulls](https://developer.github.com/v3/pulls/)
     /// associated with this repository ref
-    pub fn pulls(&self) -> PullRequests<C> {
+    pub fn pulls(&self) -> PullRequests {
         PullRequests::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [releases](https://developer.github.com/v3/repos/releases/)
     /// associated with this repository ref
-    pub fn releases(&self) -> Releases<C> {
+    pub fn releases(&self) -> Releases {
         Releases::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [statuses](https://developer.github.com/v3/repos/statuses/)
     /// associated with this repository ref
-    pub fn statuses(&self) -> Statuses<C> {
+    pub fn statuses(&self) -> Statuses {
         Statuses::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)
     /// associated with this repository ref
-    pub fn teams(&self) -> RepoTeams<C> {
+    pub fn teams(&self) -> RepoTeams {
         RepoTeams::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to
     /// [contributors](https://developer.github.com/v3/repos/#list-contributors)
     /// associated with this repository ref
-    pub fn contributors(&self) -> Contributors<C> {
+    pub fn contributors(&self) -> Contributors {
         Contributors::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)
     /// associated with this repository ref
-    pub fn traffic(&self) -> Traffic<C> {
+    pub fn traffic(&self) -> Traffic {
         Traffic::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 }
@@ -535,10 +519,7 @@ impl Repo {
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn languages<C>(&self, github: Github<C>) -> Future<HashMap<String, i64>>
-    where
-        C: Clone + Connect + 'static,
-    {
+    pub fn languages(&self, github: Github) -> Future<HashMap<String, i64>> {
         let url = Url::parse(&self.languages_url).unwrap();
         let uri: String = url.path().into();
         github.get(&uri)

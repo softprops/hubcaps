@@ -4,7 +4,6 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::{Future, Github};
@@ -38,18 +37,15 @@ impl fmt::Display for WebHookContentType {
 }
 
 /// Interface for managing repository hooks
-pub struct Hooks<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Hooks {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Hooks<C> {
+impl Hooks {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

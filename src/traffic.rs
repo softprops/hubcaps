@@ -1,7 +1,6 @@
 //! Traffic interface
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::{Future, Github};
@@ -24,18 +23,15 @@ impl fmt::Display for TimeUnit {
 }
 
 /// Provides access to the traffic information for a repository
-pub struct Traffic<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Traffic {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Traffic<C> {
+impl Traffic {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

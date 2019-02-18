@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
 
@@ -47,19 +46,16 @@ impl Default for Sort {
 }
 
 /// A structure for accessing interfacing with a specific pull request
-pub struct PullRequest<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct PullRequest {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> PullRequest<C> {
+impl PullRequest {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -85,7 +81,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// Return a reference to labels operations available for this pull request
-    pub fn labels(&self) -> IssueLabels<C> {
+    pub fn labels(&self) -> IssueLabels {
         IssueLabels::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -95,7 +91,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// Return a reference to assignee operations available for this pull request
-    pub fn assignees(&self) -> IssueAssignees<C> {
+    pub fn assignees(&self) -> IssueAssignees {
         IssueAssignees::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -125,7 +121,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// returns issue comments interface
-    pub fn comments(&self) -> Comments<C> {
+    pub fn comments(&self) -> Comments {
         Comments::new(
             self.github.clone(),
             self.owner.clone(),
@@ -135,7 +131,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// returns review comments interface
-    pub fn review_comments(&self) -> ReviewComments<C> {
+    pub fn review_comments(&self) -> ReviewComments {
         ReviewComments::new(
             self.github.clone(),
             self.owner.clone(),
@@ -144,7 +140,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
         )
     }
 
-    pub fn review_requests(&self) -> ReviewRequests<C> {
+    pub fn review_requests(&self) -> ReviewRequests {
         ReviewRequests::new(
             self.github.clone(),
             self.owner.clone(),
@@ -154,7 +150,7 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
     }
 
     /// returns pull commits interface
-    pub fn commits(&self) -> PullCommits<C> {
+    pub fn commits(&self) -> PullCommits {
         PullCommits::new(
             self.github.clone(),
             self.owner.clone(),
@@ -165,18 +161,15 @@ impl<C: Clone + Connect + 'static> PullRequest<C> {
 }
 
 /// A structure for interfacing with a repositories list of pull requests
-pub struct PullRequests<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct PullRequests {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> PullRequests<C> {
+impl PullRequests {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -193,7 +186,7 @@ impl<C: Clone + Connect + 'static> PullRequests<C> {
     }
 
     /// Get a reference to a structure for interfacing with a specific pull request
-    pub fn get(&self, number: u64) -> PullRequest<C> {
+    pub fn get(&self, number: u64) -> PullRequest {
         PullRequest::new(
             self.github.clone(),
             self.owner.as_str(),

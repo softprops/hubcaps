@@ -1,5 +1,4 @@
 //! Releases interface
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
@@ -8,19 +7,16 @@ use crate::{Future, Github};
 /// Provides access to assets for a release.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
 /// for more information.
-pub struct Assets<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Assets {
+    github: Github,
     owner: String,
     repo: String,
     releaseid: u64,
 }
 
-impl<C: Clone + Connect + 'static> Assets<C> {
+impl Assets {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, releaseid: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, releaseid: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -70,19 +66,19 @@ impl<C: Clone + Connect + 'static> Assets<C> {
     }
 }
 
-pub struct ReleaseRef<C>
+pub struct ReleaseRef
 where
-    C: Clone + Connect + 'static,
+    
 {
-    github: Github<C>,
+    github: Github,
     owner: String,
     repo: String,
     id: u64,
 }
 
-impl<C: Clone + Connect + 'static> ReleaseRef<C> {
+impl ReleaseRef {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, id: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, id: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -111,7 +107,7 @@ impl<C: Clone + Connect + 'static> ReleaseRef<C> {
     }
 
     /// Get a reference to asset operations for a release.
-    pub fn assets(&self) -> Assets<C> {
+    pub fn assets(&self) -> Assets {
         Assets::new(
             self.github.clone(),
             self.owner.as_str(),
@@ -124,18 +120,18 @@ impl<C: Clone + Connect + 'static> ReleaseRef<C> {
 /// Provides access to published releases.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
 /// for more information.
-pub struct Releases<C>
+pub struct Releases
 where
-    C: Clone + Connect + 'static,
+    
 {
-    github: Github<C>,
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Releases<C> {
+impl Releases {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,
@@ -205,7 +201,7 @@ impl<C: Clone + Connect + 'static> Releases<C> {
     }
 
     /// Get a reference to a specific release associated with a repository
-    pub fn get(&self, id: u64) -> ReleaseRef<C> {
+    pub fn get(&self, id: u64) -> ReleaseRef {
         ReleaseRef::new(
             self.github.clone(),
             self.owner.as_str(),
