@@ -94,7 +94,7 @@ use hyper::client::HttpConnector;
 #[cfg(feature = "httpcache")]
 use hyper::header::IF_NONE_MATCH;
 use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
-use hyper::{Body, Client, Method, Request, StatusCode, Uri};
+use hyper::{Client, Method, StatusCode};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
 #[cfg(feature = "rustls")]
@@ -105,6 +105,7 @@ use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
+use reqwest::r#async::{Body as Body2, Client as Client2};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
@@ -403,6 +404,7 @@ where
     host: String,
     agent: String,
     client: Client<C>,
+    client2: Client2,
     credentials: Option<Credentials>,
     #[cfg(feature = "httpcache")]
     http_cache: BoxedHttpCache,
@@ -419,7 +421,7 @@ fn create_connector() -> HttpsConnector<HttpConnector> {
 
 #[cfg(any(feature = "tls", feature = "rustls"))]
 impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A, C>(agent: A, credentials: C) -> Self
+    pub fn new<A, C>(agent: A, credentials: C) -> Result<Self>
     where
         A: Into<String>,
         C: Into<Option<Credentials>>,
@@ -427,7 +429,7 @@ impl Github<HttpsConnector<HttpConnector>> {
         Self::host(DEFAULT_HOST, agent, credentials)
     }
 
-    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Self
+    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Result<Self>
     where
         H: Into<String>,
         A: Into<String>,
@@ -435,13 +437,14 @@ impl Github<HttpsConnector<HttpConnector>> {
     {
         let connector = create_connector();
         let http = Client::builder().keep_alive(true).build(connector);
+        let http2 = Client2::builder().build()?;
         #[cfg(feature = "httpcache")]
         {
-            Self::custom(host, agent, credentials, http, HttpCache::noop())
+            Ok(Self::custom(host, agent, credentials, http, http2, HttpCache::noop()))
         }
         #[cfg(not(feature = "httpcache"))]
         {
-            Self::custom(host, agent, credentials, http)
+            Ok(Self::custom(host, agent, credentials, http, http2))
         }
     }
 }
@@ -456,6 +459,7 @@ where
         agent: A,
         credentials: CR,
         http: Client<C>,
+        http2: Client2,
         http_cache: BoxedHttpCache,
     ) -> Self
     where
@@ -467,13 +471,14 @@ where
             host: host.into(),
             agent: agent.into(),
             client: http,
+            client2: http2,
             credentials: credentials.into(),
             http_cache,
         }
     }
 
     #[cfg(not(feature = "httpcache"))]
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>, http2: Client2) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -483,6 +488,7 @@ where
             host: host.into(),
             agent: agent.into(),
             client: http,
+            client2: http2,
             credentials: credentials.into(),
         }
     }
@@ -610,29 +616,26 @@ where
         &self,
         uri: &str,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Uri, Option<String>)> {
-        let parsed_uri = uri.parse::<Uri>();
+    ) -> Future<(Url, Option<String>)> {
+        let parsed_url = uri.parse::<Url>();
 
         match self.credentials(authentication) {
             Some(&Credentials::Client(ref id, ref secret)) => {
-                let mut parsed = Url::parse(uri).unwrap();
-                parsed
-                    .query_pairs_mut()
-                    .append_pair("client_id", id)
-                    .append_pair("client_secret", secret);
                 Box::new(
-                    parsed
-                        .to_string()
-                        .parse::<Uri>()
-                        .map(|u| (u, None))
-                        .map_err(Error::from)
-                        .into_future(),
+                    parsed_url.map(|mut u| {
+                        u.query_pairs_mut()
+                            .append_pair("client_id", id)
+                            .append_pair("client_secret", secret);
+                        (u, None)
+                    })
+                    .map_err(Error::from)
+                    .into_future(),
                 )
             }
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
                 Box::new(
-                    parsed_uri
+                    parsed_url
                         .map(|u| (u, Some(auth)))
                         .map_err(Error::from)
                         .into_future(),
@@ -641,7 +644,7 @@ where
             Some(&Credentials::JWT(ref jwt)) => {
                 let auth = format!("Bearer {}", jwt.token());
                 Box::new(
-                    parsed_uri
+                    parsed_url
                         .map(|u| (u, Some(auth)))
                         .map_err(Error::from)
                         .into_future(),
@@ -651,7 +654,7 @@ where
                 if let Some(token) = apptoken.token() {
                     let auth = format!("token {}", token);
                     Box::new(
-                        parsed_uri
+                        parsed_url
                             .map(|u| (u, Some(auth)))
                             .map_err(Error::from)
                             .into_future(),
@@ -665,7 +668,7 @@ where
                             .and_then(move |token| {
                                 let auth = format!("token {}", &token.token);
                                 *token_ref.lock().unwrap() = Some(token.token);
-                                parsed_uri
+                                parsed_url
                                     .map(|u| (u, Some(auth)))
                                     .map_err(Error::from)
                                     .into_future()
@@ -674,7 +677,7 @@ where
                 }
             }
             None => Box::new(
-                parsed_uri
+                parsed_url
                     .map(|u| (u, None))
                     .map_err(Error::from)
                     .into_future(),
@@ -703,39 +706,36 @@ where
         let response = url_and_auth
             .map_err(Error::from)
             .and_then(move |(url, auth)| {
-                let mut req = Request::builder();
+                #[cfg(not(feature = "httpcache"))]
+                let mut req = instance.client2.request(method2, url);
 
                 #[cfg(feature = "httpcache")]
-                {
+                let mut req = {
+                    let mut req = instance.client2.request(method2.clone(), url);
                     if method2 == Method::GET {
                         if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
-                            req.header(IF_NONE_MATCH, etag);
+                            req = req.header(IF_NONE_MATCH, etag);
                         }
                     }
-                }
+                    req
+                };
 
-                req.method(method2).uri(url);
-
-                req.header(USER_AGENT, &*instance.agent);
-                req.header(
+                req = req.header(USER_AGENT, &*instance.agent);
+                req = req.header(
                     ACCEPT,
                     &*format!("{}", qitem::<Mime>(From::from(media_type))),
                 );
 
                 if let Some(auth_str) = auth {
-                    req.header(AUTHORIZATION, &*auth_str);
+                    req = req.header(AUTHORIZATION, &*auth_str);
                 }
 
                 trace!("Body: {:?}", &body2);
-                let req = match body2 {
-                    Some(body) => req.body(Body::from(body)),
-                    None => req.body(Body::empty()),
-                };
+                if let Some(body) = body2 {
+                    req = req.body(Body2::from(body));
+                }
                 debug!("Request: {:?}", &req);
-
-                req.map_err(Error::from)
-                    .into_future()
-                    .and_then(move |req| instance.client.request(req).map_err(Error::from))
+                req.send().map_err(Error::from)
             });
         let instance2 = self.clone();
         #[cfg(feature = "httpcache")]
