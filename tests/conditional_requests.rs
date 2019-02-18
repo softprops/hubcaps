@@ -3,8 +3,7 @@ use {
     std::env,
 
     futures::{future, Stream},
-    hyper::Client,
-    hyper_tls::HttpsConnector,
+    reqwest::r#async::Client,
     tokio::runtime::Runtime,
     log::info,
 
@@ -41,7 +40,7 @@ fn compare_counts() -> Result<()> {
 
     info!("first get the total count of repos, without caching");
 
-    let github = Github::new(agent, credentials.clone());
+    let github = Github::new(agent, credentials.clone())?;
     let repos = github.user_repos(owner).iter(&repo_list_options);
     let total_count = rt.block_on(repos.fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
 
@@ -58,10 +57,10 @@ fn compare_counts() -> Result<()> {
     info!("then get the total count with a cache");
 
     let host = "https://api.github.com";
-    let client = Client::builder().build(HttpsConnector::new(4).unwrap());
+    let client = Client::builder().build()?;
     let cache_path = testkit::test_home().join(".hubcaps/cache");
     let http_cache = Box::new(FileBasedCache::new(cache_path));
-    let github: Github<_> = Github::custom(host, agent, credentials, client, http_cache);
+    let github = Github::custom(host, agent, credentials, client, http_cache);
 
     info!("first populate the cache");
 

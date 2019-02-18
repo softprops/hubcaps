@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;
-            let github = Github::new(USER_AGENT, Credentials::Token(token));
+            let github = Github::new(USER_AGENT, Credentials::Token(token))?;
 
             let issue = github.repo("softprops", "hubcat").issues().get(1);
             let f = issue.comments().create(&CommentOptions {

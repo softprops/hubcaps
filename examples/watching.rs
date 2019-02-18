@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
         Credentials::Token(token),
-    );
+    )?;
 
     println!("watched repos");
     rt.block_on(github.activity().watching().iter().for_each(|repo| {

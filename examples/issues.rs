@@ -14,7 +14,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             rt.block_on(
                 github
                     .repo("matthiasbeyer", "imag")

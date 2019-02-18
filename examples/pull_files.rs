@@ -12,7 +12,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             for diff in rt.block_on(github.repo("rust-lang", "rust").pulls().get(49536).files())? {
                 println!("{:#?}", diff);
             }

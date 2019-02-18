@@ -12,7 +12,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             for gist in rt.block_on(github.gists().list(&Default::default()))? {
                 println!("{:#?}", gist)
             }

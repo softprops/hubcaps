@@ -14,7 +14,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
 
             let org = "eb6cb83a-cf75-4e88-a11a-ce117467d8ae";
             let repo_name = "d18e3679-9830-40a9-8cf5-16602639b43e";

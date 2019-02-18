@@ -12,7 +12,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             match rt.block_on(github.users().authenticated()) {
                 Ok(me) => println!("{:#?}", me),
                 Err(err) => println!("err {:#?}", err),
