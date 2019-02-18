@@ -91,8 +91,8 @@ use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStre
 use http::header::{HeaderMap, HeaderValue};
 use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
-use hyper::header::IF_NONE_MATCH;
-use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
+use http::header::IF_NONE_MATCH;
+use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};

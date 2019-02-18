@@ -1,6 +1,6 @@
 //! Stars interface
 use futures::Future as StdFuture;
-use hyper::StatusCode;
+use http::StatusCode;
 
 use crate::{Error, ErrorKind, Future, Github};
 

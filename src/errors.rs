@@ -3,10 +3,7 @@ use std::io::Error as IoError;
 use std::time::Duration;
 
 use error_chain::*;
-use http::uri::InvalidUri;
-use http::Error as HttpError;
-use hyper::Error as HyperError;
-use hyper::StatusCode;
+use http::StatusCode;
 use reqwest::Error as ReqwestError;
 use serde::Deserialize;
 use serde_json::error::Error as SerdeError;
@@ -33,12 +30,9 @@ error_chain! {
     }
     foreign_links {
         Codec(SerdeError);
-        Http(HttpError);
-        Hyper(HyperError);
         Reqwest(ReqwestError);
         Url(ParseError);
         IO(IoError);
-        URI(InvalidUri);
         JWT(JWTError);
     }
 }

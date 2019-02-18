@@ -7,7 +7,7 @@ use std::hash::{Hash, Hasher};
 use std::io;
 use std::path::{Path, PathBuf};
 
-use hyper::Uri;
+use http::Uri;
 use log::trace;
 
 use crate::{Error, Result};
