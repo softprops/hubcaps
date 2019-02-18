@@ -92,7 +92,7 @@ use http::header::{HeaderMap, HeaderValue};
 use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
-use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
+use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
@@ -710,7 +710,10 @@ impl Github {
                 debug!("Request: {:?}", &req);
                 req.send().map_err(Error::from)
             });
+
+        #[cfg(feature = "httpcache")]
         let instance2 = self.clone();
+
         #[cfg(feature = "httpcache")]
         let uri3 = uri.to_string();
         Box::new(response.and_then(move |response| {
@@ -720,18 +723,6 @@ impl Github {
             let (remaining, reset, etag) = get_header_values(response.headers());
 
             let status = response.status();
-            // handle redirect common with renamed repos
-            if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
-                let location = response
-                    .headers()
-                    .get(LOCATION)
-                    .and_then(|l| l.to_str().ok());
-
-                if let Some(location) = location {
-                    debug!("redirect location {:?}", location);
-                    return instance2.request(method, location, body, media_type, authentication);
-                }
-            }
             let link = response
                 .headers()
                 .get(LINK)
