@@ -93,7 +93,7 @@ use hyper::client::HttpConnector;
 #[cfg(feature = "httpcache")]
 use hyper::header::IF_NONE_MATCH;
 use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
-use hyper::{Body, Client, Method, Request, StatusCode, Uri};
+use hyper::{Body, Client, Method, Request, Response, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
 #[cfg(feature = "rustls")]
@@ -730,34 +730,11 @@ where
         #[cfg(feature = "httpcache")]
         let uri3 = uri.to_string();
         Box::new(response.and_then(move |response| {
-            if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
-                debug!("x-github-request-id: {:?}", value)
-            }
-            if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
-                debug!("x-rate-limit-limit: {:?}", value)
-            }
-            let remaining = response
-                .headers()
-                .get(X_RATELIMIT_REMAINING)
-                .and_then(|val| val.to_str().ok())
-                .and_then(|val| val.parse::<u32>().ok());
-            let reset = response
-                .headers()
-                .get(X_RATELIMIT_RESET)
-                .and_then(|val| val.to_str().ok())
-                .and_then(|val| val.parse::<u32>().ok());
-            if let Some(value) = remaining {
-                debug!("x-rate-limit-remaining: {}", value)
-            }
-            if let Some(value) = reset {
-                debug!("x-rate-limit-reset: {}", value)
-            }
-            let etag = response.headers().get(ETAG);
-            if let Some(value) = etag {
-                debug!("etag: {:?}", value)
-            }
+            #[cfg(not(feature = "httpcache"))]
+            let (remaining, reset) = get_header_values(&response);
             #[cfg(feature = "httpcache")]
-            let etag = etag.map(|etag| etag.as_bytes().to_vec());
+            let (remaining, reset, etag) = get_header_values(&response);
+
             let status = response.status();
             // handle redirect common with renamed repos
             if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
@@ -1026,6 +1003,48 @@ where
             AuthenticationConstraint::Unconstrained,
         )
     }
+}
+
+#[cfg(not(feature = "httpcache"))]
+type HeaderValues = (Option<u32>, Option<u32>);
+#[cfg(feature = "httpcache")]
+type HeaderValues = (Option<u32>, Option<u32>, Option<Vec<u8>>);
+
+fn get_header_values(response: &Response<Body>) -> HeaderValues {
+    if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
+        debug!("x-github-request-id: {:?}", value)
+    }
+    if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
+        debug!("x-rate-limit-limit: {:?}", value)
+    }
+    let remaining = response
+        .headers()
+        .get(X_RATELIMIT_REMAINING)
+        .and_then(|val| val.to_str().ok())
+        .and_then(|val| val.parse::<u32>().ok());
+    let reset = response
+        .headers()
+        .get(X_RATELIMIT_RESET)
+        .and_then(|val| val.to_str().ok())
+        .and_then(|val| val.parse::<u32>().ok());
+    if let Some(value) = remaining {
+        debug!("x-rate-limit-remaining: {}", value)
+    }
+    if let Some(value) = reset {
+        debug!("x-rate-limit-reset: {}", value)
+    }
+    let etag = response.headers().get(ETAG);
+    if let Some(value) = etag {
+        debug!("etag: {:?}", value)
+    }
+
+    #[cfg(feature = "httpcache")]
+    {
+        let etag = etag.map(|etag| etag.as_bytes().to_vec());
+        (remaining, reset, etag)
+    }
+    #[cfg(not(feature = "httpcache"))]
+    (remaining, reset)
 }
 
 fn next_link(l: &Link) -> Option<String> {
