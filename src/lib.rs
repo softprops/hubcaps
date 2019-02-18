@@ -88,12 +88,13 @@ use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
+use http::header::{HeaderMap, HeaderValue};
 use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
 #[cfg(feature = "httpcache")]
 use hyper::header::IF_NONE_MATCH;
 use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
-use hyper::{Body, Client, Method, Request, Response, StatusCode, Uri};
+use hyper::{Body, Client, Method, Request, StatusCode, Uri};
 #[cfg(feature = "tls")]
 use hyper_tls::HttpsConnector;
 #[cfg(feature = "rustls")]
@@ -741,9 +742,9 @@ where
         let uri3 = uri.to_string();
         Box::new(response.and_then(move |response| {
             #[cfg(not(feature = "httpcache"))]
-            let (remaining, reset) = get_header_values(&response);
+            let (remaining, reset) = get_header_values(response.headers());
             #[cfg(feature = "httpcache")]
-            let (remaining, reset, etag) = get_header_values(&response);
+            let (remaining, reset, etag) = get_header_values(response.headers());
 
             let status = response.status();
             // handle redirect common with renamed repos
@@ -1020,20 +1021,18 @@ type HeaderValues = (Option<u32>, Option<u32>);
 #[cfg(feature = "httpcache")]
 type HeaderValues = (Option<u32>, Option<u32>, Option<Vec<u8>>);
 
-fn get_header_values(response: &Response<Body>) -> HeaderValues {
-    if let Some(value) = response.headers().get(X_GITHUB_REQUEST_ID) {
+fn get_header_values(headers: &HeaderMap<HeaderValue>) -> HeaderValues {
+    if let Some(value) = headers.get(X_GITHUB_REQUEST_ID) {
         debug!("x-github-request-id: {:?}", value)
     }
-    if let Some(value) = response.headers().get(X_RATELIMIT_LIMIT) {
+    if let Some(value) = headers.get(X_RATELIMIT_LIMIT) {
         debug!("x-rate-limit-limit: {:?}", value)
     }
-    let remaining = response
-        .headers()
+    let remaining = headers
         .get(X_RATELIMIT_REMAINING)
         .and_then(|val| val.to_str().ok())
         .and_then(|val| val.parse::<u32>().ok());
-    let reset = response
-        .headers()
+    let reset = headers
         .get(X_RATELIMIT_RESET)
         .and_then(|val| val.to_str().ok())
         .and_then(|val| val.parse::<u32>().ok());
@@ -1043,7 +1042,7 @@ fn get_header_values(response: &Response<Body>) -> HeaderValues {
     if let Some(value) = reset {
         debug!("x-rate-limit-reset: {}", value)
     }
-    let etag = response.headers().get(ETAG);
+    let etag = headers.get(ETAG);
     if let Some(value) = etag {
         debug!("etag: {:?}", value)
     }
@@ -1109,5 +1108,53 @@ mod tests {
     fn default_sort_direction() {
         let default: SortDirection = Default::default();
         assert_eq!(default, SortDirection::Asc)
+    }
+
+    #[test]
+    #[cfg(not(feature = "httpcache"))]
+    fn header_values() {
+        let empty = HeaderMap::new();
+        let actual = get_header_values(&empty);
+        let expected = (None, None);
+        assert_eq!(actual, expected);
+
+        let mut all_valid = HeaderMap::new();
+        all_valid.insert(X_RATELIMIT_REMAINING, HeaderValue::from_static("1234"));
+        all_valid.insert(X_RATELIMIT_RESET, HeaderValue::from_static("5678"));
+        let actual = get_header_values(&all_valid);
+        let expected = (Some(1234), Some(5678));
+        assert_eq!(actual, expected);
+
+        let mut invalid = HeaderMap::new();
+        invalid.insert(X_RATELIMIT_REMAINING, HeaderValue::from_static("foo"));
+        invalid.insert(X_RATELIMIT_RESET, HeaderValue::from_static("bar"));
+        let actual = get_header_values(&invalid);
+        let expected = (None, None);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    #[cfg(feature = "httpcache")]
+    fn header_values() {
+        let empty = HeaderMap::new();
+        let actual = get_header_values(&empty);
+        let expected = (None, None, None);
+        assert_eq!(actual, expected);
+
+        let mut all_valid = HeaderMap::new();
+        all_valid.insert(X_RATELIMIT_REMAINING, HeaderValue::from_static("1234"));
+        all_valid.insert(X_RATELIMIT_RESET, HeaderValue::from_static("5678"));
+        all_valid.insert(ETAG, HeaderValue::from_static("foobar"));
+        let actual = get_header_values(&all_valid);
+        let expected = (Some(1234), Some(5678), Some(b"foobar".to_vec()));
+        assert_eq!(actual, expected);
+
+        let mut invalid = HeaderMap::new();
+        invalid.insert(X_RATELIMIT_REMAINING, HeaderValue::from_static("foo"));
+        invalid.insert(X_RATELIMIT_RESET, HeaderValue::from_static("bar"));
+        invalid.insert(ETAG, HeaderValue::from_static(""));
+        let actual = get_header_values(&invalid);
+        let expected = (None, None, Some(Vec::new()));
+        assert_eq!(actual, expected);
     }
 }
