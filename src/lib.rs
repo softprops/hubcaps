@@ -605,19 +605,14 @@ where
         }
     }
 
-    fn request<Out>(
+    fn url_and_auth(
         &self,
-        method: Method,
         uri: &str,
-        body: Option<Vec<u8>>,
-        media_type: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Option<Link>, Out)>
-    where
-        Out: DeserializeOwned + 'static + Send,
-    {
+    ) -> Future<(Uri, Option<String>)> {
         let parsed_uri = uri.parse::<Uri>();
-        let url_and_auth: Future<(Uri, Option<String>)> = match self.credentials(authentication) {
+
+        match self.credentials(authentication) {
             Some(&Credentials::Client(ref id, ref secret)) => {
                 let mut parsed = Url::parse(uri).unwrap();
                 parsed
@@ -683,7 +678,22 @@ where
                     .map_err(Error::from)
                     .into_future(),
             ),
-        };
+        }
+    }
+
+    fn request<Out>(
+        &self,
+        method: Method,
+        uri: &str,
+        body: Option<Vec<u8>>,
+        media_type: MediaType,
+        authentication: AuthenticationConstraint,
+    ) -> Future<(Option<Link>, Out)>
+    where
+        Out: DeserializeOwned + 'static + Send,
+    {
+        let url_and_auth = self.url_and_auth(uri, authentication);
+
         let instance = self.clone();
         #[cfg(feature = "httpcache")]
         let uri2 = uri.to_string();
