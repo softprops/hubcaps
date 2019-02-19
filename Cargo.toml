@@ -41,8 +41,10 @@ percent-encoding = "1"
 [features]
 default = ["default-tls"]
 # enable native tls
-default-tls = ["reqwest/default-tls"]
+default-tls = ["reqwest/default-tls", "tls"]
 # enable rustls
-rustls-tls = ["reqwest/rustls-tls"]
+rustls-tls = ["reqwest/rustls-tls", "tls"]
+# common tls feature
+tls = []
 # enable etag-based http_cache functionality
 httpcache = ["dirs"]
