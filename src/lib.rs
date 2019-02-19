@@ -143,6 +143,7 @@ pub mod watching;
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
 pub use crate::http_cache::{BoxedHttpCache, HttpCache, NoCache};
+pub use reqwest::Proxy;
 
 use crate::activity::Activity;
 use crate::app::App;
@@ -424,6 +425,7 @@ struct Config {
     agent: Option<String>,
     credentials: Option<Credentials>,
     client: Option<Client>,
+    proxies: Vec<Proxy>,
     #[cfg(feature = "tls")]
     tls: TlsBackend,
     #[cfg(feature = "httpcache")]
@@ -441,6 +443,7 @@ impl Builder {
                 agent: None,
                 credentials: None,
                 client: None,
+                proxies: Vec::new(),
                 #[cfg(feature = "tls")]
                 tls: TlsBackend::default(),
                 #[cfg(feature = "httpcache")]
@@ -479,6 +482,12 @@ impl Builder {
         self
     }
 
+    /// Add a `Proxy` to the list of proxies the client will use.
+    pub fn proxy(mut self, proxy: Proxy) -> Builder {
+        self.config.proxies.push(proxy);
+        self
+    }
+
     /// Set the `HttpCache`.
     ///
     /// Defaults to `NoCache`
@@ -514,16 +523,26 @@ impl Builder {
         let client = match config.client {
             Some(client) => client,
             None => {
-                #[cfg(feature = "tls")]
-                match config.tls {
-                    #[cfg(feature = "default-tls")]
-                    TlsBackend::Default => Client::builder().use_default_tls().build()?,
-                    #[cfg(feature = "rustls-tls")]
-                    TlsBackend::Rustls => Client::builder().use_rustls_tls().build()?,
+                let mut builder = {
+                    #[cfg(feature = "tls")]
+                    {
+                        match config.tls {
+                            #[cfg(feature = "default-tls")]
+                            TlsBackend::Default => Client::builder().use_default_tls(),
+                            #[cfg(feature = "rustls-tls")]
+                            TlsBackend::Rustls => Client::builder().use_rustls_tls(),
+                        }
+                    }
+
+                    #[cfg(not(feature = "tls"))]
+                    Client::builder()
+                };
+
+                for proxy in config.proxies {
+                    builder = builder.proxy(proxy);
                 }
 
-                #[cfg(not(feature = "tls"))]
-                Client::builder().build()?
+                builder.build()?
             }
         };
         #[cfg(feature = "httpcache")]
