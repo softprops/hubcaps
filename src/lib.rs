@@ -400,7 +400,6 @@ pub struct Github {
     http_cache: BoxedHttpCache,
 }
 
-#[cfg(any(feature = "tls", feature = "rustls"))]
 impl Github {
     pub fn new<A, C>(agent: A, credentials: C) -> Result<Self>
     where
@@ -426,9 +425,7 @@ impl Github {
             Ok(Self::custom(host, agent, credentials, http))
         }
     }
-}
 
-impl Github {
     #[cfg(feature = "httpcache")]
     pub fn custom<H, A, CR>(
         host: H,

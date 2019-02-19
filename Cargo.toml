@@ -39,10 +39,10 @@ base64 = "0.10"
 percent-encoding = "1"
 
 [features]
-default = ["tls"]
-# enable tls
-tls = ["reqwest/default-tls"]
+default = ["default-tls"]
+# enable native tls
+default-tls = ["reqwest/default-tls"]
 # enable rustls
-rustls = ["reqwest/rustls-tls"]
+rustls-tls = ["reqwest/rustls-tls"]
 # enable etag-based http_cache functionality
 httpcache = ["dirs"]
