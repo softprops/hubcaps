@@ -3,7 +3,6 @@ use {
     std::env,
 
     futures::{future, Stream},
-    reqwest::r#async::Client,
     tokio::runtime::Runtime,
     log::info,
 
@@ -56,11 +55,12 @@ fn compare_counts() -> Result<()> {
 
     info!("then get the total count with a cache");
 
-    let host = "https://api.github.com";
-    let client = Client::builder().build()?;
     let cache_path = testkit::test_home().join(".hubcaps/cache");
     let http_cache = Box::new(FileBasedCache::new(cache_path));
-    let github = Github::custom(host, agent, credentials, client, http_cache);
+    let github = Github::builder()
+        .credentials(credentials)
+        .cache(http_cache)
+        .build()?;
 
     info!("first populate the cache");
 

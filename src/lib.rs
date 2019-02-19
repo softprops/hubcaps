@@ -580,43 +580,6 @@ impl Github {
             .build()
     }
 
-    #[cfg(feature = "httpcache")]
-    pub fn custom<H, A, CR>(
-        host: H,
-        agent: A,
-        credentials: CR,
-        http: Client,
-        http_cache: BoxedHttpCache,
-    ) -> Self
-    where
-        H: Into<String>,
-        A: Into<String>,
-        CR: Into<Option<Credentials>>,
-    {
-        Self {
-            host: host.into(),
-            agent: agent.into(),
-            client: http,
-            credentials: credentials.into(),
-            http_cache,
-        }
-    }
-
-    #[cfg(not(feature = "httpcache"))]
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client) -> Self
-    where
-        H: Into<String>,
-        A: Into<String>,
-        CR: Into<Option<Credentials>>,
-    {
-        Self {
-            host: host.into(),
-            agent: agent.into(),
-            client: http,
-            credentials: credentials.into(),
-        }
-    }
-
     pub fn set_credentials<CR>(&mut self, credentials: CR)
     where
         CR: Into<Option<Credentials>>,
