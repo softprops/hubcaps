@@ -99,7 +99,7 @@ use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
-use reqwest::r#async::{Body, Client};
+use reqwest::r#async::{Body, Client, ClientBuilder};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
@@ -424,7 +424,7 @@ struct Config {
     host: Option<String>,
     agent: Option<String>,
     credentials: Option<Credentials>,
-    client: Option<Client>,
+    builder: Option<ClientBuilder>,
     proxies: Vec<Proxy>,
     #[cfg(feature = "tls")]
     tls: TlsBackend,
@@ -442,7 +442,7 @@ impl Builder {
                 host: None,
                 agent: None,
                 credentials: None,
-                client: None,
+                builder: None,
                 proxies: Vec::new(),
                 #[cfg(feature = "tls")]
                 tls: TlsBackend::default(),
@@ -474,11 +474,14 @@ impl Builder {
         self
     }
 
-    /// Set the `reqwest::async::Client`.
+    /// Configures the underlying `reqwest` client using `hubcaps::client::ClientBuilder`.
     ///
     /// Overwrites other `reqwest` specific settings from the builder.
-    pub fn client(mut self, client: Client) -> Builder {
-        self.config.client = Some(client);
+    pub fn client<F>(mut self, f: F) -> Builder
+    where
+        F: FnOnce(ClientBuilder) -> ClientBuilder,
+    {
+        self.config.builder = Some(f(Client::builder()));
         self
     }
 
@@ -520,30 +523,26 @@ impl Builder {
             .agent
             .unwrap_or_else(|| DEFAULT_USER_AGENT.to_string());
         let credentials = config.credentials;
-        let client = match config.client {
-            Some(client) => client,
-            None => {
-                let mut builder = {
-                    #[cfg(feature = "tls")]
-                    {
-                        match config.tls {
-                            #[cfg(feature = "default-tls")]
-                            TlsBackend::Default => Client::builder().use_default_tls(),
-                            #[cfg(feature = "rustls-tls")]
-                            TlsBackend::Rustls => Client::builder().use_rustls_tls(),
-                        }
-                    }
-
-                    #[cfg(not(feature = "tls"))]
-                    Client::builder()
-                };
-
-                for proxy in config.proxies {
-                    builder = builder.proxy(proxy);
+        let client = {
+            let mut builder = {
+                let builder = config.builder.unwrap_or_else(ClientBuilder::new);
+                #[cfg(feature = "tls")]
+                match config.tls {
+                    #[cfg(feature = "default-tls")]
+                    TlsBackend::Default => builder.use_default_tls(),
+                    #[cfg(feature = "rustls-tls")]
+                    TlsBackend::Rustls => builder.use_rustls_tls(),
                 }
 
-                builder.build()?
+                #[cfg(not(feature = "tls"))]
+                builder
+            };
+
+            for proxy in config.proxies {
+                builder = builder.proxy(proxy);
             }
+
+            builder.build()?
         };
         #[cfg(feature = "httpcache")]
         let cache = config.cache.unwrap_or_else(|| Box::new(NoCache));
