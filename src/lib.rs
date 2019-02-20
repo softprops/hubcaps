@@ -74,7 +74,7 @@
 //! [dependencies.hubcaps]
 //!  version = "..."
 //!  default-features = false
-//!  features = ["tls","httpcache"]
+//!  features = ["default-tls","httpcache"]
 //! ```
 //!
 //! Then use the `Github::custom` constructor to provide a cache implementation. See

@@ -14,7 +14,7 @@ fn main() -> Result<()> {
 
     #[cfg(not(feature = "httpcache"))]
     {
-        println!("rerun this example with `cargo run --no-default-features --features tls,httpcache --example conditional_requests`");
+        println!("rerun this example with `cargo run --no-default-features --features default-tls,httpcache --example conditional_requests`");
         Ok(())
     }
 
