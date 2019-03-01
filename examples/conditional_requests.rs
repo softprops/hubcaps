@@ -1,7 +1,6 @@
 #[cfg(feature = "httpcache")]
 use {
-    hyper::Client,
-    hyper_tls::HttpsConnector,
+    reqwest::r#async::Client,
     tokio::runtime::Runtime,
 };
 
@@ -15,7 +14,7 @@ fn main() -> Result<()> {
 
     #[cfg(not(feature = "httpcache"))]
     {
-        println!("rerun this example with `cargo run --no-default-features --features tls,httpcache --example conditional_requests`");
+        println!("rerun this example with `cargo run --no-default-features --features default-tls,httpcache --example conditional_requests`");
         Ok(())
     }
 
@@ -25,7 +24,7 @@ fn main() -> Result<()> {
 
         let host = "https://api.github.com";
         let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
-        let client = Client::builder().build(HttpsConnector::new(4).unwrap());
+        let client = Client::builder().build()?;
         let http_cache = HttpCache::in_home_dir();
         let github = Github::custom(host, agent, None, client, http_cache);
 

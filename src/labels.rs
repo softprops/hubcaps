@@ -1,21 +1,17 @@
 //! Labels interface
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::{Future, Github, Stream};
 
-pub struct Labels<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Labels {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Labels<C> {
+impl Labels {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

@@ -13,7 +13,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             // add labels associated with a pull
             println!(
                 "{:#?}",

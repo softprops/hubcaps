@@ -2,8 +2,6 @@
 use crate::{Future, Github, Stream};
 use serde::Deserialize;
 
-use hyper::client::connect::Connect;
-
 /// User information
 #[derive(Debug, Deserialize)]
 pub struct User {
@@ -64,15 +62,12 @@ pub struct AuthenticatedUser {
 }
 
 /// Query user information
-pub struct Users<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Users {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Users<C> {
-    pub fn new(github: Github<C>) -> Self {
+impl Users {
+    pub fn new(github: Github) -> Self {
         Users { github }
     }
 
@@ -91,18 +86,15 @@ impl<C: Clone + Connect + 'static> Users<C> {
 }
 
 /// reference to contributors associated with a github repo
-pub struct Contributors<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Contributors {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Contributors<C> {
+impl Contributors {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

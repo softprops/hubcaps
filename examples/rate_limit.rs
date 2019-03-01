@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
         None,
-    );
+    )?;
     let status = rt.block_on(github.rate_limit().get())?;
     println!("{:#?}", status);
     Ok(())

@@ -13,7 +13,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             let owner = "softprops";
             let repo = "hubcaps";
 

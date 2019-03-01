@@ -2,7 +2,6 @@
 use std::fmt;
 use std::ops;
 
-use hyper::client::connect::Connect;
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::Deserialize;
 use serde::de::{self, Visitor};
@@ -10,18 +9,15 @@ use serde::de::{self, Visitor};
 use crate::{Future, Github, Stream};
 
 /// Provides access to the content information for a repository
-pub struct Content<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Content {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Content<C> {
+impl Content {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

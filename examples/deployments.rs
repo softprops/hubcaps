@@ -11,7 +11,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             let repo = github.repo("softprops", "hubcaps");
             let deployments = repo.deployments();
             // let deploy = deployments.create(&DeploymentOptions::builder("master")

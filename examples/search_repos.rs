@@ -14,7 +14,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
             println!("repo search results");
             // https://developer.github.com/v3/search/#parameters
             rt.block_on(

@@ -33,7 +33,7 @@ fn main() -> Result<()> {
     File::open(&key_file)?.read_to_end(&mut key)?;
     let cred = JWTCredentials::new(app_id.parse().expect("Bad GH_APP_ID"), key)?;
 
-    let mut github = Github::new(USER_AGENT, Credentials::JWT(cred.clone()));
+    let mut github = Github::new(USER_AGENT, Credentials::JWT(cred.clone()))?;
     let installation = rt
         .block_on(
             github

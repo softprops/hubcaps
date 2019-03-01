@@ -13,7 +13,7 @@ fn main() -> Result<()> {
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
-            );
+            )?;
 
             let opts = ThreadListOptions::builder().all(true).build();
             for thread in rt.block_on(github.activity().notifications().list(&opts))? {

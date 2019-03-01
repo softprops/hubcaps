@@ -1,25 +1,21 @@
 //! Git interface
 
 // Third party
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 // Ours
 use crate::{Future, Github};
 
 /// reference to git operations associated with a github repo
-pub struct Git<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Git {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Git<C> {
+impl Git {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
     where
         O: Into<String>,
         R: Into<String>,

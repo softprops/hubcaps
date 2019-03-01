@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use hyper::client::connect::Connect;
 use serde::de::DeserializeOwned;
 use url::{self, form_urlencoded};
 use serde::Deserialize;
@@ -40,11 +39,8 @@ impl fmt::Display for IssuesSort {
 /// Provides access to general search operations
 ///
 #[derive(Clone)]
-pub struct Search<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Search {
+    github: Github,
 }
 
 fn items<D>(result: SearchResult<D>) -> Vec<D>
@@ -54,19 +50,19 @@ where
     result.items
 }
 
-impl<C: Clone + Connect + 'static> Search<C> {
+impl Search {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 
     /// return a reference to a search interface for issues
-    pub fn issues(&self) -> SearchIssues<C> {
+    pub fn issues(&self) -> SearchIssues {
         SearchIssues::new(self.clone())
     }
 
     /// Return a reference to a search interface for repositories
-    pub fn repos(&self) -> SearchRepos<C> {
+    pub fn repos(&self) -> SearchRepos {
         SearchRepos::new(self.clone())
     }
 
@@ -87,16 +83,13 @@ impl<C: Clone + Connect + 'static> Search<C> {
 
 /// Provides access to issue search operations
 /// https://developer.github.com/v3/search/#search-issues
-pub struct SearchIssues<C>
-where
-    C: Clone + Connect + 'static,
-{
-    search: Search<C>,
+pub struct SearchIssues {
+    search: Search,
 }
 
-impl<C: Clone + Connect + 'static> SearchIssues<C> {
+impl SearchIssues {
     #[doc(hidden)]
-    pub fn new(search: Search<C>) -> Self {
+    pub fn new(search: Search) -> Self {
         Self { search }
     }
 

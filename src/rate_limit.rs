@@ -1,16 +1,15 @@
 //! Rate Limit interface
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::{Future, Github};
 
-pub struct RateLimit<C: Clone + Connect + 'static> {
-    github: Github<C>,
+pub struct RateLimit {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> RateLimit<C> {
+impl RateLimit {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 

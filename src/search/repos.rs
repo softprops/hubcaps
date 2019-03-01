@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fmt;
 
 use url::form_urlencoded;
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use super::{Search, SearchResult};
@@ -32,16 +31,13 @@ impl fmt::Display for ReposSort {
 
 /// Provides access to [search operations for repositories](https://developer.github.com/v3/search/#search-repositories)
 ///
-pub struct SearchRepos<C>
-where
-    C: Clone + Connect + 'static,
-{
-    search: Search<C>,
+pub struct SearchRepos {
+    search: Search,
 }
 
-impl<C: Clone + Connect + 'static> SearchRepos<C> {
+impl SearchRepos {
     #[doc(hidden)]
-    pub fn new(search: Search<C>) -> Self {
+    pub fn new(search: Search) -> Self {
         Self { search }
     }
 

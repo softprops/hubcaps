@@ -1,21 +1,16 @@
 //! Stars interface
-
 use futures::Future as StdFuture;
-use hyper::client::connect::Connect;
-use hyper::StatusCode;
+use http::StatusCode;
 
 use crate::{Error, ErrorKind, Future, Github};
 
-pub struct Stars<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Stars {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Stars<C> {
+impl Stars {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 

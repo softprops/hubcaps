@@ -1,24 +1,20 @@
 //! Pull Commits interface
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::users::User;
 use crate::{Future, Github, Stream};
 
 /// A structure for interfacing with a pull commits
-pub struct PullCommits<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct PullCommits {
+    github: Github,
     owner: String,
     repo: String,
     number: u64,
 }
 
-impl<C: Clone + Connect + 'static> PullCommits<C> {
+impl PullCommits {
     #[doc(hidden)]
-    pub fn new<O, R>(github: Github<C>, owner: O, repo: R, number: u64) -> Self
+    pub fn new<O, R>(github: Github, owner: O, repo: R, number: u64) -> Self
     where
         O: Into<String>,
         R: Into<String>,

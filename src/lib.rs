@@ -74,7 +74,7 @@
 //! [dependencies.hubcaps]
 //!  version = "..."
 //!  default-features = false
-//!  features = ["tls","httpcache"]
+//!  features = ["default-tls","httpcache"]
 //! ```
 //!
 //! Then use the `Github::custom` constructor to provide a cache implementation. See
@@ -89,22 +89,17 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
 use http::header::{HeaderMap, HeaderValue};
-use hyper::client::connect::Connect;
-use hyper::client::HttpConnector;
+use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
-use hyper::header::IF_NONE_MATCH;
-use hyper::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, LOCATION, USER_AGENT};
-use hyper::{Body, Client, Method, Request, StatusCode, Uri};
-#[cfg(feature = "tls")]
-use hyper_tls::HttpsConnector;
-#[cfg(feature = "rustls")]
-use hyper_rustls::HttpsConnector;
+use http::header::IF_NONE_MATCH;
+use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
+use reqwest::r#async::{Body, Client};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
@@ -396,30 +391,17 @@ impl PartialEq for InstallationTokenGenerator {
 
 /// Entry point interface for interacting with Github API
 #[derive(Clone, Debug)]
-pub struct Github<C>
-where
-    C: Clone + Connect + 'static,
-{
+pub struct Github {
     host: String,
     agent: String,
-    client: Client<C>,
+    client: Client,
     credentials: Option<Credentials>,
     #[cfg(feature = "httpcache")]
     http_cache: BoxedHttpCache,
 }
 
-#[cfg(feature = "tls")]
-fn create_connector() -> HttpsConnector<HttpConnector> {
-    HttpsConnector::new(4).unwrap()
-}
-#[cfg(feature = "rustls")]
-fn create_connector() -> HttpsConnector<HttpConnector> {
-    HttpsConnector::new(4)
-}
-
-#[cfg(any(feature = "tls", feature = "rustls"))]
-impl Github<HttpsConnector<HttpConnector>> {
-    pub fn new<A, C>(agent: A, credentials: C) -> Self
+impl Github {
+    pub fn new<A, C>(agent: A, credentials: C) -> Result<Self>
     where
         A: Into<String>,
         C: Into<Option<Credentials>>,
@@ -427,35 +409,29 @@ impl Github<HttpsConnector<HttpConnector>> {
         Self::host(DEFAULT_HOST, agent, credentials)
     }
 
-    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Self
+    pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Result<Self>
     where
         H: Into<String>,
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        let connector = create_connector();
-        let http = Client::builder().keep_alive(true).build(connector);
+        let http = Client::builder().build()?;
         #[cfg(feature = "httpcache")]
         {
-            Self::custom(host, agent, credentials, http, HttpCache::noop())
+            Ok(Self::custom(host, agent, credentials, http, HttpCache::noop()))
         }
         #[cfg(not(feature = "httpcache"))]
         {
-            Self::custom(host, agent, credentials, http)
+            Ok(Self::custom(host, agent, credentials, http))
         }
     }
-}
 
-impl<C> Github<C>
-where
-    C: Clone + Connect + 'static,
-{
     #[cfg(feature = "httpcache")]
     pub fn custom<H, A, CR>(
         host: H,
         agent: A,
         credentials: CR,
-        http: Client<C>,
+        http: Client,
         http_cache: BoxedHttpCache,
     ) -> Self
     where
@@ -473,7 +449,7 @@ where
     }
 
     #[cfg(not(feature = "httpcache"))]
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client<C>) -> Self
+    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client) -> Self
     where
         H: Into<String>,
         A: Into<String>,
@@ -494,17 +470,17 @@ where
         self.credentials = credentials.into();
     }
 
-    pub fn rate_limit(&self) -> RateLimit<C> {
+    pub fn rate_limit(&self) -> RateLimit {
         RateLimit::new(self.clone())
     }
 
     /// Return a reference to user activity
-    pub fn activity(&self) -> Activity<C> {
+    pub fn activity(&self) -> Activity {
         Activity::new(self.clone())
     }
 
     /// Return a reference to a Github repository
-    pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository<C>
+    pub fn repo<O, R>(&self, owner: O, repo: R) -> Repository
     where
         O: Into<String>,
         R: Into<String>,
@@ -514,7 +490,7 @@ where
 
     /// Return a reference to the collection of repositories owned by and
     /// associated with an owner
-    pub fn user_repos<S>(&self, owner: S) -> UserRepositories<C>
+    pub fn user_repos<S>(&self, owner: S) -> UserRepositories
     where
         S: Into<String>,
     {
@@ -523,11 +499,11 @@ where
 
     /// Return a reference to the collection of repositories owned by the user
     /// associated with the current authentication credentials
-    pub fn repos(&self) -> Repositories<C> {
+    pub fn repos(&self) -> Repositories {
         Repositories::new(self.clone())
     }
 
-    pub fn org<O>(&self, org: O) -> Organization<C>
+    pub fn org<O>(&self, org: O) -> Organization
     where
         O: Into<String>,
     {
@@ -536,19 +512,19 @@ where
 
     /// Return a reference to the collection of organizations that the user
     /// associated with the current authentication credentials is in
-    pub fn orgs(&self) -> Organizations<C> {
+    pub fn orgs(&self) -> Organizations {
         Organizations::new(self.clone())
     }
 
     /// Return a reference to an interface that provides access
     /// to user information.
-    pub fn users(&self) -> Users<C> {
+    pub fn users(&self) -> Users {
         Users::new(self.clone())
     }
 
     /// Return a reference to the collection of organizations a user
     /// is publicly associated with
-    pub fn user_orgs<U>(&self, user: U) -> UserOrganizations<C>
+    pub fn user_orgs<U>(&self, user: U) -> UserOrganizations
     where
         U: Into<String>,
     {
@@ -556,7 +532,7 @@ where
     }
 
     /// Return a reference to an interface that provides access to a user's gists
-    pub fn user_gists<O>(&self, owner: O) -> UserGists<C>
+    pub fn user_gists<O>(&self, owner: O) -> UserGists
     where
         O: Into<String>,
     {
@@ -565,18 +541,18 @@ where
 
     /// Return a reference to an interface that provides access to the
     /// gists belonging to the owner of the token used to configure this client
-    pub fn gists(&self) -> Gists<C> {
+    pub fn gists(&self) -> Gists {
         Gists::new(self.clone())
     }
 
     /// Return a reference to an interface that provides access to search operations
-    pub fn search(&self) -> Search<C> {
+    pub fn search(&self) -> Search {
         Search::new(self.clone())
     }
 
     /// Return a reference to the collection of repositories owned by and
     /// associated with an organization
-    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories<C>
+    pub fn org_repos<O>(&self, org: O) -> OrganizationRepositories
     where
         O: Into<String>,
     {
@@ -584,7 +560,7 @@ where
     }
 
     /// Return a reference to GitHub Apps
-    pub fn app(&self) -> App<C> {
+    pub fn app(&self) -> App {
         App::new(self.clone())
     }
 
@@ -610,29 +586,26 @@ where
         &self,
         uri: &str,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Uri, Option<String>)> {
-        let parsed_uri = uri.parse::<Uri>();
+    ) -> Future<(Url, Option<String>)> {
+        let parsed_url = uri.parse::<Url>();
 
         match self.credentials(authentication) {
             Some(&Credentials::Client(ref id, ref secret)) => {
-                let mut parsed = Url::parse(uri).unwrap();
-                parsed
-                    .query_pairs_mut()
-                    .append_pair("client_id", id)
-                    .append_pair("client_secret", secret);
                 Box::new(
-                    parsed
-                        .to_string()
-                        .parse::<Uri>()
-                        .map(|u| (u, None))
-                        .map_err(Error::from)
-                        .into_future(),
+                    parsed_url.map(|mut u| {
+                        u.query_pairs_mut()
+                            .append_pair("client_id", id)
+                            .append_pair("client_secret", secret);
+                        (u, None)
+                    })
+                    .map_err(Error::from)
+                    .into_future(),
                 )
             }
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
                 Box::new(
-                    parsed_uri
+                    parsed_url
                         .map(|u| (u, Some(auth)))
                         .map_err(Error::from)
                         .into_future(),
@@ -641,7 +614,7 @@ where
             Some(&Credentials::JWT(ref jwt)) => {
                 let auth = format!("Bearer {}", jwt.token());
                 Box::new(
-                    parsed_uri
+                    parsed_url
                         .map(|u| (u, Some(auth)))
                         .map_err(Error::from)
                         .into_future(),
@@ -651,7 +624,7 @@ where
                 if let Some(token) = apptoken.token() {
                     let auth = format!("token {}", token);
                     Box::new(
-                        parsed_uri
+                        parsed_url
                             .map(|u| (u, Some(auth)))
                             .map_err(Error::from)
                             .into_future(),
@@ -665,7 +638,7 @@ where
                             .and_then(move |token| {
                                 let auth = format!("token {}", &token.token);
                                 *token_ref.lock().unwrap() = Some(token.token);
-                                parsed_uri
+                                parsed_url
                                     .map(|u| (u, Some(auth)))
                                     .map_err(Error::from)
                                     .into_future()
@@ -674,7 +647,7 @@ where
                 }
             }
             None => Box::new(
-                parsed_uri
+                parsed_url
                     .map(|u| (u, None))
                     .map_err(Error::from)
                     .into_future(),
@@ -703,41 +676,41 @@ where
         let response = url_and_auth
             .map_err(Error::from)
             .and_then(move |(url, auth)| {
-                let mut req = Request::builder();
+                #[cfg(not(feature = "httpcache"))]
+                let mut req = instance.client.request(method2, url);
 
                 #[cfg(feature = "httpcache")]
-                {
+                let mut req = {
+                    let mut req = instance.client.request(method2.clone(), url);
                     if method2 == Method::GET {
                         if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
-                            req.header(IF_NONE_MATCH, etag);
+                            req = req.header(IF_NONE_MATCH, etag);
                         }
                     }
-                }
+                    req
+                };
 
-                req.method(method2).uri(url);
-
-                req.header(USER_AGENT, &*instance.agent);
-                req.header(
+                req = req.header(USER_AGENT, &*instance.agent);
+                req = req.header(
                     ACCEPT,
                     &*format!("{}", qitem::<Mime>(From::from(media_type))),
                 );
 
                 if let Some(auth_str) = auth {
-                    req.header(AUTHORIZATION, &*auth_str);
+                    req = req.header(AUTHORIZATION, &*auth_str);
                 }
 
                 trace!("Body: {:?}", &body2);
-                let req = match body2 {
-                    Some(body) => req.body(Body::from(body)),
-                    None => req.body(Body::empty()),
-                };
+                if let Some(body) = body2 {
+                    req = req.body(Body::from(body));
+                }
                 debug!("Request: {:?}", &req);
-
-                req.map_err(Error::from)
-                    .into_future()
-                    .and_then(move |req| instance.client.request(req).map_err(Error::from))
+                req.send().map_err(Error::from)
             });
+
+        #[cfg(feature = "httpcache")]
         let instance2 = self.clone();
+
         #[cfg(feature = "httpcache")]
         let uri3 = uri.to_string();
         Box::new(response.and_then(move |response| {
@@ -747,18 +720,6 @@ where
             let (remaining, reset, etag) = get_header_values(response.headers());
 
             let status = response.status();
-            // handle redirect common with renamed repos
-            if StatusCode::MOVED_PERMANENTLY == status || StatusCode::TEMPORARY_REDIRECT == status {
-                let location = response
-                    .headers()
-                    .get(LOCATION)
-                    .and_then(|l| l.to_str().ok());
-
-                if let Some(location) = location {
-                    debug!("redirect location {:?}", location);
-                    return instance2.request(method, location, body, media_type, authentication);
-                }
-            }
             let link = response
                 .headers()
                 .get(LINK)
@@ -1064,15 +1025,14 @@ fn next_link(l: &Link) -> Option<String> {
 }
 
 /// "unfold" paginated results of a list of github entities
-fn unfold<C, D, I>(
-    github: Github<C>,
+fn unfold<D, I>(
+    github: Github,
     first: Future<(Option<Link>, D)>,
     into_items: fn(D) -> Vec<I>,
 ) -> Stream<I>
 where
     D: DeserializeOwned + 'static + Send,
     I: 'static + Send,
-    C: Clone + Connect + 'static,
 {
     Box::new(
         first

@@ -25,12 +25,12 @@ tokio = "0.1"
 dirs = { version = "1.0", optional = true }
 futures = "0.1"
 http = "0.1"
-hyper = "0.12"
 hyperx = "0.13"
-jsonwebtoken = "5"
+jsonwebtoken = { version = "6", git = "https://github.com/Keats/jsonwebtoken", branch = "next" }
 mime = "0.3"
 log = "0.4"
 url = "1.7"
+reqwest = { version = "0.9.10", default-features = false }
 serde = { version = "1.0.84", features = ['derive'] }
 serde_derive = "1.0"
 serde_json = "1.0"
@@ -38,19 +38,11 @@ error-chain = "0.12"
 base64 = "0.10"
 percent-encoding = "1"
 
-[dependencies.hyper-tls]
-optional = true
-version = "0.3"
-
-[dependencies.hyper-rustls]
-optional = true
-version = "0.14"
-
 [features]
-default = ["tls"]
-# enable tls
-tls = ["hyper-tls"]
+default = ["default-tls"]
+# enable native tls
+default-tls = ["reqwest/default-tls"]
 # enable rustls
-rustls = ["hyper-rustls"]
+rustls-tls = ["reqwest/rustls-tls"]
 # enable etag-based http_cache functionality
 httpcache = ["dirs"]

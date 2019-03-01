@@ -1,5 +1,4 @@
 //! Organizations interface
-use hyper::client::connect::Connect;
 use serde::Deserialize;
 
 use crate::repositories::OrgRepositories;
@@ -7,17 +6,14 @@ use crate::teams::OrgTeams;
 use crate::{Future, Github};
 
 /// Provides access to label operations available for an individual organization
-pub struct Organization<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Organization {
+    github: Github,
     org: String,
 }
 
-impl<C: Clone + Connect + 'static> Organization<C> {
+impl Organization {
     #[doc(hidden)]
-    pub fn new<O>(github: Github<C>, org: O) -> Self
+    pub fn new<O>(github: Github, org: O) -> Self
     where
         O: Into<String>,
     {
@@ -28,26 +24,23 @@ impl<C: Clone + Connect + 'static> Organization<C> {
     }
 
     /// returns a reference to an interface for team operations
-    pub fn teams(&self) -> OrgTeams<C> {
+    pub fn teams(&self) -> OrgTeams {
         OrgTeams::new(self.github.clone(), self.org.clone())
     }
 
     /// returns a reference to an interface for repo operations
-    pub fn repos(&self) -> OrgRepositories<C> {
+    pub fn repos(&self) -> OrgRepositories {
         OrgRepositories::new(self.github.clone(), self.org.clone())
     }
 }
 
-pub struct Organizations<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Organizations {
+    github: Github,
 }
 
-impl<C: Clone + Connect + 'static> Organizations<C> {
+impl Organizations {
     #[doc(hidden)]
-    pub fn new(github: Github<C>) -> Self {
+    pub fn new(github: Github) -> Self {
         Self { github }
     }
 
@@ -62,16 +55,13 @@ impl<C: Clone + Connect + 'static> Organizations<C> {
     }
 }
 
-pub struct UserOrganizations<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct UserOrganizations {
+    github: Github,
     user: String,
 }
 
-impl<C: Clone + Connect + 'static> UserOrganizations<C> {
-    pub fn new<U>(github: Github<C>, user: U) -> Self
+impl UserOrganizations {
+    pub fn new<U>(github: Github, user: U) -> Self
     where
         U: Into<String>,
     {

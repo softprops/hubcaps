@@ -2,24 +2,20 @@
 //!
 //! For more information, visit the official
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::{Future, Github, Stream};
 
 /// reference to gists associated with a github user
-pub struct Branches<C>
-where
-    C: Clone + Connect + 'static,
-{
-    github: Github<C>,
+pub struct Branches {
+    github: Github,
     owner: String,
     repo: String,
 }
 
-impl<C: Clone + Connect + 'static> Branches<C> {
+impl Branches {
     #[doc(hidden)]
-    pub fn new<U, R>(github: Github<C>, owner: U, repo: R) -> Self
+    pub fn new<U, R>(github: Github, owner: U, repo: R) -> Self
     where
         U: Into<String>,
         R: Into<String>,
