@@ -25,7 +25,7 @@ tokio = "0.1"
 dirs = { version = "1.0", optional = true }
 futures = "0.1"
 http = "0.1"
-hyperx = "0.13"
+hyperx = "0.14"
 jsonwebtoken = { version = "6", git = "https://github.com/Keats/jsonwebtoken", branch = "next" }
 mime = "0.3"
 log = "0.4"
