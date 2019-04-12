@@ -2,7 +2,7 @@ use std::cell::Cell;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use log::debug;
 
@@ -26,7 +26,7 @@ fn global_test_root() -> PathBuf {
 fn test_root() -> PathBuf {
     let root = global_test_root();
 
-    static NEXT_TEST_NUM: AtomicUsize = ATOMIC_USIZE_INIT;
+    static NEXT_TEST_NUM: AtomicUsize = AtomicUsize::new(0);
     thread_local!(static TEST_NUM: usize = NEXT_TEST_NUM.fetch_add(1, Ordering::SeqCst));
     let root = root.join(&TEST_NUM.with(|my_id| format!("t{}", my_id)));
 
