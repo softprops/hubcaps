@@ -77,7 +77,7 @@
 //!  features = ["default-tls","httpcache"]
 //! ```
 //!
-//! Then use the `Github::custom` constructor to provide a cache implementation. See
+//! Then use the `Github::builder` builder to provide a cache implementation. See
 //! the conditional_requests example in this crates github repository for an example usage
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
