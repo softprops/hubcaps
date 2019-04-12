@@ -100,6 +100,7 @@ use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
 use reqwest::r#async::{Body, Client, ClientBuilder};
+use reqwest::Proxy;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
@@ -140,10 +141,19 @@ pub mod traffic;
 pub mod users;
 pub mod watching;
 
+/// Re-exports of the used reqwest types.
+pub mod client {
+    pub use reqwest::header;
+    pub use reqwest::r#async::ClientBuilder;
+    pub use reqwest::RedirectPolicy;
+    #[cfg(feature = "tls")]
+    pub use reqwest::{Certificate, Identity};
+    pub use reqwest::{Proxy, Url};
+}
+
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
 pub use crate::http_cache::{BoxedHttpCache, HttpCache, NoCache};
-pub use reqwest::Proxy;
 
 use crate::activity::Activity;
 use crate::app::App;
