@@ -22,6 +22,7 @@ use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
 use crate::{Future, Github, SortDirection, Stream};
+use crate::collaborators::Collaborators;
 
 /// describes repository visibilities
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -417,6 +418,12 @@ impl Repository {
     /// associated with this repository ref
     pub fn statuses(&self) -> Statuses {
         Statuses::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to the [collaborators](https://developer.github.com/v3/repos/collaborators/)
+    /// associated with this repository ref
+    pub fn collaborators(&self) -> Collaborators {
+        Collaborators::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)

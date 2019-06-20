@@ -139,6 +139,7 @@ pub mod teams;
 pub mod traffic;
 pub mod users;
 pub mod watching;
+pub mod collaborators;
 
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
