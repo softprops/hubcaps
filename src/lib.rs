@@ -753,7 +753,8 @@ impl Github {
                                     }
                                 }
                             }
-                            serde_json::from_slice::<Out>(&response_body)
+                            let parsed_response = if status == StatusCode::NO_CONTENT { serde_json::from_str("null") } else { serde_json::from_slice::<Out>(&response_body) };
+                            parsed_response
                                 .map(|out| (link, out))
                                 .map_err(|error| ErrorKind::Codec(error).into())
                         } else if status == StatusCode::NOT_MODIFIED {
