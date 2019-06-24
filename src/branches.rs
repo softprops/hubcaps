@@ -4,7 +4,7 @@
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github, Stream};
+use crate::{Future, Github, Stream, MediaType};
 
 /// reference to gists associated with a github user
 pub struct Branches {
@@ -65,7 +65,7 @@ impl Branches {
     where
         B: Into<String>,
     {
-        self.github.put(
+        self.github.put_media(
             &format!(
                 "/repos/{owner}/{repo}/branches/{branch}/protection",
                 owner = self.owner,
@@ -73,6 +73,7 @@ impl Branches {
                 branch = branch.into()
             ),
             json!(pro),
+            MediaType::Preview("luke-cage")
         )
     }
 }
@@ -117,9 +118,11 @@ pub struct Restrictions {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RequiredPullRequestReviews {
-    pub dismissal_restrictions: Restrictions,
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub dismissal_restrictions: Option<Restrictions>,
     pub dismiss_stale_reviews: bool,
     pub require_code_owner_reviews: bool,
+    pub required_approving_review_count: u8
 }
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -969,11 +969,22 @@ impl Github {
     where
         D: DeserializeOwned + 'static + Send,
     {
+        self.put_media(
+            uri,
+            message,
+            MediaType::Json
+        )
+    }
+
+    fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    where
+        D: DeserializeOwned + 'static + Send,
+    {
         self.request_entity(
             Method::PUT,
             &(self.host.clone() + uri),
             Some(message),
-            MediaType::Json,
+            media,
             AuthenticationConstraint::Unconstrained,
         )
     }
