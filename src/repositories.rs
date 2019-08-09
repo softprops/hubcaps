@@ -16,6 +16,7 @@ use crate::keys::Keys;
 use crate::labels::Labels;
 use crate::pulls::PullRequests;
 use crate::releases::Releases;
+use crate::repo_commits::RepoCommits;
 use crate::statuses::Statuses;
 use crate::teams::RepoTeams;
 use crate::traffic::Traffic;
@@ -348,6 +349,11 @@ impl Repository {
     /// get a reference to branch operations
     pub fn branches(&self) -> Branches {
         Branches::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
+    /// get a reference to repository commit operations
+    pub fn commits(&self) -> RepoCommits {
+        RepoCommits::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
     /// get a reference to content operations

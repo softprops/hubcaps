@@ -129,6 +129,7 @@ pub mod pull_commits;
 pub mod pulls;
 pub mod rate_limit;
 pub mod releases;
+pub mod repo_commits;
 pub mod repositories;
 pub mod review_comments;
 pub mod review_requests;
