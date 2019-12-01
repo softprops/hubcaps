@@ -450,6 +450,10 @@ impl Repository {
     pub fn traffic(&self) -> Traffic {
         Traffic::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
+
+    pub fn fork(&self) -> Future<Repo> {
+        self.github.post(&self.path("/forks"), Vec::new())
+    }
 }
 
 // representations (todo: replace with derive_builder)
