@@ -123,6 +123,7 @@ pub mod hooks;
 pub mod issues;
 pub mod keys;
 pub mod labels;
+pub mod membership;
 pub mod notifications;
 pub mod organizations;
 pub mod pull_commits;
