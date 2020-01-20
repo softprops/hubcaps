@@ -742,7 +742,7 @@ impl Github {
                         if status.is_success() {
                             debug!(
                                 "response payload {}",
-                                String::from_utf8_lossy(&response_body)
+                                String::from_utf8_lossy(response_body)
                             );
                             #[cfg(feature = "httpcache")]
                             {
