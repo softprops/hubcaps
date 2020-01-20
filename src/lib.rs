@@ -99,7 +99,7 @@ use hyperx::header::{qitem, Link, RelationType};
 // use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
-use reqwest::r#async::{Body, Client};
+use reqwest::{Body, Client};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
