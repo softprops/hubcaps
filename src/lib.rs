@@ -684,7 +684,7 @@ impl Github {
             .map_err(Error::from)
             .and_then(move |(url, auth)| {
                 #[cfg(not(feature = "httpcache"))]
-                let mut req = instance.client.request(method2, url);
+                let mut req = instance.client.request(method2, url.into());
 
                 #[cfg(feature = "httpcache")]
                 let mut req = {
