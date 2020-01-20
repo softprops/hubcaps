@@ -9,7 +9,7 @@ use serde::Deserialize;
 use serde_json::error::Error as SerdeError;
 use url::ParseError;
 
-use crate::jwt::errors::Error as JWTError;
+//use crate::jwt::errors::Error as JWTError;
 
 error_chain! {
     errors {
@@ -33,7 +33,6 @@ error_chain! {
         Reqwest(ReqwestError);
         Url(ParseError);
         IO(IoError);
-        JWT(JWTError);
     }
 }
 
