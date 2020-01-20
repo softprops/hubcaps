@@ -87,7 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
+use futures::{future, stream, Future as StdFuture, Stream as StdStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
 use http::header::{HeaderMap, HeaderValue};

@@ -1,6 +1,5 @@
 //! Checks interface
 // see: https://developer.github.com/v3/checks/suites/
-use futures::IntoFuture;
 use serde::{Deserialize, Serialize};
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
