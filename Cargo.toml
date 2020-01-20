@@ -24,7 +24,7 @@ tokio = "0.1"
 [dependencies]
 dirs = { version = "1.0", optional = true }
 futures = "0.1"
-http = "0.1"
+http = "0.2"
 hyperx = "0.13"
 # jsonwebtoken = "6"
 mime = "0.3"
