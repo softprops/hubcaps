@@ -807,14 +807,14 @@ impl Github {
         return Ok(response?.1);
     }
 
-    fn get<D>(&self, uri: &str) -> Future<D>
+    async fn get<D>(&self, uri: &str) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.get_media(uri, MediaType::Json)
+        self.get_media(uri, MediaType::Json).await
     }
 
-    fn get_media<D>(&self, uri: &str, media: MediaType) -> Future<D>
+    async fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -825,6 +825,7 @@ impl Github {
             media,
             AuthenticationConstraint::Unconstrained,
         )
+        .await
     }
 
     fn get_stream<D>(&self, uri: &str) -> Stream<D>
@@ -848,39 +849,37 @@ impl Github {
         .await
     }
 
-    fn delete(&self, uri: &str) -> Future<()> {
-        Box::new(
-            self.request_entity::<()>(
-                Method::DELETE,
-                &(self.host.clone() + uri),
-                None,
-                MediaType::Json,
-                AuthenticationConstraint::Unconstrained,
-            )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
-            }),
+    async fn delete(&self, uri: &str) -> Result<()> {
+        self.request_entity::<()>(
+            Method::DELETE,
+            &(self.host.clone() + uri),
+            None,
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
+        .await
+        .or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            otherwise => Err(otherwise),
+        })
     }
 
-    fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(
-            self.request_entity::<()>(
-                Method::DELETE,
-                &(self.host.clone() + uri),
-                Some(message),
-                MediaType::Json,
-                AuthenticationConstraint::Unconstrained,
-            )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
-            }),
+    async fn delete_message(&self, uri: &str, message: Vec<u8>) -> Result<()> {
+        self.request_entity::<()>(
+            Method::DELETE,
+            &(self.host.clone() + uri),
+            Some(message),
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
         )
+        .await
+        .or_else(|err| match err {
+            Error(ErrorKind::Codec(_), _) => Ok(()),
+            otherwise => Err(otherwise),
+        })
     }
 
-    fn post<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    async fn post<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -890,6 +889,7 @@ impl Github {
             MediaType::Json,
             AuthenticationConstraint::Unconstrained,
         )
+        .await
     }
 
     async fn post_media<D>(
@@ -912,14 +912,14 @@ impl Github {
         .await
     }
 
-    fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.patch(uri, message).or_else(|err| match err {
+    async fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Result<()> {
+        self.patch(uri, message).await.or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
-        }))
+        })
     }
 
-    fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    async fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -930,30 +930,31 @@ impl Github {
             media,
             AuthenticationConstraint::Unconstrained,
         )
+        .await
     }
 
-    fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    async fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.patch_media(uri, message, MediaType::Json)
+        self.patch_media(uri, message, MediaType::Json).await
     }
 
-    fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.put(uri, message).or_else(|err| match err {
+    async fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Result<()> {
+        self.put(uri, message).await.or_else(|err| match err {
             Error(ErrorKind::Codec(_), _) => Ok(()),
             err => Err(err),
-        }))
+        })
     }
 
-    fn put<D>(&self, uri: &str, message: Vec<u8>) -> Future<D>
+    async fn put<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.put_media(uri, message, MediaType::Json)
+        self.put_media(uri, message, MediaType::Json).await
     }
 
-    fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
+    async fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -964,6 +965,7 @@ impl Github {
             media,
             AuthenticationConstraint::Unconstrained,
         )
+        .await
     }
 }
 
