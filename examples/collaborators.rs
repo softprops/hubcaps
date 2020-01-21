@@ -22,18 +22,27 @@ fn main() -> Result<()> {
                 println!("=============");
                 println!("Repos:");
 
-                for repo in rt.block_on(github.org_repos(&org.login[..]).list(&Default::default()))? {
+                for repo in
+                    rt.block_on(github.org_repos(&org.login[..]).list(&Default::default()))?
+                {
                     println!("* {}", repo.name);
 
                     // If you have push permissions on an org, you can list collaborators.
                     // Otherwise, don't print them.
-                    if let Ok(collabs) = rt.block_on(github.repo(
-                            &org.login[..],
-                            &repo.name[..]
-                        ).collaborators().list()) {
-                        println!("  * Collaborators: {}", collabs.into_iter().map(|c| {
-                            c.login
-                        }).collect::<Vec<_>>().join(", "));
+                    if let Ok(collabs) = rt.block_on(
+                        github
+                            .repo(&org.login[..], &repo.name[..])
+                            .collaborators()
+                            .list(),
+                    ) {
+                        println!(
+                            "  * Collaborators: {}",
+                            collabs
+                                .into_iter()
+                                .map(|c| { c.login })
+                                .collect::<Vec<_>>()
+                                .join(", ")
+                        );
                     }
                 }
                 println!("")

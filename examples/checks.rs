@@ -39,7 +39,8 @@ fn main() -> Result<()> {
             github
                 .app()
                 .find_repo_installation(user_name.clone(), repo.clone()),
-        ).unwrap();
+        )
+        .unwrap();
 
     github.set_credentials(Credentials::InstallationToken(
         InstallationTokenGenerator::new(installation.id, cred),

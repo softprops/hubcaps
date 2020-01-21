@@ -1,15 +1,13 @@
 #[cfg(feature = "httpcache")]
 use {
-    std::env,
-
     futures::{future, Stream},
-    reqwest::r#async::Client,
-    tokio::runtime::Runtime,
-    log::info,
-
     hubcaps::http_cache::FileBasedCache,
     hubcaps::repositories::UserRepoListOptions,
     hubcaps::{Credentials, Error, Github, Result},
+    log::info,
+    reqwest::r#async::Client,
+    std::env,
+    tokio::runtime::Runtime,
 };
 
 #[cfg(feature = "httpcache")]

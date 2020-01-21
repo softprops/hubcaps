@@ -3,8 +3,8 @@ use std::fmt;
 use std::ops;
 
 use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-use serde::Deserialize;
 use serde::de::{self, Visitor};
+use serde::Deserialize;
 
 use crate::{Future, Github, Stream};
 

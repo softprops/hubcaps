@@ -66,10 +66,7 @@ impl Assets {
     }
 }
 
-pub struct ReleaseRef
-where
-    
-{
+pub struct ReleaseRef {
     github: Github,
     owner: String,
     repo: String,
@@ -120,10 +117,7 @@ impl ReleaseRef {
 /// Provides access to published releases.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
 /// for more information.
-pub struct Releases
-where
-    
-{
+pub struct Releases {
     github: Github,
     owner: String,
     repo: String,

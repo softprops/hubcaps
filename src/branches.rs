@@ -4,7 +4,7 @@
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github, Stream, MediaType};
+use crate::{Future, Github, MediaType, Stream};
 
 /// reference to gists associated with a github user
 pub struct Branches {
@@ -73,7 +73,7 @@ impl Branches {
                 branch = branch.into()
             ),
             json!(pro),
-            MediaType::Preview("luke-cage")
+            MediaType::Preview("luke-cage"),
         )
     }
 }
@@ -118,11 +118,11 @@ pub struct Restrictions {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RequiredPullRequestReviews {
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub dismissal_restrictions: Option<Restrictions>,
     pub dismiss_stale_reviews: bool,
     pub require_code_owner_reviews: bool,
-    pub required_approving_review_count: u8
+    pub required_approving_review_count: u8,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

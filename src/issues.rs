@@ -2,8 +2,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
+use url::form_urlencoded;
 
 use crate::comments::Comments;
 use crate::labels::Label;
@@ -98,7 +98,8 @@ impl IssueAssignees {
 
     /// add a set of assignees
     pub fn add(&self, assignees: Vec<&str>) -> Future<Issue> {
-        self.github.post(&self.path(""), json_lit!({ "assignees": assignees }))
+        self.github
+            .post(&self.path(""), json_lit!({ "assignees": assignees }))
     }
 }
 

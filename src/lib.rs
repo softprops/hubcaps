@@ -88,11 +88,11 @@ use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-use http::header::{HeaderMap, HeaderValue};
-use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
+use http::header::{HeaderMap, HeaderValue};
 use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
+use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
@@ -113,6 +113,7 @@ pub mod activity;
 pub mod app;
 pub mod branches;
 pub mod checks;
+pub mod collaborators;
 pub mod comments;
 pub mod content;
 pub mod deployments;
@@ -140,7 +141,6 @@ pub mod teams;
 pub mod traffic;
 pub mod users;
 pub mod watching;
-pub mod collaborators;
 
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
@@ -420,7 +420,13 @@ impl Github {
         let http = Client::builder().build()?;
         #[cfg(feature = "httpcache")]
         {
-            Ok(Self::custom(host, agent, credentials, http, HttpCache::noop()))
+            Ok(Self::custom(
+                host,
+                agent,
+                credentials,
+                http,
+                HttpCache::noop(),
+            ))
         }
         #[cfg(not(feature = "httpcache"))]
         {
@@ -592,9 +598,9 @@ impl Github {
         let parsed_url = uri.parse::<Url>();
 
         match self.credentials(authentication) {
-            Some(&Credentials::Client(ref id, ref secret)) => {
-                Box::new(
-                    parsed_url.map(|mut u| {
+            Some(&Credentials::Client(ref id, ref secret)) => Box::new(
+                parsed_url
+                    .map(|mut u| {
                         u.query_pairs_mut()
                             .append_pair("client_id", id)
                             .append_pair("client_secret", secret);
@@ -602,8 +608,7 @@ impl Github {
                     })
                     .map_err(Error::from)
                     .into_future(),
-                )
-            }
+            ),
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
                 Box::new(
@@ -970,11 +975,7 @@ impl Github {
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.put_media(
-            uri,
-            message,
-            MediaType::Json
-        )
+        self.put_media(uri, message, MediaType::Json)
     }
 
     fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>

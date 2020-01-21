@@ -1,13 +1,13 @@
 use serde_json;
 
+use self::super::{Error, Github};
 use crate::users::User;
-use self::super::{Github, Error};
 use http::StatusCode;
 
+use crate::{ErrorKind, Future};
+use futures::future::{Future as StdFuture, IntoFuture};
 use std::collections::HashMap;
 use std::fmt;
-use crate::{Future, ErrorKind};
-use futures::future::{ Future as StdFuture, IntoFuture };
 
 #[derive(Debug)]
 pub enum Permissions {
@@ -24,13 +24,14 @@ impl Default for Permissions {
 
 impl fmt::Display for Permissions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match *self {
-                   Permissions::Admin => "admin",
-                   Permissions::Push => "push",
-                   Permissions::Pull => "pull",
-               }
+        write!(
+            f,
+            "{}",
+            match *self {
+                Permissions::Admin => "admin",
+                Permissions::Push => "push",
+                Permissions::Pull => "pull",
+            }
         )
     }
 }
@@ -43,8 +44,9 @@ pub struct Collaborators {
 
 impl Collaborators {
     pub fn new<O, R>(github: Github, owner: O, repo: R) -> Collaborators
-        where O: Into<String>,
-              R: Into<String>
+    where
+        O: Into<String>,
+        R: Into<String>,
     {
         Collaborators {
             github: github,
@@ -85,10 +87,9 @@ impl Collaborators {
         permission_params.insert("permission", permissions.to_string());
 
         match serde_json::to_string(&permission_params) {
-            Ok(data) => self.github.put::<()>(
-                &self.path(&format!("/{}", username)),
-                data.into_bytes(),
-            ),
+            Ok(data) => self
+                .github
+                .put::<()>(&self.path(&format!("/{}", username)), data.into_bytes()),
             Err(e) => Box::new(Err(e.into()).into_future()),
         }
     }
@@ -96,5 +97,4 @@ impl Collaborators {
     pub fn remove(&self, username: &str) -> Future<()> {
         self.github.delete(&self.path(&format!("/{}", username)))
     }
-
 }

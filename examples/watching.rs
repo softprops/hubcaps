@@ -21,25 +21,49 @@ fn main() -> Result<()> {
     }))?;
 
     println!("watch a repo");
-    rt.block_on(github.activity().watching().watch_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .watch_repo("octocat", "Hello-World"),
+    )
+    .and_then(|sub| {
         println!("subscription: {:#?}", sub);
         Ok(())
     })?;
 
     println!("get watching for repo");
-    rt.block_on(github.activity().watching().get_for_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .get_for_repo("octocat", "Hello-World"),
+    )
+    .and_then(|sub| {
         println!("subscription: {:#?}", sub);
         Ok(())
     })?;
 
     println!("ignore a repo");
-    rt.block_on(github.activity().watching().ignore_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .ignore_repo("octocat", "Hello-World"),
+    )
+    .and_then(|sub| {
         println!("subscription: {:#?}", sub);
         Ok(())
     })?;
 
     println!("unwatch a repo");
-    rt.block_on(github.activity().watching().unwatch_repo("octocat", "Hello-World")).and_then(|()| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .unwatch_repo("octocat", "Hello-World"),
+    )
+    .and_then(|()| {
         println!("unwatched");
         Ok(())
     })?;

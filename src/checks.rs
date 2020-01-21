@@ -160,7 +160,6 @@ pub struct CheckRunOptions {
     pub actions: Option<Vec<Action>>,
 }
 
-
 #[derive(Debug, Serialize, PartialEq)]
 pub struct CheckRunUpdateOptions {
     #[serde(skip_serializing_if = "Option::is_none")]

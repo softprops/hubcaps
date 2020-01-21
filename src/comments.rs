@@ -1,8 +1,8 @@
 //! Comments interface
 use std::collections::HashMap;
 
-use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
+use url::form_urlencoded;
 
 use crate::users::User;
 use crate::{Future, Github};
