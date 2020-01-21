@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use http::Uri;
 use log::trace;
 
-use crate::{Error, Result};
+use crate::{Error, Result, Result};
 
 pub type BoxedHttpCache = Box<dyn HttpCache + Send>;
 

@@ -6,7 +6,7 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// Content-Type web hooks will receive
 /// deliveries in
@@ -58,9 +58,10 @@ impl Hooks {
     }
 
     /// lists hook associated with a repository
-    pub fn list(&self) -> Future<Vec<Hook>> {
+    pub async fn list(&self) -> Result<Vec<Hook>> {
         self.github
             .get(&format!("/repos/{}/{}/hooks", self.owner, self.repo))
+            .await
     }
 
     /// creates a new repository hook
@@ -68,25 +69,30 @@ impl Hooks {
     /// Creating hooks for a service that already has one configured will update the existing hook.
     /// see [github docs](https://developer.github.com/v3/repos/hooks/)
     /// for more information
-    pub fn create(&self, options: &HookCreateOptions) -> Future<Hook> {
-        self.github.post(
-            &format!("/repos/{}/{}/hooks", self.owner, self.repo),
-            json!(options),
-        )
+    pub async fn create(&self, options: &HookCreateOptions) -> Result<Hook> {
+        self.github
+            .post(
+                &format!("/repos/{}/{}/hooks", self.owner, self.repo),
+                json!(options)?,
+            )
+            .await
     }
 
     /// edits an existing repository hook
-    pub fn edit(&self, id: u64, options: &HookEditOptions) -> Future<Hook> {
-        self.github.patch(
-            &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
-            json!(options),
-        )
+    pub async fn edit(&self, id: u64, options: &HookEditOptions) -> Result<Hook> {
+        self.github
+            .patch(
+                &format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id),
+                json!(options)?,
+            )
+            .await
     }
 
     /// deletes a repository hook by id
-    pub fn delete(&self, id: u64) -> Future<()> {
+    pub async fn delete(&self, id: u64) -> Result<()> {
         self.github
             .delete(&format!("/repos/{}/{}/hooks/{}", self.owner, self.repo, id))
+            .await
     }
 }
 

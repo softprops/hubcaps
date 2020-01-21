@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use url::form_urlencoded;
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// reference to gists associated with a github user
 pub struct UserGists {
@@ -26,12 +26,12 @@ impl UserGists {
         }
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
+    pub async fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
         let mut uri = vec![format!("/users/{}/gists", self.owner)];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 }
 
@@ -49,59 +49,66 @@ impl Gists {
         format!("/gists{}", more)
     }
 
-    pub fn star(&self, id: &str) -> Future<()> {
+    pub async fn star(&self, id: &str) -> Result<()> {
         self.github
             .put_no_response(&self.path(&format!("/{}/star", id)), Vec::new())
+            .await
     }
 
-    pub fn unstar(&self, id: &str) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}/star", id)))
+    pub async fn unstar(&self, id: &str) -> Result<()> {
+        self.github
+            .delete(&self.path(&format!("/{}/star", id)))
+            .await
     }
 
-    pub fn fork(&self, id: &str) -> Future<Gist> {
+    pub async fn fork(&self, id: &str) -> Result<Gist> {
         self.github
             .post(&self.path(&format!("/{}/forks", id)), Vec::new())
+            .await
     }
 
-    pub fn forks(&self, id: &str) -> Future<Vec<GistFork>> {
-        self.github.get(&self.path(&format!("/{}/forks", id)))
+    pub async fn forks(&self, id: &str) -> Result<Vec<GistFork>> {
+        self.github.get(&self.path(&format!("/{}/forks", id))).await
     }
 
-    pub fn delete(&self, id: &str) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", id)))
+    pub async fn delete(&self, id: &str) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", id))).await
     }
 
-    pub fn get(&self, id: &str) -> Future<Gist> {
-        self.github.get(&self.path(&format!("/{}", id)))
+    pub async fn get(&self, id: &str) -> Result<Gist> {
+        self.github.get(&self.path(&format!("/{}", id))).await
     }
 
-    pub fn getrev(&self, id: &str, sha: &str) -> Future<Gist> {
-        self.github.get(&self.path(&format!("/{}/{}", id, sha)))
+    pub async fn getrev(&self, id: &str, sha: &str) -> Result<Gist> {
+        self.github
+            .get(&self.path(&format!("/{}/{}", id, sha)))
+            .await
     }
 
-    pub fn list(&self, options: &GistListOptions) -> Future<Vec<Gist>> {
+    pub async fn list(&self, options: &GistListOptions) -> Result<Vec<Gist>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Gist>>(&uri.join("?"))
+        self.github.get::<Vec<Gist>>(&uri.join("?")).await
     }
 
-    pub fn public(&self) -> Future<Vec<Gist>> {
-        self.github.get(&self.path("/public"))
+    pub async fn public(&self) -> Result<Vec<Gist>> {
+        self.github.get(&self.path("/public")).await
     }
 
-    pub fn starred(&self) -> Future<Vec<Gist>> {
-        self.github.get(&self.path("/starred"))
+    pub async fn starred(&self) -> Result<Vec<Gist>> {
+        self.github.get(&self.path("/starred")).await
     }
 
-    pub fn create(&self, gist: &GistOptions) -> Future<Gist> {
-        self.github.post(&self.path(""), json!(gist))
+    pub async fn create(&self, gist: &GistOptions) -> Result<Gist> {
+        self.github.post(&self.path(""), json!(gist)?).await
     }
 
-    pub fn edit(&self, id: &str, gist: &GistOptions) -> Future<Gist> {
+    pub async fn edit(&self, id: &str, gist: &GistOptions) -> Result<Gist> {
         self.github
-            .patch(&self.path(&format!("/{}", id)), json!(gist))
+            .patch(&self.path(&format!("/{}", id)), json!(gist)?)
+            .await
     }
 }
 

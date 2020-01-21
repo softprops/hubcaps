@@ -3,7 +3,7 @@
 use serde::Deserialize;
 
 use crate::repositories::Repo;
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 
 pub struct Watching {
     github: Github,
@@ -17,58 +17,66 @@ impl Watching {
 
     /// Provides a stream over all pages of the repositories watched by the authenticated user.
     /// https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
-    pub fn iter(&self) -> Stream<Repo> {
+    pub async fn iter(&self) -> Stream<Repo> {
         self.github.get_stream("/user/subscriptions")
     }
 
     /// https://developer.github.com/v3/activity/watching/#get-a-repository-subscription
-    pub fn get_for_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription>
+    pub async fn get_for_repo<O, R>(&self, owner: O, repo: R) -> Result<Subscription>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        self.github.get(&format!(
-            "/repos/{}/{}/subscription",
-            owner.into(),
-            repo.into()
-        ))
+        self.github
+            .get(&format!(
+                "/repos/{}/{}/subscription",
+                owner.into(),
+                repo.into()
+            ))
+            .await
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn watch_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription>
+    pub async fn watch_repo<O, R>(&self, owner: O, repo: R) -> Result<Subscription>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        self.github.put(
-            &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
-            json_lit!({ "subscribed": true }),
-        )
+        self.github
+            .put(
+                &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
+                json_lit!({ "subscribed": true })?,
+            )
+            .await
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn ignore_repo<O, R>(&self, owner: O, repo: R) -> Future<Subscription>
+    pub async fn ignore_repo<O, R>(&self, owner: O, repo: R) -> Result<Subscription>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        self.github.put(
-            &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
-            json_lit!({ "ignored": true }),
-        )
+        self.github
+            .put(
+                &format!("/repos/{}/{}/subscription", owner.into(), repo.into()),
+                json_lit!({ "ignored": true })?,
+            )
+            .await
     }
 
     /// https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-    pub fn unwatch_repo<O, R>(&self, owner: O, repo: R) -> Future<()>
+    pub async fn unwatch_repo<O, R>(&self, owner: O, repo: R) -> Result<()>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        self.github.delete(&format!(
-            "/repos/{}/{}/subscription",
-            owner.into(),
-            repo.into()
-        ))
+        self.github
+            .delete(&format!(
+                "/repos/{}/{}/subscription",
+                owner.into(),
+                repo.into()
+            ))
+            .await
     }
 }
 

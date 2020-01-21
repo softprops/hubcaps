@@ -828,11 +828,12 @@ impl Github {
         .await
     }
 
-    fn get_stream<D>(&self, uri: &str) -> Stream<D>
+    async fn get_stream<D>(&self, uri: &str) -> Stream<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        unfold(self.clone(), self.get_pages(uri), |x| x)
+        loop {}
+        // unfold(self.clone(), self.get_pages(uri), |x| x)
     }
 
     async fn get_pages<D>(&self, uri: &str) -> Result<(Option<Link>, D)>
@@ -1016,6 +1017,7 @@ fn next_link(l: &Link) -> Option<String> {
         .map(|v| v.link().to_owned())
 }
 
+/*
 /// "unfold" paginated results of a list of github entities
 fn unfold<D, I>(
     github: Github,
@@ -1052,6 +1054,7 @@ where
             .flatten(),
     )
 }
+ */
 
 #[cfg(test)]
 mod tests {

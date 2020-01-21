@@ -3,7 +3,7 @@ use std::fmt;
 
 use serde::Deserialize;
 
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// Describes types of breakdowns of the data for views or clones
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -48,31 +48,31 @@ impl Traffic {
     }
 
     /// List the top 10 referrers over the past 14 days
-    pub fn referrers(&self) -> Future<Vec<Referrer>> {
-        self.github.get(&self.path("/popular/referrers"))
+    pub async fn referrers(&self) -> Result<Vec<Referrer>> {
+        self.github.get(&self.path("/popular/referrers")).await
     }
 
     /// List the top 10 popular contents over the past 14 days
-    pub fn paths(&self) -> Future<Vec<Path>> {
-        self.github.get(&self.path("/popular/paths"))
+    pub async fn paths(&self) -> Result<Vec<Path>> {
+        self.github.get(&self.path("/popular/paths")).await
     }
 
     /// Return the total number of views and breakdown per day or week for the last 14 days
-    pub fn views(&self, unit: TimeUnit) -> Future<Views> {
+    pub async fn views(&self, unit: TimeUnit) -> Result<Views> {
         let path = match unit {
             TimeUnit::Week => "/views?per=week",
             TimeUnit::Day => "/views?per=day",
         };
-        self.github.get(&self.path(path))
+        self.github.get(&self.path(path)).await
     }
 
     /// Return the total number of clones and breakdown per day or week for the last 14 days
-    pub fn clones(&self, unit: TimeUnit) -> Future<Clones> {
+    pub async fn clones(&self, unit: TimeUnit) -> Result<Clones> {
         let path = match unit {
             TimeUnit::Week => "/clones?per=week",
             TimeUnit::Day => "/clones?per=day",
         };
-        self.github.get(&self.path(path))
+        self.github.get(&self.path(path)).await
     }
 }
 

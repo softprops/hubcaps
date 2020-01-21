@@ -6,7 +6,7 @@ use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::de::{self, Visitor};
 use serde::Deserialize;
 
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 
 /// Provides access to the content information for a repository
 pub struct Content {
@@ -38,16 +38,16 @@ impl Content {
 
     /// Gets the contents of the location. This could be a file, symlink, or
     /// submodule. To list the contents of a directory, use `iter`.
-    pub fn get(&self, location: &str) -> Future<Contents> {
-        self.github.get(&self.path(location))
+    pub async fn get(&self, location: &str) -> Result<Contents> {
+        self.github.get(&self.path(location)).await
     }
 
     /// Information on a single file.
     ///
     /// GitHub only supports downloading files up to 1 megabyte in size. If you
     /// need to retrieve larger files, the Git Data API must be used instead.
-    pub fn file(&self, location: &str) -> Future<File> {
-        self.github.get(&self.path(location))
+    pub async fn file(&self, location: &str) -> Result<File> {
+        self.github.get(&self.path(location)).await
     }
 
     /// List the root directory.
@@ -59,7 +59,7 @@ impl Content {
     ///
     /// GitHub limits the number of items returned to 1000 for this API. If you
     /// need to retrieve more items, the Git Data API must be used instead.
-    pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
+    pub async fn iter(&self, location: &str) -> Stream<DirectoryItem> {
         self.github.get_stream(&self.path(location))
     }
 }

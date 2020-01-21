@@ -8,7 +8,7 @@ use url::{self, form_urlencoded};
 
 use crate::labels::Label;
 use crate::users::User;
-use crate::{unfold, Future, Github, SortDirection, Stream};
+use crate::{unfold, Future, Github, Result, SortDirection, Stream};
 
 mod repos;
 
@@ -109,7 +109,7 @@ impl SearchIssues {
     /// Return a stream of search results repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
     /// for query format options
-    pub fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Stream<IssuesItem>
+    pub async fn iter<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Stream<IssuesItem>
     where
         Q: Into<String>,
     {
@@ -119,12 +119,17 @@ impl SearchIssues {
     /// Return the first page of search result repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters-3)
     /// for query format options
-    pub fn list<Q>(&self, q: Q, options: &SearchIssuesOptions) -> Future<SearchResult<IssuesItem>>
+    pub async fn list<Q>(
+        &self,
+        q: Q,
+        options: &SearchIssuesOptions,
+    ) -> Result<SearchResult<IssuesItem>>
     where
         Q: Into<String>,
     {
         self.search
             .search::<IssuesItem>(&self.search_uri(q, options))
+            .await
     }
 }
 

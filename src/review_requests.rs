@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::pulls::Pull;
 use crate::teams::Team;
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// A structure for interfacing with review requests
 pub struct ReviewRequests {
@@ -30,19 +30,20 @@ impl ReviewRequests {
     }
 
     /// list requested reviews
-    pub fn get(&self) -> Future<ReviewRequest> {
-        self.github.get::<ReviewRequest>(&self.path())
+    pub async fn get(&self) -> Result<ReviewRequest> {
+        self.github.get::<ReviewRequest>(&self.path()).await
     }
 
     /// Add new requested reviews
-    pub fn create(&self, review_request: &ReviewRequestOptions) -> Future<Pull> {
-        self.github.post(&self.path(), json!(review_request))
+    pub async fn create(&self, review_request: &ReviewRequestOptions) -> Result<Pull> {
+        self.github.post(&self.path(), json!(review_request)?).await
     }
 
     /// Delete a review request
-    pub fn delete(&self, review_request: &ReviewRequestOptions) -> Future<()> {
+    pub async fn delete(&self, review_request: &ReviewRequestOptions) -> Result<()> {
         self.github
-            .delete_message(&self.path(), json!(review_request))
+            .delete_message(&self.path(), json!(review_request)?)
+            .await
     }
 
     fn path(&self) -> String {

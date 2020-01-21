@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// A structure for interfacing with a review comments
 pub struct ReviewComments {
@@ -28,13 +28,13 @@ impl ReviewComments {
     }
 
     /// list review comments
-    pub fn list(&self) -> Future<Vec<ReviewComment>> {
-        self.github.get::<Vec<ReviewComment>>(&self.path())
+    pub async fn list(&self) -> Result<Vec<ReviewComment>> {
+        self.github.get::<Vec<ReviewComment>>(&self.path()).await
     }
 
     /// Create new review comment
-    pub fn create(&self, review_comment: &ReviewCommentOptions) -> Future<ReviewComment> {
-        self.github.post(&self.path(), json!(review_comment))
+    pub async fn create(&self, review_comment: &ReviewCommentOptions) -> Result<ReviewComment> {
+        self.github.post(&self.path(), json!(review_comment)?).await
     }
 
     fn path(&self) -> String {

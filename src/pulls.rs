@@ -12,7 +12,7 @@ use crate::pull_commits::PullCommits;
 use crate::review_comments::ReviewComments;
 use crate::review_requests::ReviewRequests;
 use crate::users::User;
-use crate::{Future, Github, SortDirection, Stream};
+use crate::{Github, Result, SortDirection, Stream};
 
 /// Sort directions for pull requests
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -76,8 +76,8 @@ impl PullRequest {
     }
 
     /// Request a pull requests information
-    pub fn get(&self) -> Future<Pull> {
-        self.github.get(&self.path(""))
+    pub async fn get(&self) -> Result<Pull> {
+        self.github.get(&self.path("")).await
     }
 
     /// Return a reference to labels operations available for this pull request
@@ -101,23 +101,25 @@ impl PullRequest {
     }
 
     /// short hand for editing state = open
-    pub fn open(&self) -> Future<Pull> {
+    pub async fn open(&self) -> Result<Pull> {
         self.edit(&PullEditOptions::builder().state("open").build())
+            .await
     }
 
     /// shorthand for editing state = closed
-    pub fn close(&self) -> Future<Pull> {
+    pub async fn close(&self) -> Result<Pull> {
         self.edit(&PullEditOptions::builder().state("closed").build())
+            .await
     }
 
     /// Edit a pull request
-    pub fn edit(&self, pr: &PullEditOptions) -> Future<Pull> {
-        self.github.patch::<Pull>(&self.path(""), json!(pr))
+    pub async fn edit(&self, pr: &PullEditOptions) -> Result<Pull> {
+        self.github.patch::<Pull>(&self.path(""), json!(pr)?).await
     }
 
     /// Returns a vector of file diffs associated with this pull
-    pub fn files(&self) -> Future<Vec<FileDiff>> {
-        self.github.get(&self.path("/files"))
+    pub async fn files(&self) -> Result<Vec<FileDiff>> {
+        self.github.get(&self.path("/files")).await
     }
 
     /// returns issue comments interface
@@ -196,26 +198,26 @@ impl PullRequests {
     }
 
     /// Create a new pull request
-    pub fn create(&self, pr: &PullOptions) -> Future<Pull> {
-        self.github.post(&self.path(""), json!(pr))
+    pub async fn create(&self, pr: &PullOptions) -> Result<Pull> {
+        self.github.post(&self.path(""), json!(pr)?).await
     }
 
     /// list pull requests
-    pub fn list(&self, options: &PullListOptions) -> Future<Vec<Pull>> {
+    pub async fn list(&self, options: &PullListOptions) -> Result<Vec<Pull>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get::<Vec<Pull>>(&uri.join("?"))
+        self.github.get::<Vec<Pull>>(&uri.join("?")).await
     }
 
     /// provides a stream over all pages of pull requests
-    pub fn iter(&self, options: &PullListOptions) -> Stream<Pull> {
+    pub async fn iter(&self, options: &PullListOptions) -> Stream<Pull> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get_stream(&uri.join("?"))
+        self.github.get_stream(&uri.join("?")).await
     }
 }
 

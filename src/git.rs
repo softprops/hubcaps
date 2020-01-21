@@ -4,7 +4,7 @@
 use serde::Deserialize;
 
 // Ours
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// reference to git operations associated with a github repo
 pub struct Git {
@@ -34,48 +34,53 @@ impl Git {
     /// list a git tree of files for this repo at a given sha
     /// https://developer.github.com/v3/git/trees/#get-a-tree
     /// https://developer.github.com/v3/git/trees/#get-a-tree-recursively
-    pub fn tree<S>(&self, sha: S, recursive: bool) -> Future<TreeData>
+    pub async fn tree<S>(&self, sha: S, recursive: bool) -> Result<TreeData>
     where
         S: Into<String>,
     {
-        self.github.get(&self.path(&format!(
-            "/trees/{}?recursive={}",
-            sha.into(),
-            if recursive { "1" } else { "0" }
-        )))
+        self.github
+            .get(&self.path(&format!(
+                "/trees/{}?recursive={}",
+                sha.into(),
+                if recursive { "1" } else { "0" }
+            )))
+            .await
     }
 
     /// get the blob contents of a given sha
     /// https://developer.github.com/v3/git/blobs/#get-a-blob
-    pub fn blob<S>(&self, sha: S) -> Future<Blob>
+    pub async fn blob<S>(&self, sha: S) -> Result<Blob>
     where
         S: Into<String>,
     {
         self.github
             .get(&self.path(&format!("/blobs/{}", sha.into())))
+            .await
     }
 
     /// get the git reference data of a given ref
     /// the specified reference must be formatted as as "heads/branch", not just "branch"
     /// https://developer.github.com/v3/git/refs/#get-a-reference
-    pub fn reference<S>(&self, reference: S) -> Future<GetReferenceResponse>
+    pub async fn reference<S>(&self, reference: S) -> Result<GetReferenceResponse>
     where
         S: Into<String>,
     {
         self.github
             .get(&self.path(&format!("/refs/{}", reference.into())))
+            .await
     }
 
     //// deletes a refish
     /// branches should be in the format `heads/feature-a`
     /// tags should be in the format `tags/v1.0`
     /// https://developer.github.com/v3/git/refs/#delete-a-reference
-    pub fn delete_reference<S>(&self, reference: S) -> Future<()>
+    pub async fn delete_reference<S>(&self, reference: S) -> Result<()>
     where
         S: Into<String>,
     {
         self.github
             .delete(&self.path(&format!("/refs/{}", reference.into())))
+            .await
     }
 }
 

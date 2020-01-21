@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// interface for statuses associated with a repository
 pub struct Statuses {
@@ -30,26 +30,31 @@ impl Statuses {
     }
 
     /// creates a new status for a target sha
-    pub fn create(&self, sha: &str, status: &StatusOptions) -> Future<Status> {
+    pub async fn create(&self, sha: &str, status: &StatusOptions) -> Result<Status> {
         self.github
-            .post(&self.path(&format!("/{}", sha)), json!(status))
+            .post(&self.path(&format!("/{}", sha)), json!(status)?)
+            .await
     }
 
     /// lists all statuses associated with a given git sha
-    pub fn list(&self, sha: &str) -> Future<Vec<Status>> {
-        self.github.get(&format!(
-            "/repos/{}/{}/commits/{}/statuses",
-            self.owner, self.repo, sha
-        ))
+    pub async fn list(&self, sha: &str) -> Result<Vec<Status>> {
+        self.github
+            .get(&format!(
+                "/repos/{}/{}/commits/{}/statuses",
+                self.owner, self.repo, sha
+            ))
+            .await
     }
 
     /// list the combined statuses for a given git sha
     /// fixme: give this a type
-    pub fn combined(&self, sha: &str) -> Future<String> {
-        self.github.get(&format!(
-            "/repos/{}/{}/commits/{}/status",
-            self.owner, self.repo, sha
-        ))
+    pub async fn combined(&self, sha: &str) -> Result<String> {
+        self.github
+            .get(&format!(
+                "/repos/{}/{}/commits/{}/status",
+                self.owner, self.repo, sha
+            ))
+            .await
     }
 }
 

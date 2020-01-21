@@ -23,7 +23,7 @@ use crate::teams::RepoTeams;
 use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
-use crate::{Future, Github, SortDirection, Stream};
+use crate::{Github, Result, SortDirection, Stream};
 
 /// describes repository visibilities
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -149,28 +149,28 @@ impl Repositories {
 
     /// Create a new repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
-        self.github.post(&self.path(""), json!(repo))
+    pub async fn create(&self, repo: &RepoOptions) -> Result<Repo> {
+        self.github.post(&self.path(""), json!(repo)?).await
     }
 
     /// list the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn list(&self, options: &RepoListOptions) -> Future<Vec<Repo>> {
+    pub async fn list(&self, options: &RepoListOptions) -> Result<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 
     /// provides a stream over all pages of the authenticated users repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &RepoListOptions) -> Stream<Repo> {
+    pub async fn iter(&self, options: &RepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get_stream(&uri.join("?"))
+        self.github.get_stream(&uri.join("?")).await
     }
 }
 
@@ -197,28 +197,28 @@ impl OrgRepositories {
     }
 
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrgRepoListOptions) -> Future<Vec<Repo>> {
+    pub async fn list(&self, options: &OrgRepoListOptions) -> Result<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 
     /// provides a stream over all pages of an orgs's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrgRepoListOptions) -> Stream<Repo> {
+    pub async fn iter(&self, options: &OrgRepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get_stream(&uri.join("?"))
+        self.github.get_stream(&uri.join("?")).await
     }
 
     /// Create a new org repository
     /// https://developer.github.com/v3/repos/#create
-    pub fn create(&self, repo: &RepoOptions) -> Future<Repo> {
-        self.github.post(&self.path(""), json!(repo))
+    pub async fn create(&self, repo: &RepoOptions) -> Result<Repo> {
+        self.github.post(&self.path(""), json!(repo)?).await
     }
 }
 
@@ -250,14 +250,14 @@ impl UserRepositories {
     }
 
     /// https://developer.github.com/v3/repos/#list-user-repositories
-    pub fn list(&self, options: &UserRepoListOptions) -> Future<Vec<Repo>> {
-        self.github.get(&self.uri(options))
+    pub async fn list(&self, options: &UserRepoListOptions) -> Result<Vec<Repo>> {
+        self.github.get(&self.uri(options)).await
     }
 
     /// provides a stream over all pages of a user's repositories
     /// https://developer.github.com/v3/repos/#list-your-repositories
-    pub fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
-        self.github.get_stream(&self.uri(options))
+    pub async fn iter(&self, options: &UserRepoListOptions) -> Stream<Repo> {
+        self.github.get_stream(&self.uri(options)).await
     }
 }
 
@@ -285,22 +285,22 @@ impl OrganizationRepositories {
 
     /// list an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn list(&self, options: &OrganizationRepoListOptions) -> Future<Vec<Repo>> {
+    pub async fn list(&self, options: &OrganizationRepoListOptions) -> Result<Vec<Repo>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 
     /// Provides a stream over all pages of an organization's repositories
     /// https://developer.github.com/v3/repos/#list-organization-repositories
-    pub fn iter(&self, options: &OrganizationRepoListOptions) -> Stream<Repo> {
+    pub async fn iter(&self, options: &OrganizationRepoListOptions) -> Stream<Repo> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get_stream(&uri.join("?"))
+        self.github.get_stream(&uri.join("?")).await
     }
 }
 
@@ -329,21 +329,21 @@ impl Repository {
     }
 
     /// get a reference to the GitHub repository object that this `Repository` refers to
-    pub fn get(&self) -> Future<Repo> {
-        self.github.get(&self.path(""))
+    pub async fn get(&self) -> Result<Repo> {
+        self.github.get(&self.path("")).await
     }
 
     /// https://developer.github.com/v3/repos/#edit
-    pub fn edit(&self, options: &RepoEditOptions) -> Future<Repo> {
+    pub async fn edit(&self, options: &RepoEditOptions) -> Result<Repo> {
         // Note that this intentionally calls POST rather than PATCH,
         // even though the docs say PATCH.
         // In my tests (changing the default branch) POST works while PATCH doesn't.
-        self.github.post(&self.path(""), json!(options))
+        self.github.post(&self.path(""), json!(options)?).await
     }
 
     /// https://developer.github.com/v3/repos/#delete-a-repository
-    pub fn delete(&self) -> Future<()> {
-        self.github.delete(&self.path(""))
+    pub async fn delete(&self) -> Result<()> {
+        self.github.delete(&self.path("")).await
     }
 
     /// get a reference to branch operations
@@ -451,8 +451,8 @@ impl Repository {
         Traffic::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
-    pub fn fork(&self) -> Future<Repo> {
-        self.github.post(&self.path("/forks"), Vec::new())
+    pub async fn fork(&self) -> Result<Repo> {
+        self.github.post(&self.path("/forks"), Vec::new()).await
     }
 }
 
@@ -536,10 +536,10 @@ impl Repo {
     /// The keys are the language names, and the values are the number of bytes of code written in
     /// that language.
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn languages(&self, github: Github) -> Future<HashMap<String, i64>> {
+    pub async fn languages(&self, github: Github) -> Result<HashMap<String, i64>> {
         let url = Url::parse(&self.languages_url).unwrap();
         let uri: String = url.path().into();
-        github.get(&uri)
+        github.get(&uri).await
     }
 }
 

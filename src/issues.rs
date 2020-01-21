@@ -8,7 +8,7 @@ use url::form_urlencoded;
 use crate::comments::Comments;
 use crate::labels::Label;
 use crate::users::User;
-use crate::{Future, Github, SortDirection, Stream};
+use crate::{Github, Result, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -97,9 +97,10 @@ impl IssueAssignees {
     }
 
     /// add a set of assignees
-    pub fn add(&self, assignees: Vec<&str>) -> Future<Issue> {
+    pub async fn add(&self, assignees: Vec<&str>) -> Result<Issue> {
         self.github
-            .post(&self.path(""), json_lit!({ "assignees": assignees }))
+            .post(&self.path(""), json_lit!({ "assignees": assignees })?)
+            .await
     }
 }
 
@@ -135,26 +136,26 @@ impl IssueLabels {
 
     /// add a set of labels to this issue ref
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn add(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
-        self.github.post(&self.path(""), json!(labels))
+    pub async fn add(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
+        self.github.post(&self.path(""), json!(labels)?).await
     }
 
     /// remove a label from this issue
-    pub fn remove(&self, label: &str) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", label)))
+    pub async fn remove(&self, label: &str) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", label))).await
     }
 
     /// replace all labels associated with this issue with a new set.
     /// providing an empty set of labels is the same as clearing the
     /// current labels
     #[allow(clippy::needless_pass_by_value)] // shipped public API
-    pub fn set(&self, labels: Vec<&str>) -> Future<Vec<Label>> {
-        self.github.put(&self.path(""), json!(labels))
+    pub async fn set(&self, labels: Vec<&str>) -> Result<Vec<Label>> {
+        self.github.put(&self.path(""), json!(labels)?).await
     }
 
     /// remove all labels from an issue
-    pub fn clear(&self) -> Future<()> {
-        self.github.delete(&self.path(""))
+    pub async fn clear(&self) -> Result<()> {
+        self.github.delete(&self.path("")).await
     }
 }
 
@@ -183,8 +184,8 @@ impl IssueRef {
     }
 
     /// Request an issue's information
-    pub fn get(&self) -> Future<Issue> {
-        self.github.get(&self.path(""))
+    pub async fn get(&self) -> Result<Issue> {
+        self.github.get(&self.path("")).await
     }
 
     fn path(&self, more: &str) -> String {
@@ -215,8 +216,8 @@ impl IssueRef {
     }
 
     /// Edit the issues options
-    pub fn edit(&self, is: &IssueOptions) -> Future<Issue> {
-        self.github.patch(&self.path(""), json!(is))
+    pub async fn edit(&self, is: &IssueOptions) -> Result<Issue> {
+        self.github.patch(&self.path(""), json!(is)?).await
     }
 
     /// Return a reference to comment operations available for this issue
@@ -265,19 +266,19 @@ impl Issues {
         )
     }
 
-    pub fn create(&self, is: &IssueOptions) -> Future<Issue> {
-        self.github.post(&self.path(""), json!(is))
+    pub async fn create(&self, is: &IssueOptions) -> Result<Issue> {
+        self.github.post(&self.path(""), json!(is)?).await
     }
 
     /// Return the first page of issues for this repisotiry
     /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
     /// for more information
-    pub fn list(&self, options: &IssueListOptions) -> Future<Vec<Issue>> {
+    pub async fn list(&self, options: &IssueListOptions) -> Result<Vec<Issue>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 
     /// Return a stream of all issues for this repository
@@ -287,12 +288,12 @@ impl Issues {
     ///
     /// Note: You'll typically want to use a `IssueListOptions` with a `per_page`
     /// of 100 for maximum api credential rate limit efficency
-    pub fn iter(&self, options: &IssueListOptions) -> Stream<Issue> {
+    pub async fn iter(&self, options: &IssueListOptions) -> Stream<Issue> {
         let mut uri = vec![self.path("")];
         if let Some(query) = options.serialize() {
             uri.push(query);
         }
-        self.github.get_stream(&uri.join("?"))
+        self.github.get_stream(&uri.join("?")).await
     }
 }
 

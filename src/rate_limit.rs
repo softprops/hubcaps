@@ -1,7 +1,7 @@
 //! Rate Limit interface
 use serde::Deserialize;
 
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 pub struct RateLimit {
     github: Github,
@@ -14,8 +14,8 @@ impl RateLimit {
     }
 
     /// https://developer.github.com/v3/rate_limit/#get-your-current-rate-limit-status
-    pub fn get(&self) -> Future<RateLimitStatus> {
-        self.github.get("/rate_limit")
+    pub async fn get(&self) -> Result<RateLimitStatus> {
+        self.github.get("/rate_limit").await
     }
 }
 

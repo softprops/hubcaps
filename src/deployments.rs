@@ -6,7 +6,7 @@ use url::form_urlencoded;
 
 use crate::statuses::State;
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// Interface for repository deployments
 pub struct Deployments {
@@ -46,14 +46,14 @@ impl DeploymentStatuses {
     }
 
     /// lists all statuses associated with a deployment
-    pub fn list(&self) -> Future<Vec<DeploymentStatus>> {
-        self.github.get(&self.path(""))
+    pub async fn list(&self) -> Result<Vec<DeploymentStatus>> {
+        self.github.get(&self.path("")).await
     }
 
     /// creates a new deployment status. For convenience, a DeploymentStatusOptions.builder
     /// interface is required for building up a request
-    pub fn create(&self, status: &DeploymentStatusOptions) -> Future<DeploymentStatus> {
-        self.github.post(&self.path(""), json!(status))
+    pub async fn create(&self, status: &DeploymentStatusOptions) -> Result<DeploymentStatus> {
+        self.github.post(&self.path(""), json!(status)?).await
     }
 }
 
@@ -76,17 +76,17 @@ impl Deployments {
     }
 
     /// lists all deployments for a repository
-    pub fn list(&self, opts: &DeploymentListOptions) -> Future<Vec<Deployment>> {
+    pub async fn list(&self, opts: &DeploymentListOptions) -> Result<Vec<Deployment>> {
         let mut uri = vec![self.path("")];
         if let Some(query) = opts.serialize() {
             uri.push(query);
         }
-        self.github.get(&uri.join("?"))
+        self.github.get(&uri.join("?")).await
     }
 
     /// creates a new deployment for this repository
-    pub fn create(&self, dep: &DeploymentOptions) -> Future<Deployment> {
-        self.github.post(&self.path(""), json!(dep))
+    pub async fn create(&self, dep: &DeploymentOptions) -> Result<Deployment> {
+        self.github.post(&self.path(""), json!(dep)?).await
     }
 
     /// get a reference to the statuses api for a give deployment

@@ -4,7 +4,7 @@
 //! [Github docs](https://developer.github.com/v3/repos/branches/)
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github, MediaType, Stream};
+use crate::{Github, MediaType, Result, Stream};
 
 /// reference to gists associated with a github user
 pub struct Branches {
@@ -28,53 +28,61 @@ impl Branches {
     }
 
     /// list of branches for this repo
-    pub fn list(&self) -> Future<Vec<Branch>> {
-        self.github.get(&format!(
-            "/repos/{owner}/{repo}/branches",
-            owner = self.owner,
-            repo = self.repo
-        ))
+    pub async fn list(&self) -> Result<Vec<Branch>> {
+        self.github
+            .get(&format!(
+                "/repos/{owner}/{repo}/branches",
+                owner = self.owner,
+                repo = self.repo
+            ))
+            .await
     }
 
     /// provides an stream over branches for this repo
-    pub fn iter(&self) -> Stream<Branch> {
-        self.github.get_stream(&format!(
-            "/repos/{owner}/{repo}/branches",
-            owner = self.owner,
-            repo = self.repo
-        ))
+    pub async fn iter(&self) -> Stream<Branch> {
+        self.github
+            .get_stream(&format!(
+                "/repos/{owner}/{repo}/branches",
+                owner = self.owner,
+                repo = self.repo
+            ))
+            .await
     }
 
     /// gets a branch for this repo by name
-    pub fn get<B>(&self, branch: B) -> Future<Branch>
+    pub async fn get<B>(&self, branch: B) -> Result<Branch>
     where
         B: Into<String>,
     {
-        self.github.get(&format!(
-            "/repos/{owner}/{repo}/branches/{branch}",
-            owner = self.owner,
-            repo = self.repo,
-            branch = branch.into()
-        ))
+        self.github
+            .get(&format!(
+                "/repos/{owner}/{repo}/branches/{branch}",
+                owner = self.owner,
+                repo = self.repo,
+                branch = branch.into()
+            ))
+            .await
     }
 
     /// update branch production for a given branch
     ///
     /// https://developer.github.com/v3/repos/branches/#update-branch-protection
-    pub fn protection<B>(&self, branch: B, pro: &Protection) -> Future<ProtectionState>
+    pub async fn protection<B>(&self, branch: B, pro: &Protection) -> Result<ProtectionState>
     where
         B: Into<String>,
     {
-        self.github.put_media(
-            &format!(
-                "/repos/{owner}/{repo}/branches/{branch}/protection",
-                owner = self.owner,
-                repo = self.repo,
-                branch = branch.into()
-            ),
-            json!(pro),
-            MediaType::Preview("luke-cage"),
-        )
+        self.github
+            .put_media(
+                &format!(
+                    "/repos/{owner}/{repo}/branches/{branch}/protection",
+                    owner = self.owner,
+                    repo = self.repo,
+                    branch = branch.into()
+                ),
+                json!(pro)?,
+                MediaType::Preview("luke-cage"),
+            )
+            .await
     }
 }
 

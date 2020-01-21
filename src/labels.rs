@@ -1,7 +1,7 @@
 //! Labels interface
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 
 pub struct Labels {
     github: Github,
@@ -27,26 +27,27 @@ impl Labels {
         format!("/repos/{}/{}/labels{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, lab: &LabelOptions) -> Future<Label> {
-        self.github.post(&self.path(""), json!(lab))
+    pub async fn create(&self, lab: &LabelOptions) -> Result<Label> {
+        self.github.post(&self.path(""), json!(lab)?).await
     }
 
-    pub fn update(&self, prevname: &str, lab: &LabelOptions) -> Future<Label> {
+    pub async fn update(&self, prevname: &str, lab: &LabelOptions) -> Result<Label> {
         self.github
-            .patch(&self.path(&format!("/{}", prevname)), json!(lab))
+            .patch(&self.path(&format!("/{}", prevname)), json!(lab)?)
+            .await
     }
 
-    pub fn delete(&self, name: &str) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", name)))
+    pub async fn delete(&self, name: &str) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", name))).await
     }
 
-    pub fn list(&self) -> Future<Vec<Label>> {
-        self.github.get(&self.path(""))
+    pub async fn list(&self) -> Result<Vec<Label>> {
+        self.github.get(&self.path("")).await
     }
 
     /// provides a stream over all pages of this repo's labels
-    pub fn iter(&self) -> Stream<Label> {
-        self.github.get_stream(&self.path(""))
+    pub async fn iter(&self) -> Stream<Label> {
+        self.github.get_stream(&self.path("")).await
     }
 }
 

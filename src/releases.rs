@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 /// Provides access to assets for a release.
 /// See the [github docs](https://developer.github.com/v3/repos/releases/)
@@ -45,24 +45,24 @@ impl Assets {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release-asset)
     /// for more information.
-    pub fn get(&self, id: u64) -> Future<Asset> {
-        self.github.get(&self.path(&format!("/{}", id)))
+    pub async fn get(&self, id: u64) -> Result<Asset> {
+        self.github.get(&self.path(&format!("/{}", id))).await
     }
 
     /// Delete an asset by id.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release-asset)
     /// for more information.
-    pub fn delete(&self, id: u64) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", id)))
+    pub async fn delete(&self, id: u64) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", id))).await
     }
 
     /// List assets for a release.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-assets-for-a-release)
     /// for more information.
-    pub fn list(&self) -> Future<Vec<Asset>> {
-        self.github.get(&self.path(""))
+    pub async fn list(&self) -> Result<Vec<Asset>> {
+        self.github.get(&self.path("")).await
     }
 }
 
@@ -99,8 +99,8 @@ impl ReleaseRef {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-single-release)
     /// for more information.
-    pub fn get(&self) -> Future<Release> {
-        self.github.get::<Release>(&self.path(""))
+    pub async fn get(&self) -> Result<Release> {
+        self.github.get::<Release>(&self.path("")).await
     }
 
     /// Get a reference to asset operations for a release.
@@ -145,53 +145,55 @@ impl Releases {
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#create-a-release)
     /// for more information.
-    pub fn create(&self, rel: &ReleaseOptions) -> Future<Release> {
-        self.github.post(&self.path(""), json!(rel))
+    pub async fn create(&self, rel: &ReleaseOptions) -> Result<Release> {
+        self.github.post(&self.path(""), json!(rel)?).await
     }
 
     /// Edit a release by id.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#edit-a-release)
     /// for more information.
-    pub fn edit(&self, id: u64, rel: &ReleaseOptions) -> Future<Release> {
+    pub async fn edit(&self, id: u64, rel: &ReleaseOptions) -> Result<Release> {
         self.github
-            .patch(&self.path(&format!("/{}", id)), json!(rel))
+            .patch(&self.path(&format!("/{}", id)), json!(rel)?)
+            .await
     }
 
     /// Delete a release by id.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#delete-a-release)
     /// for more information.
-    pub fn delete(&self, id: u64) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", id)))
+    pub async fn delete(&self, id: u64) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", id))).await
     }
 
     /// List published releases and draft releases for users with push access.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository)
     /// for more information.
-    pub fn list(&self) -> Future<Vec<Release>> {
-        self.github.get(&self.path(""))
+    pub async fn list(&self) -> Result<Vec<Release>> {
+        self.github.get(&self.path("")).await
     }
 
     /// Return the latest full release. Draft releases and prereleases are not returned.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-the-latest-release)
     /// for more information.
-    pub fn latest(&self) -> Future<Release> {
-        self.github.get(&self.path("/latest"))
+    pub async fn latest(&self) -> Result<Release> {
+        self.github.get(&self.path("/latest")).await
     }
 
     /// Return a release by tag name.
     ///
     /// See the [github docs](https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name)
     /// for more information.
-    pub fn by_tag<S>(&self, tag_name: S) -> Future<Release>
+    pub async fn by_tag<S>(&self, tag_name: S) -> Result<Release>
     where
         S: Into<String>,
     {
         self.github
             .get(&self.path(&format!("/tags/{}", tag_name.into())))
+            .await
     }
 
     /// Get a reference to a specific release associated with a repository

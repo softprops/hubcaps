@@ -1,5 +1,5 @@
 //! Users interface
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 use serde::Deserialize;
 
 /// User information
@@ -72,16 +72,17 @@ impl Users {
     }
 
     /// Information about current authenticated user
-    pub fn authenticated(&self) -> Future<AuthenticatedUser> {
-        self.github.get("/user")
+    pub async fn authenticated(&self) -> Result<AuthenticatedUser> {
+        self.github.get("/user").await
     }
 
-    pub fn get<U>(&self, username: U) -> Future<User>
+    pub async fn get<U>(&self, username: U) -> Result<User>
     where
         U: Into<String>,
     {
         self.github
             .get(&format!("/users/{username}", username = username.into()))
+            .await
     }
 }
 
@@ -107,14 +108,16 @@ impl Contributors {
     }
 
     /// list of contributors for this repo
-    pub fn list(&self) -> Future<Vec<User>> {
+    pub async fn list(&self) -> Result<Vec<User>> {
         self.github
             .get(&format!("/repos/{}/{}/contributors", self.owner, self.repo))
+            .await
     }
 
     /// provides a stream over all pages of teams
-    pub fn iter(&self) -> Stream<User> {
+    pub async fn iter(&self) -> Stream<User> {
         self.github
             .get_stream(&format!("/repos/{}/{}/contributors", self.owner, self.repo))
+            .await
     }
 }

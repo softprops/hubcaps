@@ -4,7 +4,7 @@
 //! for motivation and use
 use serde::{Deserialize, Serialize};
 
-use crate::{Future, Github};
+use crate::{Github, Result};
 
 pub struct Keys {
     github: Github,
@@ -30,20 +30,20 @@ impl Keys {
         format!("/repos/{}/{}/keys{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, key: &KeyOptions) -> Future<Key> {
-        self.github.post(&self.path(""), json!(key))
+    pub async fn create(&self, key: &KeyOptions) -> Result<Key> {
+        self.github.post(&self.path(""), json!(key)?).await
     }
 
-    pub fn list(&self) -> Future<Vec<Key>> {
-        self.github.get(&self.path(""))
+    pub async fn list(&self) -> Result<Vec<Key>> {
+        self.github.get(&self.path("")).await
     }
 
-    pub fn get(&self, id: u64) -> Future<Key> {
-        self.github.get(&self.path(&format!("/{}", id)))
+    pub async fn get(&self, id: u64) -> Result<Key> {
+        self.github.get(&self.path(&format!("/{}", id))).await
     }
 
-    pub fn delete(&self, id: u64) -> Future<()> {
-        self.github.delete(&self.path(&format!("/{}", id)))
+    pub async fn delete(&self, id: u64) -> Result<()> {
+        self.github.delete(&self.path(&format!("/{}", id))).await
     }
 }
 

@@ -4,7 +4,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 
 use crate::users::User;
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 
 /// Team repository permissions
 #[derive(Clone, Copy)]
@@ -47,13 +47,14 @@ impl RepoTeams {
     }
 
     /// list of teams for this repo
-    pub fn list(&self) -> Future<Vec<Team>> {
+    pub async fn list(&self) -> Result<Vec<Team>> {
         self.github
             .get(&format!("/repos/{}/{}/teams", self.owner, self.repo))
+            .await
     }
 
     /// provides a stream over all pages of teams
-    pub fn iter(&self) -> Stream<Team> {
+    pub async fn iter(&self) -> Stream<Team> {
         self.github
             .get_stream(&format!("/repos/{}/{}/teams", self.owner, self.repo))
     }
@@ -78,8 +79,8 @@ impl OrgTeams {
     }
 
     /// list of teams for this org
-    pub fn list(&self) -> Future<Vec<Team>> {
-        self.github.get(&format!("/orgs/{}/teams", self.org))
+    pub async fn list(&self) -> Result<Vec<Team>> {
+        self.github.get(&format!("/orgs/{}/teams", self.org)).await
     }
 
     /// Get a reference to a structure for interfacing with a specific
@@ -89,31 +90,34 @@ impl OrgTeams {
     }
 
     /// create team
-    pub fn create(&self, team_options: &TeamOptions) -> Future<Team> {
+    pub async fn create(&self, team_options: &TeamOptions) -> Result<Team> {
         self.github
-            .post(&format!("/orgs/{}/teams", self.org), json!(team_options))
+            .post(&format!("/orgs/{}/teams", self.org), json!(team_options)?)
+            .await
     }
 
     /// provides an iterator over all pages of teams
-    pub fn iter(&self) -> Stream<Team> {
+    pub async fn iter(&self) -> Stream<Team> {
         self.github.get_stream(&format!("/orgs/{}/teams", self.org))
     }
 
     /// adds a repository permission to this team
     /// learn more [here](https://developer.github.com/v3/orgs/teams/#add-or-update-team-repository)
-    pub fn add_repo_permission<N>(
+    pub async fn add_repo_permission<N>(
         &self,
         team_id: u64,
         repo_name: N,
         permission: Permission,
-    ) -> Future<()>
+    ) -> Result<()>
     where
         N: Into<String>,
     {
-        self.github.put_no_response(
-            &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
-            json_lit!({ "permission": permission.to_string() }),
-        )
+        self.github
+            .put_no_response(
+                &format!("/teams/{}/repos/{}/{}", team_id, self.org, repo_name.into()),
+                json_lit!({ "permission": permission.to_string() })?,
+            )
+            .await
     }
 }
 
@@ -134,44 +138,53 @@ impl OrgTeamActions {
     }
 
     /// list the team
-    pub fn get(&self) -> Future<Team> {
-        self.github.get(&self.path(""))
+    pub async fn get(&self) -> Result<Team> {
+        self.github.get(&self.path("")).await
     }
 
     /// edit the team
-    pub fn update(&self, team_options: &TeamOptions) -> Future<Team> {
-        self.github.patch(&self.path(""), json!(team_options))
+    pub async fn update(&self, team_options: &TeamOptions) -> Result<Team> {
+        self.github
+            .patch(&self.path(""), json!(team_options)?)
+            .await
     }
 
     /// delete the team
-    pub fn delete(&self) -> Future<()> {
-        self.github.delete(&self.path(""))
+    pub async fn delete(&self) -> Result<()> {
+        self.github.delete(&self.path("")).await
     }
 
     /// list of teams for this org
-    pub fn list_members(&self) -> Future<Vec<User>> {
-        self.github.get(&self.path("/members"))
+    pub async fn list_members(&self) -> Result<Vec<User>> {
+        self.github.get(&self.path("/members")).await
     }
 
     /// provides an iterator over all pages of members
-    pub fn iter_members(&self) -> Stream<User> {
+    pub async fn iter_members(&self) -> Stream<User> {
         self.github.get_stream(&self.path("/members"))
     }
 
     /// add a user to the team, if they are already on the team,
     /// change the role. If the user is not yet part of the
     /// organization, they are invited to join.
-    pub fn add_user(&self, user: &str, user_options: TeamMemberOptions) -> Future<TeamMember> {
-        self.github.put(
-            &self.path(&format!("/memberships/{}", user)),
-            json!(user_options),
-        )
+    pub async fn add_user(
+        &self,
+        user: &str,
+        user_options: TeamMemberOptions,
+    ) -> Result<TeamMember> {
+        self.github
+            .put(
+                &self.path(&format!("/memberships/{}", user)),
+                json!(user_options)?,
+            )
+            .await
     }
 
     /// Remove the user from the team
-    pub fn remove_user(&self, user: &str) -> Future<()> {
+    pub async fn remove_user(&self, user: &str) -> Result<()> {
         self.github
             .delete(&self.path(&format!("/memberships/{}", user)))
+            .await
     }
 }
 

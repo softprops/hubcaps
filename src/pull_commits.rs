@@ -2,7 +2,7 @@
 use serde::Deserialize;
 
 use crate::users::User;
-use crate::{Future, Github, Stream};
+use crate::{Github, Result, Stream};
 
 /// A structure for interfacing with a pull commits
 pub struct PullCommits {
@@ -28,20 +28,22 @@ impl PullCommits {
     }
 
     /// list pull commits
-    pub fn list(&self) -> Future<Vec<PullCommit>> {
+    pub async fn list(&self) -> Result<Vec<PullCommit>> {
         let uri = format!(
             "/repos/{}/{}/pulls/{}/commits",
             self.owner, self.repo, self.number
         );
-        self.github.get::<Vec<PullCommit>>(&uri)
+        self.github.get::<Vec<PullCommit>>(&uri).await
     }
 
     /// provides a stream over all pages of pull commits
-    pub fn iter(&self) -> Stream<PullCommit> {
-        self.github.get_stream(&format!(
-            "/repos/{}/{}/pulls/{}/commits",
-            self.owner, self.repo, self.number
-        ))
+    pub async fn iter(&self) -> Stream<PullCommit> {
+        self.github
+            .get_stream(&format!(
+                "/repos/{}/{}/pulls/{}/commits",
+                self.owner, self.repo, self.number
+            ))
+            .await
     }
 }
 

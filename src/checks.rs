@@ -2,7 +2,7 @@
 // see: https://developer.github.com/v3/checks/suites/
 use serde::{Deserialize, Serialize};
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType};
+use self::super::{AuthenticationConstraint, Future, Github, MediaType, Result};
 
 pub struct CheckRuns {
     github: Github,
@@ -28,41 +28,41 @@ impl<'a> CheckRuns {
         format!("/repos/{}/{}/check-runs{}", self.owner, self.repo, more)
     }
 
-    pub fn create(&self, check_run_options: &CheckRunOptions) -> Future<CheckRun> {
-        match serde_json::to_string(check_run_options) {
-            Ok(data) => self.github.post_media::<CheckRun>(
+    pub async fn create(&self, check_run_options: &CheckRunOptions) -> Result<CheckRun> {
+        self.github
+            .post_media::<CheckRun>(
                 &self.path(""),
-                data.into_bytes(),
+                serde_json::to_string(check_run_options)?.into_bytes(),
                 MediaType::Preview("antiope"),
                 AuthenticationConstraint::Unconstrained,
-            ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
-        }
+            )
+            .await
     }
 
-    pub fn update(
+    pub async fn update(
         &self,
         check_run_id: &str,
         check_run_options: &CheckRunUpdateOptions,
-    ) -> Future<CheckRun> {
-        match serde_json::to_string(check_run_options) {
-            Ok(data) => self.github.post_media::<CheckRun>(
+    ) -> Result<CheckRun> {
+        self.github
+            .post_media::<CheckRun>(
                 &self.path(&format!("/{}", check_run_id)),
-                data.into_bytes(),
+                serde_json::to_string(check_run_options)?.into_bytes(),
                 MediaType::Preview("antiope"),
                 AuthenticationConstraint::Unconstrained,
-            ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
-        }
+            )
+            .await
     }
 
-    pub fn list_for_suite(&self, suite_id: &str) -> Future<Vec<CheckRun>> {
+    pub async fn list_for_suite(&self, suite_id: &str) -> Result<Vec<CheckRun>> {
         // !!! does this actually work?
         // https://developer.github.com/v3/checks/runs/#list-check-runs-in-a-check-suite
-        self.github.get_media::<Vec<CheckRun>>(
-            &self.path(&format!("/{}/check-runs", suite_id)),
-            MediaType::Preview("antiope"),
-        )
+        self.github
+            .get_media::<Vec<CheckRun>>(
+                &self.path(&format!("/{}/check-runs", suite_id)),
+                MediaType::Preview("antiope"),
+            )
+            .await
     }
 }
 
