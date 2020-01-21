@@ -87,7 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::future::TryFutureExt;
+use futures::future::{FutureExt, TryFutureExt};
 use futures::{future, stream, Future as FFuture, Stream as StdStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
@@ -595,41 +595,45 @@ impl Github {
         uri: &str,
         authentication: AuthenticationConstraint,
     ) -> Result<(Url, Option<String>)> {
-        let parsed_url = uri.parse::<Url>();
+        let parsed_url = uri.parse::<Url>().map_err(Error::from)?;
 
-        match self.credentials(authentication) {
-            Some(&Credentials::Client(ref id, ref secret)) => parsed_url
-                .map(|mut u| {
-                    u.query_pairs_mut()
-                        .append_pair("client_id", id)
-                        .append_pair("client_secret", secret);
-                    (u, None)
-                })
-                .map_err(Error::from),
+        let tuple = match self.credentials(authentication) {
+            Some(&Credentials::Client(ref id, ref secret)) => {
+                let mut parsed_url = parsed_url;
+                parsed_url
+                    .query_pairs_mut()
+                    .append_pair("client_id", id)
+                    .append_pair("client_secret", secret);
+                (parsed_url, None)
+            }
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
-                parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
+                (parsed_url, Some(auth))
             }
             Some(&Credentials::JWT(ref jwt)) => {
                 let auth = format!("Bearer {}", jwt.token());
-                parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
+                (parsed_url, Some(auth))
             }
             Some(&Credentials::InstallationToken(ref apptoken)) => {
                 if let Some(token) = apptoken.token() {
                     let auth = format!("token {}", token);
-                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
+                    (parsed_url, Some(auth))
                 } else {
                     debug!("App token is stale, refreshing");
                     let token_ref = apptoken.access_key.clone();
-                    let token = self.app().make_access_token(apptoken.installation_id).await;
+                    //let token = self.app().make_access_token(apptoken.installation_id).await;
 
-                    let auth = format!("token {}", &token?.token);
-                    *token_ref.lock().unwrap() = Some(token?.token);
-                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
+                    //let auth = format!("token {}", &token?.token);
+                    let auth = String::from("!!!");
+                    //*token_ref.lock().unwrap() = Some(token?.token);
+                    *token_ref.lock().unwrap() = Some(auth);
+                    (parsed_url, Some(auth))
                 }
             }
-            None => parsed_url.map(|u| (u, None)).map_err(Error::from),
-        }
+            None => (parsed_url, None),
+        };
+
+        Ok(tuple)
     }
 
     async fn request<Out>(
