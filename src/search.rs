@@ -73,11 +73,11 @@ impl Search {
         unfold(self.github.clone(), self.github.get_pages(url), items)
     }
 
-    fn search<D>(&self, url: &str) -> Future<SearchResult<D>>
+    async fn search<D>(&self, url: &str) -> Result<SearchResult<D>>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.github.get(url)
+        self.github.get(url).await
     }
 }
 

@@ -88,7 +88,7 @@ use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use futures::future::{FutureExt, TryFutureExt};
-use futures::{future, stream, Future as FFuture, Stream as StdStream};
+use futures::{future, stream, Future as FFuture, Stream as FStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
 use http::header::{HeaderMap, HeaderValue};
@@ -166,7 +166,8 @@ const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 
 pub type Future<T> = Box<dyn FFuture<Output = std::result::Result<T, Error>> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<dyn StdStream<Item = std::result::Result<T, Error>> + Send>;
+pub type Stream<T> = Box<dyn FStream<Item = std::result::Result<T, Error>> + Send>;
+// pub type Stream<T> = FStream<Item = std::result::Result<T, Error>>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -832,8 +833,7 @@ impl Github {
     where
         D: DeserializeOwned + 'static + Send,
     {
-        loop {}
-        // unfold(self.clone(), self.get_pages(uri), |x| x)
+        unfold(self.clone(), self.get_pages(uri).await, |x| x)
     }
 
     async fn get_pages<D>(&self, uri: &str) -> Result<(Option<Link>, D)>
@@ -1017,44 +1017,36 @@ fn next_link(l: &Link) -> Option<String> {
         .map(|v| v.link().to_owned())
 }
 
-/*
 /// "unfold" paginated results of a list of github entities
 fn unfold<D, I>(
     github: Github,
-    first: Future<(Option<Link>, D)>,
+    first: Result<(Option<Link>, D)>,
     into_items: fn(D) -> Vec<I>,
 ) -> Stream<I>
 where
     D: DeserializeOwned + 'static + Send,
     I: 'static + Send,
 {
-    Box::new(
-        first
-            .map(move |(link, payload)| {
-                let mut items = into_items(payload);
-                items.reverse();
-                stream::unfold::<_, _, Future<(I, (Option<Link>, Vec<I>))>, _>(
-                    (link, items),
-                    move |(link, mut items)| match items.pop() {
-                        Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(|l| next_link(&l)).map(|url| {
-                            let url = Url::parse(&url).unwrap();
-                            let uri = [url.path(), url.query().unwrap_or_default()].join("?");
-                            Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
-                                let mut items = into_items(payload);
-                                let item = items.remove(0);
-                                items.reverse();
-                                (item, (link, items))
-                            })) as Future<(I, (Option<Link>, Vec<I>))>
-                        }),
-                    },
-                )
-            })
-            .into_stream()
-            .flatten(),
+    let (link, payload) = first.unwrap_or((None, vec![first]));
+    let mut items = into_items(payload);
+    items.reverse();
+    stream::unfold::<_, _, Future<(I, (Option<Link>, Vec<I>))>, _>(
+        (link, items),
+        move |(link, mut items)| match items.pop() {
+            Some(item) => Some(Box::new(future::ok((item, (link, items))))),
+            _ => link.and_then(|l| next_link(&l)).map(|url| {
+                let url = Url::parse(&url).unwrap();
+                let uri = [url.path(), url.query().unwrap_or_default()].join("?");
+                Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
+                    let mut items = into_items(payload);
+                    let item = items.remove(0);
+                    items.reverse();
+                    (item, (link, items))
+                })) as Future<(I, (Option<Link>, Vec<I>))>
+            }),
+        },
     )
 }
- */
 
 #[cfg(test)]
 mod tests {

@@ -6,7 +6,7 @@ use url::form_urlencoded;
 
 use super::{Search, SearchResult};
 use crate::users::User;
-use crate::{Future, SortDirection, Stream};
+use crate::{Result, SortDirection, Stream};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {
@@ -58,7 +58,7 @@ impl SearchRepos {
     /// Return a stream of search results repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters)
     /// for query format options
-    pub fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> Stream<ReposItem>
+    pub async fn iter<Q>(&self, q: Q, options: &SearchReposOptions) -> Stream<ReposItem>
     where
         Q: Into<String>,
     {
@@ -68,12 +68,17 @@ impl SearchRepos {
     /// Return the first page of search result repository query
     /// See [github docs](https://developer.github.com/v3/search/#parameters)
     /// for query format options
-    pub fn list<Q>(&self, q: Q, options: &SearchReposOptions) -> Future<SearchResult<ReposItem>>
+    pub async fn list<Q>(
+        &self,
+        q: Q,
+        options: &SearchReposOptions,
+    ) -> Result<SearchResult<ReposItem>>
     where
         Q: Into<String>,
     {
         self.search
             .search::<ReposItem>(&self.search_uri(q, options))
+            .await
     }
 }
 

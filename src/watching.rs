@@ -18,7 +18,7 @@ impl Watching {
     /// Provides a stream over all pages of the repositories watched by the authenticated user.
     /// https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
     pub async fn iter(&self) -> Stream<Repo> {
-        self.github.get_stream("/user/subscriptions")
+        self.github.get_stream("/user/subscriptions").await
     }
 
     /// https://developer.github.com/v3/activity/watching/#get-a-repository-subscription

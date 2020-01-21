@@ -60,7 +60,7 @@ impl Content {
     /// GitHub limits the number of items returned to 1000 for this API. If you
     /// need to retrieve more items, the Git Data API must be used instead.
     pub async fn iter(&self, location: &str) -> Stream<DirectoryItem> {
-        self.github.get_stream(&self.path(location))
+        self.github.get_stream(&self.path(location)).await
     }
 }
 

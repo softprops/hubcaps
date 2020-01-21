@@ -57,6 +57,7 @@ impl RepoTeams {
     pub async fn iter(&self) -> Stream<Team> {
         self.github
             .get_stream(&format!("/repos/{}/{}/teams", self.owner, self.repo))
+            .await
     }
 }
 
@@ -98,7 +99,9 @@ impl OrgTeams {
 
     /// provides an iterator over all pages of teams
     pub async fn iter(&self) -> Stream<Team> {
-        self.github.get_stream(&format!("/orgs/{}/teams", self.org))
+        self.github
+            .get_stream(&format!("/orgs/{}/teams", self.org))
+            .await
     }
 
     /// adds a repository permission to this team
@@ -161,7 +164,7 @@ impl OrgTeamActions {
 
     /// provides an iterator over all pages of members
     pub async fn iter_members(&self) -> Stream<User> {
-        self.github.get_stream(&self.path("/members"))
+        self.github.get_stream(&self.path("/members")).await
     }
 
     /// add a user to the team, if they are already on the team,
