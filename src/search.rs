@@ -66,11 +66,16 @@ impl Search {
         SearchRepos::new(self.clone())
     }
 
-    fn iter<D>(&self, url: &str) -> Stream<D>
+    async fn iter<D>(&self, url: &str) -> Stream<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        unfold(self.github.clone(), self.github.get_pages(url), items)
+        unfold::<_, D>(
+            self.github.clone(),
+            self.github.get_pages(url).await,
+            Box::new(items),
+        )
+        .await
     }
 
     async fn search<D>(&self, url: &str) -> Result<SearchResult<D>>

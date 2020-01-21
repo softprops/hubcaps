@@ -1,0 +1,149 @@
+use crate::errors::Error;
+use crate::Github;
+use futures::future::{BoxFuture, FutureExt};
+use futures::stream;
+use futures::Stream;
+use hyperx::header::{Link, RelationType};
+use reqwest::Url;
+use serde::de::DeserializeOwned;
+
+pub async fn unfold<Source, StreamOk>(
+    github: Github,
+    initial: Result<(Option<Link>, Source), Error>,
+    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+) -> Box<dyn Stream<Item = Result<StreamOk, Error>>>
+where
+    StreamOk: 'static + Send,
+    Source: DeserializeOwned + 'static + Send,
+{
+    let state = StreamState::new(github, initial, to_items);
+
+    Box::new(stream::unfold(state, move |state| {
+        async { state.next().await }
+    }))
+}
+
+struct StreamState<Source, StreamOk>
+where
+    StreamOk: 'static + Send,
+    Source: DeserializeOwned + 'static + Send,
+{
+    github: Github,
+    items: Option<Result<Vec<StreamOk>, Error>>,
+    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+    next_page: Option<Link>,
+}
+
+impl<Source, StreamOk> StreamState<Source, StreamOk>
+where
+    StreamOk: 'static + Send,
+    Source: DeserializeOwned + 'static + Send,
+{
+    fn new(
+        github: Github,
+        initial: Result<(Option<Link>, Source), Error>,
+        to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+    ) -> Self {
+        let dummy = Self {
+            github,
+            to_items,
+            items: None,
+            next_page: None,
+        };
+
+        dummy.load_state(initial)
+    }
+
+    fn next(mut self) -> BoxFuture<'static, Option<(Result<StreamOk, Error>, Self)>> {
+        async move {
+            if let Some(resultitems) = self.items.take() {
+                match resultitems {
+                    Ok(mut items) => {
+                        if let Some(item) = items.pop() {
+                            Some((
+                                Ok(item),
+                                Self {
+                                    github: self.github,
+                                    to_items: self.to_items,
+                                    items: Some(Ok(items)),
+                                    next_page: self.next_page,
+                                },
+                            ))
+                        } else if self.next_page.is_some() {
+                            self.fetch_next_page().await.next().await
+                        } else {
+                            None
+                        }
+                    }
+                    Err(e) => {
+                        Some((
+                            Err(e),
+                            Self {
+                                github: self.github,
+                                to_items: self.to_items,
+                                items: None,     // Returned once, just now
+                                next_page: None, // Cannot have a next_page if Items is Err !!! fix the data model
+                            },
+                        ))
+                    }
+                }
+            } else {
+                None
+            }
+        }
+        .boxed()
+    }
+
+    async fn fetch_next_page(mut self) -> Self {
+        if let Some(next_page) = self.next_page.take() {
+            if let Some(url) = next_link(&next_page) {
+                if let Ok(url) = Url::parse(&url) {
+                    let uri = [url.path(), url.query().unwrap_or_default()].join("?");
+
+                    let fetched_page = self.github.get_pages(&uri).await;
+                    return self.load_state(fetched_page);
+                }
+            }
+
+            Self {
+                github: self.github,
+                items: self.items,
+                to_items: self.to_items,
+                next_page: None, // don't visit this path again,
+                                 // !!! convert next_page at intake?
+            }
+        } else {
+            self
+        }
+    }
+
+    fn load_state(self, state: Result<(Option<Link>, Source), Error>) -> Self {
+        let items: Result<Vec<StreamOk>, Error>;
+        let next_page: Option<Link>;
+
+        match state {
+            Ok((link, payload)) => {
+                items = Ok((self.to_items)(payload));
+                next_page = link;
+            }
+            Err(e) => {
+                items = Err(e);
+                next_page = None;
+            }
+        }
+
+        Self {
+            github: self.github,
+            to_items: self.to_items,
+            items: Some(items),
+            next_page,
+        }
+    }
+}
+
+pub fn next_link(l: &Link) -> Option<String> {
+    l.values()
+        .into_iter()
+        .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
+        .map(|v| v.link().to_owned())
+}
