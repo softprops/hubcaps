@@ -172,7 +172,7 @@ impl ops::Deref for DecodedContents {
 }
 
 impl<'de> Deserialize<'de> for DecodedContents {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -185,7 +185,7 @@ impl<'de> Deserialize<'de> for DecodedContents {
                 write!(f, "base64 string")
             }
 
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            fn visit_str<E>(self, v: &str) -> std::result::Result<Self::Value, E>
             where
                 E: de::Error,
             {
