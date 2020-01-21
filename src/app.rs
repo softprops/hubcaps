@@ -1,7 +1,7 @@
 //! Labels interface
 use serde::Deserialize;
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType, Result};
+use self::super::{AuthenticationConstraint, Github, MediaType, Result};
 
 pub struct App {
     github: Github,
@@ -28,15 +28,17 @@ impl App {
             .await
     }
 
-    pub fn find_repo_installation<O, R>(&self, owner: O, repo: R) -> Future<Installation>
+    pub async fn find_repo_installation<O, R>(&self, owner: O, repo: R) -> Result<Installation>
     where
         O: Into<String>,
         R: Into<String>,
     {
-        self.github.get_media::<Installation>(
-            &format!("/repos/{}/{}/installation", owner.into(), repo.into()),
-            MediaType::Preview("machine-man"),
-        )
+        self.github
+            .get_media::<Installation>(
+                &format!("/repos/{}/{}/installation", owner.into(), repo.into()),
+                MediaType::Preview("machine-man"),
+            )
+            .await
     }
 }
 
