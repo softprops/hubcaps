@@ -97,7 +97,7 @@ use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
-// use jsonwebtoken as jwt;
+use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
 use reqwest::{Body, Client, Url};
@@ -337,9 +337,9 @@ impl ExpiringJWTCredential {
             exp: expires.as_secs(),
             iss: app_id,
         };
-        //let header = jwt::Header::new(jwt::Algorithm::RS256);
-        //let jwt = jwt::encode(&header, &payload, private_key)?;
-        let jwt = String::from("hi");
+        let header = jwt::Header::new(jwt::Algorithm::RS256);
+        let jwt = jwt::encode(&header, &payload, private_key)?;
+
         Ok(ExpiringJWTCredential {
             created_at: created_at,
             token: jwt,
