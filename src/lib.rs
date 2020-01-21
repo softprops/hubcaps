@@ -87,7 +87,8 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::{future, stream, Future as StdFuture, Stream as StdStream};
+use futures::future::TryFutureExt;
+use futures::{future, stream, Future as FFuture, Stream as StdStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
 use http::header::{HeaderMap, HeaderValue};
@@ -99,10 +100,9 @@ use hyperx::header::{qitem, Link, RelationType};
 // use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
-use reqwest::{Body, Client};
+use reqwest::{Body, Client, Url};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use url::Url;
 
 #[doc(hidden)] // public for doc testing and integration testing only
 #[cfg(feature = "httpcache")]
@@ -163,10 +163,10 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
+pub type Future<T> = Box<dyn FFuture<Output = std::result::Result<T, Error>> + Send>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<dyn StdStream<Item = T, Error = Error> + Send>;
+pub type Stream<T> = Box<dyn StdStream<Item = std::result::Result<T, Error>> + Send>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -590,86 +590,56 @@ impl Github {
         }
     }
 
-    fn url_and_auth(
+    async fn url_and_auth(
         &self,
         uri: &str,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Url, Option<String>)> {
+    ) -> Result<(Url, Option<String>)> {
         let parsed_url = uri.parse::<Url>();
 
         match self.credentials(authentication) {
-            Some(&Credentials::Client(ref id, ref secret)) => Box::new(
-                parsed_url
-                    .map(|mut u| {
-                        u.query_pairs_mut()
-                            .append_pair("client_id", id)
-                            .append_pair("client_secret", secret);
-                        (u, None)
-                    })
-                    .map_err(Error::from)
-                    .into_future(),
-            ),
+            Some(&Credentials::Client(ref id, ref secret)) => parsed_url
+                .map(|mut u| {
+                    u.query_pairs_mut()
+                        .append_pair("client_id", id)
+                        .append_pair("client_secret", secret);
+                    (u, None)
+                })
+                .map_err(Error::from),
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
-                Box::new(
-                    parsed_url
-                        .map(|u| (u, Some(auth)))
-                        .map_err(Error::from)
-                        .into_future(),
-                )
+                parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
             }
             Some(&Credentials::JWT(ref jwt)) => {
                 let auth = format!("Bearer {}", jwt.token());
-                Box::new(
-                    parsed_url
-                        .map(|u| (u, Some(auth)))
-                        .map_err(Error::from)
-                        .into_future(),
-                )
+                parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
             }
             Some(&Credentials::InstallationToken(ref apptoken)) => {
                 if let Some(token) = apptoken.token() {
                     let auth = format!("token {}", token);
-                    Box::new(
-                        parsed_url
-                            .map(|u| (u, Some(auth)))
-                            .map_err(Error::from)
-                            .into_future(),
-                    )
+                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
                 } else {
                     debug!("App token is stale, refreshing");
                     let token_ref = apptoken.access_key.clone();
-                    Box::new(
-                        self.app()
-                            .make_access_token(apptoken.installation_id)
-                            .and_then(move |token| {
-                                let auth = format!("token {}", &token.token);
-                                *token_ref.lock().unwrap() = Some(token.token);
-                                parsed_url
-                                    .map(|u| (u, Some(auth)))
-                                    .map_err(Error::from)
-                                    .into_future()
-                            }),
-                    )
+                    let token = self.app().make_access_token(apptoken.installation_id).await;
+
+                    let auth = format!("token {}", &token?.token);
+                    *token_ref.lock().unwrap() = Some(token?.token);
+                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from)
                 }
             }
-            None => Box::new(
-                parsed_url
-                    .map(|u| (u, None))
-                    .map_err(Error::from)
-                    .into_future(),
-            ),
+            None => parsed_url.map(|u| (u, None)).map_err(Error::from),
         }
     }
 
-    fn request<Out>(
+    async fn request<Out>(
         &self,
         method: Method,
         uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<(Option<Link>, Out)>
+    ) -> Result<(Option<Link>, Out)>
     where
         Out: DeserializeOwned + 'static + Send,
     {
@@ -680,158 +650,157 @@ impl Github {
         let uri2 = uri.to_string();
         let body2 = body.clone();
         let method2 = method.clone();
-        let response = url_and_auth
-            .map_err(Error::from)
-            .and_then(move |(url, auth)| {
-                #[cfg(not(feature = "httpcache"))]
-                let mut req = instance.client.request(method2, url.into());
+        let (url, auth): (Url, Option<String>) = url_and_auth.await.map_err(Error::from)?;
 
-                #[cfg(feature = "httpcache")]
-                let mut req = {
-                    let mut req = instance.client.request(method2.clone(), url);
-                    if method2 == Method::GET {
-                        if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
-                            req = req.header(IF_NONE_MATCH, etag);
-                        }
+        let response = {
+            #[cfg(not(feature = "httpcache"))]
+            let mut req = instance.client.request(method2, url);
+
+            #[cfg(feature = "httpcache")]
+            let mut req = {
+                let mut req = instance.client.request(method2.clone(), url);
+                if method2 == Method::GET {
+                    if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
+                        req = req.header(IF_NONE_MATCH, etag);
                     }
-                    req
-                };
-
-                req = req.header(USER_AGENT, &*instance.agent);
-                req = req.header(
-                    ACCEPT,
-                    &*format!("{}", qitem::<Mime>(From::from(media_type))),
-                );
-
-                if let Some(auth_str) = auth {
-                    req = req.header(AUTHORIZATION, &*auth_str);
                 }
+                req
+            };
 
-                trace!("Body: {:?}", &body2);
-                if let Some(body) = body2 {
-                    req = req.body(Body::from(body));
-                }
-                debug!("Request: {:?}", &req);
-                req.send().map_err(Error::from)
-            });
+            req = req.header(USER_AGENT, &*instance.agent);
+            req = req.header(
+                ACCEPT,
+                &*format!("{}", qitem::<Mime>(From::from(media_type))),
+            );
+
+            if let Some(auth_str) = auth {
+                req = req.header(AUTHORIZATION, &*auth_str);
+            }
+
+            trace!("Body: {:?}", &body2);
+            if let Some(body) = body2 {
+                req = req.body(Body::from(body));
+            }
+            debug!("Request: {:?}", &req);
+
+            req.send().await.map_err(Error::from)
+        }?;
 
         #[cfg(feature = "httpcache")]
         let instance2 = self.clone();
 
         #[cfg(feature = "httpcache")]
         let uri3 = uri.to_string();
-        Box::new(response.and_then(move |response| {
-            #[cfg(not(feature = "httpcache"))]
-            let (remaining, reset) = get_header_values(response.headers());
+
+        #[cfg(not(feature = "httpcache"))]
+        let (remaining, reset) = get_header_values(response.headers());
+        #[cfg(feature = "httpcache")]
+        let (remaining, reset, etag) = get_header_values(response.headers());
+
+        let status = response.status();
+        let link = response
+            .headers()
+            .get(LINK)
+            .and_then(|l| l.to_str().ok())
+            .and_then(|l| l.parse().ok());
+
+        let response_body = response.bytes().await?;
+        if status.is_success() {
+            debug!(
+                "response payload {}",
+                String::from_utf8_lossy(&response_body)
+            );
             #[cfg(feature = "httpcache")]
-            let (remaining, reset, etag) = get_header_values(response.headers());
-
-            let status = response.status();
-            let link = response
-                .headers()
-                .get(LINK)
-                .and_then(|l| l.to_str().ok())
-                .and_then(|l| l.parse().ok());
-
-            Box::new(
-                response
-                    .into_body()
-                    .concat2()
+            {
+                if let Some(etag) = etag {
+                    let next_link = link.as_ref().and_then(|l| next_link(&l));
+                    if let Err(e) = instance2.http_cache.cache_response(
+                        &uri3,
+                        &response_body,
+                        &etag,
+                        &next_link,
+                    ) {
+                        // failing to cache isn't fatal, so just log & swallow the error
+                        debug!("Failed to cache body & etag: {}", e);
+                    }
+                }
+            }
+            let parsed_response = if status == StatusCode::NO_CONTENT {
+                serde_json::from_str("null")
+            } else {
+                serde_json::from_slice::<Out>(&response_body)
+            };
+            parsed_response
+                .map(|out| (link, out))
+                .map_err(|error| ErrorKind::Codec(error).into())
+        } else if status == StatusCode::NOT_MODIFIED {
+            // only supported case is when client provides if-none-match
+            // header when cargo builds with --cfg feature="httpcache"
+            #[cfg(feature = "httpcache")]
+            {
+                instance2
+                    .http_cache
+                    .lookup_body(&uri3)
                     .map_err(Error::from)
-                    .and_then(move |response_body| {
-                        if status.is_success() {
-                            debug!(
-                                "response payload {}",
-                                String::from_utf8_lossy(response_body)
-                            );
-                            #[cfg(feature = "httpcache")]
-                            {
-                                if let Some(etag) = etag {
-                                    let next_link = link.as_ref().and_then(|l| next_link(&l));
-                                    if let Err(e) = instance2.http_cache.cache_response(
-                                        &uri3,
-                                        &response_body,
-                                        &etag,
-                                        &next_link,
-                                    ) {
-                                        // failing to cache isn't fatal, so just log & swallow the error
-                                        debug!("Failed to cache body & etag: {}", e);
-                                    }
-                                }
-                            }
-                            let parsed_response = if status == StatusCode::NO_CONTENT { serde_json::from_str("null") } else { serde_json::from_slice::<Out>(&response_body) };
-                            parsed_response
-                                .map(|out| (link, out))
-                                .map_err(|error| ErrorKind::Codec(error).into())
-                        } else if status == StatusCode::NOT_MODIFIED {
-                            // only supported case is when client provides if-none-match
-                            // header when cargo builds with --cfg feature="httpcache"
-                            #[cfg(feature = "httpcache")]
-                            {
-                                instance2
-                                    .http_cache
-                                    .lookup_body(&uri3)
-                                    .map_err(Error::from)
-                                    .and_then(|body| {
-                                        serde_json::from_str::<Out>(&body)
-                                            .map_err(Error::from)
-                                            .and_then(|out| {
-                                                let link = match link {
-                                                    Some(link) => Ok(Some(link)),
-                                                    None => instance2
-                                                        .http_cache
-                                                        .lookup_next_link(&uri3)
-                                                        .map(|next_link| next_link.map(|next| {
-                                                            let next = LinkValue::new(next).push_rel(RelationType::Next);
-                                                            Link::new(vec![next])
-                                                        }))
-                                                };
-                                                link.map(|link| (link, out))
+                    .and_then(|body| {
+                        serde_json::from_str::<Out>(&body)
+                            .map_err(Error::from)
+                            .and_then(|out| {
+                                let link = match link {
+                                    Some(link) => Ok(Some(link)),
+                                    None => instance2.http_cache.lookup_next_link(&uri3).map(
+                                        |next_link| {
+                                            next_link.map(|next| {
+                                                let next = LinkValue::new(next)
+                                                    .push_rel(RelationType::Next);
+                                                Link::new(vec![next])
                                             })
-                                    })
-                            }
-                            #[cfg(not(feature = "httpcache"))]
-                            {
-                                unreachable!("this should not be reachable without the httpcache feature enabled")
-                            }
-                        } else {
-                            let error = match (remaining, reset) {
-                                (Some(remaining), Some(reset)) if remaining == 0 => {
-                                    let now = SystemTime::now()
-                                        .duration_since(UNIX_EPOCH)
-                                        .unwrap()
-                                        .as_secs();
-                                    ErrorKind::RateLimit {
-                                        reset: Duration::from_secs(u64::from(reset) - now),
-                                    }
-                                }
-                                _ => ErrorKind::Fault {
-                                    code: status,
-                                    error: serde_json::from_slice(&response_body)?,
-                                },
-                            };
-                            Err(error.into())
-                        }
-                    }),
-            )
-        }))
+                                        },
+                                    ),
+                                };
+                                link.map(|link| (link, out))
+                            })
+                    })
+            }
+            #[cfg(not(feature = "httpcache"))]
+            {
+                unreachable!("this should not be reachable without the httpcache feature enabled")
+            }
+        } else {
+            let error = match (remaining, reset) {
+                (Some(remaining), Some(reset)) if remaining == 0 => {
+                    let now = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+                    ErrorKind::RateLimit {
+                        reset: Duration::from_secs(u64::from(reset) - now),
+                    }
+                }
+                _ => ErrorKind::Fault {
+                    code: status,
+                    error: serde_json::from_slice(&response_body)?,
+                },
+            };
+            Err(error.into())
+        }
     }
 
-    fn request_entity<D>(
+    async fn request_entity<D>(
         &self,
         method: Method,
         uri: &str,
         body: Option<Vec<u8>>,
         media_type: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<D>
+    ) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
-        Box::new(
-            self.request(method, uri, body, media_type, authentication)
-                .map(|(_, entity)| entity),
-        )
+        let response: Result<(_, D)> = self
+            .request(method, uri, body, media_type, authentication)
+            .await;
+        return Ok(response?.1);
     }
 
     fn get<D>(&self, uri: &str) -> Future<D>
@@ -861,7 +830,7 @@ impl Github {
         unfold(self.clone(), self.get_pages(uri), |x| x)
     }
 
-    fn get_pages<D>(&self, uri: &str) -> Future<(Option<Link>, D)>
+    async fn get_pages<D>(&self, uri: &str) -> Result<(Option<Link>, D)>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -872,6 +841,7 @@ impl Github {
             MediaType::Json,
             AuthenticationConstraint::Unconstrained,
         )
+        .await
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
@@ -918,13 +888,13 @@ impl Github {
         )
     }
 
-    fn post_media<D>(
+    async fn post_media<D>(
         &self,
         uri: &str,
         message: Vec<u8>,
         media: MediaType,
         authentication: AuthenticationConstraint,
-    ) -> Future<D>
+    ) -> Result<D>
     where
         D: DeserializeOwned + 'static + Send,
     {
@@ -935,6 +905,7 @@ impl Github {
             media,
             authentication,
         )
+        .await
     }
 
     fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {

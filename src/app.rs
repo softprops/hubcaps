@@ -1,7 +1,7 @@
 //! Labels interface
 use serde::Deserialize;
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType};
+use self::super::{AuthenticationConstraint, Future, Github, MediaType, Result};
 
 pub struct App {
     github: Github,
@@ -17,13 +17,15 @@ impl App {
         format!("/app{}", more)
     }
 
-    pub fn make_access_token(&self, installation_id: u64) -> Future<AccessToken> {
-        self.github.post_media::<AccessToken>(
-            &self.path(&format!("/installations/{}/access_tokens", installation_id)),
-            Vec::new(),
-            MediaType::Preview("machine-man"),
-            AuthenticationConstraint::JWT,
-        )
+    pub async fn make_access_token(&self, installation_id: u64) -> Result<AccessToken> {
+        self.github
+            .post_media::<AccessToken>(
+                &self.path(&format!("/installations/{}/access_tokens", installation_id)),
+                Vec::new(),
+                MediaType::Preview("machine-man"),
+                AuthenticationConstraint::JWT,
+            )
+            .await
     }
 
     pub fn find_repo_installation<O, R>(&self, owner: O, repo: R) -> Future<Installation>
