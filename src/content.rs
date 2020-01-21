@@ -51,8 +51,8 @@ impl Content {
     }
 
     /// List the root directory.
-    pub fn root(&self) -> Stream<DirectoryItem> {
-        self.iter("/")
+    pub async fn root(&self) -> Stream<DirectoryItem> {
+        self.iter("/").await
     }
 
     /// Provides a stream over the directory items in `location`.

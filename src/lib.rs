@@ -627,7 +627,7 @@ impl Github {
                     //let auth = format!("token {}", &token?.token);
                     let auth = String::from("!!!");
                     //*token_ref.lock().unwrap() = Some(token?.token);
-                    *token_ref.lock().unwrap() = Some(auth);
+                    *token_ref.lock().unwrap() = Some(auth.clone());
                     (parsed_url, Some(auth))
                 }
             }

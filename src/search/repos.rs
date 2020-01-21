@@ -62,7 +62,9 @@ impl SearchRepos {
     where
         Q: Into<String>,
     {
-        self.search.iter::<ReposItem>(&self.search_uri(q, options))
+        self.search
+            .iter::<ReposItem>(&self.search_uri(q, options))
+            .await
     }
 
     /// Return the first page of search result repository query
