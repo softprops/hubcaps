@@ -68,7 +68,7 @@ impl Search {
 
     async fn iter<D>(&self, url: &str) -> Stream<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         unfold::<_, D>(
             self.github.clone(),

@@ -54,44 +54,64 @@ where
         dummy.load_state(initial)
     }
 
-    fn next(mut self) -> BoxFuture<'static, Option<(Result<StreamOk, Error>, Self)>> {
-        async move {
-            if let Some(resultitems) = self.items.take() {
-                match resultitems {
-                    Ok(mut items) => {
-                        if let Some(item) = items.pop() {
-                            Some((
-                                Ok(item),
-                                Self {
-                                    github: self.github,
-                                    to_items: self.to_items,
-                                    items: Some(Ok(items)),
-                                    next_page: self.next_page,
-                                },
-                            ))
-                        } else if self.next_page.is_some() {
-                            self.fetch_next_page().await.next().await
-                        } else {
-                            None
-                        }
-                    }
-                    Err(e) => {
-                        Some((
-                            Err(e),
+    async fn next(mut self) -> Option<(Result<StreamOk, Error>, Self)> {
+        let state = self;
+        loop {
+            match state.flat_next() {
+                FetcherState::NextReady(item, state) => {
+                    return Some((item, state));
+                }
+                FetcherState::Empty => {
+                    return None;
+                }
+                FetcherState::FetchNextPage(next_state) => {
+                    state = next_state.fetch_next_page().await;
+                }
+            }
+        }
+    }
+
+    fn flat_next(mut self) -> FetcherState<StreamOk, Self> {
+        if let Some(resultitems) = self.items.take() {
+            match resultitems {
+                Ok(mut items) => {
+                    if let Some(item) = items.pop() {
+                        FetcherState::NextReady(
+                            Ok(item),
                             Self {
                                 github: self.github,
                                 to_items: self.to_items,
-                                items: None,     // Returned once, just now
-                                next_page: None, // Cannot have a next_page if Items is Err !!! fix the data model
+                                items: Some(Ok(items)),
+                                next_page: self.next_page,
                             },
-                        ))
+                        )
+                    } else if self.next_page.is_some() {
+                        FetcherState::FetchNextPage(self)
+                    } else {
+                        // No more things, no more next pages
+                        FetcherState::Empty
                     }
                 }
+                Err(e) => {
+                    FetcherState::NextReady(
+                        Err(e),
+                        Self {
+                            github: self.github,
+                            to_items: self.to_items,
+                            items: None,     // Returned once, just now
+                            next_page: None, // Cannot have a next_page if Items is Err !!! fix the data model
+                        },
+                    )
+                }
+            }
+        } else {
+            if self.next_page.is_some() {
+                FetcherState::FetchNextPage(self)
             } else {
-                None
+                // No more things, no more next pages
+                FetcherState::Empty
             }
         }
-        .boxed()
     }
 
     async fn fetch_next_page(mut self) -> Self {
@@ -139,6 +159,12 @@ where
             next_page,
         }
     }
+}
+
+enum FetcherState<StreamOk, State> {
+    NextReady(Result<StreamOk, Error>, State),
+    FetchNextPage(State),
+    Empty,
 }
 
 pub fn next_link(l: &Link) -> Option<String> {

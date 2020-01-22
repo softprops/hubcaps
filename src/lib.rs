@@ -833,7 +833,7 @@ impl Github {
 
     async fn get_stream<D>(&self, uri: &str) -> Stream<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         unfold::<_, D>(self.clone(), self.get_pages(uri).await, Box::new(|x| x)).await
     }
