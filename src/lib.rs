@@ -338,7 +338,7 @@ impl ExpiringJWTCredential {
             iss: app_id,
         };
         let header = jwt::Header::new(jwt::Algorithm::RS256);
-        let jwt = jwt::encode(&header, &payload, private_key)?;
+        let jwt = jwt::encode(&header, &payload, &jwt::EncodingKey::from_secret(private_key))?;
 
         Ok(ExpiringJWTCredential {
             created_at: created_at,
@@ -624,12 +624,10 @@ impl Github {
                 } else {
                     debug!("App token is stale, refreshing");
                     let token_ref = apptoken.access_key.clone();
-                    //let token = self.app().make_access_token(apptoken.installation_id).await;
+                    let token = self.app().make_access_token(apptoken.installation_id).await;
 
-                    //let auth = format!("token {}", &token?.token);
-                    let auth = String::from("!!!");
-                    //*token_ref.lock().unwrap() = Some(token?.token);
-                    *token_ref.lock().unwrap() = Some(auth.clone());
+                    let auth = format!("token {}", &token?.token);
+                    *token_ref.lock().unwrap() = Some(token?.token);
                     (parsed_url, Some(auth))
                 }
             }
