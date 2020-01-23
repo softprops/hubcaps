@@ -341,7 +341,7 @@ impl ExpiringJWTCredential {
         let jwt = jwt::encode(
             &header,
             &payload,
-            &jwt::EncodingKey::from_secret(private_key),
+            &jwt::EncodingKey::from_rsa_pem(private_key).expect("lol bad key I guess"),
         )?;
 
         Ok(ExpiringJWTCredential {
