@@ -11,14 +11,14 @@ pub async fn unfold<Source, StreamOk>(
     github: Github,
     initial: Result<(Option<Link>, Source), Error>,
     to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
-) -> Box<dyn Stream<Item = Result<StreamOk, Error>>>
+) -> crate::Stream<StreamOk>
 where
     StreamOk: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
 {
     let state = StreamState::new(github, initial, to_items);
 
-    Box::new(stream::unfold(state, move |state| async {
+    Box::pin(stream::unfold(state, move |state| async {
         state.next().await
     }))
 }

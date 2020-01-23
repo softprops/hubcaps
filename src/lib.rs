@@ -169,7 +169,7 @@ const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 
 pub type Future<T> = Box<dyn FFuture<Output = std::result::Result<T, Error>> + Send + Sync>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<dyn FStream<Item = std::result::Result<T, Error>>>;
+pub type Stream<T> = std::pin::Pin<Box<dyn FStream<Item = std::result::Result<T, Error>>>>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
