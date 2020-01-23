@@ -12,7 +12,7 @@ use log::trace;
 
 use crate::{Error, Result, Result};
 
-pub type BoxedHttpCache = Box<dyn HttpCache + Send>;
+pub type BoxedHttpCache = Box<dyn HttpCache + Send + Sync>;
 
 pub trait HttpCache: HttpCacheClone + Debug {
     fn cache_response(
@@ -170,7 +170,7 @@ pub trait HttpCacheClone {
 
 impl<T> HttpCacheClone for T
 where
-    T: 'static + HttpCache + Clone + Send,
+    T: 'static + HttpCache + Clone + Send + Sync,
 {
     fn box_clone(&self) -> BoxedHttpCache {
         Box::new(self.clone())

@@ -87,7 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::future::{FutureExt, TryFutureExt};
+use futures::future::{BoxFuture, FutureExt, TryFutureExt};
 use futures::{future, stream, Future as FFuture, Stream as FStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
@@ -166,7 +166,7 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<dyn FFuture<Output = std::result::Result<T, Error>> + Send>;
+pub type Future<T> = Box<dyn FFuture<Output = std::result::Result<T, Error>> + Send + Sync>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
 pub type Stream<T> = Box<dyn FStream<Item = std::result::Result<T, Error>>>;
@@ -338,7 +338,11 @@ impl ExpiringJWTCredential {
             iss: app_id,
         };
         let header = jwt::Header::new(jwt::Algorithm::RS256);
-        let jwt = jwt::encode(&header, &payload, &jwt::EncodingKey::from_secret(private_key))?;
+        let jwt = jwt::encode(
+            &header,
+            &payload,
+            &jwt::EncodingKey::from_secret(private_key),
+        )?;
 
         Ok(ExpiringJWTCredential {
             created_at: created_at,
@@ -622,13 +626,7 @@ impl Github {
                     let auth = format!("token {}", token);
                     (parsed_url, Some(auth))
                 } else {
-                    debug!("App token is stale, refreshing");
-                    let token_ref = apptoken.access_key.clone();
-                    let token = self.app().make_access_token(apptoken.installation_id).await;
-
-                    let auth = format!("token {}", &token?.token);
-                    *token_ref.lock().unwrap() = Some(token?.token);
-                    (parsed_url, Some(auth))
+                    unreachable!("request() should be handling the refresh!");
                 }
             }
             None => (parsed_url, None),
@@ -646,16 +644,69 @@ impl Github {
         authentication: AuthenticationConstraint,
     ) -> Result<(Option<Link>, Out)>
     where
-        Out: DeserializeOwned + 'static + Send,
+        Out: DeserializeOwned + 'static + Send + Sync,
     {
-        let url_and_auth = self.url_and_auth(uri, authentication);
+        if let Some(&Credentials::InstallationToken(ref apptoken)) =
+            self.credentials(authentication)
+        {
+            if apptoken.token().is_none() {
+                debug!("App token is stale, refreshing");
+                let refresh_uri = (self.host.clone()
+                    + &format!(
+                        "/app/installations/{}/access_tokens",
+                        apptoken.installation_id
+                    ));
+                let url_and_auth = self
+                    .url_and_auth(&refresh_uri, AuthenticationConstraint::JWT)
+                    .await?;
 
+                let token_ref = apptoken.access_key.clone();
+
+                let token_response: app::AccessToken = self
+                    .authenticated_request(
+                        Method::POST,
+                        &refresh_uri,
+                        url_and_auth.0,
+                        url_and_auth.1,
+                        Some(Vec::new()),
+                        MediaType::Preview("machine-man"),
+                    )
+                    .await?
+                    .1;
+
+                let token = token_response.token;
+                let auth = format!("token {}", &token);
+                *token_ref.lock().unwrap() = Some(token);
+            }
+        }
+
+        let url_and_auth = self.url_and_auth(&uri, authentication).await?;
+        self.authenticated_request(
+            method,
+            &uri,
+            url_and_auth.0,
+            url_and_auth.1,
+            body,
+            media_type,
+        )
+        .await
+    }
+
+    async fn authenticated_request<Out>(
+        &self,
+        method: Method,
+        uri2: &str,
+        url: Url,
+        auth: Option<String>,
+        body: Option<Vec<u8>>,
+        media_type: MediaType,
+    ) -> Result<(Option<Link>, Out)>
+    where
+        Out: DeserializeOwned + 'static + Send + Sync,
+    {
         let instance = self.clone();
-        #[cfg(feature = "httpcache")]
-        let uri2 = uri.to_string();
         let body2 = body.clone();
         let method2 = method.clone();
-        let (url, auth): (Url, Option<String>) = url_and_auth.await.map_err(Error::from)?;
 
         let response = {
             #[cfg(not(feature = "httpcache"))]
@@ -800,7 +851,7 @@ impl Github {
         authentication: AuthenticationConstraint,
     ) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         let response: Result<(_, D)> = self
             .request(method, uri, body, media_type, authentication)
@@ -810,14 +861,14 @@ impl Github {
 
     async fn get<D>(&self, uri: &str) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.get_media(uri, MediaType::Json).await
     }
 
     async fn get_media<D>(&self, uri: &str, media: MediaType) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.request_entity(
             Method::GET,
@@ -838,7 +889,7 @@ impl Github {
 
     async fn get_pages<D>(&self, uri: &str) -> Result<(Option<Link>, D)>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.request(
             Method::GET,
@@ -882,7 +933,7 @@ impl Github {
 
     async fn post<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.post_media(
             uri,
@@ -901,7 +952,7 @@ impl Github {
         authentication: AuthenticationConstraint,
     ) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.request_entity(
             Method::POST,
@@ -922,7 +973,7 @@ impl Github {
 
     async fn patch_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.request_entity(
             Method::PATCH,
@@ -936,7 +987,7 @@ impl Github {
 
     async fn patch<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.patch_media(uri, message, MediaType::Json).await
     }
@@ -950,14 +1001,14 @@ impl Github {
 
     async fn put<D>(&self, uri: &str, message: Vec<u8>) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.put_media(uri, message, MediaType::Json).await
     }
 
     async fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Result<D>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.request_entity(
             Method::PUT,

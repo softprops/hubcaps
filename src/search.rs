@@ -45,7 +45,7 @@ pub struct Search {
 
 fn items<D>(result: SearchResult<D>) -> Vec<D>
 where
-    D: DeserializeOwned + 'static + Send,
+    D: DeserializeOwned + 'static + Send + Sync,
 {
     result.items
 }
@@ -80,7 +80,7 @@ impl Search {
 
     async fn search<D>(&self, url: &str) -> Result<SearchResult<D>>
     where
-        D: DeserializeOwned + 'static + Send,
+        D: DeserializeOwned + 'static + Send + Sync,
     {
         self.github.get(url).await
     }
