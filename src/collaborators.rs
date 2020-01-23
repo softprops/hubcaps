@@ -4,8 +4,7 @@ use self::super::{Error, Github};
 use crate::users::User;
 use http::StatusCode;
 
-use crate::{ErrorKind, Future, Result};
-use futures::future::{Future as StdFuture, IntoFuture};
+use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::fmt;
 

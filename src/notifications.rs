@@ -5,7 +5,6 @@ use serde::Deserialize;
 use url::form_urlencoded;
 
 use crate::users::User;
-use crate::Future;
 use crate::Github;
 use crate::Result;
 

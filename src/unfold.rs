@@ -1,8 +1,6 @@
 use crate::errors::Error;
 use crate::Github;
-use futures::future::{BoxFuture, FutureExt};
 use futures::stream;
-use futures::Stream;
 use hyperx::header::{Link, RelationType};
 use reqwest::Url;
 use serde::de::DeserializeOwned;

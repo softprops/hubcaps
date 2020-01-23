@@ -1,8 +1,7 @@
 //! Stars interface
-use futures::Future as StdFuture;
 use http::StatusCode;
 
-use crate::{Error, ErrorKind, Future, Github, Result};
+use crate::{Error, ErrorKind, Github, Result};
 
 pub struct Stars {
     github: Github,

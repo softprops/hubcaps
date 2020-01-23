@@ -87,8 +87,7 @@ use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::future::{BoxFuture, FutureExt, TryFutureExt};
-use futures::{future, stream, Future as FFuture, Stream as FStream};
+use futures::{Future as FFuture, Stream as FStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
 use http::header::{HeaderMap, HeaderValue};
@@ -96,7 +95,7 @@ use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
 use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
-use hyperx::header::{qitem, Link, RelationType};
+use hyperx::header::{qitem, Link};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
@@ -651,11 +650,11 @@ impl Github {
         {
             if apptoken.token().is_none() {
                 debug!("App token is stale, refreshing");
-                let refresh_uri = (self.host.clone()
+                let refresh_uri = self.host.clone()
                     + &format!(
                         "/app/installations/{}/access_tokens",
                         apptoken.installation_id
-                    ));
+                    );
                 let url_and_auth = self
                     .url_and_auth(&refresh_uri, AuthenticationConstraint::JWT)
                     .await?;
@@ -674,9 +673,7 @@ impl Github {
                     .await?
                     .1;
 
-                let token = token_response.token;
-                let auth = format!("token {}", &token);
-                *token_ref.lock().unwrap() = Some(token);
+                *token_ref.lock().unwrap() = Some(token_response.token);
             }
         }
 
@@ -695,7 +692,7 @@ impl Github {
     async fn authenticated_request<Out>(
         &self,
         method: Method,
-        uri2: &str,
+        _uri2: &str,
         url: Url,
         auth: Option<String>,
         body: Option<Vec<u8>>,
@@ -716,7 +713,7 @@ impl Github {
             let mut req = {
                 let mut req = instance.client.request(method2.clone(), url);
                 if method2 == Method::GET {
-                    if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
+                    if let Ok(etag) = instance.http_cache.lookup_etag(&_uri2) {
                         req = req.header(IF_NONE_MATCH, etag);
                     }
                 }

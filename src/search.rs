@@ -8,7 +8,7 @@ use url::{self, form_urlencoded};
 
 use crate::labels::Label;
 use crate::users::User;
-use crate::{unfold, Future, Github, Result, SortDirection, Stream};
+use crate::{unfold, Github, Result, SortDirection, Stream};
 
 mod repos;
 

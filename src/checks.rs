@@ -2,7 +2,7 @@
 // see: https://developer.github.com/v3/checks/suites/
 use serde::{Deserialize, Serialize};
 
-use self::super::{AuthenticationConstraint, Future, Github, MediaType, Result};
+use self::super::{AuthenticationConstraint, Github, MediaType, Result};
 
 pub struct CheckRuns {
     github: Github,
