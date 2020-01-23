@@ -19,7 +19,7 @@ maintenance = { status = "actively-developed" }
 
 [dev-dependencies]
 pretty_env_logger = "0.3"
-tokio = "0.1"
+tokio = { version = "0.2", features = ["macros"] }
 
 [dependencies]
 dirs = { version = "1.0", optional = true }
@@ -47,3 +47,8 @@ default-tls = ["reqwest/default-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 # enable etag-based http_cache functionality
 httpcache = ["dirs"]
+
+[[example]]
+name = "conditional_requests"
+path = "examples/conditional_requests.rs"
+required-features = ["httpcache"]
