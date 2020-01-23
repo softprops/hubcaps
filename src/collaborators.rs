@@ -3,8 +3,9 @@ use serde_json;
 use self::super::{Error, Github};
 use crate::users::User;
 use http::StatusCode;
+use serde::Deserialize;
 
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, Result, Stream};
 use std::collections::HashMap;
 use std::fmt;
 
@@ -62,6 +63,10 @@ impl Collaborators {
         self.github.get::<Vec<User>>(&self.path("")).await
     }
 
+    pub async fn iter(&self) -> Stream<Collaborator> {
+        self.github.get_stream::<Collaborator>(&self.path("")).await
+    }
+
     pub async fn is_collaborator(&self, username: &str) -> Result<bool> {
         self.github
             .get::<()>(&self.path(&format!("/{}", username)))
@@ -97,4 +102,35 @@ impl Collaborators {
             .delete(&self.path(&format!("/{}", username)))
             .await
     }
+}
+
+/// Collaborator information. User, plus `permissions`
+#[derive(Debug, Deserialize)]
+pub struct Collaborator {
+    pub login: String,
+    pub id: u64,
+    pub avatar_url: String,
+    pub gravatar_id: String,
+    pub url: String,
+    pub html_url: String,
+    pub followers_url: String,
+    pub following_url: String,
+    pub gists_url: String,
+    pub starred_url: String,
+    pub subscriptions_url: String,
+    pub organizations_url: String,
+    pub repos_url: String,
+    pub events_url: String,
+    pub received_events_url: String,
+    // type (keyword)
+    pub site_admin: bool,
+
+    pub permissions: CollaboratorPermission,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CollaboratorPermission {
+    pub pull: bool,
+    pub push: bool,
+    pub admin: bool,
 }
