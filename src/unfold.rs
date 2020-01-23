@@ -10,39 +10,39 @@ use serde::de::DeserializeOwned;
 pub async fn unfold<Source, StreamOk>(
     github: Github,
     initial: Result<(Option<Link>, Source), Error>,
-    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
 ) -> Box<dyn Stream<Item = Result<StreamOk, Error>>>
 where
-    StreamOk: 'static + Send,
-    Source: DeserializeOwned + 'static + Send,
+    StreamOk: 'static + Send + Sync,
+    Source: DeserializeOwned + 'static + Send + Sync,
 {
     let state = StreamState::new(github, initial, to_items);
 
-    Box::new(stream::unfold(state, move |state| {
-        async { state.next().await }
+    Box::new(stream::unfold(state, move |state| async {
+        state.next().await
     }))
 }
 
 struct StreamState<Source, StreamOk>
 where
-    StreamOk: 'static + Send,
-    Source: DeserializeOwned + 'static + Send,
+    StreamOk: 'static + Send + Sync,
+    Source: DeserializeOwned + 'static + Send + Sync,
 {
     github: Github,
     items: Option<Result<Vec<StreamOk>, Error>>,
-    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
     next_page: Option<Link>,
 }
 
 impl<Source, StreamOk> StreamState<Source, StreamOk>
 where
-    StreamOk: 'static + Send,
-    Source: DeserializeOwned + 'static + Send,
+    StreamOk: 'static + Send + Sync,
+    Source: DeserializeOwned + 'static + Send + Sync,
 {
     fn new(
         github: Github,
         initial: Result<(Option<Link>, Source), Error>,
-        to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send>,
+        to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
     ) -> Self {
         let dummy = Self {
             github,
@@ -54,8 +54,8 @@ where
         dummy.load_state(initial)
     }
 
-    async fn next(mut self) -> Option<(Result<StreamOk, Error>, Self)> {
-        let state = self;
+    async fn next(self) -> Option<(Result<StreamOk, Error>, Self)> {
+        let mut state = self;
         loop {
             match state.flat_next() {
                 FetcherState::NextReady(item, state) => {
