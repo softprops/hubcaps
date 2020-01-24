@@ -1,24 +1,24 @@
 use std::env;
 
-use futures::Future;
-use tokio::runtime::Runtime;
+use futures::try_join;
 
 use hubcaps::{Credentials, Github, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
             let stars = github.activity().stars();
-            let f = stars
-                .star("softprops", "hubcaps")
-                .join(stars.is_starred("softprops", "hubcaps"));
-            match rt.block_on(f) {
+            let result = try_join!(
+                stars.star("softprops", "hubcaps"),
+                stars.is_starred("softprops", "hubcaps")
+            );
+            match result {
                 Ok((_, starred)) => println!("starred? {:?}", starred),
                 Err(err) => println!("err {}", err),
             }

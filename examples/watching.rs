@@ -1,72 +1,62 @@
 use std::env;
 
-use futures::Stream;
-use tokio::runtime::Runtime;
+use futures::future;
+use futures::TryStreamExt;
 
 use hubcaps::{Credentials, Github, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     let token = env::var("GITHUB_TOKEN").expect("example missing GITHUB_TOKEN");
-    let mut rt = Runtime::new()?;
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
         Credentials::Token(token),
     )?;
 
     println!("watched repos");
-    rt.block_on(github.activity().watching().iter().for_each(|repo| {
-        println!("{}", repo.full_name);
-        Ok(())
-    }))?;
+    github
+        .activity()
+        .watching()
+        .iter()
+        .await
+        .try_for_each(|repo| {
+            println!("{}", repo.full_name);
+            future::ok(())
+        })
+        .await?;
 
     println!("watch a repo");
-    rt.block_on(
-        github
-            .activity()
-            .watching()
-            .watch_repo("octocat", "Hello-World"),
-    )
-    .and_then(|sub| {
-        println!("subscription: {:#?}", sub);
-        Ok(())
-    })?;
+    let sub = github
+        .activity()
+        .watching()
+        .watch_repo("octocat", "Hello-World")
+        .await?;
+    println!("subscription: {:#?}", sub);
 
     println!("get watching for repo");
-    rt.block_on(
-        github
-            .activity()
-            .watching()
-            .get_for_repo("octocat", "Hello-World"),
-    )
-    .and_then(|sub| {
-        println!("subscription: {:#?}", sub);
-        Ok(())
-    })?;
+    let sub = github
+        .activity()
+        .watching()
+        .get_for_repo("octocat", "Hello-World")
+        .await?;
+    println!("subscription: {:#?}", sub);
 
     println!("ignore a repo");
-    rt.block_on(
-        github
-            .activity()
-            .watching()
-            .ignore_repo("octocat", "Hello-World"),
-    )
-    .and_then(|sub| {
-        println!("subscription: {:#?}", sub);
-        Ok(())
-    })?;
+    let sub = github
+        .activity()
+        .watching()
+        .ignore_repo("octocat", "Hello-World")
+        .await?;
+    println!("subscription: {:#?}", sub);
 
     println!("unwatch a repo");
-    rt.block_on(
-        github
-            .activity()
-            .watching()
-            .unwatch_repo("octocat", "Hello-World"),
-    )
-    .and_then(|()| {
-        println!("unwatched");
-        Ok(())
-    })?;
+    github
+        .activity()
+        .watching()
+        .unwatch_repo("octocat", "Hello-World")
+        .await?;
+    println!("unwatched");
 
     Ok(())
 }

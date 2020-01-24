@@ -1,15 +1,13 @@
 use std::env;
 
-use tokio::runtime::Runtime;
-
 use hubcaps::traffic::TimeUnit;
 use hubcaps::{Credentials, Github, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -18,21 +16,29 @@ fn main() -> Result<()> {
             let repo = "hubcaps";
 
             println!("Top 10 referrers");
-            for referrer in rt.block_on(github.repo(owner, repo).traffic().referrers())? {
+            for referrer in github.repo(owner, repo).traffic().referrers().await? {
                 println!("{:#?}", referrer)
             }
 
             println!("Top 10 paths");
-            for path in rt.block_on(github.repo(owner, repo).traffic().paths())? {
+            for path in github.repo(owner, repo).traffic().paths().await? {
                 println!("{:#?}", path)
             }
 
             println!("Views per day");
-            let views = rt.block_on(github.repo(owner, repo).traffic().views(TimeUnit::Day))?;
+            let views = github
+                .repo(owner, repo)
+                .traffic()
+                .views(TimeUnit::Day)
+                .await?;
             println!("{:#?}", views);
 
             println!("Clones per day");
-            let clones = rt.block_on(github.repo(owner, repo).traffic().clones(TimeUnit::Day))?;
+            let clones = github
+                .repo(owner, repo)
+                .traffic()
+                .clones(TimeUnit::Day)
+                .await?;
             println!("{:#?}", clones);
             Ok(())
         }

@@ -1,15 +1,15 @@
 use std::env;
 
-use futures::Stream;
-use tokio::runtime::Runtime;
+use futures::future;
+use futures::TryStreamExt;
 
 use hubcaps::{Credentials, Github, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -17,22 +17,25 @@ fn main() -> Result<()> {
             // add labels associated with a pull
             println!(
                 "{:#?}",
-                rt.block_on(
-                    github
-                        .repo("softprops", "hubcaps")
-                        .pulls()
-                        .get(121)
-                        .labels()
-                        .add(vec!["enhancement"])
-                )?
+                github
+                    .repo("softprops", "hubcaps")
+                    .pulls()
+                    .get(121)
+                    .labels()
+                    .add(vec!["enhancement"])
+                    .await?
             );
             // stream over all labels defined for a repo
-            rt.block_on(github.repo("rust-lang", "cargo").labels().iter().for_each(
-                move |label| {
+            github
+                .repo("rust-lang", "cargo")
+                .labels()
+                .iter()
+                .await
+                .try_for_each(|label| {
                     println!("{}", label.name);
-                    Ok(())
-                },
-            ))?;
+                    future::ok(())
+                })
+                .await?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

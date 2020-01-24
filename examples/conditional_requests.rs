@@ -1,41 +1,32 @@
-#[cfg(feature = "httpcache")]
-use {reqwest::r#async::Client, tokio::runtime::Runtime};
+use reqwest::Client;
 
-use hubcaps::Result;
+use hubcaps::{Github, HttpCache, Result};
 
-#[cfg(feature = "httpcache")]
-use hubcaps::{Github, HttpCache};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
+    let host = "https://api.github.com";
+    let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+    let client = Client::builder().build()?;
+    let http_cache = HttpCache::in_home_dir();
+    let github = Github::custom(host, agent, None, client, http_cache);
 
-    #[cfg(not(feature = "httpcache"))]
-    {
-        println!("rerun this example with `cargo run --no-default-features --features default-tls,httpcache --example conditional_requests`");
-        Ok(())
-    }
+    let _repos = github
+        .user_repos("dwijnand")
+        .list(&Default::default())
+        .await?;
+    let status1 = github.rate_limit().get().await?;
 
-    #[cfg(feature = "httpcache")]
-    {
-        let mut rt = Runtime::new()?;
+    let _repos = github
+        .user_repos("dwijnand")
+        .list(&Default::default())
+        .await?;
+    let status2 = github.rate_limit().get().await?;
 
-        let host = "https://api.github.com";
-        let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
-        let client = Client::builder().build()?;
-        let http_cache = HttpCache::in_home_dir();
-        let github = Github::custom(host, agent, None, client, http_cache);
+    let rem1 = status1.resources.core.remaining;
+    let rem2 = status2.resources.core.remaining;
 
-        let _repos = rt.block_on(github.user_repos("dwijnand").list(&Default::default()))?;
-        let status1 = rt.block_on(github.rate_limit().get())?;
+    assert_eq!(rem1, rem2);
 
-        let _repos = rt.block_on(github.user_repos("dwijnand").list(&Default::default()))?;
-        let status2 = rt.block_on(github.rate_limit().get())?;
-
-        let rem1 = status1.resources.core.remaining;
-        let rem2 = status2.resources.core.remaining;
-
-        assert_eq!(rem1, rem2);
-
-        Ok(())
-    }
+    Ok(())
 }
