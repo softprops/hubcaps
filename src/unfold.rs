@@ -1,3 +1,5 @@
+use std::vec::IntoIter;
+
 use crate::errors::Error;
 use crate::Github;
 use futures::stream;
@@ -27,7 +29,7 @@ where
     Source: DeserializeOwned + 'static + Send + Sync,
 {
     github: Github,
-    items: Option<Result<Vec<StreamOk>, Error>>,
+    items: Option<Result<IntoIter<StreamOk>, Error>>,
     to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
     next_page: Option<Link>,
 }
@@ -73,7 +75,7 @@ where
         if let Some(resultitems) = self.items.take() {
             match resultitems {
                 Ok(mut items) => {
-                    if let Some(item) = items.pop() {
+                    if let Some(item) = items.next() {
                         FetcherState::NextReady(
                             Ok(item),
                             Self {
@@ -136,12 +138,12 @@ where
     }
 
     fn load_state(self, state: Result<(Option<Link>, Source), Error>) -> Self {
-        let items: Result<Vec<StreamOk>, Error>;
+        let items: Result<IntoIter<StreamOk>, Error>;
         let next_page: Option<Link>;
 
         match state {
             Ok((link, payload)) => {
-                items = Ok((self.to_items)(payload));
+                items = Ok((self.to_items)(payload).into_iter());
                 next_page = link;
             }
             Err(e) => {
