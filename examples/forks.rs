@@ -1,7 +1,9 @@
 use std::env;
 
+use futures::Stream;
 use tokio::runtime::Runtime;
 
+use hubcaps::repositories::ForkListOptions;
 use hubcaps::{Credentials, Github, Result};
 
 fn main() -> Result<()> {
@@ -13,12 +15,20 @@ fn main() -> Result<()> {
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
+            let owner = "octokit";
+            let repo = "rest.js";
 
-            let repo = github.repo("softprops", "hubcaps");
-
-            let forked = rt.block_on(repo.forks().create())?;
-
-            println!("Forked repository to {}", forked.full_name);
+            let options = ForkListOptions::builder().build();
+            rt.block_on(
+                github
+                    .repo(owner, repo)
+                    .forks()
+                    .iter(&options)
+                    .for_each(move |repo| {
+                        println!("{}", repo.full_name);
+                        Ok(())
+                    })
+            )?;
 
             Ok(())
         }
