@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 use url::form_urlencoded;
+use percent_encoding::{percent_encode, PATH_SEGMENT_ENCODE_SET};
 use serde::{Deserialize, Serialize};
 
 use crate::comments::Comments;
@@ -140,6 +141,7 @@ impl IssueLabels {
 
     /// remove a label from this issue
     pub fn remove(&self, label: &str) -> Future<()> {
+        let label = percent_encode(label.as_ref(), PATH_SEGMENT_ENCODE_SET);
         self.github.delete(&self.path(&format!("/{}", label)))
     }
 
