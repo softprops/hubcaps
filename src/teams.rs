@@ -158,8 +158,8 @@ impl OrgTeamActions {
     }
 
     /// list of teams for this org
-    pub async fn list_members(&self, role: Option<TeamMemberRole>) -> Result<Vec<User>> {
-        self.github.get(self.path("/members")).await
+    pub async fn list_members(&self) -> Result<Vec<User>> {
+        self.github.get(&self.path("/members")).await
     }
 
     /// provides an iterator over all pages of members
