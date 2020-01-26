@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use http::Uri;
 use log::trace;
 
-use crate::{Error, Result, Result};
+use crate::{Error, Result};
 
 pub type BoxedHttpCache = Box<dyn HttpCache + Send + Sync>;
 
@@ -141,8 +141,8 @@ pub fn cache_path<S: AsRef<OsStr>>(dir: &Path, uri: &str, extension: S) -> PathB
     let uri = uri.parse::<Uri>().expect("Expected a URI");
     let mut path = dir.to_path_buf();
     path.push("v1");
-    path.push(uri.scheme_part().expect("no URI scheme").as_str()); // https
-    path.push(uri.authority_part().expect("no URI authority").as_str()); // api.github.com
+    path.push(uri.scheme().expect("no URI scheme").as_str()); // https
+    path.push(uri.authority().expect("no URI authority").as_str()); // api.github.com
     path.push(Path::new(&uri.path()[1..])); // users/dwijnand/repos
     if let Some(query) = uri.query() {
         path.push(hash1(query, DefaultHasher::new())); // fa269019d5035d5f

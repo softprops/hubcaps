@@ -93,9 +93,9 @@ use http::header::IF_NONE_MATCH;
 use http::header::{HeaderMap, HeaderValue};
 use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
 use http::{Method, StatusCode};
-#[cfg(feature = "httpcache")]
-use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link};
+#[cfg(feature = "httpcache")]
+use hyperx::header::{LinkValue, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
@@ -711,7 +711,7 @@ impl Github {
 
             #[cfg(feature = "httpcache")]
             let mut req = {
-                let mut req = instance.client.request(method2.clone(), url);
+                let mut req = instance.client.request(method2.clone(), url.clone());
                 if method2 == Method::GET {
                     if let Ok(etag) = instance.http_cache.lookup_etag(&_uri2) {
                         req = req.header(IF_NONE_MATCH, etag);
@@ -743,7 +743,7 @@ impl Github {
         let instance2 = self.clone();
 
         #[cfg(feature = "httpcache")]
-        let uri3 = uri.to_string();
+        let uri3 = url.to_string();
 
         #[cfg(not(feature = "httpcache"))]
         let (remaining, reset) = get_header_values(response.headers());
