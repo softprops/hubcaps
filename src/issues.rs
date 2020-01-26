@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use std::fmt;
 
 use url::form_urlencoded;
-use percent_encoding::{percent_encode, PATH_SEGMENT_ENCODE_SET};
 use serde::{Deserialize, Serialize};
 
 use crate::comments::Comments;
 use crate::labels::Label;
 use crate::users::User;
+use crate::utils::{percent_encode, PATH_SEGMENT};
 use crate::{Future, Github, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
@@ -141,7 +141,7 @@ impl IssueLabels {
 
     /// remove a label from this issue
     pub fn remove(&self, label: &str) -> Future<()> {
-        let label = percent_encode(label.as_ref(), PATH_SEGMENT_ENCODE_SET);
+        let label = percent_encode(label.as_ref(), PATH_SEGMENT);
         self.github.delete(&self.path(&format!("/{}", label)))
     }
 
