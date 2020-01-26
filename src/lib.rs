@@ -142,7 +142,7 @@ pub mod users;
 pub mod watching;
 
 mod unfold;
-pub use unfold::{next_link, unfold};
+use unfold::{next_link, unfold};
 
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
