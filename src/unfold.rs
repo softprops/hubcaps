@@ -18,9 +18,7 @@ where
 {
     let state = StreamState::new(github, initial, to_items);
 
-    Box::pin(stream::unfold(state, move |state| async {
-        state.next().await
-    }))
+    Box::pin(stream::unfold(state, |state| async { state.next().await }))
 }
 
 struct StreamState<Source, StreamOk>
