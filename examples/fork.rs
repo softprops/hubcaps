@@ -14,7 +14,7 @@ async fn main() -> Result<()> {
 
             let repo = github.repo("softprops", "hubcaps");
 
-            let forked = repo.fork().await?;
+            let forked = repo.forks().create().await?;
 
             println!("Forked repository to {}", forked.full_name);
 

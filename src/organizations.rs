@@ -1,6 +1,7 @@
 //! Organizations interface
 use serde::Deserialize;
 
+use crate::membership::OrgMembership;
 use crate::repositories::OrgRepositories;
 use crate::teams::OrgTeams;
 use crate::{Github, Result};
@@ -21,6 +22,11 @@ impl Organization {
             github,
             org: org.into(),
         }
+    }
+
+    /// returns a reference to an interface for Organization invitations
+    pub fn membership(&self) -> OrgMembership {
+        OrgMembership::new(self.github.clone(), self.org.clone())
     }
 
     /// returns a reference to an interface for team operations
