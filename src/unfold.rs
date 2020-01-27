@@ -1,9 +1,10 @@
 use std::vec::IntoIter;
 
 use crate::errors::Error;
+use crate::utils::next_link;
 use crate::Github;
 use futures::stream;
-use hyperx::header::{Link, RelationType};
+use hyperx::header::Link;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 
@@ -163,11 +164,4 @@ enum FetcherState<StreamOk, State> {
     NextReady(Result<StreamOk, Error>, State),
     FetchNextPage(State),
     Empty,
-}
-
-pub fn next_link(l: &Link) -> Option<String> {
-    l.values()
-        .into_iter()
-        .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
-        .map(|v| v.link().to_owned())
 }
