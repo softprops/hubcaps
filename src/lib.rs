@@ -123,6 +123,7 @@ pub mod hooks;
 pub mod issues;
 pub mod keys;
 pub mod labels;
+pub mod membership;
 pub mod notifications;
 pub mod organizations;
 pub mod pull_commits;
@@ -174,6 +175,19 @@ const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
 const X_RATELIMIT_REMAINING: &str = "x-ratelimit-remaining";
 const X_RATELIMIT_RESET: &str = "x-ratelimit-reset";
+
+pub(crate) mod utils {
+    pub use percent_encoding::percent_encode;
+    use percent_encoding::{AsciiSet, CONTROLS};
+
+    /// https://url.spec.whatwg.org/#fragment-percent-encode-set
+    const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
+
+    /// https://url.spec.whatwg.org/#path-percent-encode-set
+    pub const PATH: &AsciiSet = &FRAGMENT.add(b'#').add(b'?').add(b'{').add(b'}');
+
+    pub const PATH_SEGMENT: &AsciiSet = &PATH.add(b'/').add(b'%');
+}
 
 /// Github defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information

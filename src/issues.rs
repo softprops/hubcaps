@@ -8,6 +8,7 @@ use url::form_urlencoded;
 use crate::comments::Comments;
 use crate::labels::Label;
 use crate::users::User;
+use crate::utils::{percent_encode, PATH_SEGMENT};
 use crate::{Github, Result, SortDirection, Stream};
 
 /// enum representation of github pull and issue state
@@ -142,6 +143,7 @@ impl IssueLabels {
 
     /// remove a label from this issue
     pub async fn remove(&self, label: &str) -> Result<()> {
+        let label = percent_encode(label.as_ref(), PATH_SEGMENT);
         self.github.delete(&self.path(&format!("/{}", label))).await
     }
 

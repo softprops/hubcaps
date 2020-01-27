@@ -2,10 +2,10 @@
 use std::fmt;
 use std::ops;
 
-use percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
 use serde::de::{self, Visitor};
 use serde::Deserialize;
 
+use crate::utils::{percent_encode, PATH};
 use crate::{Github, Result, Stream};
 
 /// Provides access to the content information for a repository
@@ -32,7 +32,7 @@ impl Content {
     fn path(&self, location: &str) -> String {
         // Handle files with spaces and other characters that can mess up the
         // final URL.
-        let location = percent_encode(location.as_ref(), DEFAULT_ENCODE_SET);
+        let location = percent_encode(location.as_ref(), PATH);
         format!("/repos/{}/{}/contents{}", self.owner, self.repo, location)
     }
 

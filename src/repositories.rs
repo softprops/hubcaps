@@ -174,6 +174,57 @@ impl Repositories {
     }
 }
 
+pub struct Forks {
+    github: Github,
+    owner: String,
+    repo: String,
+}
+
+impl Forks {
+    #[doc(hidden)]
+    pub fn new<U, R>(github: Github, owner: U, repo: R) -> Self
+    where
+        U: Into<String>,
+        R: Into<String>,
+    {
+        Self {
+            github,
+            owner: owner.into(),
+            repo: repo.into(),
+        }
+    }
+
+    fn path(&self) -> String {
+        format!("/repos/{}/{}/forks", self.owner, self.repo)
+    }
+
+    /// Create a new fork
+    /// https://developer.github.com/v3/repos/forks/#create-a-fork
+    pub async fn create(&self) -> Result<Repo> {
+        self.github.post(&self.path(), Vec::new()).await
+    }
+
+    /// list the forks
+    /// https://developer.github.com/v3/repos/forks/#list-forks
+    pub async fn list(&self, options: &ForkListOptions) -> Result<Vec<Repo>> {
+        let mut uri = vec![self.path()];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get(&uri.join("?")).await
+    }
+
+    /// provides a stream over all pages of the forks
+    /// https://developer.github.com/v3/repos/forks/#list-forks
+    pub async fn iter(&self, options: &ForkListOptions) -> Stream<Repo> {
+        let mut uri = vec![self.path()];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get_stream(&uri.join("?")).await
+    }
+}
+
 /// Provides access to the authenticated user's repositories
 pub struct OrgRepositories {
     github: Github,
@@ -451,8 +502,11 @@ impl Repository {
         Traffic::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
-    pub async fn fork(&self) -> Result<Repo> {
-        self.github.post(&self.path("/forks"), Vec::new()).await
+    /// get a reference to
+    /// [forks](https://developer.github.com/v3/repos/forks/#list-forks)
+    /// associated with this repository ref
+    pub fn forks(&self) -> Forks {
+        Forks::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 }
 
@@ -777,6 +831,50 @@ impl RepoListOptionsBuilder {
 
     pub fn build(&self) -> RepoListOptions {
         RepoListOptions {
+            params: self.0.params.clone(),
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct ForkListOptions {
+    params: HashMap<&'static str, String>,
+}
+
+impl ForkListOptions {
+    pub fn builder() -> ForkListOptionsBuilder {
+        ForkListOptionsBuilder::default()
+    }
+
+    /// serialize options as a string. returns None if no options are defined
+    pub fn serialize(&self) -> Option<String> {
+        if self.params.is_empty() {
+            None
+        } else {
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(&self.params)
+                .finish();
+            Some(encoded)
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct ForkListOptionsBuilder(ForkListOptions);
+
+impl ForkListOptionsBuilder {
+    pub fn per_page(&mut self, n: usize) -> &mut Self {
+        self.0.params.insert("per_page", n.to_string());
+        self
+    }
+
+    pub fn sort(&mut self, sort: Sort) -> &mut Self {
+        self.0.params.insert("sort", sort.to_string());
+        self
+    }
+
+    pub fn build(&self) -> ForkListOptions {
+        ForkListOptions {
             params: self.0.params.clone(),
         }
     }
