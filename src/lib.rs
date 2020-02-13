@@ -901,6 +901,19 @@ impl Github {
         )
     }
 
+    fn get_pages_url<D>(&self, url: &Url) -> Future<(Option<Link>, D)>
+    where
+        D: DeserializeOwned + 'static + Send,
+    {
+        self.request(
+            Method::GET,
+            url.as_str(),
+            None,
+            MediaType::Json,
+            AuthenticationConstraint::Unconstrained,
+        )
+    }
+
     fn delete(&self, uri: &str) -> Future<()> {
         Box::pin(
             self.request_entity::<()>(
@@ -1102,9 +1115,7 @@ where
                             None => match link.and_then(|l| next_link(&l)) {
                                 Some(url) => {
                                     let url = Url::from_str(&url).unwrap();
-                                    let uri =
-                                        [url.path(), url.query().unwrap_or_default()].join("?");
-                                    let (link, payload) = github.get_pages(uri.as_ref()).await?;
+                                    let (link, payload) = github.get_pages_url(&url).await?;
                                     let mut items = into_items(payload);
                                     let item = items.remove(0);
                                     items.reverse();
