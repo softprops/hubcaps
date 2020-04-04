@@ -56,17 +56,20 @@ impl Labels {
 pub struct LabelOptions {
     pub name: String,
     pub color: String,
+    pub description: String,
 }
 
 impl LabelOptions {
-    pub fn new<N, C>(name: N, color: C) -> LabelOptions
+    pub fn new<N, C, D>(name: N, color: C, description: D) -> LabelOptions
     where
         N: Into<String>,
         C: Into<String>,
+        D: Into<String>,
     {
         LabelOptions {
             name: name.into(),
             color: color.into(),
+            description: description.into(),
         }
     }
 }
