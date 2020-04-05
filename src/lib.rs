@@ -77,7 +77,7 @@
 //!  features = ["default-tls","httpcache"]
 //! ```
 //!
-//! Then use the `Github::custom` constructor to provide a cache implementation. See
+//! Then use the `Github::builder` builder to provide a cache implementation. See
 //! the conditional_requests example in this crates github repository for an example usage
 //!
 #![allow(missing_docs)] // todo: make this a deny eventually
@@ -99,7 +99,8 @@ use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
-use reqwest::r#async::{Body, Client};
+use reqwest::r#async::{Body, Client, ClientBuilder};
+use reqwest::Proxy;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use url::Url;
@@ -143,9 +144,19 @@ pub mod users;
 pub mod watching;
 pub mod collaborators;
 
+/// Re-exports of the used reqwest types.
+pub mod client {
+    pub use reqwest::header;
+    pub use reqwest::r#async::ClientBuilder;
+    pub use reqwest::RedirectPolicy;
+    #[cfg(feature = "tls")]
+    pub use reqwest::{Certificate, Identity};
+    pub use reqwest::{Proxy, Url};
+}
+
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
-pub use crate::http_cache::{BoxedHttpCache, HttpCache};
+pub use crate::http_cache::{BoxedHttpCache, HttpCache, NoCache};
 
 use crate::activity::Activity;
 use crate::app::App;
@@ -157,6 +168,8 @@ use crate::search::Search;
 use crate::users::Users;
 
 const DEFAULT_HOST: &str = "https://api.github.com";
+const DEFAULT_USER_AGENT: &'static str =
+    concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 // We use 9 minutes for the life to give some buffer for clock drift between
 // our clock and GitHub's. The absolute max is 10 minutes.
 const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
@@ -405,6 +418,172 @@ impl PartialEq for InstallationTokenGenerator {
     }
 }
 
+#[cfg(feature = "tls")]
+enum TlsBackend {
+    #[cfg(feature = "default-tls")]
+    Default,
+    #[cfg(feature = "rustls-tls")]
+    Rustls,
+}
+
+#[cfg(feature = "tls")]
+impl Default for TlsBackend {
+    fn default() -> TlsBackend {
+        #[cfg(feature = "default-tls")]
+        {
+            TlsBackend::Default
+        }
+
+        #[cfg(all(feature = "rustls-tls", not(feature = "default-tls")))]
+        {
+            TlsBackend::Rustls
+        }
+    }
+}
+
+/// A `Builder` can be used to create a `Github` client with custom configuration.
+pub struct Builder {
+    config: Config,
+}
+
+struct Config {
+    host: Option<String>,
+    agent: Option<String>,
+    credentials: Option<Credentials>,
+    builder: Option<ClientBuilder>,
+    proxies: Vec<Proxy>,
+    #[cfg(feature = "tls")]
+    tls: TlsBackend,
+    #[cfg(feature = "httpcache")]
+    cache: Option<BoxedHttpCache>,
+}
+
+impl Builder {
+    /// Constructs a new `Builder`.
+    ///
+    /// This is the same as `Github::builder()`.
+    pub fn new() -> Builder {
+        Builder {
+            config: Config {
+                host: None,
+                agent: None,
+                credentials: None,
+                builder: None,
+                proxies: Vec::new(),
+                #[cfg(feature = "tls")]
+                tls: TlsBackend::default(),
+                #[cfg(feature = "httpcache")]
+                cache: None,
+            },
+        }
+    }
+
+    /// Set the github api host.
+    ///
+    /// Defaults to `"https://api.github.com"`
+    pub fn host<S: Into<String>>(mut self, host: S) -> Builder {
+        self.config.host = Some(host.into());
+        self
+    }
+
+    /// Set the user agent used for every request.
+    ///
+    /// Defaults to `"hubcaps/{version}"`
+    pub fn agent<S: Into<String>>(mut self, agent: S) -> Builder {
+        self.config.agent = Some(agent.into());
+        self
+    }
+
+    /// Set the credentials used for every request.
+    pub fn credentials<C: Into<Option<Credentials>>>(mut self, creds: C) -> Builder {
+        self.config.credentials = creds.into();
+        self
+    }
+
+    /// Configures the underlying `reqwest` client using `hubcaps::client::ClientBuilder`.
+    ///
+    /// Overwrites other `reqwest` specific settings from the builder.
+    pub fn client<F>(mut self, f: F) -> Builder
+    where
+        F: FnOnce(ClientBuilder) -> ClientBuilder,
+    {
+        self.config.builder = Some(f(Client::builder()));
+        self
+    }
+
+    /// Add a `Proxy` to the list of proxies the client will use.
+    pub fn proxy(mut self, proxy: Proxy) -> Builder {
+        self.config.proxies.push(proxy);
+        self
+    }
+
+    /// Set the `HttpCache`.
+    ///
+    /// Defaults to `NoCache`
+    #[cfg(feature = "httpcache")]
+    pub fn cache(mut self, cache: BoxedHttpCache) -> Builder {
+        self.config.cache = Some(cache);
+        self
+    }
+
+    /// Use native TLS backend.
+    #[cfg(feature = "default-tls")]
+    pub fn use_default_tls(mut self) -> Builder {
+        self.config.tls = TlsBackend::Default;
+        self
+    }
+
+    /// Use rustls TLS backend.
+    #[cfg(feature = "rustls-tls")]
+    pub fn use_rustls_tls(mut self) -> Builder {
+        self.config.tls = TlsBackend::Rustls;
+        self
+    }
+
+    /// Returns a `Github` client that uses this `Builder` configuration.
+    pub fn build(self) -> Result<Github> {
+        let config = self.config;
+
+        let host = config.host.unwrap_or_else(|| DEFAULT_HOST.to_string());
+        let agent = config
+            .agent
+            .unwrap_or_else(|| DEFAULT_USER_AGENT.to_string());
+        let credentials = config.credentials;
+        let client = {
+            let mut builder = {
+                let builder = config.builder.unwrap_or_else(ClientBuilder::new);
+                #[cfg(feature = "tls")]
+                match config.tls {
+                    #[cfg(feature = "default-tls")]
+                    TlsBackend::Default => builder.use_default_tls(),
+                    #[cfg(feature = "rustls-tls")]
+                    TlsBackend::Rustls => builder.use_rustls_tls(),
+                }
+
+                #[cfg(not(feature = "tls"))]
+                builder
+            };
+
+            for proxy in config.proxies {
+                builder = builder.proxy(proxy);
+            }
+
+            builder.build()?
+        };
+        #[cfg(feature = "httpcache")]
+        let cache = config.cache.unwrap_or_else(|| Box::new(NoCache));
+
+        Ok(Github {
+            host,
+            agent,
+            credentials,
+            client,
+            #[cfg(feature = "httpcache")]
+            http_cache: cache,
+        })
+    }
+}
+
 /// Entry point interface for interacting with Github API
 #[derive(Clone, Debug)]
 pub struct Github {
@@ -417,12 +596,19 @@ pub struct Github {
 }
 
 impl Github {
+    /// Create a `Builder` to configure a `Github` client.
+    ///
+    /// This is same as `Builder::new()`.
+    pub fn builder() -> Builder {
+        Builder::new()
+    }
+
     pub fn new<A, C>(agent: A, credentials: C) -> Result<Self>
     where
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        Self::host(DEFAULT_HOST, agent, credentials)
+        Builder::new().agent(agent).credentials(credentials).build()
     }
 
     pub fn host<H, A, C>(host: H, agent: A, credentials: C) -> Result<Self>
@@ -431,52 +617,11 @@ impl Github {
         A: Into<String>,
         C: Into<Option<Credentials>>,
     {
-        let http = Client::builder().build()?;
-        #[cfg(feature = "httpcache")]
-        {
-            Ok(Self::custom(host, agent, credentials, http, HttpCache::noop()))
-        }
-        #[cfg(not(feature = "httpcache"))]
-        {
-            Ok(Self::custom(host, agent, credentials, http))
-        }
-    }
-
-    #[cfg(feature = "httpcache")]
-    pub fn custom<H, A, CR>(
-        host: H,
-        agent: A,
-        credentials: CR,
-        http: Client,
-        http_cache: BoxedHttpCache,
-    ) -> Self
-    where
-        H: Into<String>,
-        A: Into<String>,
-        CR: Into<Option<Credentials>>,
-    {
-        Self {
-            host: host.into(),
-            agent: agent.into(),
-            client: http,
-            credentials: credentials.into(),
-            http_cache,
-        }
-    }
-
-    #[cfg(not(feature = "httpcache"))]
-    pub fn custom<H, A, CR>(host: H, agent: A, credentials: CR, http: Client) -> Self
-    where
-        H: Into<String>,
-        A: Into<String>,
-        CR: Into<Option<Credentials>>,
-    {
-        Self {
-            host: host.into(),
-            agent: agent.into(),
-            client: http,
-            credentials: credentials.into(),
-        }
+        Builder::new()
+            .host(host)
+            .agent(agent)
+            .credentials(credentials)
+            .build()
     }
 
     pub fn set_credentials<CR>(&mut self, credentials: CR)

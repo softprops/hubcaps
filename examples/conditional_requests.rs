@@ -1,8 +1,5 @@
 #[cfg(feature = "httpcache")]
-use {
-    reqwest::r#async::Client,
-    tokio::runtime::Runtime,
-};
+use tokio::runtime::Runtime;
 
 use hubcaps::Result;
 
@@ -22,11 +19,8 @@ fn main() -> Result<()> {
     {
         let mut rt = Runtime::new()?;
 
-        let host = "https://api.github.com";
-        let agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
-        let client = Client::builder().build()?;
         let http_cache = HttpCache::in_home_dir();
-        let github = Github::custom(host, agent, None, client, http_cache);
+        let github = Github::builder().cache(http_cache).build()?;
 
         let _repos = rt.block_on(github.user_repos("dwijnand").list(&Default::default()))?;
         let status1 = rt.block_on(github.rate_limit().get())?;
