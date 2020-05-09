@@ -23,8 +23,8 @@ tokio = { version = "0.2", features = ["macros"] }
 
 [dependencies]
 dirs = { version = "2.0", optional = true }
-futures = "0.3"
-futures-util = "0.3.1"
+futures = "0.3.4"
+futures-util = "0.3.4"
 http = "0.2"
 hyperx = "1"
 jsonwebtoken = { version = "7.0.0-beta.1" }
