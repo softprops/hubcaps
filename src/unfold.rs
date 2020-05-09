@@ -8,10 +8,12 @@ use hyperx::header::Link;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 
+type ItemsFn<Source, T> = Box<dyn Fn(Source) -> Vec<T> + Send + Sync>;
+
 pub async fn unfold<Source, T>(
     github: Github,
     initial: Result<(Option<Link>, Source), Error>,
-    to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
+    to_items: ItemsFn<Source, T>,
 ) -> crate::Stream<T>
 where
     T: 'static + Send + Sync,
@@ -29,7 +31,7 @@ where
 {
     github: Github,
     items: Option<Result<IntoIter<T>, Error>>,
-    to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
+    to_items: ItemsFn<Source, T>,
     next_page: Option<Link>,
 }
 
@@ -41,7 +43,7 @@ where
     fn new(
         github: Github,
         initial: Result<(Option<Link>, Source), Error>,
-        to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
+        to_items: ItemsFn<Source, T>,
     ) -> Self {
         let dummy = Self {
             github,
