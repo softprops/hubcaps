@@ -8,13 +8,13 @@ use hyperx::header::Link;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 
-pub async fn unfold<Source, StreamOk>(
+pub async fn unfold<Source, T>(
     github: Github,
     initial: Result<(Option<Link>, Source), Error>,
-    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
-) -> crate::Stream<StreamOk>
+    to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
+) -> crate::Stream<T>
 where
-    StreamOk: 'static + Send + Sync,
+    T: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
 {
     let state = StreamState::new(github, initial, to_items);
@@ -22,26 +22,26 @@ where
     Box::pin(stream::unfold(state, |state| async { state.next().await }))
 }
 
-struct StreamState<Source, StreamOk>
+struct StreamState<Source, T>
 where
-    StreamOk: 'static + Send + Sync,
+    T: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
 {
     github: Github,
-    items: Option<Result<IntoIter<StreamOk>, Error>>,
-    to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
+    items: Option<Result<IntoIter<T>, Error>>,
+    to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
     next_page: Option<Link>,
 }
 
-impl<Source, StreamOk> StreamState<Source, StreamOk>
+impl<Source, T> StreamState<Source, T>
 where
-    StreamOk: 'static + Send + Sync,
+    T: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
 {
     fn new(
         github: Github,
         initial: Result<(Option<Link>, Source), Error>,
-        to_items: Box<dyn Fn(Source) -> Vec<StreamOk> + Send + Sync>,
+        to_items: Box<dyn Fn(Source) -> Vec<T> + Send + Sync>,
     ) -> Self {
         let dummy = Self {
             github,
@@ -53,7 +53,7 @@ where
         dummy.load_state(initial)
     }
 
-    async fn next(self) -> Option<(Result<StreamOk, Error>, Self)> {
+    async fn next(self) -> Option<(Result<T, Error>, Self)> {
         let mut state = self;
         loop {
             match state.flat_next() {
@@ -70,7 +70,7 @@ where
         }
     }
 
-    fn flat_next(mut self) -> FetcherState<StreamOk, Self> {
+    fn flat_next(mut self) -> FetcherState<T, Self> {
         if let Some(resultitems) = self.items.take() {
             match resultitems {
                 Ok(mut items) => {
@@ -137,7 +137,7 @@ where
     }
 
     fn load_state(self, state: Result<(Option<Link>, Source), Error>) -> Self {
-        let items: Result<IntoIter<StreamOk>, Error>;
+        let items: Result<IntoIter<T>, Error>;
         let next_page: Option<Link>;
 
         match state {
@@ -160,8 +160,8 @@ where
     }
 }
 
-enum FetcherState<StreamOk, State> {
-    NextReady(Result<StreamOk, Error>, State),
+enum FetcherState<T, State> {
+    NextReady(Result<T, Error>, State),
     FetchNextPage(State),
     Empty,
 }
