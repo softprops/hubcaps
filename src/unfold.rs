@@ -1,9 +1,8 @@
-use std::vec::IntoIter;
-
 use crate::errors::Error;
 use crate::utils::next_link;
 use crate::Github;
 use futures::stream;
+use futures::{StreamExt, TryStreamExt};
 use hyperx::header::Link;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
@@ -17,150 +16,40 @@ pub async fn unfold<Source, T>(
     to_items: ItemsFn<Source, T>,
 ) -> crate::Stream<T>
 where
-    T: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
-{
-    let state = StreamState::new(github, initial, to_items);
-
-    Box::pin(stream::unfold(state, |state| async { state.next().await }))
-}
-
-struct StreamState<Source, T>
-where
     T: 'static + Send + Sync,
-    Source: DeserializeOwned + 'static + Send + Sync,
 {
-    github: Github,
-    items: Option<Result<IntoIter<T>, Error>>,
-    to_items: ItemsFn<Source, T>,
-    next_page: Option<Link>,
-}
+    match initial {
+        Ok((link, source)) => {
+            let items = to_items(source);
+            let state = (github, to_items, link);
+            let first = stream::once(async { Ok::<_, Error>(items) });
 
-impl<Source, T> StreamState<Source, T>
-where
-    T: 'static + Send + Sync,
-    Source: DeserializeOwned + 'static + Send + Sync,
-{
-    fn new(github: Github, initial: PageResult<Source>, to_items: ItemsFn<Source, T>) -> Self {
-        let dummy = Self {
-            github,
-            to_items,
-            items: None,
-            next_page: None,
-        };
-
-        dummy.load_state(initial)
-    }
-
-    async fn next(self) -> Option<(Result<T, Error>, Self)> {
-        let mut state = self;
-        loop {
-            match state.flat_next() {
-                FetcherState::NextReady(item, state) => {
-                    return Some((item, state));
-                }
-                FetcherState::Empty => {
-                    return None;
-                }
-                FetcherState::FetchNextPage(next_state) => {
-                    state = next_state.fetch_next_page().await;
-                }
-            }
-        }
-    }
-
-    fn flat_next(mut self) -> FetcherState<T, Self> {
-        if let Some(resultitems) = self.items.take() {
-            match resultitems {
-                Ok(mut items) => {
-                    if let Some(item) = items.next() {
-                        FetcherState::NextReady(
-                            Ok(item),
-                            Self {
-                                github: self.github,
-                                to_items: self.to_items,
-                                items: Some(Ok(items)),
-                                next_page: self.next_page,
-                            },
-                        )
-                    } else if self.next_page.is_some() {
-                        FetcherState::FetchNextPage(self)
-                    } else {
-                        // No more things, no more next pages
-                        FetcherState::Empty
-                    }
-                }
-                Err(e) => {
-                    FetcherState::NextReady(
-                        Err(e),
-                        Self {
-                            github: self.github,
-                            to_items: self.to_items,
-                            items: None,     // Returned once, just now
-                            next_page: None, // Cannot have a next_page if Items is Err !!! fix the data model
-                        },
-                    )
-                }
-            }
-        } else {
-            if self.next_page.is_some() {
-                FetcherState::FetchNextPage(self)
-            } else {
-                // No more things, no more next pages
-                FetcherState::Empty
-            }
-        }
-    }
-
-    async fn fetch_next_page(mut self) -> Self {
-        if let Some(next_page) = self.next_page.take() {
-            if let Some(url) = next_link(&next_page) {
-                if let Ok(url) = Url::parse(&url) {
+            let others = stream::try_unfold(state, |(github, to_items, link)| async move {
+                if let Some(url) = parse_next_link(link)? {
                     let uri = [url.path(), url.query().unwrap_or_default()].join("?");
 
-                    let fetched_page = self.github.get_pages(&uri).await;
-                    return self.load_state(fetched_page);
+                    let (link, source) = github.get_pages(&uri).await?;
+                    let items = to_items(source);
+
+                    return Ok(Some((items, (github, to_items, link))));
                 }
-            }
+                Ok(None)
+            });
 
-            Self {
-                github: self.github,
-                items: self.items,
-                to_items: self.to_items,
-                next_page: None, // don't visit this path again,
-                                 // !!! convert next_page at intake?
-            }
-        } else {
-            self
+            Box::pin(
+                first
+                    .chain(others)
+                    .map_ok(|list| stream::iter(list.into_iter().map(Ok)))
+                    .try_flatten(),
+            )
         }
-    }
-
-    fn load_state(self, state: PageResult<Source>) -> Self {
-        let items: Result<IntoIter<T>, Error>;
-        let next_page: Option<Link>;
-
-        match state {
-            Ok((link, payload)) => {
-                items = Ok((self.to_items)(payload).into_iter());
-                next_page = link;
-            }
-            Err(e) => {
-                items = Err(e);
-                next_page = None;
-            }
-        }
-
-        Self {
-            github: self.github,
-            to_items: self.to_items,
-            items: Some(items),
-            next_page,
-        }
+        Err(e) => Box::pin(stream::once(async { Err(e) })),
     }
 }
 
-enum FetcherState<T, State> {
-    NextReady(Result<T, Error>, State),
-    FetchNextPage(State),
-    Empty,
+fn parse_next_link(link: Option<Link>) -> Result<Option<Url>, Error> {
+    link.and_then(|l| next_link(&l))
+        .map(|s| Url::parse(&s).map_err(Error::from))
+        .transpose()
 }
