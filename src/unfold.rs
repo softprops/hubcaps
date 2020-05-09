@@ -9,10 +9,11 @@ use reqwest::Url;
 use serde::de::DeserializeOwned;
 
 type ItemsFn<Source, T> = Box<dyn Fn(Source) -> Vec<T> + Send + Sync>;
+type PageResult<Source> = Result<(Option<Link>, Source), Error>;
 
 pub async fn unfold<Source, T>(
     github: Github,
-    initial: Result<(Option<Link>, Source), Error>,
+    initial: PageResult<Source>,
     to_items: ItemsFn<Source, T>,
 ) -> crate::Stream<T>
 where
@@ -40,11 +41,7 @@ where
     T: 'static + Send + Sync,
     Source: DeserializeOwned + 'static + Send + Sync,
 {
-    fn new(
-        github: Github,
-        initial: Result<(Option<Link>, Source), Error>,
-        to_items: ItemsFn<Source, T>,
-    ) -> Self {
+    fn new(github: Github, initial: PageResult<Source>, to_items: ItemsFn<Source, T>) -> Self {
         let dummy = Self {
             github,
             to_items,
@@ -138,7 +135,7 @@ where
         }
     }
 
-    fn load_state(self, state: Result<(Option<Link>, Source), Error>) -> Self {
+    fn load_state(self, state: PageResult<Source>) -> Self {
         let items: Result<IntoIter<T>, Error>;
         let next_page: Option<Link>;
 
