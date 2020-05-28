@@ -2,9 +2,11 @@
 use std::fmt;
 use std::ops;
 
-use serde::Deserialize;
+use data_encoding::BASE64;
 use serde::de::{self, Visitor};
+use serde::{Deserialize, Serialize};
 
+use crate::repo_commits::CommitDetails;
 use crate::utils::{percent_encode, PATH};
 use crate::{Future, Github, Stream};
 
@@ -62,6 +64,34 @@ impl Content {
     pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
         self.github.get_stream(&self.path(location))
     }
+
+    /// Creates a file at a specific location in a repository.
+    /// You DO NOT need to base64 encode the content, we will do it for you.
+    pub fn create(&self, location: &str, content: &str, message: &str) -> Future<NewFileResponse> {
+        let file = &NewFile {
+            content: BASE64.encode(&content.to_string().into_bytes()),
+            message: message.to_string(),
+            sha: None,
+        };
+        self.github.put(&self.path(location), json!(file))
+    }
+
+    /// Updates a file at a specific location in a repository.
+    /// You DO NOT need to base64 encode the content, we will do it for you.
+    pub fn update(
+        &self,
+        location: &str,
+        content: &str,
+        message: &str,
+        sha: &str,
+    ) -> Future<NewFileResponse> {
+        let file = &NewFile {
+            content: BASE64.encode(&content.to_string().into_bytes()),
+            message: message.to_string(),
+            sha: Some(sha.to_string()),
+        };
+        self.github.put(&self.path(location), json!(file))
+    }
 }
 
 /// Contents of a path in a repository.
@@ -79,6 +109,19 @@ pub enum Contents {
 pub enum Encoding {
     Base64,
     // Are there actually any other encoding types?
+}
+
+#[derive(Debug, Serialize)]
+pub struct NewFile {
+    pub content: String,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sha: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct NewFileResponse {
+    pub commit: CommitDetails,
 }
 
 #[derive(Debug, Deserialize)]
