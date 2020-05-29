@@ -22,6 +22,7 @@ pretty_env_logger = "0.3"
 tokio = "0.1"
 
 [dependencies]
+data-encoding = "2"
 dirs = { version = "2.0", optional = true }
 futures = "0.1"
 http = "0.1"
