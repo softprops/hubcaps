@@ -74,9 +74,11 @@ impl LabelOptions {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Label {
     pub url: String,
     pub name: String,
     pub color: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 }
