@@ -1,5 +1,5 @@
 //! Stars interface
-use futures::Future as StdFuture;
+use futures::prelude::*;
 use http::StatusCode;
 
 use crate::{Error, ErrorKind, Future, Github};
@@ -20,20 +20,22 @@ impl Stars {
         O: Into<String>,
         R: Into<String>,
     {
-        Box::new(
+        Box::pin(
             self.github
                 .get::<()>(&format!("/user/starred/{}/{}", owner.into(), repo.into()))
-                .map(|_| true)
-                .or_else(|err| match err {
-                    Error(
-                        ErrorKind::Fault {
-                            code: StatusCode::NOT_FOUND,
-                            ..
-                        },
-                        _,
-                    ) => Ok(false),
-                    Error(ErrorKind::Codec(_), _) => Ok(true),
-                    otherwise => Err(otherwise),
+                .map_ok(|_| true)
+                .or_else(|err| async move {
+                    match err {
+                        Error(
+                            ErrorKind::Fault {
+                                code: StatusCode::NOT_FOUND,
+                                ..
+                            },
+                            _,
+                        ) => Ok(false),
+                        Error(ErrorKind::Codec(_), _) => Ok(true),
+                        otherwise => Err(otherwise),
+                    }
                 }),
         )
     }

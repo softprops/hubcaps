@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
@@ -16,10 +16,14 @@ fn main() -> Result<()> {
             )?;
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
-            rt.block_on(pulls.iter(&Default::default()).for_each(|pull| {
-                println!("{:#?}", pull);
-                Ok(())
-            }))?;
+            rt.block_on(
+                pulls
+                    .iter(&Default::default())
+                    .try_for_each(|pull| async move {
+                        println!("{:#?}", pull);
+                        Ok(())
+                    }),
+            )?;
 
             println!("comments");
             for c in rt.block_on(
@@ -41,22 +45,24 @@ fn main() -> Result<()> {
                     .get(28)
                     .commits()
                     .iter()
-                    .for_each(|c| {
+                    .try_for_each(|c| async move {
                         println!("{:#?}", c);
                         Ok(())
                     }),
             )?;
 
             println!("review requests");
-            println!("{:#?}",
-                     rt.block_on(
-                         github
-                             .repo("softprops", "hubcaps")
-                             .pulls()
-                             .get(190)
-                             .review_requests()
-                             .get()
-                     )?);
+            println!(
+                "{:#?}",
+                rt.block_on(
+                    github
+                        .repo("softprops", "hubcaps")
+                        .pulls()
+                        .get(190)
+                        .review_requests()
+                        .get()
+                )?
+            );
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

@@ -1,6 +1,5 @@
 //! Checks interface
 // see: https://developer.github.com/v3/checks/suites/
-use futures::IntoFuture;
 use serde::{Deserialize, Serialize};
 
 use self::super::{AuthenticationConstraint, Future, Github, MediaType};
@@ -37,7 +36,7 @@ impl<'a> CheckRuns {
                 MediaType::Preview("antiope"),
                 AuthenticationConstraint::Unconstrained,
             ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
+            Err(e) => Box::pin(futures::future::err(e.into())),
         }
     }
 
@@ -53,7 +52,7 @@ impl<'a> CheckRuns {
                 MediaType::Preview("antiope"),
                 AuthenticationConstraint::Unconstrained,
             ),
-            Err(e) => Box::new(Err(e.into()).into_future()),
+            Err(e) => Box::pin(futures::future::err(e.into())),
         }
     }
 
@@ -159,7 +158,6 @@ pub struct CheckRunOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actions: Option<Vec<Action>>,
 }
-
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct CheckRunUpdateOptions {

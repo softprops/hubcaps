@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::branches::Protection;
@@ -21,7 +21,7 @@ fn main() -> Result<()> {
                     .repo("softprops", "hubcaps")
                     .branches()
                     .iter()
-                    .for_each(|branch| {
+                    .try_for_each(|branch| async move {
                         println!("{:#?}", branch);
                         Ok(())
                     }),

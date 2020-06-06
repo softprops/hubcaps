@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::{Future, Stream};
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
@@ -10,23 +10,22 @@ fn main() -> Result<()> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let mut rt = Runtime::new()?;
-            let github = Github::new(
+            let github = &Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
-            let handle = rt.executor();
             rt.block_on(
                 github
                     .user_repos("softprops")
                     .iter(&Default::default())
-                    .for_each(move |repo| {
+                    .try_for_each(move |repo| async move {
                         println!("{}", repo.name);
-                        let f = repo.languages(github.clone()).map(|langs| {
+                        let f = repo.languages(github.clone()).map_ok(|langs| {
                             for (language, bytes_of_code) in langs {
                                 println!("{}: {} bytes", language, bytes_of_code)
                             }
                         });
-                        handle.spawn(f.map_err(|_| ()));
+                        tokio::spawn(f.map(|_| ()));
                         Ok(())
                     }),
             )?;

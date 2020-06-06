@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::search::SearchReposOptions;
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
                         "user:softprops hubcaps",
                         &SearchReposOptions::builder().per_page(100).build(),
                     )
-                    .for_each(|repo| {
+                    .try_for_each(|repo| async move {
                         println!("{}", repo.full_name);
                         Ok(())
                     }),

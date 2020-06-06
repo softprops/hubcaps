@@ -2,9 +2,9 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
-use futures::stream::Stream;
 use hubcaps::{Credentials, Github, InstallationTokenGenerator, JWTCredentials, Result};
 
 fn var(name: &str) -> Result<String> {
@@ -34,16 +34,12 @@ fn main() -> Result<()> {
         InstallationTokenGenerator::new(installation_id.parse().unwrap(), cred),
     ));
 
-    rt.block_on(
-        github
-            .org("NixOS")
-            .membership()
-            .invitations()
-            .for_each(|invite| {
-                println!("{:#?}", invite);
-                Ok(())
-            }),
-    )?;
+    rt.block_on(github.org("NixOS").membership().invitations().try_for_each(
+        |invite| async move {
+            println!("{:#?}", invite);
+            Ok(())
+        },
+    ))?;
 
     Ok(())
 }
