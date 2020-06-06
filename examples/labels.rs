@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
@@ -27,12 +27,16 @@ fn main() -> Result<()> {
                 )?
             );
             // stream over all labels defined for a repo
-            rt.block_on(github.repo("rust-lang", "cargo").labels().iter().for_each(
-                move |label| {
-                    println!("{}", label.name);
-                    Ok(())
-                },
-            ))?;
+            rt.block_on(
+                github
+                    .repo("rust-lang", "cargo")
+                    .labels()
+                    .iter()
+                    .try_for_each(move |label| async move {
+                        println!("{}", label.name);
+                        Ok(())
+                    }),
+            )?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

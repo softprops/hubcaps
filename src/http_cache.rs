@@ -12,7 +12,7 @@ use log::trace;
 
 use crate::{Error, Result};
 
-pub type BoxedHttpCache = Box<dyn HttpCache + Send>;
+pub type BoxedHttpCache = Box<dyn HttpCache + Send + Sync>;
 
 pub trait HttpCache: HttpCacheClone + Debug {
     fn cache_response(
@@ -139,10 +139,11 @@ impl HttpCache for FileBasedCache {
 #[doc(hidden)] // public for doc testing only
 pub fn cache_path<S: AsRef<OsStr>>(dir: &Path, uri: &str, extension: S) -> PathBuf {
     let uri = uri.parse::<Uri>().expect("Expected a URI");
+    let parts = uri.clone().into_parts();
     let mut path = dir.to_path_buf();
     path.push("v1");
-    path.push(uri.scheme_part().expect("no URI scheme").as_str()); // https
-    path.push(uri.authority_part().expect("no URI authority").as_str()); // api.github.com
+    path.push(parts.scheme.expect("no URI scheme").as_str()); // https
+    path.push(parts.authority.expect("no URI authority").as_str()); // api.github.com
     path.push(Path::new(&uri.path()[1..])); // users/dwijnand/repos
     if let Some(query) = uri.query() {
         path.push(hash1(query, DefaultHasher::new())); // fa269019d5035d5f
@@ -170,7 +171,7 @@ pub trait HttpCacheClone {
 
 impl<T> HttpCacheClone for T
 where
-    T: 'static + HttpCache + Clone + Send,
+    T: 'static + HttpCache + Clone + Send + Sync,
 {
     fn box_clone(&self) -> BoxedHttpCache {
         Box::new(self.clone())

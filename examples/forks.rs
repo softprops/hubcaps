@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::repositories::ForkListOptions;
@@ -24,10 +24,10 @@ fn main() -> Result<()> {
                     .repo(owner, repo)
                     .forks()
                     .iter(&options)
-                    .for_each(move |repo| {
+                    .try_for_each(move |repo| async move {
                         println!("{}", repo.full_name);
                         Ok(())
-                    })
+                    }),
             )?;
 
             Ok(())

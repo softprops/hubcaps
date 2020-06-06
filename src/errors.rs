@@ -100,7 +100,9 @@ mod tests {
         let expect = ClientError {
             message: String::from("Not Found"),
             errors: None,
-            documentation_url: Some(String::from("https://developer.github.com/v3/activity/watching/#set-a-repository-subscription")),
+            documentation_url: Some(String::from(
+                "https://developer.github.com/v3/activity/watching/#set-a-repository-subscription",
+            )),
         };
         assert_eq!(serde_json::from_value::<ClientError>(json).unwrap(), expect)
     }

@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
@@ -15,33 +15,59 @@ fn main() -> Result<()> {
     )?;
 
     println!("watched repos");
-    rt.block_on(github.activity().watching().iter().for_each(|repo| {
-        println!("{}", repo.full_name);
-        Ok(())
-    }))?;
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .iter()
+            .try_for_each(|repo| async move {
+                println!("{}", repo.full_name);
+                Ok(())
+            }),
+    )?;
 
     println!("watch a repo");
-    rt.block_on(github.activity().watching().watch_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .watch_repo("octocat", "Hello-World"),
+    )
+    .map(|sub| {
         println!("subscription: {:#?}", sub);
-        Ok(())
     })?;
 
     println!("get watching for repo");
-    rt.block_on(github.activity().watching().get_for_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .get_for_repo("octocat", "Hello-World"),
+    )
+    .map(|sub| {
         println!("subscription: {:#?}", sub);
-        Ok(())
     })?;
 
     println!("ignore a repo");
-    rt.block_on(github.activity().watching().ignore_repo("octocat", "Hello-World")).and_then(|sub| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .ignore_repo("octocat", "Hello-World"),
+    )
+    .map(|sub| {
         println!("subscription: {:#?}", sub);
-        Ok(())
     })?;
 
     println!("unwatch a repo");
-    rt.block_on(github.activity().watching().unwatch_repo("octocat", "Hello-World")).and_then(|()| {
+    rt.block_on(
+        github
+            .activity()
+            .watching()
+            .unwatch_repo("octocat", "Hello-World"),
+    )
+    .map(|()| {
         println!("unwatched");
-        Ok(())
     })?;
 
     Ok(())

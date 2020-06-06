@@ -1,15 +1,13 @@
 #[cfg(feature = "httpcache")]
 use {
-    std::env,
-
-    futures::{future, Stream},
-    reqwest::r#async::Client,
-    tokio::runtime::Runtime,
-    log::info,
-
+    futures::{future, prelude::*},
     hubcaps::http_cache::FileBasedCache,
     hubcaps::repositories::UserRepoListOptions,
     hubcaps::{Credentials, Error, Github, Result},
+    log::info,
+    reqwest::Client,
+    std::env,
+    tokio::runtime::Runtime,
 };
 
 #[cfg(feature = "httpcache")]
@@ -42,7 +40,8 @@ fn compare_counts() -> Result<()> {
 
     let github = Github::new(agent, credentials.clone())?;
     let repos = github.user_repos(owner).iter(&repo_list_options);
-    let total_count = rt.block_on(repos.fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
+    let total_count =
+        rt.block_on(repos.try_fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
 
     // octocat current has 8 repos, so we set per_page to 5 to get 2 pages
     // but if octocat ends up having less than 5 repos, it'll be just one page
@@ -65,13 +64,13 @@ fn compare_counts() -> Result<()> {
     info!("first populate the cache");
 
     let repos = github.user_repos(owner).iter(&repo_list_options);
-    let count1 = rt.block_on(repos.fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
+    let count1 = rt.block_on(repos.try_fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
     let status1 = rt.block_on(github.rate_limit().get())?;
 
     info!("then retrieve via the cache");
 
     let repos = github.user_repos(owner).iter(&repo_list_options);
-    let count2 = rt.block_on(repos.fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
+    let count2 = rt.block_on(repos.try_fold(0, |acc, _repo| future::ok::<_, Error>(acc + 1)))?;
     let status2 = rt.block_on(github.rate_limit().get())?;
 
     info!("and compare the counts");

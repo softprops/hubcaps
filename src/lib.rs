@@ -83,26 +83,28 @@
 #![allow(missing_docs)] // todo: make this a deny eventually
 
 use std::fmt;
+use std::pin::Pin;
+use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::time;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use futures::{future, stream, Future as StdFuture, IntoFuture, Stream as StdStream};
-use http::header::{HeaderMap, HeaderValue};
-use http::{Method, StatusCode};
+use futures::{future, prelude::*, stream, Future as StdFuture, Stream as StdStream};
 #[cfg(feature = "httpcache")]
 use http::header::IF_NONE_MATCH;
+use http::header::{HeaderMap, HeaderValue};
 use http::header::{ACCEPT, AUTHORIZATION, ETAG, LINK, USER_AGENT};
+use http::{Method, StatusCode};
 #[cfg(feature = "httpcache")]
 use hyperx::header::LinkValue;
 use hyperx::header::{qitem, Link, RelationType};
 use jsonwebtoken as jwt;
 use log::{debug, error, trace};
 use mime::Mime;
-use reqwest::r#async::{Body, Client};
+use reqwest::Url;
+use reqwest::{Body, Client};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use url::Url;
 
 #[doc(hidden)] // public for doc testing and integration testing only
 #[cfg(feature = "httpcache")]
@@ -113,6 +115,7 @@ pub mod activity;
 pub mod app;
 pub mod branches;
 pub mod checks;
+pub mod collaborators;
 pub mod comments;
 pub mod content;
 pub mod deployments;
@@ -141,7 +144,6 @@ pub mod teams;
 pub mod traffic;
 pub mod users;
 pub mod watching;
-pub mod collaborators;
 
 pub use crate::errors::{Error, ErrorKind, Result};
 #[cfg(feature = "httpcache")]
@@ -164,10 +166,10 @@ const MAX_JWT_TOKEN_LIFE: time::Duration = time::Duration::from_secs(60 * 9);
 const JWT_TOKEN_REFRESH_PERIOD: time::Duration = time::Duration::from_secs(60 * 8);
 
 /// A type alias for `Futures` that may return `hubcaps::Errors`
-pub type Future<T> = Box<dyn StdFuture<Item = T, Error = Error> + Send>;
+pub type Future<T> = Pin<Box<dyn StdFuture<Output = Result<T>> + Send>>;
 
 /// A type alias for `Streams` that may result in `hubcaps::Errors`
-pub type Stream<T> = Box<dyn StdStream<Item = T, Error = Error> + Send>;
+pub type Stream<T> = Pin<Box<dyn StdStream<Item = Result<T>> + Send>>;
 
 const X_GITHUB_REQUEST_ID: &str = "x-github-request-id";
 const X_RATELIMIT_LIMIT: &str = "x-ratelimit-limit";
@@ -349,7 +351,11 @@ impl ExpiringJWTCredential {
             iss: app_id,
         };
         let header = jwt::Header::new(jwt::Algorithm::RS256);
-        let jwt = jwt::encode(&header, &payload, private_key)?;
+        let jwt = jwt::encode(
+            &header,
+            &payload,
+            &jsonwebtoken::EncodingKey::from_secret(private_key),
+        )?;
 
         Ok(ExpiringJWTCredential {
             created_at: created_at,
@@ -434,7 +440,13 @@ impl Github {
         let http = Client::builder().build()?;
         #[cfg(feature = "httpcache")]
         {
-            Ok(Self::custom(host, agent, credentials, http, HttpCache::noop()))
+            Ok(Self::custom(
+                host,
+                agent,
+                credentials,
+                http,
+                HttpCache::noop(),
+            ))
         }
         #[cfg(not(feature = "httpcache"))]
         {
@@ -606,68 +618,53 @@ impl Github {
         let parsed_url = uri.parse::<Url>();
 
         match self.credentials(authentication) {
-            Some(&Credentials::Client(ref id, ref secret)) => {
-                Box::new(
-                    parsed_url.map(|mut u| {
+            Some(&Credentials::Client(ref id, ref secret)) => Box::pin(future::ready(
+                parsed_url
+                    .map(|mut u| {
                         u.query_pairs_mut()
                             .append_pair("client_id", id)
                             .append_pair("client_secret", secret);
                         (u, None)
                     })
-                    .map_err(Error::from)
-                    .into_future(),
-                )
-            }
+                    .map_err(Error::from),
+            )),
             Some(&Credentials::Token(ref token)) => {
                 let auth = format!("token {}", token);
-                Box::new(
-                    parsed_url
-                        .map(|u| (u, Some(auth)))
-                        .map_err(Error::from)
-                        .into_future(),
-                )
+                Box::pin(future::ready(
+                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from),
+                ))
             }
             Some(&Credentials::JWT(ref jwt)) => {
                 let auth = format!("Bearer {}", jwt.token());
-                Box::new(
-                    parsed_url
-                        .map(|u| (u, Some(auth)))
-                        .map_err(Error::from)
-                        .into_future(),
-                )
+                Box::pin(future::ready(
+                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from),
+                ))
             }
             Some(&Credentials::InstallationToken(ref apptoken)) => {
                 if let Some(token) = apptoken.token() {
                     let auth = format!("token {}", token);
-                    Box::new(
-                        parsed_url
-                            .map(|u| (u, Some(auth)))
-                            .map_err(Error::from)
-                            .into_future(),
-                    )
+                    Box::pin(future::ready(
+                        parsed_url.map(|u| (u, Some(auth))).map_err(Error::from),
+                    ))
                 } else {
                     debug!("App token is stale, refreshing");
                     let token_ref = apptoken.access_key.clone();
-                    Box::new(
+                    Box::pin(
                         self.app()
                             .make_access_token(apptoken.installation_id)
                             .and_then(move |token| {
                                 let auth = format!("token {}", &token.token);
                                 *token_ref.lock().unwrap() = Some(token.token);
-                                parsed_url
-                                    .map(|u| (u, Some(auth)))
-                                    .map_err(Error::from)
-                                    .into_future()
+                                future::ready(
+                                    parsed_url.map(|u| (u, Some(auth))).map_err(Error::from),
+                                )
                             }),
                     )
                 }
             }
-            None => Box::new(
-                parsed_url
-                    .map(|u| (u, None))
-                    .map_err(Error::from)
-                    .into_future(),
-            ),
+            None => Box::pin(future::ready(
+                parsed_url.map(|u| (u, None)).map_err(Error::from),
+            )),
         }
     }
 
@@ -729,7 +726,7 @@ impl Github {
 
         #[cfg(feature = "httpcache")]
         let uri3 = uri.to_string();
-        Box::new(response.and_then(move |response| {
+        Box::pin(response.and_then(move |response| {
             #[cfg(not(feature = "httpcache"))]
             let (remaining, reset) = get_header_values(response.headers());
             #[cfg(feature = "httpcache")]
@@ -742,12 +739,11 @@ impl Github {
                 .and_then(|l| l.to_str().ok())
                 .and_then(|l| l.parse().ok());
 
-            Box::new(
+            Box::pin(
                 response
-                    .into_body()
-                    .concat2()
+                    .bytes()
                     .map_err(Error::from)
-                    .and_then(move |response_body| {
+                    .and_then(move |response_body| async move {
                         if status.is_success() {
                             debug!(
                                 "response payload {}",
@@ -837,9 +833,9 @@ impl Github {
     where
         D: DeserializeOwned + 'static + Send,
     {
-        Box::new(
+        Box::pin(
             self.request(method, uri, body, media_type, authentication)
-                .map(|(_, entity)| entity),
+                .map_ok(|(_, entity)| entity),
         )
     }
 
@@ -884,7 +880,7 @@ impl Github {
     }
 
     fn delete(&self, uri: &str) -> Future<()> {
-        Box::new(
+        Box::pin(
             self.request_entity::<()>(
                 Method::DELETE,
                 &(self.host.clone() + uri),
@@ -892,15 +888,17 @@ impl Github {
                 MediaType::Json,
                 AuthenticationConstraint::Unconstrained,
             )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
+            .or_else(|err| async move {
+                match err {
+                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    otherwise => Err(otherwise),
+                }
             }),
         )
     }
 
     fn delete_message(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(
+        Box::pin(
             self.request_entity::<()>(
                 Method::DELETE,
                 &(self.host.clone() + uri),
@@ -908,9 +906,11 @@ impl Github {
                 MediaType::Json,
                 AuthenticationConstraint::Unconstrained,
             )
-            .or_else(|err| match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
-                otherwise => Err(otherwise),
+            .or_else(|err| async move {
+                match err {
+                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    otherwise => Err(otherwise),
+                }
             }),
         )
     }
@@ -947,9 +947,11 @@ impl Github {
     }
 
     fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.patch(uri, message).or_else(|err| match err {
-            Error(ErrorKind::Codec(_), _) => Ok(()),
-            err => Err(err),
+        Box::pin(self.patch(uri, message).or_else(|err| async move {
+            match err {
+                Error(ErrorKind::Codec(_), _) => Ok(()),
+                err => Err(err),
+            }
         }))
     }
 
@@ -974,9 +976,11 @@ impl Github {
     }
 
     fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
-        Box::new(self.put(uri, message).or_else(|err| match err {
-            Error(ErrorKind::Codec(_), _) => Ok(()),
-            err => Err(err),
+        Box::pin(self.put(uri, message).or_else(|err| async move {
+            match err {
+                Error(ErrorKind::Codec(_), _) => Ok(()),
+                err => Err(err),
+            }
         }))
     }
 
@@ -984,11 +988,7 @@ impl Github {
     where
         D: DeserializeOwned + 'static + Send,
     {
-        self.put_media(
-            uri,
-            message,
-            MediaType::Json
-        )
+        self.put_media(uri, message, MediaType::Json)
     }
 
     fn put_media<D>(&self, uri: &str, message: Vec<u8>, media: MediaType) -> Future<D>
@@ -1062,30 +1062,34 @@ where
     D: DeserializeOwned + 'static + Send,
     I: 'static + Send,
 {
-    Box::new(
+    Box::pin(
         first
-            .map(move |(link, payload)| {
+            .map_ok(move |(link, payload)| {
                 let mut items = into_items(payload);
                 items.reverse();
-                stream::unfold::<_, _, Future<(I, (Option<Link>, Vec<I>))>, _>(
-                    (link, items),
-                    move |(link, mut items)| match items.pop() {
-                        Some(item) => Some(Box::new(future::ok((item, (link, items))))),
-                        _ => link.and_then(|l| next_link(&l)).map(|url| {
-                            let url = Url::parse(&url).unwrap();
-                            let uri = [url.path(), url.query().unwrap_or_default()].join("?");
-                            Box::new(github.get_pages(uri.as_ref()).map(move |(link, payload)| {
-                                let mut items = into_items(payload);
-                                let item = items.remove(0);
-                                items.reverse();
-                                (item, (link, items))
-                            })) as Future<(I, (Option<Link>, Vec<I>))>
-                        }),
+                stream::try_unfold(
+                    (github, link, items),
+                    move |(github, link, mut items)| async move {
+                        match items.pop() {
+                            Some(item) => Ok(Some((item, (github, link, items)))),
+                            None => match link.and_then(|l| next_link(&l)) {
+                                Some(url) => {
+                                    let url = Url::from_str(&url).unwrap();
+                                    let uri =
+                                        [url.path(), url.query().unwrap_or_default()].join("?");
+                                    let (link, payload) = github.get_pages(uri.as_ref()).await?;
+                                    let mut items = into_items(payload);
+                                    let item = items.remove(0);
+                                    items.reverse();
+                                    Ok(Some((item, (github, link, items))))
+                                }
+                                None => Ok(None),
+                            },
+                        }
                     },
                 )
             })
-            .into_stream()
-            .flatten(),
+            .try_flatten_stream(),
     )
 }
 

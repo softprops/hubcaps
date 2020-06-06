@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::issues::{IssueListOptions, State};
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
                             .state(State::All)
                             .build(),
                     )
-                    .for_each(move |issue| {
+                    .try_for_each(move |issue| async move {
                         println!("{} ({})", issue.title, issue.state);
                         Ok(())
                     }),

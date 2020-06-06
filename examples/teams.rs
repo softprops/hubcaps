@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::teams::{TeamMemberOptions, TeamMemberRole, TeamOptions};
@@ -20,17 +20,25 @@ fn main() -> Result<()> {
             let repo_name = "d18e3679-9830-40a9-8cf5-16602639b43e";
 
             println!("org teams");
-            rt.block_on(github.org(org).teams().iter().for_each(|team| {
-                println!("{:#?}", team);
-                Ok(())
-            }))
+            rt.block_on(
+                github
+                    .org(org)
+                    .teams()
+                    .iter()
+                    .try_for_each(|team| async move {
+                        println!("{:#?}", team);
+                        Ok(())
+                    }),
+            )
             .unwrap_or_else(|e| println!("error: {:#?}", e));
 
             println!("repo teams");
-            rt.block_on(github.repo(org, repo_name).teams().iter().for_each(|team| {
-                println!("{:#?}", team);
-                Ok(())
-            }))
+            rt.block_on(github.repo(org, repo_name).teams().iter().try_for_each(
+                |team| async move {
+                    println!("{:#?}", team);
+                    Ok(())
+                },
+            ))
             .unwrap_or_else(|e| println!("error: {:#?}", e));
 
             let new_team = rt.block_on(github.org(org).teams().create(&TeamOptions {
@@ -62,7 +70,7 @@ fn main() -> Result<()> {
             );
 
             println!("members:");
-            rt.block_on(team.iter_members().for_each(|member| {
+            rt.block_on(team.iter_members().try_for_each(|member| async move {
                 println!("{:#?}", member);
                 Ok(())
             }))

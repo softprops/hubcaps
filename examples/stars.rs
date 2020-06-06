@@ -1,6 +1,5 @@
 use std::env;
 
-use futures::Future;
 use tokio::runtime::Runtime;
 
 use hubcaps::{Credentials, Github, Result};
@@ -15,9 +14,10 @@ fn main() -> Result<()> {
                 Credentials::Token(token),
             )?;
             let stars = github.activity().stars();
-            let f = stars
-                .star("softprops", "hubcaps")
-                .join(stars.is_starred("softprops", "hubcaps"));
+            let f = futures::future::try_join(
+                stars.star("softprops", "hubcaps"),
+                stars.is_starred("softprops", "hubcaps"),
+            );
             match rt.block_on(f) {
                 Ok((_, starred)) => println!("starred? {:?}", starred),
                 Err(err) => println!("err {}", err),

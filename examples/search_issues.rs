@@ -1,6 +1,6 @@
 use std::env;
 
-use futures::Stream;
+use futures::prelude::*;
 use tokio::runtime::Runtime;
 
 use hubcaps::search::SearchIssuesOptions;
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
                         "user:softprops",
                         &SearchIssuesOptions::builder().per_page(100).build(),
                     )
-                    .for_each(|issue| {
+                    .try_for_each(|issue| async move {
                         println!("{}", issue.title);
                         Ok(())
                     }),

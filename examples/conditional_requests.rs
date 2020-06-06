@@ -1,8 +1,5 @@
 #[cfg(feature = "httpcache")]
-use {
-    reqwest::r#async::Client,
-    tokio::runtime::Runtime,
-};
+use {reqwest::Client, tokio::runtime::Runtime};
 
 use hubcaps::Result;
 
