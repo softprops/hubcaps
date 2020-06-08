@@ -1,8 +1,8 @@
 //! Deployments interface
 use std::collections::HashMap;
 
-use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
+use url::form_urlencoded;
 
 use crate::statuses::State;
 use crate::users::User;
@@ -351,10 +351,10 @@ impl DeploymentListOptionsBuilder {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-    use serde::ser::Serialize;
     use super::{DeploymentOptions, DeploymentStatusOptions};
     use crate::statuses::State;
+    use serde::ser::Serialize;
+    use std::collections::BTreeMap;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
         for test in tests {

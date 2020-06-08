@@ -1,14 +1,10 @@
-use std::env;
-
-use tokio::runtime::Runtime;
-
 use hubcaps::{Credentials, Github, Result};
+use std::env;
 
 fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -16,7 +12,7 @@ fn main() -> Result<()> {
 
             let repo = github.repo("softprops", "hubcaps");
 
-            let forked = rt.block_on(repo.forks().create())?;
+            let forked = repo.forks().create().await?;
 
             println!("Forked repository to {}", forked.full_name);
 

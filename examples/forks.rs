@@ -1,16 +1,12 @@
-use std::env;
-
 use futures::prelude::*;
-use tokio::runtime::Runtime;
-
 use hubcaps::repositories::ForkListOptions;
 use hubcaps::{Credentials, Github, Result};
+use std::env;
 
 fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -19,16 +15,15 @@ fn main() -> Result<()> {
             let repo = "rest.js";
 
             let options = ForkListOptions::builder().build();
-            rt.block_on(
-                github
-                    .repo(owner, repo)
-                    .forks()
-                    .iter(&options)
-                    .try_for_each(move |repo| async move {
-                        println!("{}", repo.full_name);
-                        Ok(())
-                    }),
-            )?;
+            github
+                .repo(owner, repo)
+                .forks()
+                .iter(&options)
+                .try_for_each(move |repo| async move {
+                    println!("{}", repo.full_name);
+                    Ok(())
+                })
+                .await?;
 
             Ok(())
         }

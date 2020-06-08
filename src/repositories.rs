@@ -2,11 +2,12 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use url::{form_urlencoded, Url};
 use serde::{Deserialize, Serialize};
+use url::{form_urlencoded, Url};
 
 use crate::branches::Branches;
 use crate::checks::CheckRuns;
+use crate::collaborators::Collaborators;
 use crate::content::Content;
 use crate::deployments::Deployments;
 use crate::git::Git;
@@ -23,7 +24,6 @@ use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
 use crate::{Future, Github, SortDirection, Stream};
-use crate::collaborators::Collaborators;
 
 /// describes repository visibilities
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -187,10 +187,10 @@ impl Forks {
         U: Into<String>,
         R: Into<String>,
     {
-        Self { 
+        Self {
             github,
             owner: owner.into(),
-            repo: repo.into(), 
+            repo: repo.into(),
         }
     }
 

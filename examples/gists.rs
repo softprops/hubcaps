@@ -1,19 +1,16 @@
+use hubcaps::{Credentials, Github, Result};
 use std::env;
 
-use tokio::runtime::Runtime;
-
-use hubcaps::{Credentials, Github, Result};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
-            for gist in rt.block_on(github.gists().list(&Default::default()))? {
+            for gist in github.gists().list(&Default::default()).await? {
                 println!("{:#?}", gist)
             }
             Ok(())

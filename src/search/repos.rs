@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use url::form_urlencoded;
 use serde::Deserialize;
+use url::form_urlencoded;
 
 use super::{Search, SearchResult};
-use crate::{Future, SortDirection, Stream};
 use crate::users::User;
+use crate::{Future, SortDirection, Stream};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ReposSort {

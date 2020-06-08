@@ -1,11 +1,9 @@
+use futures::prelude::*;
+use hubcaps::{Credentials, Github, Result};
 use std::env;
 
-use futures::prelude::*;
-use tokio::runtime::Runtime;
-
-use hubcaps::{Credentials, Github, Result};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
@@ -16,52 +14,49 @@ fn main() -> Result<()> {
             )?;
             let repo = github.repo("softprops", "hubcat");
             let pulls = repo.pulls();
-            rt.block_on(
-                pulls
-                    .iter(&Default::default())
-                    .try_for_each(|pull| async move {
-                        println!("{:#?}", pull);
-                        Ok(())
-                    }),
-            )?;
+            pulls
+                .iter(&Default::default())
+                .try_for_each(|pull| async move {
+                    println!("{:#?}", pull);
+                    Ok(())
+                })
+                .await?;
 
             println!("comments");
-            for c in rt.block_on(
-                github
-                    .repo("softprops", "hubcaps")
-                    .pulls()
-                    .get(28)
-                    .comments()
-                    .list(&Default::default()),
-            )? {
+            for c in github
+                .repo("softprops", "hubcaps")
+                .pulls()
+                .get(28)
+                .comments()
+                .list(&Default::default())
+                .await?
+            {
                 println!("{:#?}", c);
             }
 
             println!("commits");
-            rt.block_on(
-                github
-                    .repo("softprops", "hubcaps")
-                    .pulls()
-                    .get(28)
-                    .commits()
-                    .iter()
-                    .try_for_each(|c| async move {
-                        println!("{:#?}", c);
-                        Ok(())
-                    }),
-            )?;
+            github
+                .repo("softprops", "hubcaps")
+                .pulls()
+                .get(28)
+                .commits()
+                .iter()
+                .try_for_each(|c| async move {
+                    println!("{:#?}", c);
+                    Ok(())
+                })
+                .await?;
 
             println!("review requests");
             println!(
                 "{:#?}",
-                rt.block_on(
-                    github
-                        .repo("softprops", "hubcaps")
-                        .pulls()
-                        .get(190)
-                        .review_requests()
-                        .get()
-                )?
+                github
+                    .repo("softprops", "hubcaps")
+                    .pulls()
+                    .get(190)
+                    .review_requests()
+                    .get()
+                    .await?
             );
             Ok(())
         }

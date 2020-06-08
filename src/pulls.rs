@@ -2,8 +2,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use url::form_urlencoded;
 use serde::{Deserialize, Serialize};
+use url::form_urlencoded;
 
 use crate::comments::Comments;
 use crate::issues::{IssueAssignees, IssueLabels, Sort as IssueSort, State};

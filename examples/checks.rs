@@ -2,8 +2,6 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 
-use tokio::runtime::Runtime;
-
 use hubcaps::checks::{
     Action, Annotation, AnnotationLevel, CheckRunOptions, Conclusion, Image, Output,
 };
@@ -20,14 +18,14 @@ fn var(name: &str) -> Result<String> {
 
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     let key_file = var("GH_APP_KEY")?;
     let app_id = var("GH_APP_ID")?;
     let user_name = var("GH_USERNAME")?;
     let repo = var("GH_REPO")?;
     let branch = var("GH_BRANCH")?;
-    let mut rt = Runtime::new()?;
 
     let mut key = Vec::new();
     File::open(&key_file)?.read_to_end(&mut key)?;
@@ -39,7 +37,8 @@ fn main() -> Result<()> {
             github
                 .app()
                 .find_repo_installation(user_name.clone(), repo.clone()),
-        ).unwrap();
+        )
+        .unwrap();
 
     github.set_credentials(Credentials::InstallationToken(
         InstallationTokenGenerator::new(installation.id, cred),
@@ -111,6 +110,6 @@ fn main() -> Result<()> {
     };
 
     println!("{}", serde_json::to_string(options).unwrap());
-    println!("{:?}", rt.block_on(checks.create(options)));
+    println!("{:?}", checks.create(options).await);
     Ok(())
 }

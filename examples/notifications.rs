@@ -1,36 +1,32 @@
-use std::env;
-
-use tokio::runtime::Runtime;
-
 use hubcaps::notifications::ThreadListOptions;
 use hubcaps::{Credentials, Github, Result};
+use std::env;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
 
             let opts = ThreadListOptions::builder().all(true).build();
-            for thread in rt.block_on(github.activity().notifications().list(&opts))? {
+            for thread in github.activity().notifications().list(&opts).await? {
                 println!("{:#?}", thread);
-                let subscription = rt.block_on(
-                    github
-                        .activity()
-                        .notifications()
-                        .get_subscription(thread.id),
-                );
+                let subscription = github
+                    .activity()
+                    .notifications()
+                    .get_subscription(thread.id)
+                    .await;
                 if let Ok(sub) = subscription {
                     println!("{:#?}", sub);
                 }
             }
 
             // Mark all notifications as read.
-            rt.block_on(github.activity().notifications().mark_as_read(None))?;
+            github.activity().notifications().mark_as_read(None).await?;
 
             Ok(())
         }

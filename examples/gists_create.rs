@@ -1,16 +1,13 @@
+use hubcaps::gists::{Content, GistOptions};
+use hubcaps::{Credentials, Github, Result};
 use std::collections::HashMap;
 use std::env;
 
-use tokio::runtime::Runtime;
-
-use hubcaps::gists::{Content, GistOptions};
-use hubcaps::{Credentials, Github, Result};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -20,14 +17,14 @@ fn main() -> Result<()> {
             let mut files = HashMap::new();
             files.insert("file1", "Hello World");
             let options = GistOptions::new(Some("gist description"), false, files);
-            let gist = rt.block_on(github.gists().create(&options))?;
+            let gist = github.gists().create(&options).await?;
             println!("{:#?}", gist);
 
             // edit file1
             let mut files = HashMap::new();
             files.insert("file1", "Hello World!!");
             let options = GistOptions::new(None as Option<String>, false, files);
-            let gist = rt.block_on(github.gists().edit(&gist.id, &options))?;
+            let gist = github.gists().edit(&gist.id, &options).await?;
             println!("{:#?}", gist);
 
             // rename file1 to file2
@@ -41,11 +38,11 @@ fn main() -> Result<()> {
                 public: None,
                 files: files,
             };
-            let gist = rt.block_on(github.gists().edit(&gist.id, &options))?;
+            let gist = github.gists().edit(&gist.id, &options).await?;
             println!("{:#?}", gist);
 
             // delete gist
-            rt.block_on(github.gists().delete(&gist.id))?;
+            github.gists().delete(&gist.id).await?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

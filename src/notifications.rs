@@ -1,8 +1,8 @@
 //! Notifications interface
 use std::collections::HashMap;
 
-use url::form_urlencoded;
 use serde::Deserialize;
+use url::form_urlencoded;
 
 use crate::users::User;
 use crate::Future;

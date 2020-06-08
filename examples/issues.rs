@@ -1,35 +1,31 @@
-use std::env;
-
 use futures::prelude::*;
-use tokio::runtime::Runtime;
-
 use hubcaps::issues::{IssueListOptions, State};
 use hubcaps::{Credentials, Github, Result};
+use std::env;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
-            rt.block_on(
-                github
-                    .repo("matthiasbeyer", "imag")
-                    .issues()
-                    .iter(
-                        &IssueListOptions::builder()
-                            .per_page(100)
-                            .state(State::All)
-                            .build(),
-                    )
-                    .try_for_each(move |issue| async move {
-                        println!("{} ({})", issue.title, issue.state);
-                        Ok(())
-                    }),
-            )?;
+            github
+                .repo("matthiasbeyer", "imag")
+                .issues()
+                .iter(
+                    &IssueListOptions::builder()
+                        .per_page(100)
+                        .state(State::All)
+                        .build(),
+                )
+                .try_for_each(move |issue| async move {
+                    println!("{} ({})", issue.title, issue.state);
+                    Ok(())
+                })
+                .await?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),
