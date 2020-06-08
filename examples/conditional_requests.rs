@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
             .user_repos("dwijnand")
             .list(&Default::default())
             .await?;
-        let status2 = github.rate_limit().get()?;
+        let status2 = github.rate_limit().get().await?;
 
         let rem1 = status1.resources.core.remaining;
         let rem2 = status2.resources.core.remaining;
