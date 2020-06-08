@@ -1,14 +1,11 @@
+use hubcaps::{Credentials, Github, Result};
 use std::env;
 
-use tokio::runtime::Runtime;
-
-use hubcaps::{Credentials, Github, Result};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
@@ -18,7 +15,7 @@ fn main() -> Result<()> {
                 stars.star("softprops", "hubcaps"),
                 stars.is_starred("softprops", "hubcaps"),
             );
-            match rt.block_on(f) {
+            match f.await {
                 Ok((_, starred)) => println!("starred? {:?}", starred),
                 Err(err) => println!("err {}", err),
             }

@@ -1,19 +1,16 @@
+use hubcaps::{Credentials, Github, Result};
 use std::env;
 
-use tokio::runtime::Runtime;
-
-use hubcaps::{Credentials, Github, Result};
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     pretty_env_logger::init();
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
-            let mut rt = Runtime::new()?;
             let github = Github::new(
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
                 Credentials::Token(token),
             )?;
-            rt.block_on(github.activity().stars().star("rust-lang", "log"))?;
+            github.activity().stars().star("rust-lang", "log").await?;
             Ok(())
         }
         _ => Err("example missing GITHUB_TOKEN".into()),

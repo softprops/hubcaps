@@ -32,13 +32,10 @@ async fn main() -> Result<()> {
     let cred = JWTCredentials::new(app_id.parse().expect("Bad GH_APP_ID"), key)?;
 
     let mut github = Github::new(USER_AGENT, Credentials::JWT(cred.clone()))?;
-    let installation = rt
-        .block_on(
-            github
-                .app()
-                .find_repo_installation(user_name.clone(), repo.clone()),
-        )
-        .unwrap();
+    let installation = github
+        .app()
+        .find_repo_installation(user_name.clone(), repo.clone())
+        .await?;
 
     github.set_credentials(Credentials::InstallationToken(
         InstallationTokenGenerator::new(installation.id, cred),
@@ -46,7 +43,7 @@ async fn main() -> Result<()> {
 
     let repo = github.repo(user_name, repo);
     let reference = repo.git().reference(format!("heads/{}", &branch));
-    let sha = match rt.block_on(reference).unwrap() {
+    let sha = match reference.await? {
         GetReferenceResponse::Exact(r) => r.object.sha,
         GetReferenceResponse::StartWith(_) => panic!("Branch {} not found", &branch),
     };

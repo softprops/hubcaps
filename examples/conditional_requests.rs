@@ -1,10 +1,8 @@
-#[cfg(feature = "httpcache")]
-use {reqwest::Client, tokio::runtime::Runtime};
-
 use hubcaps::Result;
-
 #[cfg(feature = "httpcache")]
 use hubcaps::{Github, HttpCache};
+#[cfg(feature = "httpcache")]
+use reqwest::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
