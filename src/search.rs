@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use std::fmt;
 
 use serde::de::DeserializeOwned;
-use url::{self, form_urlencoded};
 use serde::Deserialize;
+use url::{self, form_urlencoded};
 
 use crate::labels::Label;
 use crate::users::User;

@@ -239,5 +239,4 @@ mod tests {
         ];
         test_encoding(tests)
     }
-
 }
