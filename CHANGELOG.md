@@ -1,3 +1,10 @@
+# 0.6.0
+
+* BREAKING CHANGE: Migrate from old `futures` crate futures to std library futures making it possible to use `async`/`await` with this library. Please see the examples directory for updated examples of how to use these. [#254](https://github.com/softprops/hubcaps/pull/254)
+* Add support for Content create and update apis [#253](https://github.com/softprops/hubcaps/pull/253)
+* Add description field to label apis [#252](https://github.com/softprops/hubcaps/pull/252)
+* Make status fields `created_at`, `updated_at` and `target_url` optional [#250](https://github.com/softprops/hubcaps/pull/250) [#249](https://github.com/softprops/hubcaps/pull/249)
+
 # 0.5.0
 
 * BREAKING CHANGE: upgrade to hyper 0.12 and replace `tokio-core` with `tokio` [#136](https://github.com/softprops/hubcaps/pull/136)
