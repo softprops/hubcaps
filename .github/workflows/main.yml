@@ -80,6 +80,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Publish
         shell: bash
-        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
+        run: cargo publish --token $CRATES_TOKEN
         env:
-          CRATES_TOKEN: {{ secrets.CRATES_TOKEN }}
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
