@@ -6,9 +6,7 @@ async fn main() -> Result<()> {
     pretty_env_logger::init();
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-        env::var("GITHUB_TOKEN")
-            .ok()
-            .map(|token| Credentials::Token(token)),
+        env::var("GITHUB_TOKEN").ok().map(Credentials::Token),
     )?;
 
     let first_commit = github

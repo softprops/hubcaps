@@ -1,14 +1,10 @@
-use serde_json;
-
 use self::super::{Error, Github};
 use crate::users::User;
-use http::StatusCode;
-
 use crate::{ErrorKind, Future};
 use futures::prelude::*;
+use http::StatusCode;
 use std::collections::HashMap;
 use std::fmt;
-
 #[derive(Debug)]
 pub enum Permissions {
     Admin,
@@ -49,7 +45,7 @@ impl Collaborators {
         R: Into<String>,
     {
         Collaborators {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

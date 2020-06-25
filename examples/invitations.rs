@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::Read;
 
 fn var(name: &str) -> Result<String> {
-    if let Some(v) = env::var(name).ok() {
+    if let Ok(v) = env::var(name) {
         Ok(v)
     } else {
         Err(format!("example missing {}", name).into())

@@ -22,14 +22,14 @@ async fn main() -> Result<()> {
                 println!("{}", repo.name)
             }
 
-            println!("");
+            println!();
 
             println!("My organizations:");
             for org in github.orgs().list().await? {
                 println!("{}", org.login)
             }
 
-            println!("");
+            println!();
 
             println!("softprops' organizations:");
             for org in github.user_orgs("softprops").list().await? {

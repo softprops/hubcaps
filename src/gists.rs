@@ -1,12 +1,10 @@
 //! Gists interface
-use std::collections::HashMap;
-use std::hash::Hash;
-
-use serde::{Deserialize, Serialize};
-use url::form_urlencoded;
-
 use crate::users::User;
 use crate::{Future, Github};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::hash::Hash;
+use url::form_urlencoded;
 
 /// reference to gists associated with a github user
 pub struct UserGists {
@@ -276,14 +274,12 @@ impl GistOptions {
 mod tests {
     use super::GistOptions;
     use serde::ser::Serialize;
-    use serde_json;
     use std::collections::HashMap;
 
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
         for test in tests {
-            match test {
-                (k, v) => assert_eq!(serde_json::to_string(&k).unwrap(), v),
-            }
+            let (k, v) = test;
+            assert_eq!(serde_json::to_string(&k).unwrap(), v);
         }
     }
     #[test]

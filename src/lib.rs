@@ -8,14 +8,12 @@
 //! ```no_run
 //! use hubcaps::{Credentials, Github};
 //!
-//! fn main() {
-//!   let github = Github::new(
-//!     String::from("user-agent-name"),
-//!     Credentials::Token(
-//!       String::from("personal-access-token")
-//!     ),
-//!   );
-//! }
+//! let github = Github::new(
+//!   String::from("user-agent-name"),
+//!   Credentials::Token(
+//!     String::from("personal-access-token")
+//!   ),
+//! );
 //! ```
 //!
 //! Github enterprise users will want to create a client with the
@@ -294,8 +292,8 @@ impl JWTCredentials {
         let creds = ExpiringJWTCredential::calculate(app_id, &private_key)?;
 
         Ok(JWTCredentials {
-            app_id: app_id,
-            private_key: private_key,
+            app_id,
+            private_key,
             cache: Arc::new(Mutex::new(creds)),
         })
     }
@@ -358,7 +356,7 @@ impl ExpiringJWTCredential {
         )?;
 
         Ok(ExpiringJWTCredential {
-            created_at: created_at,
+            created_at,
             token: jwt,
         })
     }
@@ -385,7 +383,7 @@ pub struct InstallationTokenGenerator {
 impl InstallationTokenGenerator {
     pub fn new(installation_id: u64, creds: JWTCredentials) -> InstallationTokenGenerator {
         InstallationTokenGenerator {
-            installation_id: installation_id,
+            installation_id,
             jwt_credential: Box::new(Credentials::JWT(creds)),
             access_key: Arc::new(Mutex::new(None)),
         }
@@ -684,18 +682,16 @@ impl Github {
         let instance = self.clone();
         #[cfg(feature = "httpcache")]
         let uri2 = uri.to_string();
-        let body2 = body.clone();
-        let method2 = method.clone();
         let response = url_and_auth
             .map_err(Error::from)
             .and_then(move |(url, auth)| {
                 #[cfg(not(feature = "httpcache"))]
-                let mut req = instance.client.request(method2, url);
+                let mut req = instance.client.request(method, url);
 
                 #[cfg(feature = "httpcache")]
                 let mut req = {
-                    let mut req = instance.client.request(method2.clone(), url);
-                    if method2 == Method::GET {
+                    let mut req = instance.client.request(method, url);
+                    if method == Method::GET {
                         if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
                             req = req.header(IF_NONE_MATCH, etag);
                         }
@@ -713,8 +709,8 @@ impl Github {
                     req = req.header(AUTHORIZATION, &*auth_str);
                 }
 
-                trace!("Body: {:?}", &body2);
-                if let Some(body) = body2 {
+                trace!("Body: {:?}", &body);
+                if let Some(body) = body {
                     req = req.body(Body::from(body));
                 }
                 debug!("Request: {:?}", &req);
@@ -1047,7 +1043,7 @@ fn get_header_values(headers: &HeaderMap<HeaderValue>) -> HeaderValues {
 
 fn next_link(l: &Link) -> Option<String> {
     l.values()
-        .into_iter()
+        .iter()
         .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
         .map(|v| v.link().to_owned())
 }

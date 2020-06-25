@@ -10,7 +10,7 @@ pub struct App {
 impl App {
     #[doc(hidden)]
     pub(crate) fn new(github: Github) -> Self {
-        App { github: github }
+        App { github }
     }
 
     fn path(&self, more: &str) -> String {

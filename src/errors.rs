@@ -1,12 +1,11 @@
 //! Client errors
-use std::io::Error as IoError;
-use std::time::Duration;
-
 use error_chain::*;
 use http::StatusCode;
 use reqwest::Error as ReqwestError;
 use serde::Deserialize;
 use serde_json::error::Error as SerdeError;
+use std::io::Error as IoError;
+use std::time::Duration;
 use url::ParseError;
 
 use crate::jwt::errors::Error as JWTError;
@@ -58,7 +57,7 @@ pub struct ClientError {
 #[cfg(test)]
 mod tests {
     use super::{ClientError, FieldErr};
-    use serde_json;
+
     #[test]
     fn deserialize_client_field_errors() {
         for (json, expect) in vec![

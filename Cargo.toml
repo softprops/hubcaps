@@ -13,8 +13,6 @@ readme = "README.md"
 edition = "2018"
 
 [badges]
-travis-ci = { repository = "softprops/hubcaps" }
-coveralls = { repository = "softprops/hubcaps" }
 maintenance = { status = "actively-developed" }
 
 [dev-dependencies]
