@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["GetReferenceResponse","The response for getting a git reference"]],"struct":[["Blob",""],["Git","reference to git operations associated with a github repo"],["GitFile",""],["Object",""],["Reference",""],["TreeData",""]]});

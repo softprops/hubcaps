@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CommitDetails","Representation of a repo commit details"],["CommitRef","Representation of a reference to a commit"],["RepoCommit","Representation of a repo commit"],["RepoCommits","A structure for interfacing with a repository commits"],["UserStamp","Representation of a git user"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TimeUnit","Describes types of breakdowns of the data for views or clones"]],"struct":[["Clones",""],["DataPoint",""],["Path",""],["Referrer",""],["Traffic","Provides access to the traffic information for a repository"],["Views",""]]});

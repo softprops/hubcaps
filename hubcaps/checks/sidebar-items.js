@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AnnotationLevel",""],["CheckRunState",""],["Conclusion",""]],"struct":[["Action",""],["Annotation",""],["CheckRun",""],["CheckRunOptions",""],["CheckRunUpdateOptions",""],["CheckRuns",""],["CheckSuite",""],["Image",""],["Output",""]]});
