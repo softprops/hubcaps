@@ -12,7 +12,7 @@ async fn main() -> Result<()> {
             )?;
 
             println!("My organizations:");
-            println!("");
+            println!();
 
             for org in github.orgs().list().await? {
                 println!("{}", org.login);
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
                         );
                     }
                 }
-                println!("")
+                println!()
             }
             Ok(())
         }

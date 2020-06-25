@@ -435,12 +435,10 @@ impl PullListOptionsBuilder {
 mod tests {
     use super::*;
     use serde::ser::Serialize;
-    use serde_json;
     fn test_encoding<E: Serialize>(tests: Vec<(E, &str)>) {
         for test in tests {
-            match test {
-                (k, v) => assert_eq!(serde_json::to_string(&k).unwrap(), v),
-            }
+            let (k, v) = test;
+            assert_eq!(serde_json::to_string(&k).unwrap(), v);
         }
     }
 
@@ -448,9 +446,8 @@ mod tests {
     fn pull_list_reqs() {
         fn test_serialize(tests: Vec<(PullListOptions, Option<String>)>) {
             for test in tests {
-                match test {
-                    (k, v) => assert_eq!(k.serialize(), v),
-                }
+                let (k, v) = test;
+                assert_eq!(k.serialize(), v);
             }
         }
         let tests = vec![

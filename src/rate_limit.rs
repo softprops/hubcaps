@@ -1,6 +1,6 @@
 //! Rate Limit interface
-use serde::Deserialize;
 use crate::{Future, Github};
+use serde::Deserialize;
 
 pub struct RateLimit {
     github: Github,

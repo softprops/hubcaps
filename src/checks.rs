@@ -18,7 +18,7 @@ impl<'a> CheckRuns {
         R: Into<String>,
     {
         CheckRuns {
-            github: github,
+            github,
             owner: owner.into(),
             repo: repo.into(),
         }

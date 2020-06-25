@@ -9,7 +9,7 @@ use hubcaps::git::GetReferenceResponse;
 use hubcaps::{Credentials, Github, InstallationTokenGenerator, JWTCredentials, Result};
 
 fn var(name: &str) -> Result<String> {
-    if let Some(v) = env::var(name).ok() {
+    if let Ok(v) = env::var(name) {
         Ok(v)
     } else {
         Err(format!("example missing {}", name).into())

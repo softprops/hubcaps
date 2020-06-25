@@ -146,7 +146,6 @@ pub struct Object {
 mod tests {
     use super::*;
     use serde::Deserialize;
-    use serde_json;
     use std::fmt::Debug;
 
     fn test_deserializing<'de, T>(payload: &'static str, expected: T)

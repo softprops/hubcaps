@@ -36,7 +36,7 @@ async fn main() -> Result<()> {
             let options = GistOptions {
                 description: None as Option<String>,
                 public: None,
-                files: files,
+                files,
             };
             let gist = github.gists().edit(&gist.id, &options).await?;
             println!("{:#?}", gist);

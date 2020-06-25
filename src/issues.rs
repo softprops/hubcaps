@@ -503,9 +503,8 @@ mod tests {
     fn issue_list_reqs() {
         fn test_serialize(tests: Vec<(IssueListOptions, Option<String>)>) {
             for test in tests {
-                match test {
-                    (k, v) => assert_eq!(k.serialize(), v),
-                }
+                let (k, v) = test;
+                assert_eq!(k.serialize(), v);
             }
         }
         let tests = vec![
