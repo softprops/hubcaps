@@ -5,6 +5,7 @@
 * Add support for Content create and update apis [#253](https://github.com/softprops/hubcaps/pull/253)
 * Add description field to label apis [#252](https://github.com/softprops/hubcaps/pull/252)
 * Make status fields `created_at`, `updated_at` and `target_url` optional [#250](https://github.com/softprops/hubcaps/pull/250) [#249](https://github.com/softprops/hubcaps/pull/249)
+* Mask sensitive information in the `Debug` impl of `Credentials` type [#261](https://github.com/softprops/hubcaps/pull/261)
 
 # 0.5.0
 
