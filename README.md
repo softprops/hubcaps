@@ -1,6 +1,6 @@
 # hubcaps
 
-[![Main](https://github.com/softprops/hubcaps/workflows/Main/badge.svg)](https://github.com/softprops/hubcaps/actions) [![Coverage Status](https://coveralls.io/repos/softprops/hubcaps/badge.svg?branch=master&service=github)](https://coveralls.io/github/softprops/hubcaps?branch=master) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE) [![crates.io](http://meritbadge.herokuapp.com/hubcaps)](https://crates.io/crates/hubcaps) [![Released API docs](https://docs.rs/hubcaps/badge.svg)](http://docs.rs/hubcaps) [![Master API docs](https://img.shields.io/badge/docs-master-green.svg)](https://softprops.github.io/hubcaps)
+[![Main](https://github.com/softprops/hubcaps/workflows/Main/badge.svg)](https://github.com/softprops/hubcaps/actions) [![Coverage Status](https://coveralls.io/repos/softprops/hubcaps/badge.svg?branch=master&service=github)](https://coveralls.io/github/softprops/hubcaps?branch=master) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE) [![crates.io](https://img.shields.io/crates/v/hubcaps.svg?logo=rust)](https://crates.io/crates/hubcaps) [![Released API docs](https://docs.rs/hubcaps/badge.svg)](http://docs.rs/hubcaps) [![Master API docs](https://img.shields.io/badge/docs-latest-green.svg)](https://softprops.github.io/hubcaps)
 
 > a rust interface for github
 
