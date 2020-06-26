@@ -1,3 +1,7 @@
+# 0.6.1
+
+* patch release just to update crates.io readme
+
 # 0.6.0
 
 * BREAKING CHANGE: Migrate from old `futures` crate futures to std library futures making it possible to use `async`/`await` with this library. This puts this library in better compatibility with the current rust async ecosystem. Please see the examples directory for updated examples of how to use these. [#254](https://github.com/softprops/hubcaps/pull/254)
