@@ -1070,8 +1070,15 @@ fn get_header_values(headers: &HeaderMap<HeaderValue>) -> HeaderValues {
 fn next_link(l: &Link) -> Option<String> {
     l.values()
         .iter()
-        .find(|v| v.rel().unwrap_or(&[]).get(0) == Some(&RelationType::Next))
-        .map(|v| v.link().to_owned())
+        .find_map(|value| {
+            value.rel().and_then(|rels| {
+                if rels.iter().any(|rel| rel == &RelationType::Next) {
+                    Some(value.link().into())
+                } else {
+                    None
+                }
+            })
+        })
 }
 
 /// "unfold" paginated results of a list of github entities
