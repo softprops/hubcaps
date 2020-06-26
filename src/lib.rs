@@ -253,7 +253,7 @@ impl Default for SortDirection {
 }
 
 /// Various forms of authentication credentials supported by Github
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum Credentials {
     /// Oauth token string
     /// https://developer.github.com/v3/#oauth2-token-sent-in-a-header
@@ -270,6 +270,32 @@ pub enum Credentials {
     InstallationToken(InstallationTokenGenerator),
 }
 
+impl fmt::Debug for Credentials {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Credentials::Token(value) => f
+                .debug_tuple("Credentials::Token")
+                .field(&"*".repeat(value.len()))
+                .finish(),
+            Credentials::Client(id, secret) => f
+                .debug_tuple("Credentials::Client")
+                .field(&id)
+                .field(&"*".repeat(secret.len()))
+                .finish(),
+            Credentials::JWT(jwt) => f
+                .debug_struct("Credentials::JWT")
+                .field("app_id", &jwt.app_id)
+                .field("private_key", &"vec![***]")
+                .finish(),
+            Credentials::InstallationToken(generator) => f
+                .debug_struct("Credentials::InstallationToken")
+                .field("installation_id", &generator.installation_id)
+                .field("jwt_credential", &"***")
+                .finish(),
+        }
+    }
+}
+
 /// JSON Web Token authentication mechanism
 ///
 /// The GitHub client methods are all &self, but the dynamically
@@ -278,7 +304,7 @@ pub enum Credentials {
 ///
 /// We use a token inside a Mutex so we can have interior mutability
 /// even though JWTCredentials is not mutable.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct JWTCredentials {
     pub app_id: u64,
     /// DER RSA key. Generate with
@@ -1092,6 +1118,21 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn credentials_impl_debug() {
+        assert_eq!(
+            format!("{:?}", Credentials::Token("secret".into())),
+            "Credentials::Token(\"******\")"
+        );
+        assert_eq!(
+            format!(
+                "{:?}",
+                Credentials::Client("client_id".into(), "client_secret".into())
+            ),
+            "Credentials::Client(\"client_id\", \"*************\")"
+        );
+    }
 
     #[test]
     fn default_sort_direction() {
