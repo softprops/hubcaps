@@ -1,8 +1,32 @@
-# hubcaps
 
-[![Main](https://github.com/softprops/hubcaps/workflows/Main/badge.svg)](https://github.com/softprops/hubcaps/actions) [![Coverage Status](https://coveralls.io/repos/softprops/hubcaps/badge.svg?branch=master&service=github)](https://coveralls.io/github/softprops/hubcaps?branch=master) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE) [![crates.io](https://img.shields.io/crates/v/hubcaps.svg?logo=rust)](https://crates.io/crates/hubcaps) [![Released API docs](https://docs.rs/hubcaps/badge.svg)](http://docs.rs/hubcaps) [![Master API docs](https://img.shields.io/badge/docs-latest-green.svg)](https://softprops.github.io/hubcaps)
 
-> a rust interface for github
+<h1 align="center">
+  hubcaps
+</h1>
+
+<p align="center">
+   a Rust interface for GitHub
+</p>
+
+<div align="center">
+  <a alt="GitHub Actions" href="https://github.com/softprops/hubcaps/actions">
+    <img src="https://github.com/softprops/hubcaps/workflows/Main/badge.svg"/>
+  </a>
+  <a alt="crates.io" href="https://crates.io/crates/hubcaps">
+    <img src="https://img.shields.io/crates/v/hubcaps.svg?logo=rust"/>
+  </a>
+  <a alt="docs.rs" href="http://docs.rs/hubcaps">
+    <img src="https://docs.rs/hubcaps/badge.svg"/>
+  </a>
+  <a alt="latest docs" href="https://softprops.github.io/hubcaps">
+   <img src="https://img.shields.io/badge/docs-latest-green.svg"/>
+  </a>
+  <a alt="license" href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg"/>
+  </a>
+</div>
+
+<br />
 
 ## installation
 
