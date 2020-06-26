@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ErrorKind","The kind of an error."]],"struct":[["ClientError",""],["Error","The Error type."],["FieldErr",""]],"trait":[["ResultExt","Additional methods for `Result`, for easy interaction with this crate."]],"type":[["Result","Convenient wrapper around `std::Result`."]]});
+initSidebarItems({"enum":[["Error",""]],"struct":[["ClientError",""],["FieldErr",""]],"type":[["Result","A standard result type capturing common errors for all GitHub operations"]]});
