@@ -57,7 +57,6 @@ jobs:
         uses: hecrj/setup-rust-action@v1
       - uses: actions/checkout@v2
       - name: Generate Docs
-        shell: bash
         run: |
           cargo doc --no-deps
           echo "<meta http-equiv=refresh content=0;url=`echo ${{ github.repository  }} | cut -d / -f 2 | tr '-' '_'`/index.html>" > target/doc/index.html
@@ -77,7 +76,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Publish
         if: env.CRATES_TOKEN
-        shell: bash
         run: cargo publish --token $CRATES_TOKEN
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
