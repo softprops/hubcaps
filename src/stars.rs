@@ -2,7 +2,7 @@
 use futures::prelude::*;
 use http::StatusCode;
 
-use crate::{Error, ErrorKind, Future, Github};
+use crate::{Error, Future, Github};
 
 pub struct Stars {
     github: Github,
@@ -26,14 +26,11 @@ impl Stars {
                 .map_ok(|_| true)
                 .or_else(|err| async move {
                     match err {
-                        Error(
-                            ErrorKind::Fault {
-                                code: StatusCode::NOT_FOUND,
-                                ..
-                            },
-                            _,
-                        ) => Ok(false),
-                        Error(ErrorKind::Codec(_), _) => Ok(true),
+                        Error::Fault {
+                            code: StatusCode::NOT_FOUND,
+                            ..
+                        } => Ok(false),
+                        Error::Codec(_) => Ok(true),
                         otherwise => Err(otherwise),
                     }
                 }),

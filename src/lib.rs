@@ -143,7 +143,7 @@ pub mod traffic;
 pub mod users;
 pub mod watching;
 
-pub use crate::errors::{Error, ErrorKind, Result};
+pub use crate::errors::{Error, Result};
 #[cfg(feature = "httpcache")]
 pub use crate::http_cache::{BoxedHttpCache, HttpCache};
 
@@ -763,7 +763,7 @@ impl Github {
                             let parsed_response = if status == StatusCode::NO_CONTENT { serde_json::from_str("null") } else { serde_json::from_slice::<Out>(&response_body) };
                             parsed_response
                                 .map(|out| (link, out))
-                                .map_err(|error| ErrorKind::Codec(error).into())
+                                .map_err(Error::Codec)
                         } else if status == StatusCode::NOT_MODIFIED {
                             // only supported case is when client provides if-none-match
                             // header when cargo builds with --cfg feature="httpcache"
@@ -802,16 +802,16 @@ impl Github {
                                         .duration_since(UNIX_EPOCH)
                                         .unwrap()
                                         .as_secs();
-                                    ErrorKind::RateLimit {
+                                    Error::RateLimit {
                                         reset: Duration::from_secs(u64::from(reset) - now),
                                     }
                                 }
-                                _ => ErrorKind::Fault {
+                                _ => Error::Fault {
                                     code: status,
                                     error: serde_json::from_slice(&response_body)?,
                                 },
                             };
-                            Err(error.into())
+                            Err(error)
                         }
                     }),
             )
@@ -886,7 +886,7 @@ impl Github {
             )
             .or_else(|err| async move {
                 match err {
-                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    Error::Codec(_) => Ok(()),
                     otherwise => Err(otherwise),
                 }
             }),
@@ -904,7 +904,7 @@ impl Github {
             )
             .or_else(|err| async move {
                 match err {
-                    Error(ErrorKind::Codec(_), _) => Ok(()),
+                    Error::Codec(_) => Ok(()),
                     otherwise => Err(otherwise),
                 }
             }),
@@ -945,7 +945,7 @@ impl Github {
     fn patch_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::pin(self.patch(uri, message).or_else(|err| async move {
             match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
+                Error::Codec(_) => Ok(()),
                 err => Err(err),
             }
         }))
@@ -974,7 +974,7 @@ impl Github {
     fn put_no_response(&self, uri: &str, message: Vec<u8>) -> Future<()> {
         Box::pin(self.put(uri, message).or_else(|err| async move {
             match err {
-                Error(ErrorKind::Codec(_), _) => Ok(()),
+                Error::Codec(_) => Ok(()),
                 err => Err(err),
             }
         }))

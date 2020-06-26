@@ -1,25 +1,18 @@
 use futures::prelude::*;
-use hubcaps::{Credentials, Github, InstallationTokenGenerator, JWTCredentials, Result};
+use hubcaps::{Credentials, Github, InstallationTokenGenerator, JWTCredentials};
 use std::env;
+use std::error::Error;
 use std::fs::File;
 use std::io::Read;
-
-fn var(name: &str) -> Result<String> {
-    if let Ok(v) = env::var(name) {
-        Ok(v)
-    } else {
-        Err(format!("example missing {}", name).into())
-    }
-}
 
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn Error>> {
     pretty_env_logger::init();
-    let key_file = var("GH_APP_KEY")?;
-    let app_id = var("GH_APP_ID")?;
-    let installation_id = var("GH_INSTALL_ID")?;
+    let key_file = env::var("GH_APP_KEY")?;
+    let app_id = env::var("GH_APP_ID")?;
+    let installation_id = env::var("GH_INSTALL_ID")?;
 
     let mut key = Vec::new();
     File::open(&key_file)?.read_to_end(&mut key)?;

@@ -1,6 +1,6 @@
-use self::super::{Error, Github};
 use crate::users::User;
-use crate::{ErrorKind, Future};
+use crate::Future;
+use crate::{Error, Github};
 use futures::prelude::*;
 use http::StatusCode;
 use std::collections::HashMap;
@@ -66,14 +66,11 @@ impl Collaborators {
                 .map_ok(|_| true)
                 .or_else(|err| async move {
                     match err {
-                        Error(
-                            ErrorKind::Fault {
-                                code: StatusCode::NOT_FOUND,
-                                ..
-                            },
-                            _,
-                        ) => Ok(false),
-                        Error(ErrorKind::Codec(_), _) => Ok(true),
+                        Error::Fault {
+                            code: StatusCode::NOT_FOUND,
+                            ..
+                        } => Ok(false),
+                        Error::Codec(_) => Ok(true),
                         otherwise => Err(otherwise),
                     }
                 }),
