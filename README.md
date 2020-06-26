@@ -39,9 +39,9 @@ hubcaps = "0.5"
 
 ## usage
 
-Basic usage requires a user agent string (because github requires this) and
+Basic usage requires a user agent string and
 optionally a flavor of `hubcaps::Credentials` for making requests as a particular
-github user.
+GitHub user.
 
 For user authenticated requests you'll typically want to use
 `hubcaps::Credentials::Token` with a
@@ -58,7 +58,7 @@ fn main() {
 }
 ```
 
-Github instances define methods for accessing api services that map closely to
+GitHub instances define methods for accessing api services that map closely to
 their url structure.
 
 As a convention, api methods that expect arguments are represented as functions
@@ -69,7 +69,7 @@ See [examples directory](examples/) for some getting started examples
 
 ### repositories
 
-Typically the reference point of most github services is a repository
+Typically the reference point of most GitHub services is a repository
 
 ```rust
 let repo = github.repo("user", "repo");
@@ -108,7 +108,7 @@ labels.create(
 
 ### deployments
 
-Deployments is a service for orchestrating deployments of applications sourced from github repositories
+Deployments is a service for orchestrating deployments of applications sourced from GitHub repositories
 
 ```rust
 let deployments = repo.deployments();

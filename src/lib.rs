@@ -1,8 +1,8 @@
-//! Hubcaps provides a set of building blocks for interacting with the Github API
+//! Hubcaps provides a set of building blocks for interacting with the GitHub API
 //!
 //! # Examples
 //!
-//!  Typical use will require instantiation of a Github client. Which requires
+//!  Typical use will require instantiation of a GitHub client. Which requires
 //! a user agent string and set of `hubcaps::Credentials`.
 //!
 //! ```no_run
@@ -16,7 +16,7 @@
 //! );
 //! ```
 //!
-//! Github enterprise users will want to create a client with the
+//! GitHub enterprise customers will want to create a client with the
 //! [Github#host](struct.Github.html#method.host) method
 //!
 //! Access to various services are provided via methods on instances of the `Github` type.
@@ -32,7 +32,7 @@
 //!
 //! ## Entity listings
 //!
-//! Many of Github's APIs return a collection of entities with a common interface for supporting pagination
+//! Many of GitHub's APIs return a collection of entities with a common interface for supporting pagination
 //! Hubcaps supports two types of interfaces for working with listings. `list(...)` interfaces return the first
 //! ( often enough ) list of entities. Alternatively for listings that require > 30 items you may wish to
 //! use the `iter(..)` variant which returns a `futures::Stream` over all entities in a paginated set.
@@ -44,7 +44,7 @@
 //!
 //! ## Rate Limiting
 //!
-//! A special note should be taken when accounting for Github's
+//! A special note should be taken when accounting for GitHub's
 //! [API Rate Limiting](https://developer.github.com/v3/rate_limit/)
 //! A special case
 //! [hubcaps::ErrorKind::RateLimit](errors/enum.ErrorKind.html#variant.RateLimit)
@@ -55,7 +55,7 @@
 //! This crate uses the `log` crate's debug log interface to log x-rate-limit
 //! headers received from Github.
 //! If you are attempting to test your access patterns against
-//! Github's rate limits, enable debug looking and look for "x-rate-limit"
+//! GitHub's rate limits, enable debug looking and look for "x-rate-limit"
 //! log patterns sourced from this crate
 //!
 //! # Features
@@ -187,7 +187,7 @@ pub(crate) mod utils {
     pub const PATH_SEGMENT: &AsciiSet = &PATH.add(b'/').add(b'%');
 }
 
-/// Github defined Media types
+/// GitHub defined Media types
 /// See [this doc](https://developer.github.com/v3/media/) for more for more information
 #[derive(Clone, Copy)]
 pub enum MediaType {
@@ -252,7 +252,7 @@ impl Default for SortDirection {
     }
 }
 
-/// Various forms of authentication credentials supported by Github
+/// Various forms of authentication credentials supported by GitHub
 #[derive(PartialEq, Clone)]
 pub enum Credentials {
     /// Oauth token string
@@ -435,7 +435,7 @@ impl PartialEq for InstallationTokenGenerator {
     }
 }
 
-/// Entry point interface for interacting with Github API
+/// Entry point interface for interacting with GitHub API
 #[derive(Clone, Debug)]
 pub struct Github {
     host: String,
