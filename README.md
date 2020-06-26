@@ -183,4 +183,4 @@ let teams = repo.teams();
 
 See [examples directory](examples/teams.rs) for examples
 
-Doug Tangren (softprops) 2015-2018
+Doug Tangren (softprops) 2015-2020
