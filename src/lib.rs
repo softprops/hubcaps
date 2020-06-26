@@ -1068,17 +1068,15 @@ fn get_header_values(headers: &HeaderMap<HeaderValue>) -> HeaderValues {
 }
 
 fn next_link(l: &Link) -> Option<String> {
-    l.values()
-        .iter()
-        .find_map(|value| {
-            value.rel().and_then(|rels| {
-                if rels.iter().any(|rel| rel == &RelationType::Next) {
-                    Some(value.link().into())
-                } else {
-                    None
-                }
-            })
+    l.values().iter().find_map(|value| {
+        value.rel().and_then(|rels| {
+            if rels.iter().any(|rel| rel == &RelationType::Next) {
+                Some(value.link().into())
+            } else {
+                None
+            }
         })
+    })
 }
 
 /// "unfold" paginated results of a list of github entities

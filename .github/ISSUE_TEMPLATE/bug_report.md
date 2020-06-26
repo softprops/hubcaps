@@ -1,6 +1,7 @@
 ---
 name: Bug report 🐛
 about: Did something not work as expected?
+labels: bug
 ---
 
 <!-- Please search existing issues to avoid creating duplicates. -->

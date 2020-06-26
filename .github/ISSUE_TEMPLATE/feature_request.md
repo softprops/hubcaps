@@ -1,6 +1,7 @@
 ---
 name: Feature request 💡
 about: Suggest a new idea for hubcaps
+labels: enhancement
 ---
 
 <!-- Please search existing issues to avoid creating duplicates. -->
