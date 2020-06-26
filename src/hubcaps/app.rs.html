@@ -75,7 +75,7 @@
 <span class="kw">impl</span> <span class="ident">App</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">App</span> { <span class="ident">github</span>: <span class="ident">github</span> }
+        <span class="ident">App</span> { <span class="ident">github</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {

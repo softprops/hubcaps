@@ -1147,10 +1147,6 @@
 <span id="1147">1147</span>
 <span id="1148">1148</span>
 <span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Hubcaps provides a set of building blocks for interacting with the Github API</span>
 <span class="doccomment">//!</span>
@@ -1162,14 +1158,12 @@
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use hubcaps::{Credentials, Github};</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!   let github = Github::new(</span>
-<span class="doccomment">//!     String::from(&quot;user-agent-name&quot;),</span>
-<span class="doccomment">//!     Credentials::Token(</span>
-<span class="doccomment">//!       String::from(&quot;personal-access-token&quot;)</span>
-<span class="doccomment">//!     ),</span>
-<span class="doccomment">//!   );</span>
-<span class="doccomment">//! }</span>
+<span class="doccomment">//! let github = Github::new(</span>
+<span class="doccomment">//!   String::from(&quot;user-agent-name&quot;),</span>
+<span class="doccomment">//!   Credentials::Token(</span>
+<span class="doccomment">//!     String::from(&quot;personal-access-token&quot;)</span>
+<span class="doccomment">//!   ),</span>
+<span class="doccomment">//! );</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Github enterprise users will want to create a client with the</span>
@@ -1448,8 +1442,8 @@
         <span class="kw">let</span> <span class="ident">creds</span> <span class="op">=</span> <span class="ident">ExpiringJWTCredential</span>::<span class="ident">calculate</span>(<span class="ident">app_id</span>, <span class="kw-2">&amp;</span><span class="ident">private_key</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">JWTCredentials</span> {
-            <span class="ident">app_id</span>: <span class="ident">app_id</span>,
-            <span class="ident">private_key</span>: <span class="ident">private_key</span>,
+            <span class="ident">app_id</span>,
+            <span class="ident">private_key</span>,
             <span class="ident">cache</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">creds</span>)),
         })
     }
@@ -1512,7 +1506,7 @@
         )<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">ExpiringJWTCredential</span> {
-            <span class="ident">created_at</span>: <span class="ident">created_at</span>,
+            <span class="ident">created_at</span>,
             <span class="ident">token</span>: <span class="ident">jwt</span>,
         })
     }
@@ -1539,7 +1533,7 @@
 <span class="kw">impl</span> <span class="ident">InstallationTokenGenerator</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">installation_id</span>: <span class="ident">u64</span>, <span class="ident">creds</span>: <span class="ident">JWTCredentials</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstallationTokenGenerator</span> {
         <span class="ident">InstallationTokenGenerator</span> {
-            <span class="ident">installation_id</span>: <span class="ident">installation_id</span>,
+            <span class="ident">installation_id</span>,
             <span class="ident">jwt_credential</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="ident">creds</span>)),
             <span class="ident">access_key</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>)),
         }
@@ -1838,18 +1832,16 @@
         <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">uri2</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">body2</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">method2</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">url_and_auth</span>
             .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>)
             .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">url</span>, <span class="ident">auth</span>)<span class="op">|</span> {
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>))]</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method2</span>, <span class="ident">url</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method</span>, <span class="ident">url</span>);
 
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method2</span>.<span class="ident">clone</span>(), <span class="ident">url</span>);
-                    <span class="kw">if</span> <span class="ident">method2</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Method</span>::<span class="ident">GET</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method</span>, <span class="ident">url</span>);
+                    <span class="kw">if</span> <span class="ident">method</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Method</span>::<span class="ident">GET</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">etag</span>) <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">http_cache</span>.<span class="ident">lookup_etag</span>(<span class="kw-2">&amp;</span><span class="ident">uri2</span>) {
                             <span class="ident">req</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">header</span>(<span class="ident">IF_NONE_MATCH</span>, <span class="ident">etag</span>);
                         }
@@ -1867,8 +1859,8 @@
                     <span class="ident">req</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">header</span>(<span class="ident">AUTHORIZATION</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">auth_str</span>);
                 }
 
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Body: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">body2</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>) <span class="op">=</span> <span class="ident">body2</span> {
+                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Body: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">body</span>);
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>) <span class="op">=</span> <span class="ident">body</span> {
                     <span class="ident">req</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">from</span>(<span class="ident">body</span>));
                 }
                 <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Request: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">req</span>);
@@ -2201,7 +2193,7 @@
 
 <span class="kw">fn</span> <span class="ident">next_link</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="ident">Link</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">l</span>.<span class="ident">values</span>()
-        .<span class="ident">into_iter</span>()
+        .<span class="ident">iter</span>()
         .<span class="ident">find</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">rel</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]).<span class="ident">get</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RelationType</span>::<span class="ident">Next</span>))
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">link</span>().<span class="ident">to_owned</span>())
 }

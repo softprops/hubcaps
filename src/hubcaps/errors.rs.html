@@ -106,17 +106,15 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Client errors</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
-
 <span class="kw">use</span> <span class="ident">error_chain</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">StatusCode</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Deserialize</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 <span class="kw">use</span> <span class="ident">url</span>::<span class="ident">ParseError</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">jwt</span>::<span class="ident">errors</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">JWTError</span>;
@@ -168,7 +166,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ClientError</span>, <span class="ident">FieldErr</span>};
-    <span class="kw">use</span> <span class="ident">serde_json</span>;
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">deserialize_client_field_errors</span>() {
         <span class="kw">for</span> (<span class="ident">json</span>, <span class="ident">expect</span>) <span class="kw">in</span> <span class="macro">vec</span><span class="macro">!</span>[
