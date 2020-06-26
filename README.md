@@ -4,12 +4,6 @@
 
 > a rust interface for github
 
-## /!\ planned API changes
-
-The goal and motivation behind these are not to intentionally make breaking changes, but rather to adopt evolving community standards
-
-* replace builder implementations with [derive_builder](https://crates.io/crates/derive_builder) crate type derivation
-
 ## installation
 
 Add the following to your `Cargo.toml` file
