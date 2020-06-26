@@ -763,7 +763,7 @@ impl Github {
                             let parsed_response = if status == StatusCode::NO_CONTENT { serde_json::from_str("null") } else { serde_json::from_slice::<Out>(&response_body) };
                             parsed_response
                                 .map(|out| (link, out))
-                                .map_err(|error| Error::Codec(error).into())
+                                .map_err(Error::Codec)
                         } else if status == StatusCode::NOT_MODIFIED {
                             // only supported case is when client provides if-none-match
                             // header when cargo builds with --cfg feature="httpcache"
@@ -811,7 +811,7 @@ impl Github {
                                     error: serde_json::from_slice(&response_body)?,
                                 },
                             };
-                            Err(error.into())
+                            Err(error)
                         }
                     }),
             )
