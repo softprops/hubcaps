@@ -1,11 +1,11 @@
-use hubcaps::Result;
 #[cfg(feature = "httpcache")]
 use hubcaps::{Github, HttpCache};
 #[cfg(feature = "httpcache")]
 use reqwest::Client;
+use std::error::Error;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn Error>> {
     pretty_env_logger::init();
 
     #[cfg(not(feature = "httpcache"))]

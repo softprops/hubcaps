@@ -1,6 +1,7 @@
 # 0.6.0
 
-* BREAKING CHANGE: Migrate from old `futures` crate futures to std library futures making it possible to use `async`/`await` with this library. Please see the examples directory for updated examples of how to use these. [#254](https://github.com/softprops/hubcaps/pull/254)
+* BREAKING CHANGE: Migrate from old `futures` crate futures to std library futures making it possible to use `async`/`await` with this library. This puts this library in better compatibility with the current rust async ecosystem. Please see the examples directory for updated examples of how to use these. [#254](https://github.com/softprops/hubcaps/pull/254)
+* BREAKING CHANGE: replace `error_chain` derived errors with `std::error::Error` implementing `Error` enum. The motivation is that the error crate ecosystem is a moving target. The `std::error` package is not. This also makes for a smaller crate and smaller surface area. This moves away from errors of the form `Error(ErrorKind::Codec(_), _)` to errors of the form `Error::Codec(_)`
 * Add support for Content create and update apis [#253](https://github.com/softprops/hubcaps/pull/253)
 * Add description field to label apis [#252](https://github.com/softprops/hubcaps/pull/252)
 * Make status fields `created_at`, `updated_at` and `target_url` optional [#250](https://github.com/softprops/hubcaps/pull/250) [#249](https://github.com/softprops/hubcaps/pull/249)

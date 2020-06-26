@@ -1,8 +1,9 @@
-use hubcaps::{Credentials, Github, Result};
+use hubcaps::{Credentials, Github};
 use std::env;
+use std::error::Error;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn Error>> {
     match env::var("GITHUB_TOKEN").ok() {
         Some(token) => {
             let github = Github::new(

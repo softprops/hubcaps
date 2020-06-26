@@ -1,38 +1,98 @@
 //! Client errors
-use error_chain::*;
+use crate::jwt::errors::Error as JWTError;
 use http::StatusCode;
 use reqwest::Error as ReqwestError;
 use serde::Deserialize;
 use serde_json::error::Error as SerdeError;
+use std::error::Error as StdError;
+use std::fmt;
 use std::io::Error as IoError;
+use std::result::Result as StdResult;
 use std::time::Duration;
 use url::ParseError;
 
-use crate::jwt::errors::Error as JWTError;
+/// A standard result type capturing common errors for all GitHub operations
+pub type Result<T> = StdResult<T, Error>;
 
-error_chain! {
-    errors {
-        #[doc = "Client side error returned for faulty requests"]
-        Fault {
-            code: StatusCode,
-            error: ClientError,
-        } {
-            display("{}: '{}'", code, error.message)
-            description(error.message.as_str())
-          }
-        #[doc = "Error kind returned when a credential's rate limit has been exhausted. Wait for the reset duration before issuing more requests"]
-        RateLimit {
-            reset: Duration
-        } {
-            display("Rate limit exhausted. Will reset in {} seconds", reset.as_secs())
+#[derive(Debug)]
+pub enum Error {
+    /// Client side error returned for faulty requests
+    Fault {
+        code: StatusCode,
+        error: ClientError,
+    },
+    /// Error kind returned when a credential's rate limit has been exhausted. Wait for the reset duration before issuing more requests
+    RateLimit { reset: Duration },
+    /// Serialization related errors
+    Codec(SerdeError),
+    /// HTTP client errors
+    Reqwest(ReqwestError),
+    /// Url format errors
+    Url(ParseError),
+    /// Network errors
+    IO(IoError),
+    /// JWT validation errors
+    JWT(JWTError),
+}
+
+impl From<SerdeError> for Error {
+    fn from(err: SerdeError) -> Self {
+        Error::Codec(err)
+    }
+}
+
+impl From<ReqwestError> for Error {
+    fn from(err: ReqwestError) -> Self {
+        Error::Reqwest(err)
+    }
+}
+
+impl From<ParseError> for Error {
+    fn from(err: ParseError) -> Self {
+        Error::Url(err)
+    }
+}
+
+impl From<IoError> for Error {
+    fn from(err: IoError) -> Self {
+        Error::IO(err)
+    }
+}
+
+impl From<JWTError> for Error {
+    fn from(err: JWTError) -> Self {
+        Error::JWT(err)
+    }
+}
+
+impl StdError for Error {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            Error::Codec(err) => Some(err),
+            Error::Reqwest(err) => Some(err),
+            Error::Url(err) => Some(err),
+            Error::IO(err) => Some(err),
+            Error::JWT(err) => Some(err),
+            _ => None,
         }
     }
-    foreign_links {
-        Codec(SerdeError);
-        Reqwest(ReqwestError);
-        Url(ParseError);
-        IO(IoError);
-        JWT(JWTError);
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Fault { code, error } => write!(f, "{}: {}", code, error.message),
+            Error::RateLimit { reset } => write!(
+                f,
+                "Rate limit exhausted. Will reset in {} seconds",
+                reset.as_secs()
+            ),
+            Error::Codec(err) => write!(f, "{}", err),
+            Error::Reqwest(err) => write!(f, "{}", err),
+            Error::Url(err) => write!(f, "{}", err),
+            Error::IO(err) => write!(f, "{}", err),
+            Error::JWT(err) => write!(f, "{}", err),
+        }
     }
 }
 
