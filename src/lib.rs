@@ -378,7 +378,7 @@ impl ExpiringJWTCredential {
         let jwt = jwt::encode(
             &header,
             &payload,
-            &jsonwebtoken::EncodingKey::from_secret(private_key),
+            &jsonwebtoken::EncodingKey::from_rsa_der(private_key),
         )?;
 
         Ok(ExpiringJWTCredential {
