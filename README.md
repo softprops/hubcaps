@@ -53,7 +53,7 @@ use hubcaps::{Credentials, Github};
 fn main() {
   let github = Github::new(
     "my-cool-user-agent/0.1.0",
-    Credentials::Token("personal-access-token"),
+    Credentials::Token("personal-access-token".to_string()),
   );
 }
 ```

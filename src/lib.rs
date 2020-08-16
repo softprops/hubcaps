@@ -11,7 +11,7 @@
 //! let github = Github::new(
 //!   String::from("user-agent-name"),
 //!   Credentials::Token(
-//!     String::from("personal-access-token")
+//!     String::from("personal-access-token".to_string())
 //!   ),
 //! );
 //! ```
