@@ -9,7 +9,7 @@ a user agent string and set of <code>hubcaps::Credentials</code>.</p>
 <span class="kw">let</span> <span class="ident">github</span> <span class="op">=</span> <span class="ident">Github</span>::<span class="ident">new</span>(
   <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;user-agent-name&quot;</span>),
   <span class="ident">Credentials</span>::<span class="ident">Token</span>(
-    <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;personal-access-token&quot;</span>.<span class="ident">to_string</span>())
+    <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;personal-access-token&quot;</span>)
   ),
 );</pre></div>
 <p>GitHub enterprise customers will want to create a client with the
