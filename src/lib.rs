@@ -716,7 +716,7 @@ impl Github {
 
                 #[cfg(feature = "httpcache")]
                 let mut req = {
-                    let mut req = instance.client.request(method, url);
+                    let mut req = instance.client.request(method.clone(), url);
                     if method == Method::GET {
                         if let Ok(etag) = instance.http_cache.lookup_etag(&uri2) {
                             req = req.header(IF_NONE_MATCH, etag);

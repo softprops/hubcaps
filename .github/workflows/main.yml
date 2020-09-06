@@ -31,6 +31,7 @@ jobs:
         uses: hecrj/setup-rust-action@v1
       - uses: actions/checkout@v2
       - run: cargo check --all
+      - run: cargo check --all --features httpcache
 
   test:
     needs: [codestyle, lint, compile]
