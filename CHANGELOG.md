@@ -1,3 +1,8 @@
+# 0.6.2
+
+* Fix pagination for GitHub Enterprise [#247](https://github.com/softprops/hubcaps/pull/247)
+* Fix jsonwebtoken auth support [#264](https://github.com/softprops/hubcaps/pull/264)
+
 # 0.6.1
 
 * patch release just to update crates.io readme
