@@ -1184,6 +1184,57 @@
 <span id="1184">1184</span>
 <span id="1185">1185</span>
 <span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Repository interface</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
@@ -1683,6 +1734,10 @@
         <span class="ident">Contributors</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contributor_statistics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContributorStatistics</span> {
+        <span class="ident">ContributorStatistics</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
+    }
+
     <span class="doccomment">/// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">traffic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Traffic</span> {
@@ -2020,6 +2075,53 @@
         <span class="ident">RepoListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Week</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;w&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">week</span>: <span class="ident">u64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;a&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">additions</span>: <span class="ident">u64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;d&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">deletions</span>: <span class="ident">u64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;c&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">commits</span>: <span class="ident">u64</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ContributorStatistic</span> {
+    <span class="kw">pub</span> <span class="ident">author</span>: <span class="kw">crate</span>::<span class="ident">users</span>::<span class="ident">User</span>,
+    <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">weeks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Week</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ContributorStatistics</span> {
+    <span class="ident">github</span>: <span class="ident">Github</span>,
+    <span class="ident">owner</span>: <span class="ident">String</span>,
+    <span class="ident">repo</span>: <span class="ident">String</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ContributorStatistics</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">repo</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">github</span>,
+            <span class="ident">owner</span>: <span class="ident">owner</span>.<span class="ident">into</span>(),
+            <span class="ident">repo</span>: <span class="ident">repo</span>.<span class="ident">into</span>(),
+        }
+    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+            <span class="string">&quot;/repos/{}/{}/stats/contributors&quot;</span>,
+            <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>
+        ))
+    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+            <span class="string">&quot;/repos/{}/{}/stats/contributors&quot;</span>,
+            <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>
+        ))
     }
 }
 
