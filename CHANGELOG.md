@@ -3,6 +3,7 @@
 * Fix pagination for GitHub Enterprise [#247](https://github.com/softprops/hubcaps/pull/247)
 * Fix jsonwebtoken auth support [#264](https://github.com/softprops/hubcaps/pull/264)
 * Fix compile error with httpcache cargo feature [#270](https://github.com/softprops/hubcaps/pull/270)
+* Add repository contributor statistics api [](#272)(https://github.com/softprops/hubcaps/pull/272)
 
 # 0.6.1
 
