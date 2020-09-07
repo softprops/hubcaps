@@ -856,7 +856,7 @@ pub struct Week {
 pub struct ContributorStatistic {
     pub author: crate::users::User,
     pub total: u64,
-    pub weeks: Vec<Week>
+    pub weeks: Vec<Week>,
 }
 
 pub struct ContributorStatistics {
@@ -874,12 +874,16 @@ impl ContributorStatistics {
         }
     }
     pub fn list(&self) -> Future<Vec<ContributorStatistic>> {
-        self.github
-            .get(&format!("/repos/{}/{}/stats/contributors", self.owner, self.repo))
+        self.github.get(&format!(
+            "/repos/{}/{}/stats/contributors",
+            self.owner, self.repo
+        ))
     }
     pub fn iter(&self) -> Stream<ContributorStatistic> {
-        self.github
-            .get_stream(&format!("/repos/{}/{}/stats/contributors", self.owner, self.repo))
+        self.github.get_stream(&format!(
+            "/repos/{}/{}/stats/contributors",
+            self.owner, self.repo
+        ))
     }
 }
 
