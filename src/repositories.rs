@@ -496,6 +496,10 @@ impl Repository {
         Contributors::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
 
+    pub fn contributor_statistics(&self) -> ContributorStatistics {
+        ContributorStatistics::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
+
     /// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)
     /// associated with this repository ref
     pub fn traffic(&self) -> Traffic {
@@ -833,6 +837,49 @@ impl RepoListOptionsBuilder {
         RepoListOptions {
             params: self.0.params.clone(),
         }
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Week {
+    #[serde(rename = "w")]
+    pub week: u64,
+    #[serde(rename = "a")]
+    pub additions: u64,
+    #[serde(rename = "d")]
+    pub deletions: u64,
+    #[serde(rename = "c")]
+    pub commits: u64,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ContributorStatistic {
+    pub author: crate::users::User,
+    pub total: u64,
+    pub weeks: Vec<Week>
+}
+
+pub struct ContributorStatistics {
+    github: Github,
+    owner: String,
+    repo: String,
+}
+
+impl ContributorStatistics {
+    pub fn new(github: Github, owner: impl Into<String>, repo: impl Into<String>) -> Self {
+        Self {
+            github,
+            owner: owner.into(),
+            repo: repo.into(),
+        }
+    }
+    pub fn list(&self) -> Future<Vec<ContributorStatistic>> {
+        self.github
+            .get(&format!("/repos/{}/{}/stats/contributors", self.owner, self.repo))
+    }
+    pub fn iter(&self) -> Stream<ContributorStatistic> {
+        self.github
+            .get_stream(&format!("/repos/{}/{}/stats/contributors", self.owner, self.repo))
     }
 }
 
