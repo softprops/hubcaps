@@ -28,8 +28,11 @@ impl RepoCommits {
 
     /// list repo commits
     /// !!! make optional parameters
-    pub fn list(&self) -> Future<Vec<RepoCommit>> {
-        let uri = format!("/repos/{}/{}/commits", self.owner, self.repo);
+    pub fn list(&self, path: &str) -> Future<Vec<RepoCommit>> {
+        let mut uri = format!("/repos/{}/{}/commits", self.owner, self.repo);
+        if !path.is_empty() {
+            uri += &format!("?path={}", path);
+        }
         self.github.get::<Vec<RepoCommit>>(&uri)
     }
 

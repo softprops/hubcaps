@@ -71,9 +71,9 @@ impl Content {
 
     /// Creates a file at a specific location in a repository.
     /// You DO NOT need to base64 encode the content, we will do it for you.
-    pub fn create(&self, location: &str, content: &str, message: &str) -> Future<NewFileResponse> {
+    pub fn create(&self, location: &str, content: &[u8], message: &str) -> Future<NewFileResponse> {
         let file = &NewFile {
-            content: BASE64.encode(&content.to_string().into_bytes()),
+            content: BASE64.encode(content),
             message: message.to_string(),
             sha: None,
         };
@@ -85,12 +85,12 @@ impl Content {
     pub fn update(
         &self,
         location: &str,
-        content: &str,
+        content: &[u8],
         message: &str,
         sha: &str,
     ) -> Future<NewFileResponse> {
         let file = &NewFile {
-            content: BASE64.encode(&content.to_string().into_bytes()),
+            content: BASE64.encode(content),
             message: message.to_string(),
             sha: Some(sha.to_string()),
         };
