@@ -516,7 +516,7 @@ impl Repository {
 
 // representations (todo: replace with derive_builder)
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Repo {
     pub id: u64,
     pub owner: User,
