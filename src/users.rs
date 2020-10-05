@@ -66,6 +66,7 @@ pub struct UserEmail {
     pub email: String,
     pub primary: bool,
     pub verified: bool,
+    pub visibility: Option<String>,
 }
 
 /// Query user information
