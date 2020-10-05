@@ -61,6 +61,13 @@ pub struct AuthenticatedUser {
     pub updated_at: String, // TODO: change to `DateTime`?
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UserEmail {
+    pub email: String,
+    pub primary: bool,
+    pub verified: bool,
+}
+
 /// Query user information
 pub struct Users {
     github: Github,
@@ -74,6 +81,11 @@ impl Users {
     /// Information about current authenticated user
     pub fn authenticated(&self) -> Future<AuthenticatedUser> {
         self.github.get("/user")
+    }
+
+    /// Get current authenticated user's email list
+    pub fn authenticated_emails(&self) -> Future<Vec<UserEmail>> {
+        self.github.get("/user/emails")
     }
 
     pub fn get<U>(&self, username: U) -> Future<User>
