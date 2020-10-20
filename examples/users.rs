@@ -27,5 +27,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Ok(user) => println!("{:#?}", user),
         Err(err) => println!("err {:#?}", err),
     }
+
+    match github.users().authenticated_emails().await {
+        Ok(emails) => println!("{:#?}", emails),
+        Err(err) => println!("err {:#?}", err),
+    }
+
     Ok(())
 }
