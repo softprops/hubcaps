@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1371,10 +1372,10 @@
 <span class="kw">const</span> <span class="ident">JWT_TOKEN_REFRESH_PERIOD</span>: <span class="ident">time</span>::<span class="ident">Duration</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">8</span>);
 
 <span class="doccomment">/// A type alias for `Futures` that may return `hubcaps::Errors`</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdFuture</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdFuture</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;&gt;</span>;
 
 <span class="doccomment">/// A type alias for `Streams` that may result in `hubcaps::Errors`</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdStream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdStream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;&gt;</span>;
 
 <span class="kw">const</span> <span class="ident">X_GITHUB_REQUEST_ID</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-github-request-id&quot;</span>;
 <span class="kw">const</span> <span class="ident">X_RATELIMIT_LIMIT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-ratelimit-limit&quot;</span>;
@@ -1405,16 +1406,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MediaType</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MediaType</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">MediaType</span> {
         <span class="ident">MediaType</span>::<span class="ident">Json</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mime</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-&gt;</span> <span class="ident">Mime</span> {
         <span class="kw">match</span> <span class="ident">media</span> {
-            <span class="ident">MediaType</span>::<span class="ident">Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;application/vnd.github.v3+json&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">MediaType</span>::<span class="ident">Preview</span>(<span class="ident">codename</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MediaType</span>::<span class="ident">Json</span> <span class="op">=&gt;</span> <span class="string">&quot;application/vnd.github.v3+json&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>(),
+            <span class="ident">MediaType</span>::<span class="ident">Preview</span>(<span class="ident">codename</span>) <span class="op">=&gt;</span> {
                 <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;application/vnd.github.{}-preview+json&quot;</span>, <span class="ident">codename</span>)
                     .<span class="ident">parse</span>()
                     .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
@@ -1444,17 +1445,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">SortDirection</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SortDirection</span>::<span class="ident">Asc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;asc&quot;</span>,
-            <span class="ident">SortDirection</span>::<span class="ident">Desc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;desc&quot;</span>,
+            <span class="ident">SortDirection</span>::<span class="ident">Asc</span> <span class="op">=&gt;</span> <span class="string">&quot;asc&quot;</span>,
+            <span class="ident">SortDirection</span>::<span class="ident">Desc</span> <span class="op">=&gt;</span> <span class="string">&quot;desc&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SortDirection</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SortDirection</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">SortDirection</span> {
         <span class="ident">SortDirection</span>::<span class="ident">Asc</span>
     }
 }
@@ -1478,23 +1479,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Credentials</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Credentials</span>::<span class="ident">Token</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            <span class="ident">Credentials</span>::<span class="ident">Token</span>(<span class="ident">value</span>) <span class="op">=&gt;</span> <span class="ident">f</span>
                 .<span class="ident">debug_tuple</span>(<span class="string">&quot;Credentials::Token&quot;</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;*&quot;</span>.<span class="ident">repeat</span>(<span class="ident">value</span>.<span class="ident">len</span>()))
                 .<span class="ident">finish</span>(),
-            <span class="ident">Credentials</span>::<span class="ident">Client</span>(<span class="ident">id</span>, <span class="ident">secret</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            <span class="ident">Credentials</span>::<span class="ident">Client</span>(<span class="ident">id</span>, <span class="ident">secret</span>) <span class="op">=&gt;</span> <span class="ident">f</span>
                 .<span class="ident">debug_tuple</span>(<span class="string">&quot;Credentials::Client&quot;</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;*&quot;</span>.<span class="ident">repeat</span>(<span class="ident">secret</span>.<span class="ident">len</span>()))
                 .<span class="ident">finish</span>(),
-            <span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="ident">jwt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            <span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="ident">jwt</span>) <span class="op">=&gt;</span> <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Credentials::JWT&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;app_id&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">jwt</span>.<span class="ident">app_id</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;private_key&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;vec![***]&quot;</span>)
                 .<span class="ident">finish</span>(),
-            <span class="ident">Credentials</span>::<span class="ident">InstallationToken</span>(<span class="ident">generator</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            <span class="ident">Credentials</span>::<span class="ident">InstallationToken</span>(<span class="ident">generator</span>) <span class="op">=&gt;</span> <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Credentials::InstallationToken&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;installation_id&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">generator</span>.<span class="ident">installation_id</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;jwt_credential&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;***&quot;</span>)
@@ -1517,11 +1518,11 @@
     <span class="doccomment">/// DER RSA key. Generate with</span>
     <span class="doccomment">/// `openssl rsa -in private_rsa_key.pem -outform DER -out private_rsa_key.der`</span>
     <span class="kw">pub</span> <span class="ident">private_key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ExpiringJWTCredential</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ExpiringJWTCredential</span><span class="op">&gt;&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">JWTCredentials</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">app_id</span>: <span class="ident">u64</span>, <span class="ident">private_key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JWTCredentials</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">app_id</span>: <span class="ident">u64</span>, <span class="ident">private_key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JWTCredentials</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">creds</span> <span class="op">=</span> <span class="ident">ExpiringJWTCredential</span>::<span class="ident">calculate</span>(<span class="ident">app_id</span>, <span class="kw-2">&amp;</span><span class="ident">private_key</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">JWTCredentials</span> {
@@ -1531,12 +1532,12 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">is_stale</span>()
     }
 
     <span class="doccomment">/// Fetch a valid JWT token, regenerating it if necessary</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expiring</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="kw">if</span> <span class="ident">expiring</span>.<span class="ident">is_stale</span>() {
             <span class="kw-2">*</span><span class="ident">expiring</span> <span class="op">=</span> <span class="ident">ExpiringJWTCredential</span>::<span class="ident">calculate</span>(<span class="self">self</span>.<span class="ident">app_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">private_key</span>)
@@ -1548,8 +1549,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">JWTCredentials</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">JWTCredentials</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">app_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">app_id</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">private_key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">private_key</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">JWTCredentials</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">app_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">app_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">private_key</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">private_key</span>
     }
 }
 
@@ -1567,7 +1568,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExpiringJWTCredential</span> {
-    <span class="kw">fn</span> <span class="ident">calculate</span>(<span class="ident">app_id</span>: <span class="ident">u64</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExpiringJWTCredential</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">calculate</span>(<span class="ident">app_id</span>: <span class="ident">u64</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExpiringJWTCredential</span><span class="op">&gt;</span> {
         <span class="comment">// SystemTime can go backwards, Instant can&#39;t, so always use</span>
         <span class="comment">// Instant for ensuring regular cycling.</span>
         <span class="kw">let</span> <span class="ident">created_at</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">Instant</span>::<span class="ident">now</span>();
@@ -1594,8 +1595,8 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">created_at</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">JWT_TOKEN_REFRESH_PERIOD</span>
+    <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">created_at</span>.<span class="ident">elapsed</span>() <span class="op">&gt;=</span> <span class="ident">JWT_TOKEN_REFRESH_PERIOD</span>
     }
 }
 
@@ -1610,11 +1611,11 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InstallationTokenGenerator</span> {
     <span class="kw">pub</span> <span class="ident">installation_id</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">jwt_credential</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span>,
-    <span class="ident">access_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">access_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">InstallationTokenGenerator</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">installation_id</span>: <span class="ident">u64</span>, <span class="ident">creds</span>: <span class="ident">JWTCredentials</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstallationTokenGenerator</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">installation_id</span>: <span class="ident">u64</span>, <span class="ident">creds</span>: <span class="ident">JWTCredentials</span>) <span class="op">-&gt;</span> <span class="ident">InstallationTokenGenerator</span> {
         <span class="ident">InstallationTokenGenerator</span> {
             <span class="ident">installation_id</span>,
             <span class="ident">jwt_credential</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="ident">creds</span>)),
@@ -1622,7 +1623,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="kw-2">ref</span> <span class="ident">creds</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">jwt_credential</span> {
             <span class="kw">if</span> <span class="ident">creds</span>.<span class="ident">is_stale</span>() {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -1631,14 +1632,14 @@
         <span class="self">self</span>.<span class="ident">access_key</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">jwt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Credentials</span> {
+    <span class="kw">fn</span> <span class="ident">jwt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Credentials</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">jwt_credential</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">InstallationTokenGenerator</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">InstallationTokenGenerator</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">installation_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">installation_id</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">jwt_credential</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">jwt_credential</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">InstallationTokenGenerator</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">installation_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">installation_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">jwt_credential</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">jwt_credential</span>
     }
 }
 
@@ -1654,19 +1655,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Github</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">C</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;&gt;</span>,
     {
         <span class="self">Self</span>::<span class="ident">host</span>(<span class="ident">DEFAULT_HOST</span>, <span class="ident">agent</span>, <span class="ident">credentials</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">A</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">host</span>: <span class="ident">H</span>, <span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">A</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">host</span>: <span class="ident">H</span>, <span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">C</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>().<span class="ident">build</span>()<span class="question-mark">?</span>;
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
@@ -1692,11 +1693,11 @@
         <span class="ident">credentials</span>: <span class="ident">CR</span>,
         <span class="ident">http</span>: <span class="ident">Client</span>,
         <span class="ident">http_cache</span>: <span class="ident">BoxedHttpCache</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    ) <span class="op">-&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;&gt;</span>,
     {
         <span class="self">Self</span> {
             <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">into</span>(),
@@ -1708,11 +1709,11 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">A</span>, <span class="ident">CR</span><span class="op">&gt;</span>(<span class="ident">host</span>: <span class="ident">H</span>, <span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">CR</span>, <span class="ident">http</span>: <span class="ident">Client</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">A</span>, <span class="ident">CR</span><span class="op">&gt;</span>(<span class="ident">host</span>: <span class="ident">H</span>, <span class="ident">agent</span>: <span class="ident">A</span>, <span class="ident">credentials</span>: <span class="ident">CR</span>, <span class="ident">http</span>: <span class="ident">Client</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;&gt;</span>,
     {
         <span class="self">Self</span> {
             <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">into</span>(),
@@ -1724,22 +1725,22 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_credentials</span><span class="op">&lt;</span><span class="ident">CR</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">credentials</span>: <span class="ident">CR</span>)
     <span class="kw">where</span>
-        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">CR</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credentials</span><span class="op">&gt;&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">credentials</span> <span class="op">=</span> <span class="ident">credentials</span>.<span class="ident">into</span>();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RateLimit</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RateLimit</span> {
         <span class="ident">RateLimit</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to user activity</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Activity</span> {
         <span class="ident">Activity</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to a Github repository</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Repository</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="ident">Repository</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1749,7 +1750,7 @@
 
     <span class="doccomment">/// Return a reference to the collection of repositories owned by and</span>
     <span class="doccomment">/// associated with an owner</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_repos</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserRepositories</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_repos</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">UserRepositories</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1758,11 +1759,11 @@
 
     <span class="doccomment">/// Return a reference to the collection of repositories owned by the user</span>
     <span class="doccomment">/// associated with the current authentication credentials</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Repositories</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Repositories</span> {
         <span class="ident">Repositories</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Organization</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="ident">Organization</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1771,19 +1772,19 @@
 
     <span class="doccomment">/// Return a reference to the collection of organizations that the user</span>
     <span class="doccomment">/// associated with the current authentication credentials is in</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">orgs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Organizations</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">orgs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Organizations</span> {
         <span class="ident">Organizations</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to an interface that provides access</span>
     <span class="doccomment">/// to user information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Users</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Users</span> {
         <span class="ident">Users</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to the collection of organizations a user</span>
     <span class="doccomment">/// is publicly associated with</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_orgs</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserOrganizations</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_orgs</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) <span class="op">-&gt;</span> <span class="ident">UserOrganizations</span>
     <span class="kw">where</span>
         <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1791,7 +1792,7 @@
     }
 
     <span class="doccomment">/// Return a reference to an interface that provides access to a user&#39;s gists</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_gists</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserGists</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_gists</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="ident">UserGists</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1800,18 +1801,18 @@
 
     <span class="doccomment">/// Return a reference to an interface that provides access to the</span>
     <span class="doccomment">/// gists belonging to the owner of the token used to configure this client</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Gists</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Gists</span> {
         <span class="ident">Gists</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to an interface that provides access to search operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Search</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Search</span> {
         <span class="ident">Search</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to the collection of repositories owned by and</span>
     <span class="doccomment">/// associated with an organization</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_repos</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrganizationRepositories</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_repos</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="ident">OrganizationRepositories</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1819,19 +1820,19 @@
     }
 
     <span class="doccomment">/// Return a reference to GitHub Apps</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">App</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">App</span> {
         <span class="ident">App</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">credentials</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Credentials</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">credentials</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Credentials</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="ident">authentication</span>, <span class="self">self</span>.<span class="ident">credentials</span>.<span class="ident">as_ref</span>()) {
-            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">Unconstrained</span>, <span class="ident">creds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">creds</span>,
-            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">JWT</span>, <span class="ident">creds</span> @ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">creds</span>,
+            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">Unconstrained</span>, <span class="ident">creds</span>) <span class="op">=&gt;</span> <span class="ident">creds</span>,
+            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">JWT</span>, <span class="ident">creds</span> @ <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="kw">_</span>))) <span class="op">=&gt;</span> <span class="ident">creds</span>,
             (
                 <span class="ident">AuthenticationConstraint</span>::<span class="ident">JWT</span>,
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">InstallationToken</span>(<span class="kw-2">ref</span> <span class="ident">apptoken</span>)),
-            ) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">apptoken</span>.<span class="ident">jwt</span>()),
-            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">JWT</span>, <span class="ident">creds</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            ) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">apptoken</span>.<span class="ident">jwt</span>()),
+            (<span class="ident">AuthenticationConstraint</span>::<span class="ident">JWT</span>, <span class="ident">creds</span>) <span class="op">=&gt;</span> {
                 <span class="macro">error</span><span class="macro">!</span>(
                     <span class="string">&quot;Request needs JWT authentication but only {:?} available&quot;</span>,
                     <span class="ident">creds</span>
@@ -1845,11 +1846,11 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="ident">Url</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="ident">Url</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">parsed_url</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">credentials</span>(<span class="ident">authentication</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">Client</span>(<span class="kw-2">ref</span> <span class="ident">id</span>, <span class="kw-2">ref</span> <span class="ident">secret</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">Client</span>(<span class="kw-2">ref</span> <span class="ident">id</span>, <span class="kw-2">ref</span> <span class="ident">secret</span>)) <span class="op">=&gt;</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
                 <span class="ident">parsed_url</span>
                     .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">u</span><span class="op">|</span> {
                         <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>()
@@ -1859,19 +1860,19 @@
                     })
                     .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>),
             )),
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">Token</span>(<span class="kw-2">ref</span> <span class="ident">token</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">Token</span>(<span class="kw-2">ref</span> <span class="ident">token</span>)) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;token {}&quot;</span>, <span class="ident">token</span>);
                 <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
                     <span class="ident">parsed_url</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> (<span class="ident">u</span>, <span class="prelude-val">Some</span>(<span class="ident">auth</span>))).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>),
                 ))
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="kw-2">ref</span> <span class="ident">jwt</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">JWT</span>(<span class="kw-2">ref</span> <span class="ident">jwt</span>)) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">jwt</span>.<span class="ident">token</span>());
                 <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
                     <span class="ident">parsed_url</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> (<span class="ident">u</span>, <span class="prelude-val">Some</span>(<span class="ident">auth</span>))).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>),
                 ))
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">InstallationToken</span>(<span class="kw-2">ref</span> <span class="ident">apptoken</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Credentials</span>::<span class="ident">InstallationToken</span>(<span class="kw-2">ref</span> <span class="ident">apptoken</span>)) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">apptoken</span>.<span class="ident">token</span>() {
                     <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;token {}&quot;</span>, <span class="ident">token</span>);
                     <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
@@ -1893,7 +1894,7 @@
                     )
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(
                 <span class="ident">parsed_url</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> (<span class="ident">u</span>, <span class="prelude-val">None</span>)).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>),
             )),
         }
@@ -1903,10 +1904,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">method</span>: <span class="ident">Method</span>,
         <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>,
         <span class="ident">media_type</span>: <span class="ident">MediaType</span>,
         <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">Out</span>)<span class="op">&gt;</span>
+    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">Out</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Out</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -1924,7 +1925,7 @@
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method</span>.<span class="ident">clone</span>(), <span class="ident">url</span>);
-                    <span class="kw">if</span> <span class="ident">method</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Method</span>::<span class="ident">GET</span> {
+                    <span class="kw">if</span> <span class="ident">method</span> <span class="op">==</span> <span class="ident">Method</span>::<span class="ident">GET</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">etag</span>) <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">http_cache</span>.<span class="ident">lookup_etag</span>(<span class="kw-2">&amp;</span><span class="ident">uri2</span>) {
                             <span class="ident">req</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">header</span>(<span class="ident">IF_NONE_MATCH</span>, <span class="ident">etag</span>);
                         }
@@ -1993,11 +1994,11 @@
                                     }
                                 }
                             }
-                            <span class="kw">let</span> <span class="ident">parsed_response</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">StatusCode</span>::<span class="ident">NO_CONTENT</span> { <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="string">&quot;null&quot;</span>) } <span class="kw">else</span> { <span class="ident">serde_json</span>::<span class="ident">from_slice</span>::<span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response_body</span>) };
+                            <span class="kw">let</span> <span class="ident">parsed_response</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">StatusCode</span>::<span class="ident">NO_CONTENT</span> { <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="string">&quot;null&quot;</span>) } <span class="kw">else</span> { <span class="ident">serde_json</span>::<span class="ident">from_slice</span>::<span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response_body</span>) };
                             <span class="ident">parsed_response</span>
                                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">out</span><span class="op">|</span> (<span class="ident">link</span>, <span class="ident">out</span>))
                                 .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">Codec</span>)
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">StatusCode</span>::<span class="ident">NOT_MODIFIED</span> {
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">StatusCode</span>::<span class="ident">NOT_MODIFIED</span> {
                             <span class="comment">// only supported case is when client provides if-none-match</span>
                             <span class="comment">// header when cargo builds with --cfg feature=&quot;httpcache&quot;</span>
                             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
@@ -2011,8 +2012,8 @@
                                             .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>)
                                             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">out</span><span class="op">|</span> {
                                                 <span class="kw">let</span> <span class="ident">link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link</span> {
-                                                    <span class="prelude-val">Some</span>(<span class="ident">link</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">link</span>)),
-                                                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">instance2</span>
+                                                    <span class="prelude-val">Some</span>(<span class="ident">link</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">link</span>)),
+                                                    <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">instance2</span>
                                                         .<span class="ident">http_cache</span>
                                                         .<span class="ident">lookup_next_link</span>(<span class="kw-2">&amp;</span><span class="ident">uri3</span>)
                                                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next_link</span><span class="op">|</span> <span class="ident">next_link</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> {
@@ -2030,7 +2031,7 @@
                             }
                         } <span class="kw">else</span> {
                             <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">remaining</span>, <span class="ident">reset</span>) {
-                                (<span class="prelude-val">Some</span>(<span class="ident">remaining</span>), <span class="prelude-val">Some</span>(<span class="ident">reset</span>)) <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                (<span class="prelude-val">Some</span>(<span class="ident">remaining</span>), <span class="prelude-val">Some</span>(<span class="ident">reset</span>)) <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> <span class="op">=&gt;</span> {
                                     <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">SystemTime</span>::<span class="ident">now</span>()
                                         .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
                                         .<span class="ident">unwrap</span>()
@@ -2039,7 +2040,7 @@
                                         <span class="ident">reset</span>: <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">reset</span>) <span class="op">-</span> <span class="ident">now</span>),
                                     }
                                 }
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error</span>::<span class="ident">Fault</span> {
+                                <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">Error</span>::<span class="ident">Fault</span> {
                                     <span class="ident">code</span>: <span class="ident">status</span>,
                                     <span class="ident">error</span>: <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">response_body</span>)<span class="question-mark">?</span>,
                                 },
@@ -2055,10 +2056,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">method</span>: <span class="ident">Method</span>,
         <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>,
         <span class="ident">media_type</span>: <span class="ident">MediaType</span>,
         <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2068,14 +2069,14 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="self">self</span>.<span class="ident">get_media</span>(<span class="ident">uri</span>, <span class="ident">MediaType</span>::<span class="ident">Json</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">get_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2088,14 +2089,14 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">get_stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">get_stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="ident">unfold</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">get_pages</span>(<span class="ident">uri</span>), <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pages</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">D</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">get_pages</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">D</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2108,7 +2109,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pages_url</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">D</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">get_pages_url</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">D</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2121,7 +2122,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">Box</span>::<span class="ident">pin</span>(
             <span class="self">self</span>.<span class="ident">request_entity</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(
                 <span class="ident">Method</span>::<span class="ident">DELETE</span>,
@@ -2132,14 +2133,14 @@
             )
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">match</span> <span class="ident">err</span> {
-                    <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">otherwise</span>),
+                    <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
+                    <span class="ident">otherwise</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">otherwise</span>),
                 }
             }),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">delete_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delete_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">Box</span>::<span class="ident">pin</span>(
             <span class="self">self</span>.<span class="ident">request_entity</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(
                 <span class="ident">Method</span>::<span class="ident">DELETE</span>,
@@ -2150,14 +2151,14 @@
             )
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">match</span> <span class="ident">err</span> {
-                    <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                    <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">otherwise</span>),
+                    <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
+                    <span class="ident">otherwise</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">otherwise</span>),
                 }
             }),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">post</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">post</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2175,7 +2176,7 @@
         <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">media</span>: <span class="ident">MediaType</span>,
         <span class="ident">authentication</span>: <span class="ident">AuthenticationConstraint</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2188,16 +2189,16 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">patch_no_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">patch_no_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="self">self</span>.<span class="ident">patch</span>(<span class="ident">uri</span>, <span class="ident">message</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">match</span> <span class="ident">err</span> {
-                <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
+                <span class="ident">err</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }))
     }
 
-    <span class="kw">fn</span> <span class="ident">patch_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">patch_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2210,30 +2211,30 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">patch</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">patch</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="self">self</span>.<span class="ident">patch_media</span>(<span class="ident">uri</span>, <span class="ident">message</span>, <span class="ident">MediaType</span>::<span class="ident">Json</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">put_no_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">put_no_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="self">self</span>.<span class="ident">put</span>(<span class="ident">uri</span>, <span class="ident">message</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">match</span> <span class="ident">err</span> {
-                <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="ident">Error</span>::<span class="ident">Codec</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
+                <span class="ident">err</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }))
     }
 
-    <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="self">self</span>.<span class="ident">put_media</span>(<span class="ident">uri</span>, <span class="ident">message</span>, <span class="ident">MediaType</span>::<span class="ident">Json</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">put_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">put_media</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">media</span>: <span class="ident">MediaType</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -2250,9 +2251,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>))]</span>
 <span class="kw">type</span> <span class="ident">HeaderValues</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>);
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;httpcache&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">HeaderValues</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">type</span> <span class="ident">HeaderValues</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>);
 
-<span class="kw">fn</span> <span class="ident">get_header_values</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderMap</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValues</span> {
+<span class="kw">fn</span> <span class="ident">get_header_values</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderMap</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">HeaderValues</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">X_GITHUB_REQUEST_ID</span>) {
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;x-github-request-id: {:?}&quot;</span>, <span class="ident">value</span>)
     }
@@ -2287,10 +2288,10 @@
     (<span class="ident">remaining</span>, <span class="ident">reset</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">next_link</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="ident">Link</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">next_link</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="ident">Link</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">l</span>.<span class="ident">values</span>().<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
         <span class="ident">value</span>.<span class="ident">rel</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rels</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">rels</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">rel</span><span class="op">|</span> <span class="ident">rel</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RelationType</span>::<span class="ident">Next</span>) {
+            <span class="kw">if</span> <span class="ident">rels</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">rel</span><span class="op">|</span> <span class="ident">rel</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">RelationType</span>::<span class="ident">Next</span>) {
                 <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">link</span>().<span class="ident">into</span>())
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
@@ -2303,8 +2304,8 @@
 <span class="kw">fn</span> <span class="ident">unfold</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">github</span>: <span class="ident">Github</span>,
     <span class="ident">first</span>: <span class="ident">Future</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>, <span class="ident">D</span>)<span class="op">&gt;</span>,
-    <span class="ident">into_items</span>: <span class="kw">fn</span>(<span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+    <span class="ident">into_items</span>: <span class="kw">fn</span>(<span class="ident">D</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     <span class="ident">I</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
@@ -2318,9 +2319,9 @@
                     (<span class="ident">github</span>, <span class="ident">link</span>, <span class="ident">items</span>),
                     <span class="kw">move</span> <span class="op">|</span>(<span class="ident">github</span>, <span class="ident">link</span>, <span class="kw-2">mut</span> <span class="ident">items</span>)<span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                         <span class="kw">match</span> <span class="ident">items</span>.<span class="ident">pop</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">item</span>, (<span class="ident">github</span>, <span class="ident">link</span>, <span class="ident">items</span>)))),
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">link</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">next_link</span>(<span class="kw-2">&amp;</span><span class="ident">l</span>)) {
-                                <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">item</span>, (<span class="ident">github</span>, <span class="ident">link</span>, <span class="ident">items</span>)))),
+                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">link</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">next_link</span>(<span class="kw-2">&amp;</span><span class="ident">l</span>)) {
+                                <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=&gt;</span> {
                                     <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">unwrap</span>();
                                     <span class="kw">let</span> (<span class="ident">link</span>, <span class="ident">payload</span>) <span class="op">=</span> <span class="ident">github</span>.<span class="ident">get_pages_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">into_items</span>(<span class="ident">payload</span>);
@@ -2328,7 +2329,7 @@
                                     <span class="ident">items</span>.<span class="ident">reverse</span>();
                                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">item</span>, (<span class="ident">github</span>, <span class="ident">link</span>, <span class="ident">items</span>))))
                                 }
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
                             },
                         }
                     },
