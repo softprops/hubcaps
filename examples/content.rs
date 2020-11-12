@@ -16,12 +16,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let repo = github.repo("softprops", "hubcaps");
 
     println!("License file:");
-    let license = repo.content().file("LICENSE").await?;
+    let license = repo.content().file("master", "LICENSE").await?;
     println!("{}", str::from_utf8(&license.content).unwrap());
 
     println!("Directory contents stream:");
     repo.content()
-        .iter("/examples")
+        .iter("master", "/examples")
         .try_for_each(|item| async move {
             println!("  {}", item.path);
             Ok(())
@@ -29,7 +29,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
 
     println!("Root directory:");
-    for item in repo.content().root().try_collect::<Vec<_>>().await? {
+    for item in repo
+        .content()
+        .root("master")
+        .try_collect::<Vec<_>>()
+        .await?
+    {
         println!("  {}", item.path)
     }
 
