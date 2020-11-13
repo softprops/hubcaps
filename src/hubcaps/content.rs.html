@@ -259,6 +259,10 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Content interface</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -293,49 +297,53 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
         <span class="comment">// Handle files with spaces and other characters that can mess up the</span>
         <span class="comment">// final URL.</span>
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">percent_encode</span>(<span class="ident">location</span>.<span class="ident">as_ref</span>(), <span class="ident">PATH</span>);
-        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/contents{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">location</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/contents{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">location</span>);
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">ref_</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">path</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;?ref={}&quot;</span>, <span class="ident">ref_</span>);
+        }
+        <span class="ident">path</span>
     }
 
     <span class="doccomment">/// Gets the contents of the location. This could be a file, symlink, or</span>
     <span class="doccomment">/// submodule. To list the contents of a directory, use `iter`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Contents</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Contents</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
     <span class="doccomment">/// Information on a single file.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// GitHub only supports downloading files up to 1 megabyte in size. If you</span>
     <span class="doccomment">/// need to retrieve larger files, the Git Data API must be used instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">File</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">File</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
     <span class="doccomment">/// List the root directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>(<span class="string">&quot;/&quot;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">iter</span>(<span class="string">&quot;/&quot;</span>, <span class="ident">ref_</span>)
     }
 
     <span class="doccomment">/// Provides a stream over the directory items in `location`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// GitHub limits the number of items returned to 1000 for this API. If you</span>
     <span class="doccomment">/// need to retrieve more items, the Git Data API must be used instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
     <span class="doccomment">/// Creates a file at a specific location in a repository.</span>
     <span class="doccomment">/// You DO NOT need to base64 encode the content, we will do it for you.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NewFile</span> {
-            <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">to_string</span>().<span class="ident">into_bytes</span>()),
+            <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="ident">content</span>),
             <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
             <span class="ident">sha</span>: <span class="prelude-val">None</span>,
         };
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
     }
 
     <span class="doccomment">/// Updates a file at a specific location in a repository.</span>
@@ -343,16 +351,16 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">sha</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NewFile</span> {
-            <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">to_string</span>().<span class="ident">into_bytes</span>()),
+            <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="ident">content</span>),
             <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
             <span class="ident">sha</span>: <span class="prelude-val">Some</span>(<span class="ident">sha</span>.<span class="ident">to_string</span>()),
         };
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
     }
 }
 
