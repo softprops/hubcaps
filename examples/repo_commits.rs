@@ -17,7 +17,11 @@ async fn main() -> Result<()> {
     println!("Check out the first commit: {:#?}", first_commit);
 
     println!("Here are some more recent commits:");
-    let commits = github.repo("softprops", "hubcaps").commits().list().await?;
+    let commits = github
+        .repo("softprops", "hubcaps")
+        .commits()
+        .list("")
+        .await?;
     for commit in commits {
         println!(" - {}", commit.author.login);
     }

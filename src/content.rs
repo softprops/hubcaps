@@ -31,49 +31,53 @@ impl Content {
         }
     }
 
-    fn path(&self, location: &str) -> String {
+    fn path(&self, location: &str, ref_: &str) -> String {
         // Handle files with spaces and other characters that can mess up the
         // final URL.
         let location = percent_encode(location.as_ref(), PATH);
-        format!("/repos/{}/{}/contents{}", self.owner, self.repo, location)
+        let mut path = format!("/repos/{}/{}/contents{}", self.owner, self.repo, location);
+        if !ref_.is_empty() {
+            path += &format!("?ref={}", ref_);
+        }
+        path
     }
 
     /// Gets the contents of the location. This could be a file, symlink, or
     /// submodule. To list the contents of a directory, use `iter`.
-    pub fn get(&self, location: &str) -> Future<Contents> {
-        self.github.get(&self.path(location))
+    pub fn get(&self, location: &str, ref_: &str) -> Future<Contents> {
+        self.github.get(&self.path(location, ref_))
     }
 
     /// Information on a single file.
     ///
     /// GitHub only supports downloading files up to 1 megabyte in size. If you
     /// need to retrieve larger files, the Git Data API must be used instead.
-    pub fn file(&self, location: &str) -> Future<File> {
-        self.github.get(&self.path(location))
+    pub fn file(&self, location: &str, ref_: &str) -> Future<File> {
+        self.github.get(&self.path(location, ref_))
     }
 
     /// List the root directory.
-    pub fn root(&self) -> Stream<DirectoryItem> {
-        self.iter("/")
+    pub fn root(&self, ref_: &str) -> Stream<DirectoryItem> {
+        self.iter("/", ref_)
     }
 
     /// Provides a stream over the directory items in `location`.
     ///
     /// GitHub limits the number of items returned to 1000 for this API. If you
     /// need to retrieve more items, the Git Data API must be used instead.
-    pub fn iter(&self, location: &str) -> Stream<DirectoryItem> {
-        self.github.get_stream(&self.path(location))
+    pub fn iter(&self, location: &str, ref_: &str) -> Stream<DirectoryItem> {
+        self.github.get_stream(&self.path(location, ref_))
     }
 
     /// Creates a file at a specific location in a repository.
     /// You DO NOT need to base64 encode the content, we will do it for you.
-    pub fn create(&self, location: &str, content: &str, message: &str) -> Future<NewFileResponse> {
+    pub fn create(&self, location: &str, content: &[u8], message: &str) -> Future<NewFileResponse> {
         let file = &NewFile {
-            content: BASE64.encode(&content.to_string().into_bytes()),
+            content: BASE64.encode(content),
             message: message.to_string(),
             sha: None,
         };
-        self.github.put(&self.path(location), json!(file))
+        self.github.put(&self.path(location, ""), json!(file))
     }
 
     /// Updates a file at a specific location in a repository.
@@ -81,16 +85,16 @@ impl Content {
     pub fn update(
         &self,
         location: &str,
-        content: &str,
+        content: &[u8],
         message: &str,
         sha: &str,
     ) -> Future<NewFileResponse> {
         let file = &NewFile {
-            content: BASE64.encode(&content.to_string().into_bytes()),
+            content: BASE64.encode(content),
             message: message.to_string(),
             sha: Some(sha.to_string()),
         };
-        self.github.put(&self.path(location), json!(file))
+        self.github.put(&self.path(location, ""), json!(file))
     }
 }
 
