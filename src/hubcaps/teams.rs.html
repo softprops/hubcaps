@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/teams.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>teams.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/teams.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>teams.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -246,11 +248,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Permission</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Permission</span>::<span class="ident">Pull</span> <span class="op">=&gt;</span> <span class="string">&quot;pull&quot;</span>,
-            <span class="ident">Permission</span>::<span class="ident">Push</span> <span class="op">=&gt;</span> <span class="string">&quot;push&quot;</span>,
-            <span class="ident">Permission</span>::<span class="ident">Admin</span> <span class="op">=&gt;</span> <span class="string">&quot;admin&quot;</span>,
+            <span class="ident">Permission</span>::<span class="ident">Pull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;pull&quot;</span>,
+            <span class="ident">Permission</span>::<span class="ident">Push</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;push&quot;</span>,
+            <span class="ident">Permission</span>::<span class="ident">Admin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;admin&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -265,7 +267,7 @@
 
 <span class="kw">impl</span> <span class="ident">RepoTeams</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -278,13 +280,13 @@
     }
 
     <span class="doccomment">/// list of teams for this repo</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/teams&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>))
     }
 
     <span class="doccomment">/// provides a stream over all pages of teams</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>
             .<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/teams&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>))
     }
@@ -298,7 +300,7 @@
 
 <span class="kw">impl</span> <span class="ident">OrgTeams</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -309,24 +311,24 @@
     }
 
     <span class="doccomment">/// list of teams for this org</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/orgs/{}/teams&quot;</span>, <span class="self">self</span>.<span class="ident">org</span>))
     }
 
     <span class="doccomment">/// Get a reference to a structure for interfacing with a specific</span>
     <span class="doccomment">/// team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="ident">OrgTeamActions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrgTeamActions</span> {
         <span class="ident">OrgTeamActions</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="ident">number</span>)
     }
 
     <span class="doccomment">/// create team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">team_options</span>: <span class="kw-2">&amp;</span><span class="ident">TeamOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">team_options</span>: <span class="kw-2">&amp;</span><span class="ident">TeamOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>
             .<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/orgs/{}/teams&quot;</span>, <span class="self">self</span>.<span class="ident">org</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">team_options</span>))
     }
 
     <span class="doccomment">/// provides an iterator over all pages of teams</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/orgs/{}/teams&quot;</span>, <span class="self">self</span>.<span class="ident">org</span>))
     }
 
@@ -337,7 +339,7 @@
         <span class="ident">team_id</span>: <span class="ident">u64</span>,
         <span class="ident">repo_name</span>: <span class="ident">N</span>,
         <span class="ident">permission</span>: <span class="ident">Permission</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -356,43 +358,43 @@
 
 <span class="kw">impl</span> <span class="ident">OrgTeamActions</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">OrgTeamActions</span> { <span class="ident">github</span>, <span class="ident">number</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/teams/{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">number</span>, <span class="ident">suffix</span>)
     }
 
     <span class="doccomment">/// list the team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="doccomment">/// edit the team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">team_options</span>: <span class="kw-2">&amp;</span><span class="ident">TeamOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">team_options</span>: <span class="kw-2">&amp;</span><span class="ident">TeamOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">patch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">team_options</span>))
     }
 
     <span class="doccomment">/// delete the team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="doccomment">/// list of teams for this org</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;/members&quot;</span>))
     }
 
     <span class="doccomment">/// provides an iterator over all pages of members</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;/members&quot;</span>))
     }
 
     <span class="doccomment">/// add a user to the team, if they are already on the team,</span>
     <span class="doccomment">/// change the role. If the user is not yet part of the</span>
     <span class="doccomment">/// organization, they are invited to join.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">user_options</span>: <span class="ident">TeamMemberOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">TeamMember</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">user_options</span>: <span class="ident">TeamMemberOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">TeamMember</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/memberships/{}&quot;</span>, <span class="ident">user</span>)),
             <span class="macro">json</span><span class="macro">!</span>(<span class="ident">user_options</span>),
@@ -400,7 +402,7 @@
     }
 
     <span class="doccomment">/// Remove the user from the team</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>
             .<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/memberships/{}&quot;</span>, <span class="ident">user</span>)))
     }

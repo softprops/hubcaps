@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/repositories.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>repositories.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/repositories.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>repositories.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1273,11 +1275,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Visibility</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Visibility</span>::<span class="ident">All</span> <span class="op">=&gt;</span> <span class="string">&quot;all&quot;</span>,
-            <span class="ident">Visibility</span>::<span class="ident">Public</span> <span class="op">=&gt;</span> <span class="string">&quot;public&quot;</span>,
-            <span class="ident">Visibility</span>::<span class="ident">Private</span> <span class="op">=&gt;</span> <span class="string">&quot;private&quot;</span>,
+            <span class="ident">Visibility</span>::<span class="ident">All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;all&quot;</span>,
+            <span class="ident">Visibility</span>::<span class="ident">Public</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;public&quot;</span>,
+            <span class="ident">Visibility</span>::<span class="ident">Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;private&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -1293,12 +1295,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Sort</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Sort</span>::<span class="ident">Created</span> <span class="op">=&gt;</span> <span class="string">&quot;created&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">Updated</span> <span class="op">=&gt;</span> <span class="string">&quot;updated&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">Pushed</span> <span class="op">=&gt;</span> <span class="string">&quot;pushed&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">FullName</span> <span class="op">=&gt;</span> <span class="string">&quot;full_name&quot;</span>,
+            <span class="ident">Sort</span>::<span class="ident">Created</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;created&quot;</span>,
+            <span class="ident">Sort</span>::<span class="ident">Updated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;updated&quot;</span>,
+            <span class="ident">Sort</span>::<span class="ident">Pushed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;pushed&quot;</span>,
+            <span class="ident">Sort</span>::<span class="ident">FullName</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;full_name&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -1313,11 +1315,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Affiliation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Affiliation</span>::<span class="ident">Owner</span> <span class="op">=&gt;</span> <span class="string">&quot;owner&quot;</span>,
-            <span class="ident">Affiliation</span>::<span class="ident">Collaborator</span> <span class="op">=&gt;</span> <span class="string">&quot;collaborator&quot;</span>,
-            <span class="ident">Affiliation</span>::<span class="ident">OrganizationMember</span> <span class="op">=&gt;</span> <span class="string">&quot;organization_member&quot;</span>,
+            <span class="ident">Affiliation</span>::<span class="ident">Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;owner&quot;</span>,
+            <span class="ident">Affiliation</span>::<span class="ident">Collaborator</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;collaborator&quot;</span>,
+            <span class="ident">Affiliation</span>::<span class="ident">OrganizationMember</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;organization_member&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -1334,13 +1336,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Type</span>::<span class="ident">All</span> <span class="op">=&gt;</span> <span class="string">&quot;all&quot;</span>,
-            <span class="ident">Type</span>::<span class="ident">Owner</span> <span class="op">=&gt;</span> <span class="string">&quot;owner&quot;</span>,
-            <span class="ident">Type</span>::<span class="ident">Public</span> <span class="op">=&gt;</span> <span class="string">&quot;public&quot;</span>,
-            <span class="ident">Type</span>::<span class="ident">Private</span> <span class="op">=&gt;</span> <span class="string">&quot;private&quot;</span>,
-            <span class="ident">Type</span>::<span class="ident">Member</span> <span class="op">=&gt;</span> <span class="string">&quot;member&quot;</span>,
+            <span class="ident">Type</span>::<span class="ident">All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;all&quot;</span>,
+            <span class="ident">Type</span>::<span class="ident">Owner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;owner&quot;</span>,
+            <span class="ident">Type</span>::<span class="ident">Public</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;public&quot;</span>,
+            <span class="ident">Type</span>::<span class="ident">Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;private&quot;</span>,
+            <span class="ident">Type</span>::<span class="ident">Member</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;member&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -1358,14 +1360,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">OrgRepoType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">OrgRepoType</span>::<span class="ident">All</span> <span class="op">=&gt;</span> <span class="string">&quot;all&quot;</span>,
-            <span class="ident">OrgRepoType</span>::<span class="ident">Public</span> <span class="op">=&gt;</span> <span class="string">&quot;public&quot;</span>,
-            <span class="ident">OrgRepoType</span>::<span class="ident">Private</span> <span class="op">=&gt;</span> <span class="string">&quot;private&quot;</span>,
-            <span class="ident">OrgRepoType</span>::<span class="ident">Forks</span> <span class="op">=&gt;</span> <span class="string">&quot;forks&quot;</span>,
-            <span class="ident">OrgRepoType</span>::<span class="ident">Sources</span> <span class="op">=&gt;</span> <span class="string">&quot;sources&quot;</span>,
-            <span class="ident">OrgRepoType</span>::<span class="ident">Member</span> <span class="op">=&gt;</span> <span class="string">&quot;member&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;all&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">Public</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;public&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;private&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">Forks</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;forks&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">Sources</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sources&quot;</span>,
+            <span class="ident">OrgRepoType</span>::<span class="ident">Member</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;member&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -1378,23 +1380,23 @@
 
 <span class="kw">impl</span> <span class="ident">Repositories</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">github</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/user/repos{}&quot;</span>, <span class="ident">more</span>)
     }
 
     <span class="doccomment">/// Create a new repository</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#create</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">repo</span>: <span class="kw-2">&amp;</span><span class="ident">RepoOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">repo</span>: <span class="kw-2">&amp;</span><span class="ident">RepoOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">repo</span>))
     }
 
     <span class="doccomment">/// list the authenticated users repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-your-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1404,7 +1406,7 @@
 
     <span class="doccomment">/// provides a stream over all pages of the authenticated users repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-your-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1421,7 +1423,7 @@
 
 <span class="kw">impl</span> <span class="ident">Forks</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">U</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">U</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1433,19 +1435,19 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/forks&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>)
     }
 
     <span class="doccomment">/// Create a new fork</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/forks/#create-a-fork</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(), <span class="ident">Vec</span>::<span class="ident">new</span>())
     }
 
     <span class="doccomment">/// list the forks</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/forks/#list-forks</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ForkListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ForkListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>()];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1455,7 +1457,7 @@
 
     <span class="doccomment">/// provides a stream over all pages of the forks</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/forks/#list-forks</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ForkListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ForkListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>()];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1472,7 +1474,7 @@
 
 <span class="kw">impl</span> <span class="ident">OrgRepositories</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1482,12 +1484,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/orgs/{}/repos{}&quot;</span>, <span class="self">self</span>.<span class="ident">org</span>, <span class="ident">more</span>)
     }
 
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-organization-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrgRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrgRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1497,7 +1499,7 @@
 
     <span class="doccomment">/// provides a stream over all pages of an orgs&#39;s repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-organization-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrgRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrgRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1507,7 +1509,7 @@
 
     <span class="doccomment">/// Create a new org repository</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#create</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">repo</span>: <span class="kw-2">&amp;</span><span class="ident">RepoOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">repo</span>: <span class="kw-2">&amp;</span><span class="ident">RepoOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">repo</span>))
     }
 }
@@ -1520,7 +1522,7 @@
 
 <span class="kw">impl</span> <span class="ident">UserRepositories</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1530,7 +1532,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> [<span class="string">&quot;/users/&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">owner</span>, <span class="string">&quot;/repos&quot;</span>].<span class="ident">concat</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="string">&#39;?&#39;</span>);
@@ -1540,13 +1542,13 @@
     }
 
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-user-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uri</span>(<span class="ident">options</span>))
     }
 
     <span class="doccomment">/// provides a stream over all pages of a user&#39;s repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-your-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">UserRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uri</span>(<span class="ident">options</span>))
     }
 }
@@ -1559,7 +1561,7 @@
 
 <span class="kw">impl</span> <span class="ident">OrganizationRepositories</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">org</span>: <span class="ident">O</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1569,13 +1571,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/orgs/{}/repos{}&quot;</span>, <span class="self">self</span>.<span class="ident">org</span>, <span class="ident">more</span>)
     }
 
     <span class="doccomment">/// list an organization&#39;s repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-organization-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrganizationRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrganizationRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1585,7 +1587,7 @@
 
     <span class="doccomment">/// Provides a stream over all pages of an organization&#39;s repositories</span>
     <span class="doccomment">/// https://developer.github.com/v3/repos/#list-organization-repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrganizationRepoListOptions</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrganizationRepoListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -1602,7 +1604,7 @@
 
 <span class="kw">impl</span> <span class="ident">Repository</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1614,17 +1616,17 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">more</span>)
     }
 
     <span class="doccomment">/// get a reference to the GitHub repository object that this `Repository` refers to</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="doccomment">/// https://developer.github.com/v3/repos/#edit</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoEditOptions</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">RepoEditOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Repo</span><span class="op">&gt;</span> {
         <span class="comment">// Note that this intentionally calls POST rather than PATCH,</span>
         <span class="comment">// even though the docs say PATCH.</span>
         <span class="comment">// In my tests (changing the default branch) POST works while PATCH doesn&#39;t.</span>
@@ -1632,43 +1634,43 @@
     }
 
     <span class="doccomment">/// https://developer.github.com/v3/repos/#delete-a-repository</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="doccomment">/// get a reference to branch operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">branches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Branches</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">branches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Branches</span> {
         <span class="ident">Branches</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to repository commit operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RepoCommits</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoCommits</span> {
         <span class="ident">RepoCommits</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to content operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Content</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Content</span> {
         <span class="ident">Content</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to git operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">git</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Git</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">git</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Git</span> {
         <span class="ident">Git</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to repo hook operations</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Hooks</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hooks</span> {
         <span class="ident">Hooks</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to [deployments](https://developer.github.com/v3/repos/deployments/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deployments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Deployments</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deployments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Deployments</span> {
         <span class="ident">Deployments</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to a specific github issue associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="ident">IssueRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IssueRef</span> {
         <span class="ident">IssueRef</span>::<span class="ident">new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(),
@@ -1678,77 +1680,77 @@
     }
 
     <span class="doccomment">/// get a reference to github issues associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issues</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Issues</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issues</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Issues</span> {
         <span class="ident">Issues</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to github checks associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkruns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CheckRuns</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checkruns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CheckRuns</span> {
         <span class="ident">CheckRuns</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to [deploy keys](https://developer.github.com/v3/repos/keys/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Keys</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Keys</span> {
         <span class="ident">Keys</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a list of labels associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Labels</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Labels</span> {
         <span class="ident">Labels</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a list of [pulls](https://developer.github.com/v3/pulls/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pulls</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PullRequests</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pulls</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullRequests</span> {
         <span class="ident">PullRequests</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to [releases](https://developer.github.com/v3/repos/releases/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">releases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Releases</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">releases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Releases</span> {
         <span class="ident">Releases</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to [statuses](https://developer.github.com/v3/repos/statuses/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">statuses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Statuses</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">statuses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Statuses</span> {
         <span class="ident">Statuses</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to the [collaborators](https://developer.github.com/v3/repos/collaborators/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collaborators</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Collaborators</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collaborators</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Collaborators</span> {
         <span class="ident">Collaborators</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to [teams](https://developer.github.com/v3/repos/#list-teams)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">teams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RepoTeams</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">teams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoTeams</span> {
         <span class="ident">RepoTeams</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to</span>
     <span class="doccomment">/// [contributors](https://developer.github.com/v3/repos/#list-contributors)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contributors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Contributors</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contributors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Contributors</span> {
         <span class="ident">Contributors</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contributor_statistics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ContributorStatistics</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contributor_statistics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContributorStatistics</span> {
         <span class="ident">ContributorStatistics</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference of [traffic](https://developer.github.com/v3/repos/traffic/)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">traffic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Traffic</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">traffic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Traffic</span> {
         <span class="ident">Traffic</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// get a reference to</span>
     <span class="doccomment">/// [forks](https://developer.github.com/v3/repos/forks/#list-forks)</span>
     <span class="doccomment">/// associated with this repository ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Forks</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Forks</span> {
         <span class="ident">Forks</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>())
     }
 }
@@ -1833,7 +1835,7 @@
     <span class="doccomment">/// The keys are the language names, and the values are the number of bytes of code written in</span>
     <span class="doccomment">/// that language.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">needless_pass_by_value</span>)]</span> <span class="comment">// shipped public API</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">languages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">i64</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">languages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">languages_url</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">uri</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">into</span>();
         <span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>)
@@ -1869,7 +1871,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RepoOptionsBuilder</span>(<span class="ident">RepoOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">RepoOptionsBuilder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1879,7 +1881,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1887,7 +1889,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">homepage</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">homepage</span>: <span class="ident">H</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">homepage</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">homepage</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1895,37 +1897,37 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">private</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">private</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">private</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">private</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_issues</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_issues</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_issues</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_issues</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_issues</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_issues</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_wiki</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_wiki</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_wiki</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_wiki</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_wiki</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_wiki</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_downloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_downloads</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_downloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_downloads</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_downloads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_downloads</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">team_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">team_id</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">team_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">team_id</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">team_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">team_id</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">auto_init</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">auto_init</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">auto_init</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">auto_init</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gitignore_template</span><span class="op">&lt;</span><span class="ident">GI</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gitignore_template</span>: <span class="ident">GI</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gitignore_template</span><span class="op">&lt;</span><span class="ident">GI</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gitignore_template</span>: <span class="ident">GI</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">GI</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1933,7 +1935,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">license_template</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">license_template</span>: <span class="ident">L</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">license_template</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">license_template</span>: <span class="ident">L</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -1941,7 +1943,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RepoOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoOptions</span> {
         <span class="ident">RepoOptions</span>::<span class="ident">new</span>(
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">description</span>.<span class="ident">clone</span>(),
@@ -1972,7 +1974,7 @@
         <span class="ident">auto_init</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
         <span class="ident">gitignore_template</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GI</span><span class="op">&gt;</span>,
         <span class="ident">license_template</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="self">Self</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1995,7 +1997,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-&gt;</span> <span class="ident">RepoOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoOptionsBuilder</span> {
         <span class="ident">RepoOptionsBuilder</span>::<span class="ident">new</span>(<span class="ident">name</span>)
     }
 }
@@ -2006,12 +2008,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RepoListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">RepoListOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoListOptionsBuilder</span> {
         <span class="ident">RepoListOptionsBuilder</span>::<span class="ident">default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -2027,52 +2029,52 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RepoListOptionsBuilder</span>(<span class="ident">RepoListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">RepoListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visibility</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">vis</span>: <span class="ident">Visibility</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visibility</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">vis</span>: <span class="ident">Visibility</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;visibility&quot;</span>, <span class="ident">vis</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affiliation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">affiliations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Affiliation</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affiliation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">affiliations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Affiliation</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(
             <span class="string">&quot;affiliation&quot;</span>,
             <span class="ident">affiliations</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">to_string</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>()
+                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
         );
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">Type</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sort&quot;</span>, <span class="ident">sort</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">direction</span>(<span class="ident">SortDirection</span>::<span class="ident">Asc</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">direction</span>(<span class="ident">SortDirection</span>::<span class="ident">Desc</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;direction&quot;</span>, <span class="ident">direction</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RepoListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoListOptions</span> {
         <span class="ident">RepoListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -2105,20 +2107,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ContributorStatistics</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">repo</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">repo</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">github</span>,
             <span class="ident">owner</span>: <span class="ident">owner</span>.<span class="ident">into</span>(),
             <span class="ident">repo</span>: <span class="ident">repo</span>.<span class="ident">into</span>(),
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
             <span class="string">&quot;/repos/{}/{}/stats/contributors&quot;</span>,
             <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>
         ))
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">ContributorStatistic</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
             <span class="string">&quot;/repos/{}/{}/stats/contributors&quot;</span>,
             <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>
@@ -2132,12 +2134,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ForkListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">ForkListOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForkListOptionsBuilder</span> {
         <span class="ident">ForkListOptionsBuilder</span>::<span class="ident">default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -2153,17 +2155,17 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForkListOptionsBuilder</span>(<span class="ident">ForkListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">ForkListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sort&quot;</span>, <span class="ident">sort</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ForkListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForkListOptions</span> {
         <span class="ident">ForkListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -2209,7 +2211,7 @@
         <span class="ident">allow_squash_merge</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
         <span class="ident">allow_merge_commit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
         <span class="ident">allow_rebase_merge</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    ) <span class="op">-&gt;</span> <span class="self">Self</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -2231,7 +2233,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-&gt;</span> <span class="ident">RepoEditOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoEditOptionsBuilder</span> {
         <span class="ident">RepoEditOptionsBuilder</span>::<span class="ident">new</span>(<span class="ident">name</span>)
     }
 }
@@ -2239,7 +2241,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RepoEditOptionsBuilder</span>(<span class="ident">RepoEditOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">RepoEditOptionsBuilder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -2249,7 +2251,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -2257,7 +2259,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">homepage</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">homepage</span>: <span class="ident">H</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">homepage</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">homepage</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -2265,27 +2267,27 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">private</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">private</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">private</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">private</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_issues</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_issues</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_issues</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_issues</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_issues</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_issues</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_projects</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_projects</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_projects</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_projects</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_projects</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_projects</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_wiki</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_wiki</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_wiki</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_wiki</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">has_wiki</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">has_wiki</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_branch</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">default_branch</span>: <span class="ident">DB</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_branch</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">default_branch</span>: <span class="ident">DB</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">DB</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -2293,22 +2295,22 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_squash_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_squash_merge</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_squash_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_squash_merge</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">allow_squash_merge</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_squash_merge</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_merge_commit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_merge_commit</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_merge_commit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_merge_commit</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">allow_merge_commit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_merge_commit</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_rebase_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_rebase_merge</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_rebase_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_rebase_merge</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">allow_rebase_merge</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_rebase_merge</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RepoEditOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RepoEditOptions</span> {
         <span class="ident">RepoEditOptions</span>::<span class="ident">new</span>(
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">description</span>.<span class="ident">clone</span>(),
@@ -2331,12 +2333,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OrgRepoListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">OrgRepoListOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrgRepoListOptionsBuilder</span> {
         <span class="ident">OrgRepoListOptionsBuilder</span>::<span class="ident">default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -2352,17 +2354,17 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrgRepoListOptionsBuilder</span>(<span class="ident">OrgRepoListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">OrgRepoListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">OrgRepoType</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">OrgRepoType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">OrgRepoListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrgRepoListOptions</span> {
         <span class="ident">OrgRepoListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -2375,12 +2377,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UserRepoListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">UserRepoListOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserRepoListOptionsBuilder</span> {
         <span class="ident">UserRepoListOptionsBuilder</span>::<span class="ident">default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -2396,35 +2398,35 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserRepoListOptionsBuilder</span>(<span class="ident">UserRepoListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">UserRepoListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">Type</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">Sort</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sort&quot;</span>, <span class="ident">sort</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">direction</span>(<span class="ident">SortDirection</span>::<span class="ident">Asc</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">direction</span>(<span class="ident">SortDirection</span>::<span class="ident">Desc</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;direction&quot;</span>, <span class="ident">direction</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">UserRepoListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserRepoListOptions</span> {
         <span class="ident">UserRepoListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -2437,12 +2439,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OrganizationRepoListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">OrganizationRepoListOptionsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrganizationRepoListOptionsBuilder</span> {
         <span class="ident">OrganizationRepoListOptionsBuilder</span>::<span class="ident">default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -2458,17 +2460,17 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrganizationRepoListOptionsBuilder</span>(<span class="ident">OrganizationRepoListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">OrganizationRepoListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">OrgRepoType</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tpe</span>: <span class="ident">OrgRepoType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">OrganizationRepoListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrganizationRepoListOptions</span> {
         <span class="ident">OrganizationRepoListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }

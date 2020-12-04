@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/content.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>content.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/content.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>content.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -263,6 +265,18 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Content interface</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -285,7 +299,7 @@
 
 <span class="kw">impl</span> <span class="ident">Content</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -297,20 +311,20 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="comment">// Handle files with spaces and other characters that can mess up the</span>
         <span class="comment">// final URL.</span>
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">percent_encode</span>(<span class="ident">location</span>.<span class="ident">as_ref</span>(), <span class="ident">PATH</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/contents{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">location</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">ref_</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">path</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;?ref={}&quot;</span>, <span class="ident">ref_</span>);
+            <span class="ident">path</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;?ref={}&quot;</span>, <span class="ident">ref_</span>);
         }
         <span class="ident">path</span>
     }
 
     <span class="doccomment">/// Gets the contents of the location. This could be a file, symlink, or</span>
     <span class="doccomment">/// submodule. To list the contents of a directory, use `iter`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Contents</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Contents</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
@@ -318,12 +332,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// GitHub only supports downloading files up to 1 megabyte in size. If you</span>
     <span class="doccomment">/// need to retrieve larger files, the Git Data API must be used instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">File</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">File</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
     <span class="doccomment">/// List the root directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>(<span class="string">&quot;/&quot;</span>, <span class="ident">ref_</span>)
     }
 
@@ -331,13 +345,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// GitHub limits the number of items returned to 1000 for this API. If you</span>
     <span class="doccomment">/// need to retrieve more items, the Git Data API must be used instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ref_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirectoryItem</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="ident">ref_</span>))
     }
 
     <span class="doccomment">/// Creates a file at a specific location in a repository.</span>
     <span class="doccomment">/// You DO NOT need to base64 encode the content, we will do it for you.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NewFile</span> {
             <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="ident">content</span>),
             <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
@@ -354,13 +368,24 @@
         <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">sha</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">NewFileResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NewFile</span> {
             <span class="ident">content</span>: <span class="ident">BASE64</span>.<span class="ident">encode</span>(<span class="ident">content</span>),
             <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
             <span class="ident">sha</span>: <span class="prelude-val">Some</span>(<span class="ident">sha</span>.<span class="ident">to_string</span>()),
         };
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
+    }
+
+    <span class="doccomment">/// Deletes a file.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">location</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">sha</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NewFile</span> {
+            <span class="ident">content</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
+            <span class="ident">sha</span>: <span class="prelude-val">Some</span>(<span class="ident">sha</span>.<span class="ident">to_string</span>()),
+        };
+        <span class="self">self</span>.<span class="ident">github</span>
+            .<span class="ident">delete_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="ident">location</span>, <span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">file</span>))
     }
 }
 
@@ -383,6 +408,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NewFile</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;String::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -464,14 +490,14 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DecodedContents</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">DecodedContents</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecodedContents</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecodedContents</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -479,13 +505,13 @@
 <span class="kw">impl</span> <span class="ident">ops</span>::<span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">DecodedContents</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u8</span>];
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecodedContents</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde</span>::<span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -494,11 +520,11 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecodedContentsVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">DecodedContents</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;base64 string&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">de</span>::<span class="ident">Error</span>,
             {
@@ -508,14 +534,14 @@
                 <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>);
 
                 <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">base64</span>::<span class="ident">decode_config</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="ident">base64</span>::<span class="ident">STANDARD</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidLength</span> <span class="op">=&gt;</span> {
+                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidLength</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="ident">E</span>::<span class="ident">invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;invalid base64 length&quot;</span>)
                     }
-                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidByte</span>(<span class="ident">offset</span>, <span class="ident">byte</span>) <span class="op">=&gt;</span> <span class="ident">E</span>::<span class="ident">invalid_value</span>(
+                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidByte</span>(<span class="ident">offset</span>, <span class="ident">byte</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">E</span>::<span class="ident">invalid_value</span>(
                         <span class="ident">de</span>::<span class="ident">Unexpected</span>::<span class="ident">Bytes</span>(<span class="kw-2">&amp;</span>[<span class="ident">byte</span>]),
                         <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;valid base64 character at offset {}&quot;</span>, <span class="ident">offset</span>).<span class="ident">as_str</span>(),
                     ),
-                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidLastSymbol</span>(<span class="ident">offset</span>, <span class="ident">byte</span>) <span class="op">=&gt;</span> <span class="ident">E</span>::<span class="ident">invalid_value</span>(
+                    <span class="ident">base64</span>::<span class="ident">DecodeError</span>::<span class="ident">InvalidLastSymbol</span>(<span class="ident">offset</span>, <span class="ident">byte</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">E</span>::<span class="ident">invalid_value</span>(
                         <span class="ident">de</span>::<span class="ident">Unexpected</span>::<span class="ident">Bytes</span>(<span class="kw-2">&amp;</span>[<span class="ident">byte</span>]),
                         <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;valid last base64 character at offset {}&quot;</span>, <span class="ident">offset</span>).<span class="ident">as_str</span>(),
                     ),
