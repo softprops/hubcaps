@@ -96,6 +96,17 @@ impl Content {
         };
         self.github.put(&self.path(location, ""), json!(file))
     }
+
+    /// Deletes a file.
+    pub fn delete(&self, location: &str, message: &str, sha: &str) -> Future<()> {
+        let file = &NewFile {
+            content: "".to_string(),
+            message: message.to_string(),
+            sha: Some(sha.to_string()),
+        };
+        self.github
+            .delete_message(&self.path(location, ""), json!(file))
+    }
 }
 
 /// Contents of a path in a repository.
@@ -117,6 +128,7 @@ pub enum Encoding {
 
 #[derive(Debug, Serialize)]
 pub struct NewFile {
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub content: String,
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
