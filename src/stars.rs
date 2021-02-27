@@ -2,6 +2,8 @@
 use futures::prelude::*;
 use http::StatusCode;
 
+use crate::repositories::Repo;
+use crate::Stream;
 use crate::{Error, Future, Github};
 
 pub struct Stars {
@@ -57,5 +59,23 @@ impl Stars {
     {
         self.github
             .delete(&format!("/user/starred/{}/{}", owner.into(), repo.into()))
+    }
+
+    /// list stars
+    pub fn list<U>(&self, username: U) -> Future<Vec<Repo>>
+    where
+        U: Into<String>,
+    {
+        self.github
+            .get::<Vec<Repo>>(&format!("/users/{}/starred", username.into()))
+    }
+
+    /// provides a stream over all pages of starred repos
+    pub fn iter<U>(&self, username: U) -> Stream<Repo>
+    where
+        U: Into<String>,
+    {
+        self.github
+            .get_stream(&format!("/users/{}/starred", username.into()))
     }
 }

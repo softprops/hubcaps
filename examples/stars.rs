@@ -1,3 +1,4 @@
+use futures::prelude::*;
 use hubcaps::{Credentials, Github};
 use std::env;
 use std::error::Error;
@@ -19,5 +20,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Ok((_, starred)) => println!("starred? {:?}", starred),
         Err(err) => println!("err {}", err),
     }
+
+    stars
+        .iter("softprops")
+        .try_for_each(|s| async move {
+            println!("{:?}", s.html_url);
+            Ok(())
+        })
+        .await?;
+
     Ok(())
 }
