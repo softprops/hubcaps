@@ -10,6 +10,7 @@ use crate::labels::Label;
 use crate::users::User;
 use crate::utils::{percent_encode, PATH_SEGMENT};
 use crate::{Future, Github, SortDirection, Stream};
+use crate::milestone::Milestone;
 
 /// enum representation of github pull and issue state
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -410,6 +411,11 @@ impl IssueListOptionsBuilder {
         self
     }
 
+    pub fn milestone<M>(&mut self, m: M) -> &mut Self where M: Into<String> {
+        self.0.params.insert("milestone", m.into());
+        self
+    }
+
     pub fn build(&self) -> IssueListOptions {
         IssueListOptions {
             params: self.0.params.clone(),
@@ -478,6 +484,7 @@ pub struct Issue {
     pub created_at: String,
     pub updated_at: String,
     pub assignees: Vec<User>,
+    pub milestones: Vec<Milestone>,
 }
 
 /// A reference to a pull request.
