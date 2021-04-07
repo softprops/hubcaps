@@ -484,7 +484,7 @@ pub struct Issue {
     pub created_at: String,
     pub updated_at: String,
     pub assignees: Vec<User>,
-    pub milestones: Vec<Milestone>,
+    pub milestone: Option<Milestone>,
 }
 
 /// A reference to a pull request.
