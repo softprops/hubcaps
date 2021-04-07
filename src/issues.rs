@@ -411,11 +411,6 @@ impl IssueListOptionsBuilder {
         self
     }
 
-    pub fn milestone<M>(&mut self, m: M) -> &mut Self where M: Into<String> {
-        self.0.params.insert("milestone", m.into());
-        self
-    }
-
     pub fn build(&self) -> IssueListOptions {
         IssueListOptions {
             params: self.0.params.clone(),
@@ -462,10 +457,11 @@ impl IssueOptions {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Issue {
     pub id: u64,
     pub url: String,
+    pub repository_url: String,
     pub labels_url: String,
     pub comments_url: String,
     pub events_url: String,
@@ -488,7 +484,7 @@ pub struct Issue {
 }
 
 /// A reference to a pull request.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PullRef {
     pub url: String,
     pub html_url: String,

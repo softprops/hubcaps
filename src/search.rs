@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 use serde::de::DeserializeOwned;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use url::{self, form_urlencoded};
 
 use crate::labels::Label;
@@ -13,6 +13,7 @@ use crate::{unfold, Future, Github, SortDirection, Stream};
 mod repos;
 
 pub use self::repos::*;
+use crate::milestone::Milestone;
 
 /// Sort directions for pull requests
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -173,6 +174,11 @@ impl SearchIssuesOptionsBuilder {
         self
     }
 
+    pub fn page(&mut self, n: usize) -> &mut Self {
+        self.0.params.insert("page", n.to_string());
+        self
+    }
+
     pub fn build(&self) -> SearchIssuesOptions {
         SearchIssuesOptions {
             params: self.0.params.clone(),
@@ -189,7 +195,7 @@ pub struct SearchResult<D> {
 
 /// May reporesent a Github Issue or PullRequest
 /// depending on the type of search
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct IssuesItem {
     pub url: String,
     pub repository_url: String,
@@ -212,6 +218,7 @@ pub struct IssuesItem {
     pub closed_at: Option<String>,
     pub pull_request: Option<PullRequestInfo>,
     pub body: Option<String>,
+    pub milestone: Option<Milestone>,
 }
 
 impl IssuesItem {
@@ -225,7 +232,7 @@ impl IssuesItem {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PullRequestInfo {
     pub url: String,
     pub html_url: String,
