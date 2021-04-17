@@ -18,6 +18,6 @@ pub struct Milestone {
     pub state: String,
     pub created_at: String,
     pub updated_at: String,
-    pub due_on: String,
+    pub due_on: Option<String>,
     pub closed_at: Option<String>,
 }
