@@ -272,6 +272,10 @@ impl Issues {
         self.github.post(&self.path(""), json!(is))
     }
 
+    pub fn update(&self, is: &IssueOptions) -> Future<Issue> {
+        self.github.patch(&self.path(""), json!(is))
+    }
+
     /// Return the first page of issues for this repisotiry
     /// See the [github docs](https://developer.github.com/v3/issues/#list-issues-for-a-repository)
     /// for more information
@@ -426,8 +430,11 @@ pub struct IssueOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assignee: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub assignees: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub milestone: Option<u64>,
     pub labels: Vec<String>,
+    pub state: String,
 }
 
 impl IssueOptions {
@@ -448,11 +455,13 @@ impl IssueOptions {
             title: title.into(),
             body: body.map(|b| b.into()),
             assignee: assignee.map(|a| a.into()),
+            assignees: None,
             milestone,
             labels: labels
                 .into_iter()
                 .map(|l| l.into())
                 .collect::<Vec<String>>(),
+            state: "open".to_string()
         }
     }
 }
