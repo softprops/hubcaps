@@ -11,7 +11,7 @@ pub struct Milestone {
     pub node_id: String,
     pub number: u64,
     pub title: String,
-    pub description: String,
+    pub description: Option<String>,
     pub creator: User,
     pub open_issues: u64,
     pub closed_issues: u64,
