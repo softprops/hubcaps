@@ -107,7 +107,7 @@ impl Milestones {
     }
 
     fn path(&self, more: &str) -> String {
-        format!("/repos/{}/{}/issues{}", self.owner, self.repo, more)
+        format!("/repos/{}/{}/milestones{}", self.owner, self.repo, more)
     }
 
     pub fn create(&self, is: &MilestoneOptions) -> Future<Milestone> {

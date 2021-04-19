@@ -272,8 +272,8 @@ impl Issues {
         self.github.post(&self.path(""), json!(is))
     }
 
-    pub fn update(&self, is: &IssueOptions) -> Future<Issue> {
-        self.github.patch(&self.path(""), json!(is))
+    pub fn update(&self, number: &u64, is: &IssueOptions) -> Future<Issue> {
+        self.github.patch(&self.path(&format!("/{}", number)), json!(is))
     }
 
     /// Return the first page of issues for this repisotiry
