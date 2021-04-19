@@ -5,6 +5,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use url::{form_urlencoded, Url};
 
+use crate::{Future, Github, SortDirection, Stream};
 use crate::branches::Branches;
 use crate::checks::CheckRuns;
 use crate::collaborators::Collaborators;
@@ -15,6 +16,7 @@ use crate::hooks::Hooks;
 use crate::issues::{IssueRef, Issues};
 use crate::keys::Keys;
 use crate::labels::Labels;
+use crate::milestone::Milestones;
 use crate::pulls::PullRequests;
 use crate::releases::Releases;
 use crate::repo_commits::RepoCommits;
@@ -23,7 +25,6 @@ use crate::teams::RepoTeams;
 use crate::traffic::Traffic;
 use crate::users::Contributors;
 use crate::users::User;
-use crate::{Future, Github, SortDirection, Stream};
 
 /// describes repository visibilities
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -40,7 +41,7 @@ impl fmt::Display for Visibility {
             Visibility::Public => "public",
             Visibility::Private => "private",
         }
-        .fmt(f)
+            .fmt(f)
     }
 }
 
@@ -61,7 +62,7 @@ impl fmt::Display for Sort {
             Sort::Pushed => "pushed",
             Sort::FullName => "full_name",
         }
-        .fmt(f)
+            .fmt(f)
     }
 }
 
@@ -80,7 +81,7 @@ impl fmt::Display for Affiliation {
             Affiliation::Collaborator => "collaborator",
             Affiliation::OrganizationMember => "organization_member",
         }
-        .fmt(f)
+            .fmt(f)
     }
 }
 
@@ -103,7 +104,7 @@ impl fmt::Display for Type {
             Type::Private => "private",
             Type::Member => "member",
         }
-        .fmt(f)
+            .fmt(f)
     }
 }
 
@@ -128,7 +129,7 @@ impl fmt::Display for OrgRepoType {
             OrgRepoType::Sources => "sources",
             OrgRepoType::Member => "member",
         }
-        .fmt(f)
+            .fmt(f)
     }
 }
 
@@ -183,9 +184,9 @@ pub struct Forks {
 impl Forks {
     #[doc(hidden)]
     pub fn new<U, R>(github: Github, owner: U, repo: R) -> Self
-    where
-        U: Into<String>,
-        R: Into<String>,
+        where
+            U: Into<String>,
+            R: Into<String>,
     {
         Self {
             github,
@@ -234,8 +235,8 @@ pub struct OrgRepositories {
 impl OrgRepositories {
     #[doc(hidden)]
     pub fn new<O>(github: Github, org: O) -> Self
-    where
-        O: Into<String>,
+        where
+            O: Into<String>,
     {
         OrgRepositories {
             github,
@@ -282,8 +283,8 @@ pub struct UserRepositories {
 impl UserRepositories {
     #[doc(hidden)]
     pub fn new<O>(github: Github, owner: O) -> Self
-    where
-        O: Into<String>,
+        where
+            O: Into<String>,
     {
         UserRepositories {
             github,
@@ -321,8 +322,8 @@ pub struct OrganizationRepositories {
 impl OrganizationRepositories {
     #[doc(hidden)]
     pub fn new<O>(github: Github, org: O) -> Self
-    where
-        O: Into<String>,
+        where
+            O: Into<String>,
     {
         OrganizationRepositories {
             github,
@@ -364,9 +365,9 @@ pub struct Repository {
 impl Repository {
     #[doc(hidden)]
     pub fn new<O, R>(github: Github, owner: O, repo: R) -> Self
-    where
-        O: Into<String>,
-        R: Into<String>,
+        where
+            O: Into<String>,
+            R: Into<String>,
     {
         Repository {
             github,
@@ -512,6 +513,10 @@ impl Repository {
     pub fn forks(&self) -> Forks {
         Forks::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
     }
+
+    pub fn milestones(&self) -> Milestones {
+        Milestones::new(self.github.clone(), self.owner.as_str(), self.repo.as_str())
+    }
 }
 
 // representations (todo: replace with derive_builder)
@@ -631,8 +636,8 @@ pub struct RepoOptionsBuilder(RepoOptions);
 
 impl RepoOptionsBuilder {
     pub(crate) fn new<N>(name: N) -> Self
-    where
-        N: Into<String>,
+        where
+            N: Into<String>,
     {
         RepoOptionsBuilder(RepoOptions {
             name: name.into(),
@@ -641,16 +646,16 @@ impl RepoOptionsBuilder {
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
-    where
-        D: Into<String>,
+        where
+            D: Into<String>,
     {
         self.0.description = Some(description.into());
         self
     }
 
     pub fn homepage<H>(&mut self, homepage: H) -> &mut Self
-    where
-        H: Into<String>,
+        where
+            H: Into<String>,
     {
         self.0.homepage = Some(homepage.into());
         self
@@ -687,16 +692,16 @@ impl RepoOptionsBuilder {
     }
 
     pub fn gitignore_template<GI>(&mut self, gitignore_template: GI) -> &mut Self
-    where
-        GI: Into<String>,
+        where
+            GI: Into<String>,
     {
         self.0.gitignore_template = Some(gitignore_template.into());
         self
     }
 
     pub fn license_template<L>(&mut self, license_template: L) -> &mut Self
-    where
-        L: Into<String>,
+        where
+            L: Into<String>,
     {
         self.0.license_template = Some(license_template.into());
         self
@@ -734,12 +739,12 @@ impl RepoOptions {
         gitignore_template: Option<GI>,
         license_template: Option<L>,
     ) -> Self
-    where
-        N: Into<String>,
-        D: Into<String>,
-        H: Into<String>,
-        GI: Into<String>,
-        L: Into<String>,
+        where
+            N: Into<String>,
+            D: Into<String>,
+            H: Into<String>,
+            GI: Into<String>,
+            L: Into<String>,
     {
         RepoOptions {
             name: name.into(),
@@ -971,11 +976,11 @@ impl RepoEditOptions {
         allow_merge_commit: Option<bool>,
         allow_rebase_merge: Option<bool>,
     ) -> Self
-    where
-        N: Into<String>,
-        D: Into<String>,
-        H: Into<String>,
-        DB: Into<String>,
+        where
+            N: Into<String>,
+            D: Into<String>,
+            H: Into<String>,
+            DB: Into<String>,
     {
         RepoEditOptions {
             name: name.into(),
@@ -1001,8 +1006,8 @@ pub struct RepoEditOptionsBuilder(RepoEditOptions);
 
 impl RepoEditOptionsBuilder {
     pub(crate) fn new<N>(name: N) -> Self
-    where
-        N: Into<String>,
+        where
+            N: Into<String>,
     {
         RepoEditOptionsBuilder(RepoEditOptions {
             name: name.into(),
@@ -1011,16 +1016,16 @@ impl RepoEditOptionsBuilder {
     }
 
     pub fn description<D>(&mut self, description: D) -> &mut Self
-    where
-        D: Into<String>,
+        where
+            D: Into<String>,
     {
         self.0.description = Some(description.into());
         self
     }
 
     pub fn homepage<H>(&mut self, homepage: H) -> &mut Self
-    where
-        H: Into<String>,
+        where
+            H: Into<String>,
     {
         self.0.homepage = Some(homepage.into());
         self
@@ -1047,8 +1052,8 @@ impl RepoEditOptionsBuilder {
     }
 
     pub fn default_branch<DB>(&mut self, default_branch: DB) -> &mut Self
-    where
-        DB: Into<String>,
+        where
+            DB: Into<String>,
     {
         self.0.default_branch = Some(default_branch.into());
         self
