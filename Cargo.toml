@@ -1,10 +1,10 @@
 [package]
-name = "hubcaps"
+name = "hubcaps-ex"
 version = "0.6.2"
-authors = ["David Ko <innobead.gmail.com>"]
+authors = ["softprops <d.tangren@gmail.com>", "David Ko <innobead.gmail.com>"]
 description = "Rust interface for Github"
-documentation = "https://github.com/innobead/hubcaps"
-homepage = "https://github.com/innobead/hubcaps"
+documentation = "https://docs.rs/hubcaps/"
+homepage = "https://github.com/softprops/hubcaps"
 repository = "https://github.com/innobead/hubcaps"
 keywords = ["hyper", "github"]
 license = "MIT"
