@@ -1,3 +1,7 @@
+# Next
+
+* Support the "rename branch" API
+
 # 0.6.2
 
 * Fix pagination for GitHub Enterprise [#247](https://github.com/softprops/hubcaps/pull/247)

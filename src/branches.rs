@@ -76,6 +76,24 @@ impl Branches {
             MediaType::Preview("luke-cage"),
         )
     }
+
+    /// Rename a branch
+    ///
+    /// https://docs.github.com/en/rest/reference/repos#rename-a-branch
+    pub fn rename<B>(&self, branch: B, rename: &Rename) -> Future<Branch>
+    where
+        B: Into<String>,
+    {
+        self.github.post(
+            &format!(
+                "/repos/{owner}/{repo}/branches/{branch}/rename",
+                owner = self.owner,
+                repo = self.repo,
+                branch = branch.into()
+            ),
+            json!(rename),
+        )
+    }
 }
 
 // representations
@@ -129,4 +147,9 @@ pub struct RequiredPullRequestReviews {
 pub struct StatusChecks {
     pub strict: bool,
     pub contexts: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Rename {
+    pub new_name: String,
 }
