@@ -115,9 +115,17 @@ impl PullRequest {
         self.github.patch::<Pull>(&self.path(""), json!(pr))
     }
 
-    /// Returns a vector of file diffs associated with this pull
+    /// Returns a vector of file diffs associated with this pull request
+    #[deprecated(
+        note = "This only returns the first page of results; up to 30 entries. Use `iter_files` instead"
+    )]
     pub fn files(&self) -> Future<Vec<FileDiff>> {
         self.github.get(&self.path("/files"))
+    }
+
+    /// Returns a stream of file diffs associated with this pull request
+    pub fn iter_files(&self) -> Stream<FileDiff> {
+        self.github.get_stream(&self.path("/files"))
     }
 
     /// returns issue comments interface
