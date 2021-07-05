@@ -258,7 +258,6 @@ pub struct Pull {
     pub assignee: Option<User>,
     pub assignees: Vec<User>,
     pub merge_commit_sha: Option<String>,
-    pub merged: bool,
     pub mergeable: Option<bool>,
     pub merged_by: Option<User>,
     pub comments: Option<u64>,
