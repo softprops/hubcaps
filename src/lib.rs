@@ -55,7 +55,7 @@
 //! This crate uses the `log` crate's debug log interface to log x-rate-limit
 //! headers received from Github.
 //! If you are attempting to test your access patterns against
-//! GitHub's rate limits, enable debug looking and look for "x-rate-limit"
+//! GitHub's rate limits, enable debug logging and look for "x-rate-limit"
 //! log patterns sourced from this crate
 //!
 //! # Features
