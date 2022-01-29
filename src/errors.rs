@@ -1,4 +1,5 @@
 //! Client errors
+#[cfg(feature = "jwt")]
 use crate::jwt::errors::Error as JWTError;
 use http::StatusCode;
 use reqwest::Error as ReqwestError;
@@ -31,6 +32,8 @@ pub enum Error {
     Url(ParseError),
     /// Network errors
     IO(IoError),
+
+    #[cfg(feature = "jwt")]
     /// JWT validation errors
     JWT(JWTError),
 }
@@ -59,6 +62,7 @@ impl From<IoError> for Error {
     }
 }
 
+#[cfg(feature = "jwt")]
 impl From<JWTError> for Error {
     fn from(err: JWTError) -> Self {
         Error::JWT(err)
@@ -72,6 +76,7 @@ impl StdError for Error {
             Error::Reqwest(err) => Some(err),
             Error::Url(err) => Some(err),
             Error::IO(err) => Some(err),
+            #[cfg(feature = "jwt")]
             Error::JWT(err) => Some(err),
             _ => None,
         }
@@ -91,6 +96,7 @@ impl fmt::Display for Error {
             Error::Reqwest(err) => write!(f, "{}", err),
             Error::Url(err) => write!(f, "{}", err),
             Error::IO(err) => write!(f, "{}", err),
+            #[cfg(feature = "jwt")]
             Error::JWT(err) => write!(f, "{}", err),
         }
     }
