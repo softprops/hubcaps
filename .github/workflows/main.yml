@@ -29,6 +29,8 @@ jobs:
           components: clippy
       - uses: actions/checkout@v2
       - run: cargo clippy --all-targets -- -D clippy::all
+      - run: cargo clippy --no-default-features -- -D clippy::all
+      - run: cargo clippy --no-default-features --features=jwt -- -D clippy::all
 
   compile:
     runs-on: ubuntu-latest

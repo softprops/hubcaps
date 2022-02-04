@@ -210,9 +210,9 @@ pub struct Links {
 #[derive(Debug)]
 pub struct DecodedContents(Vec<u8>);
 
-impl Into<Vec<u8>> for DecodedContents {
-    fn into(self) -> Vec<u8> {
-        self.0
+impl From<DecodedContents> for Vec<u8> {
+    fn from(DecodedContents(bytes): DecodedContents) -> Vec<u8> {
+        bytes
     }
 }
 
