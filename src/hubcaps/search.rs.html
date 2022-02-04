@@ -1,7 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/search.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>search.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;search.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>search.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -235,22 +233,21 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Search interface</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Search interface</span>
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Deserialize</span>;
+<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">url</span>::{<span class="self">self</span>, <span class="ident">form_urlencoded</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">labels</span>::<span class="ident">Label</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">users</span>::<span class="ident">User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::labels::Label</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::users::User</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">unfold</span>, <span class="ident">Future</span>, <span class="ident">Github</span>, <span class="ident">SortDirection</span>, <span class="ident">Stream</span>};
 
 <span class="kw">mod</span> <span class="ident">repos</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">repos</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::repos</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Sort directions for pull requests</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
@@ -263,12 +260,12 @@
     <span class="ident">Comments</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">IssuesSort</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IssuesSort</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">IssuesSort</span>::<span class="ident">Comments</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;comments&quot;</span>,
-            <span class="ident">IssuesSort</span>::<span class="ident">Created</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;created&quot;</span>,
-            <span class="ident">IssuesSort</span>::<span class="ident">Updated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;updated&quot;</span>,
+            <span class="ident">IssuesSort::Comments</span> =&gt; <span class="string">&quot;comments&quot;</span>,
+            <span class="ident">IssuesSort::Created</span> =&gt; <span class="string">&quot;created&quot;</span>,
+            <span class="ident">IssuesSort::Updated</span> =&gt; <span class="string">&quot;updated&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
@@ -281,7 +278,7 @@
     <span class="ident">github</span>: <span class="ident">Github</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">items</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">result</span>: <span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">items</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">result</span>: <span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
 {
@@ -290,28 +287,28 @@
 
 <span class="kw">impl</span> <span class="ident">Search</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">github</span>: <span class="ident">Github</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">github</span> }
     }
 
     <span class="doccomment">/// return a reference to a search interface for issues</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issues</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SearchIssues</span> {
-        <span class="ident">SearchIssues</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issues</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SearchIssues</span> {
+        <span class="ident">SearchIssues::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Return a reference to a search interface for repositories</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SearchRepos</span> {
-        <span class="ident">SearchRepos</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SearchRepos</span> {
+        <span class="ident">SearchRepos::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
         <span class="ident">unfold</span>(<span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get_pages</span>(<span class="ident">url</span>), <span class="ident">items</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
     {
@@ -327,17 +324,17 @@
 
 <span class="kw">impl</span> <span class="ident">SearchIssues</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">search</span>: <span class="ident">Search</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">search</span>: <span class="ident">Search</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">search</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">search_uri</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
+    <span class="kw">fn</span> <span class="ident">search_uri</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) -&gt; <span class="ident">String</span>
     <span class="kw">where</span>
         <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;/search/issues&quot;</span>.<span class="ident">to_string</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;/search/issues&quot;</span>.<span class="ident">to_string</span>()];
         <span class="kw">let</span> <span class="ident">query_options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>().<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">form_urlencoded</span>::<span class="ident">Serializer</span>::<span class="ident">new</span>(<span class="ident">query_options</span>)
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">form_urlencoded::Serializer::new</span>(<span class="ident">query_options</span>)
             .<span class="ident">append_pair</span>(<span class="string">&quot;q&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">into</span>())
             .<span class="ident">finish</span>();
         <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
@@ -347,7 +344,7 @@
     <span class="doccomment">/// Return a stream of search results repository query</span>
     <span class="doccomment">/// See [github docs](https://developer.github.com/v3/search/#parameters-3)</span>
     <span class="doccomment">/// for query format options</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">IssuesItem</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">IssuesItem</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -357,7 +354,7 @@
     <span class="doccomment">/// Return the first page of search result repository query</span>
     <span class="doccomment">/// See [github docs](https://developer.github.com/v3/search/#parameters-3)</span>
     <span class="doccomment">/// for query format options</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">IssuesItem</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Q</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">SearchIssuesOptions</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&lt;</span><span class="ident">IssuesItem</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -374,16 +371,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SearchIssuesOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SearchIssuesOptionsBuilder</span> {
-        <span class="ident">SearchIssuesOptionsBuilder</span>::<span class="ident">default</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">SearchIssuesOptionsBuilder</span> {
+        <span class="ident">SearchIssuesOptionsBuilder::default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">form_urlencoded</span>::<span class="ident">Serializer</span>::<span class="ident">new</span>(<span class="ident">String</span>::<span class="ident">new</span>())
+            <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">form_urlencoded::Serializer::new</span>(<span class="ident">String::new</span>())
                 .<span class="ident">extend_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>)
                 .<span class="ident">finish</span>();
             <span class="prelude-val">Some</span>(<span class="ident">encoded</span>)
@@ -396,22 +393,22 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SearchIssuesOptionsBuilder</span>(<span class="ident">SearchIssuesOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">SearchIssuesOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">per_page</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;per_page&quot;</span>, <span class="ident">n</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">IssuesSort</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">IssuesSort</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sort&quot;</span>, <span class="ident">sort</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">order</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">order</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;order&quot;</span>, <span class="ident">direction</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SearchIssuesOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SearchIssuesOptions</span> {
         <span class="ident">SearchIssuesOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -454,9 +451,9 @@
 
 <span class="kw">impl</span> <span class="ident">IssuesItem</span> {
     <span class="doccomment">/// returns a tuple of (repo owner name, repo name) associated with this issue</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_tuple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="ident">String</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repo_tuple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="ident">String</span>) {
         <span class="comment">// split the last two elements off the repo url path</span>
-        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">url</span>::<span class="ident">Url</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">repository_url</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">url::Url::parse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">repository_url</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">path</span>().<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="ident">path</span>.<span class="ident">reverse</span>();
         (<span class="ident">path</span>[<span class="number">1</span>].<span class="ident">to_owned</span>(), <span class="ident">path</span>[<span class="number">0</span>].<span class="ident">to_owned</span>())
@@ -470,5 +467,6 @@
     <span class="kw">pub</span> <span class="ident">diff_url</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">patch_url</span>: <span class="ident">String</span>,
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "hubcaps";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hubcaps" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>

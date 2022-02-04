@@ -1,7 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/pulls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pulls.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;pulls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pulls.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../hubcaps/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -491,21 +489,20 @@
 <span id="488">488</span>
 <span id="489">489</span>
 <span id="490">490</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Pull requests interface</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Pull requests interface</span>
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">url</span>::<span class="ident">form_urlencoded</span>;
+<span class="kw">use</span> <span class="ident">url::form_urlencoded</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">comments</span>::<span class="ident">Comments</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">issues</span>::{<span class="ident">IssueAssignees</span>, <span class="ident">IssueLabels</span>, <span class="ident">Sort</span> <span class="kw">as</span> <span class="ident">IssueSort</span>, <span class="ident">State</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">labels</span>::<span class="ident">Label</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">pull_commits</span>::<span class="ident">PullCommits</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">review_comments</span>::<span class="ident">ReviewComments</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">review_requests</span>::<span class="ident">ReviewRequests</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">users</span>::<span class="ident">User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comments::Comments</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::issues</span>::{<span class="ident">IssueAssignees</span>, <span class="ident">IssueLabels</span>, <span class="ident">Sort</span> <span class="kw">as</span> <span class="ident">IssueSort</span>, <span class="ident">State</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::labels::Label</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pull_commits::PullCommits</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::review_comments::ReviewComments</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::review_requests::ReviewRequests</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::users::User</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Future</span>, <span class="ident">Github</span>, <span class="ident">SortDirection</span>, <span class="ident">Stream</span>};
 
 <span class="doccomment">/// Sort directions for pull requests</span>
@@ -521,21 +518,21 @@
     <span class="ident">LongRunning</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Sort</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Sort</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Sort</span>::<span class="ident">Created</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;created&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">Updated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;updated&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">Popularity</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;popularity&quot;</span>,
-            <span class="ident">Sort</span>::<span class="ident">LongRunning</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;long-running&quot;</span>,
+            <span class="ident">Sort::Created</span> =&gt; <span class="string">&quot;created&quot;</span>,
+            <span class="ident">Sort::Updated</span> =&gt; <span class="string">&quot;updated&quot;</span>,
+            <span class="ident">Sort::Popularity</span> =&gt; <span class="string">&quot;popularity&quot;</span>,
+            <span class="ident">Sort::LongRunning</span> =&gt; <span class="string">&quot;long-running&quot;</span>,
         }
         .<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sort</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sort</span> {
-        <span class="ident">Sort</span>::<span class="ident">Created</span>
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sort</span> {
+        <span class="ident">Sort::Created</span>
     }
 }
 
@@ -549,7 +546,7 @@
 
 <span class="kw">impl</span> <span class="ident">PullRequest</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>, <span class="ident">number</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -562,21 +559,21 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">format!</span>(
             <span class="string">&quot;/repos/{}/{}/pulls/{}{}&quot;</span>,
             <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="self">self</span>.<span class="ident">number</span>, <span class="ident">more</span>
         )
     }
 
     <span class="doccomment">/// Request a pull requests information</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="doccomment">/// Return a reference to labels operations available for this pull request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IssueLabels</span> {
-        <span class="ident">IssueLabels</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IssueLabels</span> {
+        <span class="ident">IssueLabels::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>(),
@@ -585,8 +582,8 @@
     }
 
     <span class="doccomment">/// Return a reference to assignee operations available for this pull request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assignees</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IssueAssignees</span> {
-        <span class="ident">IssueAssignees</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assignees</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IssueAssignees</span> {
+        <span class="ident">IssueAssignees::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>(),
@@ -595,28 +592,28 @@
     }
 
     <span class="doccomment">/// short hand for editing state = open</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">PullEditOptions</span>::<span class="ident">builder</span>().<span class="ident">state</span>(<span class="string">&quot;open&quot;</span>).<span class="ident">build</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">PullEditOptions::builder</span>().<span class="ident">state</span>(<span class="string">&quot;open&quot;</span>).<span class="ident">build</span>())
     }
 
     <span class="doccomment">/// shorthand for editing state = closed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">PullEditOptions</span>::<span class="ident">builder</span>().<span class="ident">state</span>(<span class="string">&quot;closed&quot;</span>).<span class="ident">build</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">PullEditOptions::builder</span>().<span class="ident">state</span>(<span class="string">&quot;closed&quot;</span>).<span class="ident">build</span>())
     }
 
     <span class="doccomment">/// Edit a pull request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pr</span>: <span class="kw-2">&amp;</span><span class="ident">PullEditOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">patch</span>::<span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">pr</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pr</span>: <span class="kw-2">&amp;</span><span class="ident">PullEditOptions</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">patch</span>::<span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json!</span>(<span class="ident">pr</span>))
     }
 
     <span class="doccomment">/// Returns a vector of file diffs associated with this pull</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileDiff</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileDiff</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;/files&quot;</span>))
     }
 
     <span class="doccomment">/// returns issue comments interface</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Comments</span> {
-        <span class="ident">Comments</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Comments</span> {
+        <span class="ident">Comments::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">clone</span>(),
@@ -625,8 +622,8 @@
     }
 
     <span class="doccomment">/// returns review comments interface</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">review_comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReviewComments</span> {
-        <span class="ident">ReviewComments</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">review_comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReviewComments</span> {
+        <span class="ident">ReviewComments::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">clone</span>(),
@@ -634,8 +631,8 @@
         )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">review_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReviewRequests</span> {
-        <span class="ident">ReviewRequests</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">review_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReviewRequests</span> {
+        <span class="ident">ReviewRequests::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">clone</span>(),
@@ -644,8 +641,8 @@
     }
 
     <span class="doccomment">/// returns pull commits interface</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullCommits</span> {
-        <span class="ident">PullCommits</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PullCommits</span> {
+        <span class="ident">PullCommits::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">clone</span>(),
@@ -663,7 +660,7 @@
 
 <span class="kw">impl</span> <span class="ident">PullRequests</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">github</span>: <span class="ident">Github</span>, <span class="ident">owner</span>: <span class="ident">O</span>, <span class="ident">repo</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">O</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -675,13 +672,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;/repos/{}/{}/pulls{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">more</span>)
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">more</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="string">&quot;/repos/{}/{}/pulls{}&quot;</span>, <span class="self">self</span>.<span class="ident">owner</span>, <span class="self">self</span>.<span class="ident">repo</span>, <span class="ident">more</span>)
     }
 
     <span class="doccomment">/// Get a reference to a structure for interfacing with a specific pull request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullRequest</span> {
-        <span class="ident">PullRequest</span>::<span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">number</span>: <span class="ident">u64</span>) -&gt; <span class="ident">PullRequest</span> {
+        <span class="ident">PullRequest::new</span>(
             <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">repo</span>.<span class="ident">as_str</span>(),
@@ -690,13 +687,13 @@
     }
 
     <span class="doccomment">/// Create a new pull request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pr</span>: <span class="kw-2">&amp;</span><span class="ident">PullOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json</span><span class="macro">!</span>(<span class="ident">pr</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pr</span>: <span class="kw-2">&amp;</span><span class="ident">PullOptions</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">github</span>.<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>), <span class="macro">json!</span>(<span class="ident">pr</span>))
     }
 
     <span class="doccomment">/// list pull requests</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">PullListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">PullListOptions</span>) -&gt; <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
         }
@@ -704,8 +701,8 @@
     }
 
     <span class="doccomment">/// provides a stream over all pages of pull requests</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">PullListOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">PullListOptions</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Pull</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="self">self</span>.<span class="ident">path</span>(<span class="string">&quot;&quot;</span>)];
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">serialize</span>() {
             <span class="ident">uri</span>.<span class="ident">push</span>(<span class="ident">query</span>);
         }
@@ -769,7 +766,7 @@
 
 <span class="kw">impl</span> <span class="ident">PullEditOptionsBuilder</span> {
     <span class="doccomment">/// set the title of the pull</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -778,7 +775,7 @@
     }
 
     <span class="doccomment">/// set the body of the pull</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">B</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -787,7 +784,7 @@
     }
 
     <span class="doccomment">/// set the state of the pull</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -796,7 +793,7 @@
     }
 
     <span class="doccomment">/// create a new set of pull edit options</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullEditOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PullEditOptions</span> {
         <span class="ident">PullEditOptions</span> {
             <span class="ident">title</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">title</span>.<span class="ident">clone</span>(),
             <span class="ident">body</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">body</span>.<span class="ident">clone</span>(),
@@ -817,7 +814,7 @@
 
 <span class="kw">impl</span> <span class="ident">PullEditOptions</span> {
     <span class="comment">// todo represent state as enum</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullEditOptions</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">PullEditOptions</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -829,8 +826,8 @@
             <span class="ident">state</span>: <span class="ident">state</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()),
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullEditOptionsBuilder</span> {
-        <span class="ident">PullEditOptionsBuilder</span>::<span class="ident">default</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">PullEditOptionsBuilder</span> {
+        <span class="ident">PullEditOptionsBuilder::default</span>()
     }
 }
 
@@ -844,7 +841,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PullOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">BS</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">title</span>: <span class="ident">T</span>, <span class="ident">head</span>: <span class="ident">H</span>, <span class="ident">base</span>: <span class="ident">BS</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullOptions</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>, <span class="ident">BS</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">title</span>: <span class="ident">T</span>, <span class="ident">head</span>: <span class="ident">H</span>, <span class="ident">base</span>: <span class="ident">BS</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident">PullOptions</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">H</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -882,16 +879,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PullListOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullListOptionsBuilder</span> {
-        <span class="ident">PullListOptionsBuilder</span>::<span class="ident">default</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">PullListOptionsBuilder</span> {
+        <span class="ident">PullListOptionsBuilder::default</span>()
     }
 
     <span class="doccomment">/// serialize options as a string. returns None if no options are defined</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">form_urlencoded</span>::<span class="ident">Serializer</span>::<span class="ident">new</span>(<span class="ident">String</span>::<span class="ident">new</span>())
+            <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">form_urlencoded::Serializer::new</span>(<span class="ident">String::new</span>())
                 .<span class="ident">extend_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>)
                 .<span class="ident">finish</span>();
             <span class="prelude-val">Some</span>(<span class="ident">encoded</span>)
@@ -903,22 +900,22 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullListOptionsBuilder</span>(<span class="ident">PullListOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">PullListOptionsBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">State</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;state&quot;</span>, <span class="ident">state</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">IssueSort</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sort</span>: <span class="ident">IssueSort</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sort&quot;</span>, <span class="ident">sort</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">SortDirection</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;direction&quot;</span>, <span class="ident">direction</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PullListOptions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PullListOptions</span> {
         <span class="ident">PullListOptions</span> {
             <span class="ident">params</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">params</span>.<span class="ident">clone</span>(),
         }
@@ -928,11 +925,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::<span class="ident">Serialize</span>;
+    <span class="kw">use</span> <span class="ident">serde::ser::Serialize</span>;
     <span class="kw">fn</span> <span class="ident">test_encoding</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Serialize</span><span class="op">&gt;</span>(<span class="ident">tests</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">E</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span>) {
         <span class="kw">for</span> <span class="ident">test</span> <span class="kw">in</span> <span class="ident">tests</span> {
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">test</span>;
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">unwrap</span>(), <span class="ident">v</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">unwrap</span>(), <span class="ident">v</span>);
         }
     }
 
@@ -941,13 +938,13 @@
         <span class="kw">fn</span> <span class="ident">test_serialize</span>(<span class="ident">tests</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">PullListOptions</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) {
             <span class="kw">for</span> <span class="ident">test</span> <span class="kw">in</span> <span class="ident">tests</span> {
                 <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">test</span>;
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">k</span>.<span class="ident">serialize</span>(), <span class="ident">v</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">k</span>.<span class="ident">serialize</span>(), <span class="ident">v</span>);
             }
         }
-        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
-            (<span class="ident">PullListOptions</span>::<span class="ident">builder</span>().<span class="ident">build</span>(), <span class="prelude-val">None</span>),
+        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            (<span class="ident">PullListOptions::builder</span>().<span class="ident">build</span>(), <span class="prelude-val">None</span>),
             (
-                <span class="ident">PullListOptions</span>::<span class="ident">builder</span>().<span class="ident">state</span>(<span class="ident">State</span>::<span class="ident">Closed</span>).<span class="ident">build</span>(),
+                <span class="ident">PullListOptions::builder</span>().<span class="ident">state</span>(<span class="ident">State::Closed</span>).<span class="ident">build</span>(),
                 <span class="prelude-val">Some</span>(<span class="string">&quot;state=closed&quot;</span>.<span class="ident">to_owned</span>()),
             ),
         ];
@@ -956,20 +953,20 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">pullreq_edits</span>() {
-        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec!</span>[
             (
-                <span class="ident">PullEditOptions</span>::<span class="ident">builder</span>().<span class="ident">title</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">build</span>(),
+                <span class="ident">PullEditOptions::builder</span>().<span class="ident">title</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">build</span>(),
                 <span class="string">r#&quot;{&quot;title&quot;:&quot;test&quot;}&quot;#</span>,
             ),
             (
-                <span class="ident">PullEditOptions</span>::<span class="ident">builder</span>()
+                <span class="ident">PullEditOptions::builder</span>()
                     .<span class="ident">title</span>(<span class="string">&quot;test&quot;</span>)
                     .<span class="ident">body</span>(<span class="string">&quot;desc&quot;</span>)
                     .<span class="ident">build</span>(),
                 <span class="string">r#&quot;{&quot;title&quot;:&quot;test&quot;,&quot;body&quot;:&quot;desc&quot;}&quot;#</span>,
             ),
             (
-                <span class="ident">PullEditOptions</span>::<span class="ident">builder</span>().<span class="ident">state</span>(<span class="string">&quot;closed&quot;</span>).<span class="ident">build</span>(),
+                <span class="ident">PullEditOptions::builder</span>().<span class="ident">state</span>(<span class="string">&quot;closed&quot;</span>).<span class="ident">build</span>(),
                 <span class="string">r#&quot;{&quot;state&quot;:&quot;closed&quot;}&quot;#</span>,
             ),
         ];
@@ -978,9 +975,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">default_sort</span>() {
-        <span class="kw">let</span> <span class="ident">default</span>: <span class="ident">Sort</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">default</span>, <span class="ident">Sort</span>::<span class="ident">Created</span>)
+        <span class="kw">let</span> <span class="ident">default</span>: <span class="ident">Sort</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">default</span>, <span class="ident">Sort::Created</span>)
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "hubcaps";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hubcaps" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>

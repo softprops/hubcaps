@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AccessToken",""],["App",""],["Installation",""]]});
+initSidebarItems({"struct":[["AccessToken",""],["App",""],["Installation",""],["InstallationTokenGenerator","A caching token “generator” which contains JWT credentials."]]});
