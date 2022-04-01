@@ -79,6 +79,7 @@ pub enum CheckRunState {
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Conclusion {
+    Skipped,
     Success,
     Failure,
     Neutral,
