@@ -1,6 +1,6 @@
 //! Gists interface
 use crate::users::User;
-use crate::{Future, Github};
+use crate::{Future, Github, Stream};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -30,6 +30,14 @@ impl UserGists {
             uri.push(query);
         }
         self.github.get(&uri.join("?"))
+    }
+
+    pub fn iter(&self, options: &GistListOptions) -> Stream<Gist> {
+        let mut uri = vec![format!("/users/{}/gists", self.owner)];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get_stream(&uri.join("?"))
     }
 }
 
@@ -83,6 +91,14 @@ impl Gists {
             uri.push(query);
         }
         self.github.get::<Vec<Gist>>(&uri.join("?"))
+    }
+
+    pub fn iter(&self, options: &GistListOptions) -> Stream<Gist> {
+        let mut uri = vec![self.path("")];
+        if let Some(query) = options.serialize() {
+            uri.push(query);
+        }
+        self.github.get_stream(&uri.join("?"))
     }
 
     pub fn public(&self) -> Future<Vec<Gist>> {
