@@ -184,7 +184,7 @@ pub struct CheckRunUpdateOptions {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct CheckRun {
-    pub id: i32,
+    pub id: u64,
     pub name: String,
     pub head_sha: String,
     pub url: String,
