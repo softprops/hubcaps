@@ -218,5 +218,5 @@ pub struct CheckRun {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct CheckSuite {
-    pub id: u32,
+    pub id: u64,
 }
