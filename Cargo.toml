@@ -20,13 +20,13 @@ pretty_env_logger = "0.4"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 
 [dependencies]
-base64 = "0.13"
+base64 = "0.21"
 data-encoding = "2"
 dirs = { version = "3.0", optional = true }
 futures = { version = "0.3", default-features = false }
 http = "0.2"
 hyperx = "1"
-jsonwebtoken = { version = "7", optional = true }
+jsonwebtoken = { version = "8", optional = true }
 log = "0.4"
 mime = "0.3"
 percent-encoding = "2"
