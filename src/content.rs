@@ -248,14 +248,18 @@ impl<'de> Deserialize<'de> for DecodedContents {
             where
                 E: de::Error,
             {
+                use base64::engine::{Engine, general_purpose::STANDARD};
                 // GitHub wraps the base64 to column 60. The base64 crate
                 // doesn't handle whitespace, nor does it take a reader, so we
                 // must unfortunately allocate again and remove all new lines.
                 let v = v.replace("\n", "");
 
-                let decoded = base64::decode_config(&v, base64::STANDARD).map_err(|e| match e {
+                let decoded = STANDARD.decode(&v).map_err(|e| match e {
                     base64::DecodeError::InvalidLength => {
                         E::invalid_length(v.len(), &"invalid base64 length")
+                    }
+                    base64::DecodeError::InvalidPadding => {
+                        E::invalid_length(v.len(), &"invalid base64 padding")
                     }
                     base64::DecodeError::InvalidByte(offset, byte) => E::invalid_value(
                         de::Unexpected::Bytes(&[byte]),
